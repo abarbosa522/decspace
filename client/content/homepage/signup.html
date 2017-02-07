@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DecSpace - FAQ</title>
+
+    <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
+
+    <!-- CSS Stylesheet -->
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css' />
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/signup.css' />
+
+    <!-- jQuery -->
+    <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
+    <script type = 'text/javascript' src = '../../js/shared/jquery-ui-1.12.0/jquery-ui.js'></script>
+
+    <!-- AngularJS -->
+    <script src = '../../js/shared/angular.min.js'></script>
+
+    <!-- AngularJS Modules -->
+    <script src = '../../js/app.js'></script>
+
+    <!-- AngularJS Controllers -->
+    <script src = '../../js/controllers/homepage/SignUpController.js'></script>
+
+    <!-- Bootstrap -->
+    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css' />
+    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap-theme.min.css' />
+    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.js'></script>
+    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.min.js'></script>
+
+    <!-- Google Web Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600i" rel="stylesheet">
+  </head>
+
+  <body ng-app = 'decspace' ng-controller = 'SignUpController'>
+
+    <!-- Navigation Bar -->
+    <nav class = 'navbar navbar-custom navbar-fixed-top'>
+      <div class = 'container'>
+        <!-- Title -->
+        <div class = 'navbar-header'>
+          <a class = 'navbar-brand' href = '../../index.html'>DecSpace</a>
+        </div>
+
+        <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
+        <ul class = 'nav navbar-nav navbar-right'>
+          <li><a href = 'about.html'>About</a></li>
+          <li><a href = 'faq.html'>FAQ</a></li>
+          <li><a href = 'contactus.html'>Contact Us</a></li>
+
+          <button type = 'button' class = 'btn btn-default navbar-btn active' ng-click = 'toSignUp()'>
+            <span class = 'glyphicon glyphicon-user'></span>
+            Sign Up
+          </button>
+
+          <button type = 'button' class = 'btn btn-default navbar-btn btn-custom' ng-click = 'toLogIn()'>
+            <span class = 'glyphicon glyphicon-log-in'></span>
+            Log In
+          </button>
+        </ul>
+
+      </div>
+    </nav>
+
+    <div class = 'container'>
+
+      <div id = 'main-content'>
+        <p class = 'header-1'>Sign Up</p>
+
+        <br>
+
+        <form class = 'form-horizontal'>
+          <!-- Input Email -->
+          <div class = 'form-group'>
+            <label for = 'input-name' class = 'col-sm-4 control-label'>
+              <span class = 'glyphicon glyphicon-envelope'></span>
+            </label>
+            <div id = 'input-email-div' class = 'col-sm-4'>
+              <input id = 'input-email' type = 'email' class = 'form-control' placeholder = 'Email Address' ng-model = 'signup.email'>
+            </div>
+            <div id = 'error-help' class = 'col-sm-4'>
+              <span ng-if = 'showErrorHelp' ng-cloak>Email already in use.</span>
+            </div>
+          </div>
+
+          <!-- Input Password -->
+          <div class = 'form-group'>
+            <label for = 'input-password' class = 'col-sm-4 control-label'>
+              <span class = 'glyphicon glyphicon-lock'></span>
+            </label>
+
+            <div id = 'input-password-div' class = 'col-sm-4 input-group'>
+              <input id = 'input-password' type = '{{inputType}}' class = 'form-control' placeholder = 'Password' ng-model = 'signup.password'>
+
+              <span class = 'input-group-btn'>
+                <button class = 'btn btn-default' type = 'button' ng-click = 'showPassword()'>
+                  <span id = 'eye-image' class = 'glyphicon glyphicon-eye-open'></span>
+                </button>
+              </span>
+            </div>
+          </div>
+
+          <button class = 'btn btn-primary' ng-click = 'signUp()'>Register</button>
+        </form>
+
+        <br>
+
+        <div class = 'alert alert-success' role = 'alert' ng-if = 'showSuccessAlert' ng-cloak>
+          Registering <strong>successfull!</strong>
+        </div>
+
+      </div>
+    </div>
+  </body>
+</html>

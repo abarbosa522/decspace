@@ -16,7 +16,7 @@ app.post('/contact', function(req, res) {
     from: req.body.name + ' <postmaster@sandboxdfdb982a78c3439f9feda9854fcd8afc.mailgun.org>',
     to: 'decspace2017@gmail.com',
     subject: 'DecSpace Support',
-    text: req.body.message + '\nReply To: ' + req.body.address + '\n'
+    text: req.body.message + '\nReply To: ' + req.body.email + '\n'
   };
 
   mailgun.messages().send(data, function (error, body) {

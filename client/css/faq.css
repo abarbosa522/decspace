@@ -1,3 +1,12 @@
 #faq-div {
   margin-top: 5%;
 }
+
+.title-set-questions {
+  font-style: italic;
+  font-weight: 600;
+}
+
+.title-question {
+  font-style: italic;
+}

@@ -10,11 +10,15 @@ app.controller('ContactUsController', ['$scope', '$http', '$window', function($s
   }
 
   $scope.sendEmail = function() {
-    $http.post('/contact', $scope.email).success(function(response) {
-      if(response.message == message_template)
+    $http.post('/contact', $scope.contact).success(function(response) {
+      if(response.message == message_template) {
         $scope.showSuccessAlert = true;
-      else
+        $scope.showErrorAlert = false;
+      }
+      else {
+        $scope.showSuccessAlert = false;
         $scope.showErrorAlert = true;
+      }
     });
   }
 

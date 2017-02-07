@@ -25,10 +25,12 @@ app.controller('SignUpController', ['$scope', '$window', '$http', function($scop
       if(email_exists) {
         //add error class to input field
         angular.element(document.querySelector('#input-email-div')).addClass('has-error has-feedback');
+        $scope.showErrorHelp = true;
       }
       else {
         //remove error classes - just in case an existing email has been inserted
         angular.element(document.querySelector('#input-email-div')).removeClass('has-error has-feedback');
+        $scope.showErrorHelp = false;
 
         //create new account
         $http.post('/accounts', $scope.signup).success(function(response) {
@@ -39,10 +41,19 @@ app.controller('SignUpController', ['$scope', '$window', '$http', function($scop
   }
 
   $scope.showPassword = function() {
-    if($scope.inputType == 'password')
+    if($scope.inputType == 'password') {
       $scope.inputType = 'text';
-    else
-      $scope.inputType = 'password';
-  }
 
+      //change eye image: open to closed
+      angular.element(document.querySelector('#eye-image')).removeClass('glyphicon-eye-open');
+      angular.element(document.querySelector('#eye-image')).addClass('glyphicon-eye-close');
+    }
+    else {
+      $scope.inputType = 'password';
+
+      //change eye image: closed to open
+      angular.element(document.querySelector('#eye-image')).removeClass('glyphicon-eye-close');
+      angular.element(document.querySelector('#eye-image')).addClass('glyphicon-eye-open');
+    }
+  }
 }]);
