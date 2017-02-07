@@ -2,25 +2,55 @@ var express = require('express');
 var app = express();
 var mongojs = require('mongojs');
 var bodyParser = require('body-parser');
+var nodemailer = require('nodemailer');
 
 app.use(express.static(__dirname + "/client"));
 app.use(bodyParser.json());
 
-//mailgun connection and retrieval
-var api_key = 'key-17f1a48a3730fda7e3e6d07514e08f75';
-var domain = 'sandboxdfdb982a78c3439f9feda9854fcd8afc.mailgun.org';
-var mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});
+//transporter of emails
+var transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+		user: 'decspace2017@gmail.com', // Your email id
+        pass: 'decspace' // Your password
+	}
+});
 
-app.post('/contact', function(req, res) {
-  var data = {
-    from: req.body.name + ' <postmaster@sandboxdfdb982a78c3439f9feda9854fcd8afc.mailgun.org>',
-    to: 'decspace2017@gmail.com',
-    subject: 'DecSpace Support',
-    text: req.body.message + '\nReply To: ' + req.body.email + '\n'
+//send 'contact us' email to support team
+app.post('/contactus', function(req, res) {
+  var mailOptions = {
+    from: 'decspace2017@gmail.com', // sender address
+    to: 'decspace2017@gmail.com', // list of receivers
+    subject: 'DecSpace Support', // Subject line
+    text: req.body.message + '\nReply to ' + req.body.name + '<' + req.body.email + '>'
   };
 
-  mailgun.messages().send(data, function (error, body) {
-    res.json(body);
+  transporter.sendMail(mailOptions, function(error, info) {
+    if(error) {
+      res.json(error);
+    }
+    else {
+      res.json('Message sent!');
+    }
+  });
+});
+
+//send password to user
+app.post('/password', function(req, res) {
+  var mailOptions = {
+    from: 'decspace2017@gmail.com', // sender address
+    to: req.body.email, // list of receivers
+    subject: 'Password Recovery', // Subject line
+    text: 'Your password is ' + req.body.password
+  };
+
+  transporter.sendMail(mailOptions, function(error, info) {
+    if(error) {
+      res.json(error);
+    }
+    else {
+      res.json('Message sent!');
+    }
   });
 });
 

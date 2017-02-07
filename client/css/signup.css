@@ -6,3 +6,8 @@
 #error-help {
   text-align: left;
 }
+
+#new-user {
+  display: block;
+  margin-top: 1%;
+}

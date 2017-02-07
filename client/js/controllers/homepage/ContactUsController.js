@@ -1,5 +1,5 @@
 app.controller('ContactUsController', ['$scope', '$http', '$window', function($scope, $http, $window) {
-  var message_template = 'Queued. Thank you.';
+  var message_template = 'Message sent!';
 
   $scope.toSignUp = function() {
     $window.location.href = 'signup.html';
@@ -10,8 +10,8 @@ app.controller('ContactUsController', ['$scope', '$http', '$window', function($s
   }
 
   $scope.sendEmail = function() {
-    $http.post('/contact', $scope.contact).success(function(response) {
-      if(response.message == message_template) {
+    $http.post('/contactus', $scope.contact).success(function(response) {
+      if(response == message_template) {
         $scope.showSuccessAlert = true;
         $scope.showErrorAlert = false;
       }
