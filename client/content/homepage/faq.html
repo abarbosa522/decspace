@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DecSpace - FAQ</title>
+
+    <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
+
+    <!-- CSS Stylesheet -->
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css' />
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/faq.css' />
+
+    <!-- jQuery -->
+    <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
+    <script type = 'text/javascript' src = '../../js/shared/jquery-ui-1.12.0/jquery-ui.js'></script>
+
+    <!-- AngularJS -->
+    <script src = '../../js/shared/angular.min.js'></script>
+
+    <!-- AngularJS Modules -->
+    <script src = '../../js/app.js'></script>
+
+    <!-- AngularJS Controllers -->
+    <script src = '../../js/controllers/homepage/FAQController.js'></script>
+
+    <!-- Bootstrap -->
+    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css' />
+    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap-theme.min.css' />
+    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.js'></script>
+    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.min.js'></script>
+
+    <!-- Google Web Fonts -->
+    <link href = 'https://fonts.googleapis.com/css?family=Open+Sans:400,600i' rel = 'stylesheet'>
+  </head>
+
+  <body ng-app = 'decspace' ng-controller = 'FAQController'>
+
+    <!-- Navigation Bar -->
+    <nav class = 'navbar navbar-custom navbar-fixed-top'>
+      <div class = 'container'>
+        <!-- Title -->
+        <div class = 'navbar-header'>
+          <a class = 'navbar-brand' href = '../../index.html'>DecSpace</a>
+        </div>
+
+        <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
+        <ul class = 'nav navbar-nav navbar-right'>
+          <li><a href = 'about.html'>About</a></li>
+          <li class = 'active'><a href = 'faq.html'>FAQ</a></li>
+          <li><a href = 'contactus.html'>Contact Us</a></li>
+
+          <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'toSignUp()'>
+            <span class = 'glyphicon glyphicon-user'></span>
+            Sign Up
+          </button>
+
+          <button type = 'button' class = 'btn btn-default navbar-btn btn-custom' ng-click = 'toLogIn()'>
+            <span class = 'glyphicon glyphicon-log-in'></span>
+            Log In
+          </button>
+        </ul>
+
+      </div>
+    </nav>
+
+    <div class = 'container'>
+
+      <div id = 'main-content'>
+        <p class = 'header-1'>FAQ</p>
+        <p style = 'font-style: italic'>Frequently Asked Questions</p>
+
+        <!-- First set of questions -->
+        <div id = 'faq-div'>
+          <div class = 'col-sm-6'>
+            <p>New to DecSpace?</p>
+          </div>
+
+          <div class = 'col-sm-6 list-group panel'>
+            <!-- Question 1 -->
+            <a href = '#answer1' class = 'list-group-item' data-toggle = 'collapse'>What is DecSpace?</a>
+            <div id = 'answer1' class = 'collapse'>
+              <a href = '' class = 'list-group-item'>DecSpace is a web application ...</a>
+            </div>
+
+            <!-- Question 2 -->
+            <a href = '#answer2' class = 'list-group-item' data-toggle = 'collapse'>What is MCDA?</a>
+            <div id = 'answer2' class = 'collapse'>
+              <a href = '' class = 'list-group-item'>MCDA is ...</a>
+            </div>
+
+            <!-- Question 3 -->
+            <a href = '#answer3' class = 'list-group-item' data-toggle = 'collapse'>What use do MCDA methods have?</a>
+            <div id = 'answer3' class = 'collapse'>
+              <a href = '' class = 'list-group-item'>MCDA methods ...</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Second set of questions -->
+        <div>
+          <div class = 'col-sm-6'>
+            <p>Project Management</p>
+          </div>
+
+          <div class = 'col-sm-6 list-group panel'>
+            <!-- Question 4 -->
+            <a href = '#answer4' class = 'list-group-item' data-toggle = 'collapse'>How do I create a new project?</a>
+            <div id = 'answer4' class = 'collapse'>
+              <a href = '' class = 'list-group-item'>After loging in ...</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
