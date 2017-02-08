@@ -1,13 +1,62 @@
 var express = require('express');
 var app = express();
-var mongojs = require('mongojs');
 var bodyParser = require('body-parser');
-var nodemailer = require('nodemailer');
 
 app.use(express.static(__dirname + "/client"));
 app.use(bodyParser.json());
 
-//transporter of emails
+//SESSION MANAGEMENT
+var session = require('client-sessions');
+
+//session handler
+app.use(session({
+  cookieName: 'session',
+  secret: 'random_string_goes_here',
+  duration: 30 * 60 * 1000,
+  activeDuration: 5 * 60 * 1000
+}));
+
+//log in
+app.post('/login', getAccounts, function(req, res) {
+  var correct_log_in = false;
+  var user;
+  //result retrieved from the database with the usernames and corresponding passwords
+  var accounts = req.body.accounts;
+
+  //check if the email and password match to the information in the database
+  for(account in accounts) {
+    if(accounts[account]['email'] == req.body.email && accounts[account]['password'] == req.body.password) {
+      correct_log_in = true;
+      user = accounts[account]['email'];
+      break;
+    }
+  }
+
+  if(correct_log_in) {
+    req.session.user = user;
+    delete req.body.accounts;
+    res.send('Successful Login');
+  }
+  else {
+    res.send('Invalid Login');
+  }
+});
+
+//request log in
+app.get('/requestlogin', function(req, res) {
+  res.send(req.session);
+});
+
+//log out
+app.get('/logout', function(req, res) {
+  req.session.reset();
+  res.send(req.session);
+});
+
+//EMAIL HANDLING
+var nodemailer = require('nodemailer');
+
+//email transporter
 var transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
@@ -54,7 +103,8 @@ app.post('/password', function(req, res) {
   });
 });
 
-//database connections
+//DATABASE CONNECTIONS
+var mongojs = require('mongojs');
 var username = 'abarbosa';
 var password = 'andrebarbosa';
 
@@ -68,6 +118,13 @@ app.get('/accounts', function(req, res) {
     res.json(doc);
   });
 });
+
+function getAccounts(req, res, next) {
+  db1.accounts.find().sort( {name: 1}, function (err, doc) {
+    req.body.accounts = doc;
+    next();
+  });
+}
 
 //insert new account
 app.post('/accounts', function(req, res) {

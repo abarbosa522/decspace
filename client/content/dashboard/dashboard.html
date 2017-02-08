@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>DecSpace - About</title>
+    <title>DecSpace - Log In</title>
 
     <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
 
     <!-- CSS Stylesheet -->
     <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css' />
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/dashboard.css' />
 
     <!-- jQuery -->
     <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
@@ -19,7 +20,7 @@
     <script src = '../../js/app.js'></script>
 
     <!-- AngularJS Controllers -->
-    <script src = '../../js/controllers/homepage/AboutController.js'></script>
+    <script src = '../../js/controllers/dashboard/DashboardController.js'></script>
 
     <!-- Bootstrap -->
     <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css' />
@@ -28,40 +29,29 @@
     <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.min.js'></script>
 
     <!-- Google Web Fonts -->
-    <link href = 'https://fonts.googleapis.com/css?family=Open+Sans:400,600i' rel = 'stylesheet'>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600i" rel="stylesheet">
   </head>
 
-  <body ng-app = 'decspace' ng-controller = 'AboutController'>
+  <body ng-app = 'decspace' ng-controller = 'DashboardController'>
 
     <!-- Navigation Bar -->
     <nav class = 'navbar navbar-custom navbar-fixed-top'>
       <div class = 'container'>
         <!-- Title -->
         <div class = 'navbar-header'>
-          <a class = 'navbar-brand' href = '../../index.html'>DecSpace</a>
+          <a class = 'navbar-brand' href = 'dashboard.html'>DecSpace</a>
         </div>
 
         <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
         <ul class = 'nav navbar-nav navbar-right'>
-          <li class = 'active'><a href = 'about.html'>About</a></li>
-          <li><a href = 'faq.html'>FAQ</a></li>
-          <li><a href = 'contactus.html'>Contact Us</a></li>
-
           <li>
-            <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'toSignUp()'>
-              <span class = 'glyphicon glyphicon-user'></span>
-              Sign Up
-            </button>
+            <p class = 'navbar-text'>Welcome, {{username}}</p>
           </li>
 
           <li>
-            <p class = 'navbar-text'>or</p>
-          </li>
-          
-          <li>
-            <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'toLogIn()'>
-              <span class = 'glyphicon glyphicon-log-in'></span>
-              Log In
+            <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'logOut()'>
+              <span class = 'glyphicon glyphicon-log-out'></span>
+              Log Out
             </button>
           </li>
         </ul>
@@ -69,18 +59,9 @@
       </div>
     </nav>
 
+    <br><br><br>
     <div class = 'container'>
-
-      <div id = 'main-content'>
-        <p class = 'header-1'>About</p>
-
-        <br>
-        <br>
-
-        <p>DecSpace is a web application that aims to facilitate the use and creation of MCDA methods, regardless of the user's background or experience with MCDA.</p>
-      </div>
-
+      <button type="button" class="btn btn-danger btn-circle"><i class="glyphicon glyphicon-heart"></i></button>
     </div>
   </body>
-
 </html>

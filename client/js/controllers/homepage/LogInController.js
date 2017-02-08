@@ -1,5 +1,7 @@
 app.controller('LogInController', ['$scope', '$window', '$http', function($scope, $window, $http) {
   $scope.inputType = 'password';
+  var successfulString = 'Successful Login';
+  var unsuccessfulString = 'Invalid Login';
 
   $scope.toSignUp = function() {
     $window.location.href = 'signup.html';
@@ -10,23 +12,16 @@ app.controller('LogInController', ['$scope', '$window', '$http', function($scope
   }
 
   $scope.logIn = function() {
-    $http.get('/accounts').success(function(response) {
-      var correct_log_in = false;
+    $http.post('/login', $scope.login).success(function(res) {
 
-      for(account in response) {
-        if(response[account]['email'] == $scope.login.email && response[account]['password'] == $scope.login.password) {
-          correct_log_in = true;
-          break;
-        }
-      }
-
-      if(correct_log_in) {
-        $window.location.href = '../dashboard/dashboard.html';
+      if(res == successfulString) {
         $scope.showErrorAlert = false;
+        $window.location.href = '../dashboard/dashboard.html';
       }
-      else {
+      else if(res == unsuccessfulString) {
         $scope.showErrorAlert = true;
       }
+      
     });
   }
 
