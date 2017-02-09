@@ -22,7 +22,7 @@ app.post('/login', getAccounts, function(req, res) {
   var user;
   //result retrieved from the database with the usernames and corresponding passwords
   var accounts = req.body.accounts;
-
+  console.log(accounts);
   //check if the email and password match to the information in the database
   for(account in accounts) {
     if(accounts[account]['email'] == req.body.email && accounts[account]['password'] == req.body.password) {
@@ -140,6 +140,40 @@ app.delete('/accounts/:id', function(req, res) {
     res.json(doc);
   });
 });
+
+//projects
+var db2 = mongojs('mongodb://' + username + ':' + password + '@ds157247.mlab.com:57247/decspace_users', ['projects']);
+
+//db2 functions - projects
+//get all projects from db
+app.get('/projects', function(req, res) {
+  db2.projects.find().sort( {name: 1}, function (err, doc) {
+    res.json(doc);
+  });
+});
+
+function getProjects(req, res, next) {
+  db2.projects.find().sort( {name: 1}, function (err, doc) {
+    req.body.projects = doc;
+    next();
+  });
+}
+
+//insert new project
+app.post('/projects', function(req, res) {
+  db2.projects.insert(req.body, function(err, doc) {
+    res.json(doc);
+  });
+});
+
+//delete project
+app.delete('/projects/:id', function(req, res) {
+  var id = req.params.id;
+  db2.projects.remove({_id: mongojs.ObjectId(id)}, function(err, doc) {
+    res.json(doc);
+  });
+});
+
 
 app.listen(8082);
 console.log("Server running on port 8082");

@@ -11,5 +11,9 @@ app.controller('DashboardController', ['$scope', '$window', '$http', function($s
     });
   }
 
+  $scope.toProjectManagement = function() {
+    $window.location.href = '../project-management/project-management.html';
+  }
+
   requestLogIn();
 }]);

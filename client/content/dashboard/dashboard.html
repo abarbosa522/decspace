@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>DecSpace - Log In</title>
+    <title>DecSpace - Dashboard</title>
 
     <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
 
@@ -59,9 +59,50 @@
       </div>
     </nav>
 
-    <br><br><br>
     <div class = 'container'>
-      <button type="button" class="btn btn-danger btn-circle"><i class="glyphicon glyphicon-heart"></i></button>
+
+      <div id = 'main-content'>
+
+        <p class = 'header-1'>Dashboard</p>
+
+        <br><br>
+
+        <div class = 'row'>
+          <div class = 'col-md-4'>
+            <button type = 'button' class = 'btn btn-default btn-lg' ng-click = 'toProjectManagement()'>
+              <span class = 'glyphicon glyphicon-th-list'></span>
+            </button>
+          </div>
+
+          <div class = 'col-md-4'>
+            <button type = 'button' class = 'btn btn-default btn-lg'>
+              <span class = 'glyphicon glyphicon-briefcase'></span>
+            </button>
+          </div>
+
+          <div class = 'col-md-4'>
+            <button type = 'button' class = 'btn btn-default btn-lg'>
+              <span class = 'glyphicon glyphicon-cog'></span>
+            </button>
+          </div>
+        </div>
+
+        <div class = 'row'>
+          <div class = 'col-md-4'>
+            <span>Project Management</span>
+          </div>
+
+          <div class = 'col-md-4'>
+            <span>Method Creation</span>
+          </div>
+
+          <div class = 'col-md-4'>
+            <span>Settings</span>
+          </div>
+        </div>
+
+      </div>
+
     </div>
   </body>
 </html>
