@@ -70,41 +70,89 @@
         <!-- Previously created methods -->
         <div class = 'row' ng-repeat = 'project in projects'>
 
-          <div class = 'col-md-3'>
-            {{project.name}}
+          <div id = 'proj-list-{{project.id}}'>
+            <div class = 'col-md-3'>
+              {{project.name}}
+            </div>
+
+            <div class = 'col-md-3'>
+              {{project.method}}
+            </div>
+
+            <div class = 'col-md-3'>
+              Creation Date: {{project.creation_date}}
+              <br>
+              Last Update: {{project.last_update}}
+            </div>
+
+            <div class = 'col-md-3'>
+              <button type = 'button' class = 'btn btn-primary btn-open'>
+                <span class = 'glyphicon glyphicon-folder-open' ng-click = 'openProject()'></span>
+              </button>
+
+              <button type = 'button' class = 'btn btn-warning btn-edit' ng-click = 'editProject(project)'>
+                <span class = 'glyphicon glyphicon-edit'></span>
+              </button>
+
+              <button type = 'button' class = 'btn btn-info btn-duplicate' ng-click = 'duplicateProject(project)'>
+                <span class = 'glyphicon glyphicon-duplicate'></span>
+              </button>
+
+              <button type = 'button' class = 'btn btn-danger btn-delete' ng-click = 'deleteProject(project)'>
+                <span class = 'glyphicon glyphicon-trash'></span>
+              </button>
+            </div>
           </div>
 
-          <div class = 'col-md-3'>
-            {{project.method}}
+          <div id = 'proj-edit-{{project.id}}' class = 'no-display'>
+
+            <div class = 'col-md-3'>
+              <input type = 'text' class = 'form-control' ng-model = 'project.name'>
+            </div>
+
+            <div class = 'col-md-3'>
+              {{project.method}}
+            </div>
+
+            <div class = 'col-md-3'>
+              Creation Date: {{project.creation_date}}
+              <br>
+              Last Update: {{project.last_update}}
+            </div>
+
+            <div class = 'col-md-3'>
+              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmEdit(project)'>Confirm</button>
+              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelEdit(project)'>Cancel</button>
+            </div>
           </div>
 
-          <div class = 'col-md-3'>
-            Creation Date: {{project.creation_date}}
-            <br>
-            Last Update: {{project.last_update}}
+          <div id = 'proj-delete-{{project.id}}' class = 'no-display'>
+
+            <div class = 'col-md-3'>
+              {{project.name}}
+            </div>
+
+            <div class = 'col-md-3'>
+              {{project.method}}
+            </div>
+
+            <div class = 'col-md-3'>
+              Creation Date: {{project.creation_date}}
+              <br>
+              Last Update: {{project.last_update}}
+            </div>
+
+            <div class = 'col-md-3'>
+              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDelete(project)'>Confirm</button>
+              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDelete(project)'>Cancel</button>
+            </div>
           </div>
 
-          <div class = 'col-md-3'>
-            <button type = 'button' class = 'btn btn-default'>
-              <span class = 'glyphicon glyphicon-folder-open'></span>
-            </button>
-
-            <button type = 'button' class = 'btn btn-default'>
-              <span class = 'glyphicon glyphicon-edit'></span>
-            </button>
-
-            <button type = 'button' class = 'btn btn-default'>
-              <span class = 'glyphicon glyphicon-duplicate'></span>
-            </button>
-
-            <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteProject(project)'>
-              <span class = 'glyphicon glyphicon-trash'></span>
-            </button>
-          </div>
         </div>
 
         <br><br>
 
+        <!-- Form for adding a new project -->
         <div class = 'row'>
 
           <form class = 'form-inline'>
