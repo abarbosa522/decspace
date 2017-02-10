@@ -22,7 +22,7 @@ app.post('/login', getAccounts, function(req, res) {
   var user;
   //result retrieved from the database with the usernames and corresponding passwords
   var accounts = req.body.accounts;
-  console.log(accounts);
+  
   //check if the email and password match to the information in the database
   for(account in accounts) {
     if(accounts[account]['email'] == req.body.email && accounts[account]['password'] == req.body.password) {
