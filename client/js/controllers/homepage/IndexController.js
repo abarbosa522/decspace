@@ -1,4 +1,4 @@
-app.controller('IndexController', ['$scope', '$window', function($scope, $window) {
+app.controller('IndexController', function($scope, $window) {
 
   $scope.toSignUp = function() {
     $window.location.href = 'content/homepage/signup.html';
@@ -8,4 +8,4 @@ app.controller('IndexController', ['$scope', '$window', function($scope, $window
     $window.location.href = 'content/homepage/login.html';
   }
 
-}]);
+});

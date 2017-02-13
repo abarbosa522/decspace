@@ -1,4 +1,4 @@
-app.controller('LogInController', ['$scope', '$window', '$http', function($scope, $window, $http) {
+app.controller('LogInController', function($scope, $window, $http) {
   $scope.inputType = 'password';
   var successfulString = 'Successful Login';
   var unsuccessfulString = 'Invalid Login';
@@ -13,7 +13,7 @@ app.controller('LogInController', ['$scope', '$window', '$http', function($scope
 
   $scope.logIn = function() {
     $http.post('/login', $scope.login).success(function(res) {
-      
+
       if(res == successfulString) {
         $scope.showErrorAlert = false;
         $window.location.href = '../dashboard/dashboard.html';
@@ -41,4 +41,4 @@ app.controller('LogInController', ['$scope', '$window', '$http', function($scope
       angular.element(document.querySelector('#eye-image')).addClass('glyphicon-eye-open');
     }
   }
-}]);
+});

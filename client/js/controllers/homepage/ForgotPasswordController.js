@@ -1,4 +1,4 @@
-app.controller('ForgotPasswordController', ['$scope', '$window', '$http', function($scope, $window, $http) {
+app.controller('ForgotPasswordController', function($scope, $window, $http) {
   var message_template = 'Message sent!';
 
   $scope.toSignUp = function() {
@@ -42,4 +42,4 @@ app.controller('ForgotPasswordController', ['$scope', '$window', '$http', functi
       }
     });
   }
-}]);
+});

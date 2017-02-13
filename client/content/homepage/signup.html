@@ -70,54 +70,52 @@
       </div>
     </nav>
 
-    <div class = 'container'>
+    <div id = 'main-content' class = 'container'>
 
-      <div id = 'main-content'>
-        <p class = 'header-1'>Sign Up</p>
+      <p class = 'header-1'>Sign Up</p>
 
-        <br>
+      <br>
 
-        <form class = 'form-horizontal'>
-          <!-- Input Email -->
-          <div class = 'form-group'>
-            <label for = 'input-name' class = 'col-sm-4 control-label'>
-              <span class = 'glyphicon glyphicon-envelope'></span>
-            </label>
-            <div id = 'input-email-div' class = 'col-sm-4'>
-              <input id = 'input-email' type = 'email' class = 'form-control' placeholder = 'Email Address' ng-model = 'signup.email'>
-            </div>
-            <div id = 'error-help' class = 'col-sm-4'>
-              <span ng-if = 'showErrorHelp' ng-cloak>Email already in use.</span>
-            </div>
+      <form class = 'form-horizontal'>
+        <!-- Input Email -->
+        <div class = 'form-group'>
+          <label for = 'input-name' class = 'col-sm-4 control-label'>
+            <span class = 'glyphicon glyphicon-envelope'></span>
+          </label>
+          <div id = 'input-email-div' class = 'col-sm-4'>
+            <input id = 'input-email' type = 'email' class = 'form-control' placeholder = 'Email Address' ng-model = 'signup.email'>
           </div>
-
-          <!-- Input Password -->
-          <div class = 'form-group'>
-            <label for = 'input-password' class = 'col-sm-4 control-label'>
-              <span class = 'glyphicon glyphicon-lock'></span>
-            </label>
-
-            <div id = 'input-password-div' class = 'col-sm-4 input-group'>
-              <input id = 'input-password' type = '{{inputType}}' class = 'form-control' placeholder = 'Password' ng-model = 'signup.password'>
-
-              <span class = 'input-group-btn'>
-                <button class = 'btn btn-default' type = 'button' ng-click = 'showPassword()'>
-                  <span id = 'eye-image' class = 'glyphicon glyphicon-eye-open'></span>
-                </button>
-              </span>
-            </div>
+          <div id = 'error-help' class = 'col-sm-4'>
+            <span ng-if = 'showErrorHelp' ng-cloak>Email already in use.</span>
           </div>
-
-          <button class = 'btn btn-primary' ng-click = 'signUp()'>Register</button>
-        </form>
-
-        <br>
-
-        <div class = 'alert alert-success' role = 'alert' ng-if = 'showSuccessAlert' ng-cloak>
-          Registering <strong>successful!</strong>
         </div>
 
+        <!-- Input Password -->
+        <div class = 'form-group'>
+          <label for = 'input-password' class = 'col-sm-4 control-label'>
+            <span class = 'glyphicon glyphicon-lock'></span>
+          </label>
+
+          <div id = 'input-password-div' class = 'col-sm-4 input-group'>
+            <input id = 'input-password' type = '{{inputType}}' class = 'form-control' placeholder = 'Password' ng-model = 'signup.password'>
+
+            <span class = 'input-group-btn'>
+              <button class = 'btn btn-default' type = 'button' ng-click = 'showPassword()'>
+                <span id = 'eye-image' class = 'glyphicon glyphicon-eye-open'></span>
+              </button>
+            </span>
+          </div>
+        </div>
+
+        <button class = 'btn btn-primary' ng-click = 'signUp()'>Register</button>
+      </form>
+
+      <br>
+
+      <div class = 'alert alert-success' role = 'alert' ng-if = 'showSuccessAlert' ng-cloak>
+        Registering <strong>successful!</strong>
       </div>
+
     </div>
   </body>
 </html>

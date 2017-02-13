@@ -29,7 +29,7 @@
     <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.min.js'></script>
 
     <!-- Google Web Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600i" rel="stylesheet">
+    <link href = 'https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600i' rel = 'stylesheet'>
   </head>
 
   <body ng-app = 'decspace' ng-controller = 'FAQController'>
@@ -70,51 +70,49 @@
       </div>
     </nav>
 
-    <div class = 'container'>
+    <div id = 'main-content' class = 'container'>
 
-      <div id = 'main-content'>
-        <p class = 'header-1'>FAQ</p>
-        <p style = 'font-style: italic'>Frequently Asked Questions</p>
+      <p class = 'header-1'>FAQ</p>
+      <p style = 'font-style: italic'>Frequently Asked Questions</p>
 
-        <!-- First set of questions -->
-        <div id = 'faq-div'>
-          <div class = 'col-sm-6 title-set-questions'>
-            <p>New to DecSpace?</p>
-          </div>
-
-          <div class = 'col-sm-6 list-group panel'>
-            <!-- Question 1 -->
-            <a href = '#answer1' class = 'list-group-item list-group-item-info title-question' data-toggle = 'collapse'>What is DecSpace?</a>
-            <div id = 'answer1' class = 'collapse'>
-              <a href = '' class = 'list-group-item'>DecSpace is a web application ...</a>
-            </div>
-
-            <!-- Question 2 -->
-            <a href = '#answer2' class = 'list-group-item list-group-item-info title-question' data-toggle = 'collapse'>What is MCDA?</a>
-            <div id = 'answer2' class = 'collapse'>
-              <a href = '' class = 'list-group-item'>MCDA is ...</a>
-            </div>
-
-            <!-- Question 3 -->
-            <a href = '#answer3' class = 'list-group-item list-group-item-info title-question' data-toggle = 'collapse'>What use do MCDA methods have?</a>
-            <div id = 'answer3' class = 'collapse'>
-              <a href = '' class = 'list-group-item'>MCDA methods ...</a>
-            </div>
-          </div>
+      <!-- First set of questions -->
+      <div id = 'faq-div'>
+        <div class = 'col-sm-6 title-set-questions'>
+          <p>New to DecSpace?</p>
         </div>
 
-        <!-- Second set of questions -->
-        <div>
-          <div class = 'col-sm-6 title-set-questions'>
-            <p>Project Management</p>
+        <div class = 'col-sm-6 list-group panel'>
+          <!-- Question 1 -->
+          <a href = '#answer1' class = 'list-group-item list-group-item-info title-question' data-toggle = 'collapse'>What is DecSpace?</a>
+          <div id = 'answer1' class = 'collapse'>
+            <a href = '' class = 'list-group-item'>DecSpace is a web application ...</a>
           </div>
 
-          <div class = 'col-sm-6 list-group panel'>
-            <!-- Question 4 -->
-            <a href = '#answer4' class = 'list-group-item list-group-item-info title-question' data-toggle = 'collapse'>How do I create a new project?</a>
-            <div id = 'answer4' class = 'collapse'>
-              <a href = '' class = 'list-group-item'>After loging in ...</a>
-            </div>
+          <!-- Question 2 -->
+          <a href = '#answer2' class = 'list-group-item list-group-item-info title-question' data-toggle = 'collapse'>What is MCDA?</a>
+          <div id = 'answer2' class = 'collapse'>
+            <a href = '' class = 'list-group-item'>MCDA is ...</a>
+          </div>
+
+          <!-- Question 3 -->
+          <a href = '#answer3' class = 'list-group-item list-group-item-info title-question' data-toggle = 'collapse'>What use do MCDA methods have?</a>
+          <div id = 'answer3' class = 'collapse'>
+            <a href = '' class = 'list-group-item'>MCDA methods ...</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Second set of questions -->
+      <div>
+        <div class = 'col-sm-6 title-set-questions'>
+          <p>Project Management</p>
+        </div>
+
+        <div class = 'col-sm-6 list-group panel'>
+          <!-- Question 4 -->
+          <a href = '#answer4' class = 'list-group-item list-group-item-info title-question' data-toggle = 'collapse'>How do I create a new project?</a>
+          <div id = 'answer4' class = 'collapse'>
+            <a href = '' class = 'list-group-item'>After loging in ...</a>
           </div>
         </div>
       </div>

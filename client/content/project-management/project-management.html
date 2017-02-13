@@ -59,131 +59,126 @@
       </div>
     </nav>
 
-    <div class = 'container'>
+    <div id = 'main-content' class = 'container'>
 
-      <div id = 'main-content'>
+      <p class = 'header-1'>Project Management</p>
 
-        <p class = 'header-1'>Project Management</p>
+      <br><br>
 
-        <br><br>
+      <!-- Previously created methods -->
+      <div class = 'row' ng-repeat = 'project in projects'>
 
-        <!-- Previously created methods -->
-        <div class = 'row' ng-repeat = 'project in projects'>
-
-          <div id = 'proj-list-{{project.id}}'>
-            <div class = 'col-md-3'>
-              {{project.name}}
-            </div>
-
-            <div class = 'col-md-3'>
-              {{project.method}}
-            </div>
-
-            <div class = 'col-md-3'>
-              Creation Date: {{project.creation_date}}
-              <br>
-              Last Update: {{project.last_update}}
-            </div>
-
-            <div class = 'col-md-3'>
-              <button type = 'button' class = 'btn btn-primary btn-open'>
-                <span class = 'glyphicon glyphicon-folder-open' ng-click = 'openProject()'></span>
-              </button>
-
-              <button type = 'button' class = 'btn btn-warning btn-edit' ng-click = 'editProject(project)'>
-                <span class = 'glyphicon glyphicon-edit'></span>
-              </button>
-
-              <button type = 'button' class = 'btn btn-info btn-duplicate' ng-click = 'duplicateProject(project)'>
-                <span class = 'glyphicon glyphicon-duplicate'></span>
-              </button>
-
-              <button type = 'button' class = 'btn btn-danger btn-delete' ng-click = 'deleteProject(project)'>
-                <span class = 'glyphicon glyphicon-trash'></span>
-              </button>
-            </div>
+        <div id = 'proj-list-{{project.id}}'>
+          <div class = 'col-md-3'>
+            {{project.name}}
           </div>
 
-          <div id = 'proj-edit-{{project.id}}' class = 'no-display'>
-
-            <div class = 'col-md-3'>
-              <input type = 'text' class = 'form-control' ng-model = 'project.name'>
-            </div>
-
-            <div class = 'col-md-3'>
-              {{project.method}}
-            </div>
-
-            <div class = 'col-md-3'>
-              Creation Date: {{project.creation_date}}
-              <br>
-              Last Update: {{project.last_update}}
-            </div>
-
-            <div class = 'col-md-3'>
-              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmEdit(project)'>Confirm</button>
-              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelEdit(project)'>Cancel</button>
-            </div>
+          <div class = 'col-md-3'>
+            {{project.method}}
           </div>
 
-          <div id = 'proj-delete-{{project.id}}' class = 'no-display'>
-
-            <div class = 'col-md-3'>
-              {{project.name}}
-            </div>
-
-            <div class = 'col-md-3'>
-              {{project.method}}
-            </div>
-
-            <div class = 'col-md-3'>
-              Creation Date: {{project.creation_date}}
-              <br>
-              Last Update: {{project.last_update}}
-            </div>
-
-            <div class = 'col-md-3'>
-              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDelete(project)'>Confirm</button>
-              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDelete(project)'>Cancel</button>
-            </div>
+          <div class = 'col-md-3'>
+            Creation Date: {{project.creation_date}}
+            <br>
+            Last Update: {{project.last_update}}
           </div>
 
+          <div class = 'col-md-3'>
+            <button type = 'button' class = 'btn btn-primary btn-open' ng-click = 'openProject(project)'>
+              <span class = 'glyphicon glyphicon-folder-open'></span>
+            </button>
+
+            <button type = 'button' class = 'btn btn-warning btn-edit' ng-click = 'editProject(project)'>
+              <span class = 'glyphicon glyphicon-edit'></span>
+            </button>
+
+            <button type = 'button' class = 'btn btn-info btn-duplicate' ng-click = 'duplicateProject(project)'>
+              <span class = 'glyphicon glyphicon-duplicate'></span>
+            </button>
+
+            <button type = 'button' class = 'btn btn-danger btn-delete' ng-click = 'deleteProject(project)'>
+              <span class = 'glyphicon glyphicon-trash'></span>
+            </button>
+          </div>
         </div>
 
-        <br><br>
+        <div id = 'proj-edit-{{project.id}}' class = 'no-display'>
 
-        <!-- Form for adding a new project -->
-        <div class = 'row'>
+          <div class = 'col-md-3'>
+            <input type = 'text' class = 'form-control' ng-model = 'project.name'>
+          </div>
 
-          <form class = 'form-inline'>
-            <!-- New Project Name - Input Field -->
-            <div class = 'form-group'>
-              <input type = 'text' class = 'form-control' placeholder = 'New Project' ng-model = 'project.name'>
-            </div>
+          <div class = 'col-md-3'>
+            {{project.method}}
+          </div>
 
-            <!-- Method of the new project -->
-            <div class = 'form-group'>
-              <select ng-model = 'project.method'>
-                <option value = '' selected disabled>Select a method</option>
-                <option>Method X</option>
-                <option>Method Y</option>
-              </select>
-            </div>
+          <div class = 'col-md-3'>
+            Creation Date: {{project.creation_date}}
+            <br>
+            Last Update: {{project.last_update}}
+          </div>
 
-            <!-- Add button -->
-            <div class = 'form-group'>
-              <button type = 'button' class = 'btn btn-success' ng-click = 'addProject()'>Add Project</button>
-            </div>
-          </form>
-
+          <div class = 'col-md-3'>
+            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmEdit(project)'>Confirm</button>
+            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelEdit(project)'>Cancel</button>
+          </div>
         </div>
 
-        <br>
+        <div id = 'proj-delete-{{project.id}}' class = 'no-display'>
 
-        <div class = 'alert alert-danger' role = 'alert' ng-if = 'showErrorAlert' ng-cloak>
-          A method has <strong>not</strong> been chosen.
+          <div class = 'col-md-3'>
+            {{project.name}}
+          </div>
+
+          <div class = 'col-md-3'>
+            {{project.method}}
+          </div>
+
+          <div class = 'col-md-3'>
+            Creation Date: {{project.creation_date}}
+            <br>
+            Last Update: {{project.last_update}}
+          </div>
+
+          <div class = 'col-md-3'>
+            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDelete(project)'>Confirm</button>
+            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDelete(project)'>Cancel</button>
+          </div>
         </div>
 
+      </div>
+
+      <br><br>
+
+      <!-- Form for adding a new project -->
+      <div class = 'row'>
+
+        <form class = 'form-inline'>
+          <!-- New Project Name - Input Field -->
+          <div class = 'form-group'>
+            <input type = 'text' class = 'form-control' placeholder = 'New Project' ng-model = 'project.name'>
+          </div>
+
+          <!-- Method of the new project -->
+          <div class = 'form-group'>
+            <select ng-model = 'project.method'>
+              <option value = '' selected disabled>Select a method</option>
+              <option>OrderBy</option>
+            </select>
+          </div>
+
+          <!-- Add button -->
+          <div class = 'form-group'>
+            <button type = 'button' class = 'btn btn-success' ng-click = 'addProject()'>Add Project</button>
+          </div>
+        </form>
+
+      </div>
+
+      <br>
+
+      <div class = 'alert alert-danger' role = 'alert' ng-if = 'showErrorAlert' ng-cloak>
+        A method has <strong>not</strong> been chosen.
       </div>
 
     </div>

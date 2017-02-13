@@ -70,59 +70,57 @@
       </div>
     </nav>
 
-    <div class = 'container'>
+    <div id = 'main-content' class = 'container'>
 
-      <div id = 'main-content'>
-        <p class = 'header-1'>Log In</p>
+      <p class = 'header-1'>Log In</p>
 
-        <br>
+      <br>
 
-        <form class = 'form-horizontal'>
-          <!-- Input Email -->
-          <div class = 'form-group'>
-            <label for = 'input-name' class = 'col-sm-4 control-label'>
-              <span class = 'glyphicon glyphicon-envelope'></span>
-            </label>
-            <div id = 'input-email-div' class = 'col-sm-4'>
-              <input id = 'input-email' type = 'email' class = 'form-control' placeholder = 'Email Address' ng-model = 'login.email'>
-            </div>
+      <form class = 'form-horizontal'>
+        <!-- Input Email -->
+        <div class = 'form-group'>
+          <label for = 'input-name' class = 'col-sm-4 control-label'>
+            <span class = 'glyphicon glyphicon-envelope'></span>
+          </label>
+          <div id = 'input-email-div' class = 'col-sm-4'>
+            <input id = 'input-email' type = 'email' class = 'form-control' placeholder = 'Email Address' ng-model = 'login.email'>
           </div>
-
-          <!-- Input Password -->
-          <div class = 'form-group'>
-            <label for = 'input-password' class = 'col-sm-4 control-label'>
-              <span class = 'glyphicon glyphicon-lock'></span>
-            </label>
-
-            <div id = 'input-password-div' class = 'col-sm-4 input-group'>
-              <input id = 'input-password' type = '{{inputType}}' class = 'form-control' placeholder = 'Password' ng-model = 'login.password'>
-
-              <span class = 'input-group-btn'>
-                <button class = 'btn btn-default' type = 'button' ng-click = 'showPassword()'>
-                  <span id = 'eye-image' class = 'glyphicon glyphicon-eye-open'></span>
-                </button>
-              </span>
-            </div>
-          </div>
-
-          <button class = 'btn btn-primary' ng-click = 'logIn()'>Log In</button>
-        </form>
-
-        <br>
-
-        <!-- Forgot Password -->
-        <a href = 'forgotpassword.html'>Forgot your password?</a>
-
-        <!-- New user -->
-        <a id = 'new-user' href = 'signup.html'>Don't have an account?</a>
-
-        <br>
-
-        <div class = 'alert alert-danger' role = 'alert'  ng-if = 'showErrorAlert' ng-cloak>
-          Incorrect email or password.
         </div>
 
+        <!-- Input Password -->
+        <div class = 'form-group'>
+          <label for = 'input-password' class = 'col-sm-4 control-label'>
+            <span class = 'glyphicon glyphicon-lock'></span>
+          </label>
+
+          <div id = 'input-password-div' class = 'col-sm-4 input-group'>
+            <input id = 'input-password' type = '{{inputType}}' class = 'form-control' placeholder = 'Password' ng-model = 'login.password'>
+
+            <span class = 'input-group-btn'>
+              <button class = 'btn btn-default' type = 'button' ng-click = 'showPassword()'>
+                <span id = 'eye-image' class = 'glyphicon glyphicon-eye-open'></span>
+              </button>
+            </span>
+          </div>
+        </div>
+
+        <button class = 'btn btn-primary' ng-click = 'logIn()'>Log In</button>
+      </form>
+
+      <br>
+
+      <!-- Forgot Password -->
+      <a href = 'forgotpassword.html'>Forgot your password?</a>
+
+      <!-- New user -->
+      <a id = 'new-user' href = 'signup.html'>Don't have an account?</a>
+
+      <br>
+
+      <div class = 'alert alert-danger' role = 'alert'  ng-if = 'showErrorAlert' ng-cloak>
+        Incorrect email or password.
       </div>
+
     </div>
   </body>
 </html>

@@ -1,4 +1,4 @@
-app.controller('DashboardController', ['$scope', '$window', '$http', function($scope, $window, $http) {
+app.controller('DashboardController', function($scope, $window, $http) {
   function requestLogIn() {
     $http.get('/requestlogin').success(function(res) {
       $scope.username = res.user;
@@ -16,4 +16,4 @@ app.controller('DashboardController', ['$scope', '$window', '$http', function($s
   }
 
   requestLogIn();
-}]);
+});

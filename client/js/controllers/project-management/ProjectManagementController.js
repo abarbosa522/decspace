@@ -1,4 +1,4 @@
-app.controller('ProjectManagementController', ['$scope', '$window', '$http', function($scope, $window, $http) {
+app.controller('ProjectManagementController', function($scope, $window, $http) {
 
   function requestLogIn() {
     $http.get('/requestlogin').success(function(res) {
@@ -13,8 +13,12 @@ app.controller('ProjectManagementController', ['$scope', '$window', '$http', fun
   }
 
   //open project
-  $scope.openProject = function() {
-    $window.location.href = 'project-area.html';
+  $scope.openProject = function(project) {
+    switch(project.method) {
+      case 'OrderBy':
+        $window.location.href = 'order-by-method.html?id=' + project.id;
+        break;
+    }
   }
 
   //add a new project
@@ -45,7 +49,7 @@ app.controller('ProjectManagementController', ['$scope', '$window', '$http', fun
         //if the user did not create any projects previously
         if(user_proj == '') {
           //create the new project
-          var proj_text = '{"username":"' + $scope.username + '","projects":[{"id":1,"name":"' + $scope.project.name + '","method":"' + $scope.project.method + '","creation_date":"' + creation_date + '","last_update":"' + creation_date + '"}]}';
+          var proj_text = '{"username":"' + $scope.username + '","projects":[{"id":1,"name":"' + $scope.project.name + '","method":"' + $scope.project.method + '","creation_date":"' + creation_date + '","last_update":"' + creation_date + '","criteria":[],"order_by_criterion":""}]}';
 
           //transform to json
           var proj_obj = JSON.parse(proj_text);
@@ -70,7 +74,7 @@ app.controller('ProjectManagementController', ['$scope', '$window', '$http', fun
             id = 1;
 
           //add the new project to the list of projects of the logged user
-          user_proj['projects'].push({'id':id,'name':$scope.project.name,'method':$scope.project.method,'creation_date':creation_date,'last_update':creation_date});
+          user_proj['projects'].push({'id':id,'name':$scope.project.name,'method':$scope.project.method,'creation_date':creation_date,'last_update':creation_date,'criteria':[],'order_by_criterion':''});
 
           //get the id of the document and then remove it from the new one
           var id_doc = user_proj['_id'];
@@ -231,4 +235,4 @@ app.controller('ProjectManagementController', ['$scope', '$window', '$http', fun
 
   requestLogIn();
   getProjects();
-}]);
+});

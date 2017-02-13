@@ -1,4 +1,4 @@
-app.controller('SignUpController', ['$scope', '$window', '$http', function($scope, $window, $http) {
+app.controller('SignUpController', function($scope, $window, $http) {
 
   $scope.inputType = 'password';
 
@@ -56,4 +56,4 @@ app.controller('SignUpController', ['$scope', '$window', '$http', function($scop
       angular.element(document.querySelector('#eye-image')).addClass('glyphicon-eye-open');
     }
   }
-}]);
+});

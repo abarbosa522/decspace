@@ -1,4 +1,4 @@
-app.controller('AboutController', ['$scope', '$window', function($scope, $window) {
+app.controller('AboutController', function($scope, $window) {
 
   $scope.toSignUp = function() {
     $window.location.href = 'signup.html';
@@ -8,4 +8,4 @@ app.controller('AboutController', ['$scope', '$window', function($scope, $window
     $window.location.href = 'login.html';
   }
 
-}]);
+});

@@ -1,4 +1,4 @@
-app.controller('ContactUsController', ['$scope', '$http', '$window', function($scope, $http, $window) {
+app.controller('ContactUsController', function($scope, $http, $window) {
   var message_template = 'Message sent!';
 
   $scope.toSignUp = function() {
@@ -22,4 +22,4 @@ app.controller('ContactUsController', ['$scope', '$http', '$window', function($s
     });
   }
 
-}]);
+});

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DecSpace - Project Area</title>
+
+    <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
+
+    <!-- CSS Stylesheet -->
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css' />
+
+    <!-- jQuery -->
+    <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
+    <script type = 'text/javascript' src = '../../js/shared/jquery-ui-1.12.0/jquery-ui.js'></script>
+
+    <!-- AngularJS -->
+    <script src = '../../js/shared/angular.min.js'></script>
+
+    <!-- AngularJS Modules -->
+    <script src = '../../js/app.js'></script>
+
+    <!-- AngularJS Controllers -->
+    <script src = '../../js/controllers/project-management/OrderByMethodController.js'></script>
+
+    <!-- Bootstrap -->
+    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css' />
+    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap-theme.min.css' />
+    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.js'></script>
+    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.min.js'></script>
+
+    <!-- Google Web Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600i" rel="stylesheet">
+  </head>
+
+  <body ng-app = 'decspace' ng-controller = 'OrderByMethodController'>
+
+    <!-- Navigation Bar -->
+    <nav class = 'navbar navbar-custom navbar-fixed-top'>
+      <div class = 'container'>
+        <!-- Title -->
+        <div class = 'navbar-header'>
+          <a class = 'navbar-brand' href = '../dashboard/dashboard.html'>DecSpace</a>
+        </div>
+
+        <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
+        <ul class = 'nav navbar-nav navbar-right'>
+          <li>
+            <p class = 'navbar-text'>Welcome, {{username}}</p>
+          </li>
+
+          <li>
+            <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'logOut()'>
+              <span class = 'glyphicon glyphicon-log-out'></span>
+              Log Out
+            </button>
+          </li>
+        </ul>
+
+      </div>
+    </nav>
+
+    <div id = 'main-content' class = 'container'>
+      <!-- Main tabs - Method Description, Data Input and Results and Execution -->
+      <ul class = 'nav nav-tabs nav-justified'>
+        <li role = 'presentation' class = 'active'><a data-toggle = 'tab' href= '#description'>Method Description</a></li>
+        <li role = 'presentation'><a data-toggle = 'tab' href= '#data-input'>Data Input</a></li>
+        <li role = 'presentation'><a data-toggle = 'tab' href= '#results'>Results and Execution</a></li>
+      </ul>
+
+      <div class = 'tab-content'>
+        <!-- Method Description -->
+        <div id = 'description' class = 'tab-pane fade in active'>
+          <br>
+
+          <p class = 'header-1'>Order By</p>
+
+          <br>
+
+          <p>Orders a given group of actions by a certain criterion in a specific direction (ascendant and descendant).</p>
+        </div>
+
+        <!-- Data Input -->
+        <div id = 'data-input' class = 'tab-pane fade'>
+          <!-- Sub-Tabs - Criteria and Performance Table -->
+          <ul class = 'nav nav-tabs nav-justified'>
+            <li role = 'presentation' class = 'active'><a data-toggle = 'tab' href = '#criteria'>Criteria</a></li>
+            <li role = 'presentation'><a data-toggle = 'tab' href = '#performance'>Performance Table</a></li>
+          </ul>
+
+          <br>
+
+          <!-- Criteria -->
+          <div id = 'criteria' class = 'tab-pane fade in active'>
+
+            <div class = 'row'>
+              <!-- table to add and list the criteria -->
+              <table class = 'table table-bordered table-striped table-hover'>
+                <thead>
+                  <tr>
+                    <th class = 'text-center'>Order by</th>
+                    <th class = 'text-center'>Name</th>
+                    <th class = 'text-center'>Type</th>
+                    <th class = 'text-center'>Direction</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Added criteria -->
+                  <tr ng-repeat = 'criterion in criteria'>
+                    <td>
+                      <input type = 'radio' name = 'check-criterion' ng-checked = 'isCriterionSelected(criterion)' ng-click = 'selectCriterion(criterion)' >
+                    </td>
+                    <td>{{criterion.name}}</td>
+                    <td>{{criterion.type}}</td>
+                    <td>{{criterion.direction}}</td>
+                    <td>
+                      <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteCriterion(criterion)'>
+                        <span class = 'glyphicon glyphicon-minus'></span>
+                      </button>
+                    </td>
+                  </tr>
+                  <!-- Form to add criteria -->
+                  <tr>
+                    <td></td>
+                    <td>
+                      <input class = 'form-control' type = 'text' ng-model = 'new_criterion.name'>
+                    </td>
+                    <td>
+                      <select ng-model = 'new_criterion.type'>
+                        <option value = '' disabled>Select a type</option>
+                        <option>Textual</option>
+                        <option>Numeric</option>
+                      </select>
+                    </td>
+                    <td>
+                      <select ng-model = 'new_criterion.direction'>
+                        <option value = '' disabled>Select a direction</option>
+                        <option>Ascendant</option>
+                        <option>Descendant</option>
+                      </select>
+                    </td>
+                    <td>
+                      <button type = 'button' class = 'btn btn-success' ng-click = 'addCriterion()'>
+                        <span class = 'glyphicon glyphicon-plus'></span>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Performance Table -->
+          <div id = 'performance' class = 'tab-pane fade'>
+
+            <div class = 'row'>
+              <table class = 'table table-bordered table-striped table-hover'>
+                <thead>
+                  <th class = 'text-centered'>Action</th>
+                  <th class = 'text-centered' ng-repeat = 'criterion in criteria'>{{criterion.name}}</th>
+                </thead>
+                <tbody>
+                  <tr ng-repeat = 'action in actions'>
+                  </tr>
+                  <tr>
+                    <td>
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Results and Execution -->
+        <div id = 'results' class = 'tab-pane fade'>
+        </div>
+      </div>
+
+    </div>
+  </body>
+</html>
