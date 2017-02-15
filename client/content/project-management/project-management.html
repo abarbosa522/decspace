@@ -84,6 +84,14 @@
           </div>
 
           <div class = 'col-md-3'>
+            <button type = 'button' class = 'btn btn-default btn-star-empty' ng-click = 'starProject(project)' ng-if = 'project.starred == "false"' ng-cloak>
+              <span class = 'glyphicon glyphicon-star-empty'></span>
+            </button>
+
+            <button type = 'button' class = 'btn btn-default btn-star' ng-click = 'unstarProject(project)' ng-if = 'project.starred == "true"' ng-cloak>
+              <span class = 'glyphicon glyphicon-star'></span>
+            </button>
+
             <button type = 'button' class = 'btn btn-primary btn-open' ng-click = 'openProject(project)'>
               <span class = 'glyphicon glyphicon-folder-open'></span>
             </button>
@@ -145,8 +153,12 @@
           </div>
 
           <div class = 'col-md-3'>
-            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDelete(project)'>Confirm</button>
-            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDelete(project)'>Cancel</button>
+            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDelete(project)'>
+              <span class = 'glyphicon glyphicon-ok'></span>
+            </button>
+            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDelete(project)'>
+              <span class = 'glyphicon glyphicon-remove'></span>
+            </button>
           </div>
         </div>
 
@@ -173,7 +185,7 @@
 
           <!-- Add button -->
           <div class = 'form-group'>
-            <button type = 'button' class = 'btn btn-success' ng-click = 'addProject()'>Add Project</button>
+            <button type = 'button' class = 'btn btn-success btn-add' ng-click = 'addProject()'>Add Project</button>
           </div>
         </form>
 

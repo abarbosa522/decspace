@@ -108,9 +108,9 @@
                       <th></th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody ng-repeat = 'criterion in criteria'>
                     <!-- Added criteria - List view-->
-                    <tr id = 'criterion-list-{{criterion.id}}' ng-repeat = 'criterion in criteria'>
+                    <tr id = 'criterion-list-{{criterion.id}}'>
                       <!-- List view -->
                       <td>
                         <input type = 'radio' name = 'check-criterion-list-view' ng-checked = 'isCriterionSelected(criterion)' ng-click = 'selectCriterion(criterion)' >
@@ -119,16 +119,16 @@
                       <td>{{criterion.type}}</td>
                       <td>{{criterion.direction}}</td>
                       <td>
-                        <button type = 'button' class = 'btn btn-warning btn-edit' ng-click = 'editCriterion(criterion)'>
+                        <button type = 'button' class = 'btn btn-warning btn-crt-edit' ng-click = 'editCriterion(criterion)'>
                           <span class = 'glyphicon glyphicon-edit'></span>
                         </button>
-                        <button type = 'button' class = 'btn btn-danger btn-remove' ng-click = 'deleteCriterion(criterion)'>
+                        <button type = 'button' class = 'btn btn-danger btn-crt-remove' ng-click = 'deleteCriterion(criterion)'>
                           <span class = 'glyphicon glyphicon-minus'></span>
                         </button>
                       </td>
                     </tr>
                     <!-- Added criteria - edit view -->
-                    <tr id = 'criterion-edit-{{criterion.id}}' class = 'no-display' ng-repeat = 'criterion in criteria'>
+                    <tr id = 'criterion-edit-{{criterion.id}}' class = 'no-display'>
                       <td>
                         <input type = 'radio' name = 'check-criterion-edit-view' ng-checked = 'isCriterionSelected(criterion)' ng-click = 'selectCriterion(criterion)' >
                       </td>
@@ -158,6 +158,8 @@
                         </button>
                       </td>
                     </tr>
+                  </tbody>
+                  <tbody>
                     <!-- Form to add criteria -->
                     <tr>
                       <td></td>
@@ -179,7 +181,7 @@
                         </select>
                       </td>
                       <td>
-                        <button type = 'button' class = 'btn btn-success' ng-click = 'addCriterion()'>
+                        <button type = 'button' class = 'btn btn-success btn-crt-add' ng-click = 'addCriterion()'>
                           <span class = 'glyphicon glyphicon-plus'></span>
                         </button>
                       </td>
@@ -207,16 +209,39 @@
                     <th class = 'text-center' ng-repeat = 'criterion in criteria'>{{criterion.name}}</th>
                     <th></th>
                   </thead>
-                  <tbody>
-                    <tr ng-repeat = 'action in actions'>
+                  <tbody ng-repeat = 'action in actions'>
+                    <!-- List view of actions -->
+                    <tr id = 'action-list-{{action.id}}'>
                       <td>{{action.name}}</td>
                       <td ng-repeat = 'criterion in criteria'>{{action[criterion.name]}}</td>
                       <td>
-                        <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteAction(action)'>
+                        <button type = 'button' class = 'btn btn-warning btn-action-edit' ng-click = 'editAction(action)'>
+                          <span class = 'glyphicon glyphicon-edit'></span>
+                        </button>
+                        <button type = 'button' class = 'btn btn-danger btn-action-remove' ng-click = 'deleteAction(action)'>
                           <span class = 'glyphicon glyphicon-minus'></span>
                         </button>
                       </td>
                     </tr>
+                    <!-- Edit view of actions -->
+                    <tr id = 'action-edit-{{action.id}}' class = 'no-display'>
+                      <td>
+                        <input class = 'form-control' type = 'text' ng-model = 'action.name'>
+                      </td>
+                      <td ng-repeat = 'criterion in criteria'>
+                        <input class = 'form-control' type = '{{criterion.type}}' ng-model = 'action[criterion.name]'>
+                      </td>
+                      <td>
+                        <button type = 'button' class = 'btn btn-success' ng-click = 'confirmEditAction(action)'>
+                          <span class = 'glyphicon glyphicon-ok'></span>
+                        </button>
+                        <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelEditAction(action)'>
+                          <span class = 'glyphicon glyphicon-remove'></span>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                  <tbody>
                     <tr>
                       <td>
                         <input class = 'form-control' type = 'text' ng-model = 'new_action.name'>
@@ -225,7 +250,7 @@
                         <input class = 'form-control' type = '{{criterion.type}}' ng-model = 'new_action[criterion.name]'>
                       </td>
                       <td>
-                        <button type = 'button' class = 'btn btn-success' ng-click = 'addAction()'>
+                        <button type = 'button' class = 'btn btn-success btn-action-add' ng-click = 'addAction()'>
                           <span class = 'glyphicon glyphicon-plus'></span>
                         </button>
                       </td>
@@ -264,8 +289,8 @@
 
           <p class = 'header-2'>Past Executions</p>
 
-          <div class = 'list-group panel' ng-repeat = 'execution in executions'>
-            <a href = '#{{execution.id}}' class = 'list-group-item title-question' data-toggle = 'collapse'>{{execution.execution_date}}</a>
+          <div class = 'list-group' ng-repeat = 'execution in executions'>
+            <a href = '#{{execution.id}}' class = 'list-group-item' data-toggle = 'collapse'>{{execution.execution_date}}</a>
             <div id = '{{execution.id}}' class = 'collapse'>
               <a class = 'list-group-item'>
                 <p class = 'header-3'>Input Data</p>
@@ -330,11 +355,24 @@
                   </table>
                 </div>
 
-                <p class = 'header-3'>Comment</p>
-                <p>{{execution.comment}}</p>
+                <div ng-if = 'execution.comment != ""'>
+                  <p class = 'header-3'>Comment</p>
+                  <p>{{execution.comment}}</p>
+                </div>
+
+                <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteExecution(execution)'>
+                  <span class = 'glyphicon glyphicon-trash'></span>
+                </button>
               </a>
             </div>
           </div>
+
+          <br>
+
+          <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteAllExecutions()'>
+            <span class = 'glyphicon glyphicon-trash'></span>
+            Delete all executions
+          </button>
 
         </div>
       </div>

@@ -1,7 +1,10 @@
 app.controller('DashboardController', function($scope, $window, $http) {
   function requestLogIn() {
     $http.get('/requestlogin').success(function(res) {
-      $scope.username = res.user;
+      if(typeof res.user == 'undefined')
+        $window.location.href = '../homepage/login.html';
+      else
+        $scope.username = res.user;
     });
   }
 

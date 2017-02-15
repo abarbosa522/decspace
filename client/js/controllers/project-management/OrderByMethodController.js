@@ -6,11 +6,12 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
   //keep the value of the selectedCriterion
   var selectedCriterion = '';
 
-  $scope.new_execution;
-
   function requestLogIn() {
     $http.get('/requestlogin').success(function(res) {
-      $scope.username = res.user;
+      if(typeof res.user == 'undefined')
+        $window.location.href = '../homepage/login.html';
+      else
+        $scope.username = res.user;
     });
   }
 
@@ -129,12 +130,12 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
             if(user_proj['projects'][project]['id'] == proj_id) {
               //define id of the criteria
               if(user_proj['projects'][project]['criteria'].length == 0)
-                var id = 1;
+                $scope.new_criterion.id = 1;
               else
-                var id = user_proj['projects'][project]['criteria'][user_proj['projects'][project]['criteria'].length - 1]['id'] + 1;
+                $scope.new_criterion.id = user_proj['projects'][project]['criteria'][user_proj['projects'][project]['criteria'].length - 1]['id'] + 1;
 
               //insert criterion into database
-              user_proj['projects'][project]['criteria'].push({'id':id,'name':$scope.new_criterion.name,'type':$scope.new_criterion.type,'direction':$scope.new_criterion.direction});
+              user_proj['projects'][project]['criteria'].push($scope.new_criterion);
               break;
             }
           }
@@ -166,12 +167,13 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
     angular.element(document.querySelector('#criterion-list-' + criterion.id)).addClass('no-display');
     angular.element(document.querySelector('#criterion-edit-' + criterion.id)).removeClass('no-display');
 
-    //disable all other open, edit, duplicate or delete buttons
-    angular.element(document.querySelectorAll('.btn-edit, .btn-remove')).prop('disabled', true);
+    //disable all other edit, remove and add buttons
+    angular.element(document.querySelectorAll('.btn-crt-edit, .btn-crt-remove, .btn-crt-add')).prop('disabled', true);
   }
 
   //confirm edit changes
   $scope.confirmEditCriterion = function(criterion) {
+
     //don't allow any of the fields to be empty - name, type and direction
     if(getNumberOfFields(criterion) < 3 || criterion.name == '' || criterion.type == '' || criterion.direction == '') {
       $scope.showCriterionFieldsError = true;
@@ -201,16 +203,17 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
           }
 
           //find project
-          for(proj in user_proj['projects'])
-            if(user_proj['projects'][proj]['id'] == project.id) {
-              for(crt in user_proj['projects'][proj]['id']['criterion']) {
-                if(user_proj['projects'][proj]['id']['criterion'][crt]['id'] == criterion.id) {
-                  user_proj['projects'][proj]['id']['criterion'][crt]['name'] = criterion.name;
-                  user_proj['projects'][proj]['id']['criterion'][crt]['type'] = criterion.type;
-                  user_proj['projects'][proj]['id']['criterion'][crt]['direction'] = criterion.direction;
+          for(proj in user_proj['projects']) {
+            if(user_proj['projects'][proj]['id'] == proj_id) {
+              for(crt in user_proj['projects'][proj]['criteria']) {
+                if(user_proj['projects'][proj]['criteria'][crt]['id'] == criterion.id) {
+                  user_proj['projects'][proj]['criteria'][crt]['name'] = criterion.name;
+                  user_proj['projects'][proj]['criteria'][crt]['type'] = criterion.type;
+                  user_proj['projects'][proj]['criteria'][crt]['direction'] = criterion.direction;
                 }
               }
             }
+          }
 
           var id_doc = user_proj['_id'];
           delete user_proj['_id'];
@@ -221,6 +224,8 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
             $http.post('/projects', user_proj).success(function() {
               //refresh the list of projects and the initial view
               getCriteria();
+              //enable the add button again
+              angular.element(document.querySelectorAll('.btn-crt-add')).prop('disabled', false);
             });
           });
         });
@@ -230,7 +235,10 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
 
   //cancel edit changes
   $scope.cancelEditCriterion = function(criterion) {
+    //refresh the list of projects and the initial view
     getCriteria();
+    //enable the add button again
+    angular.element(document.querySelectorAll('.btn-crt-add')).prop('disabled', false);
   }
 
   $scope.deleteCriterion = function(criterion) {
@@ -389,6 +397,12 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
 
           for(project in user_proj['projects']) {
             if(user_proj['projects'][project]['id'] == proj_id) {
+              //define id of the criteria
+              if(user_proj['projects'][project]['actions'].length == 0)
+                $scope.new_action.id = 1;
+              else
+                $scope.new_action.id = user_proj['projects'][project]['actions'][user_proj['projects'][project]['actions'].length - 1]['id'] + 1;
+
               //insert action into database
               user_proj['projects'][project]['actions'].push($scope.new_action);
               break;
@@ -412,6 +426,85 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
         });
       }
     }
+  }
+
+  //edit a certain action
+  $scope.editAction = function(action) {
+    //hide the listed project and show the edit view
+    angular.element(document.querySelector('#action-list-' + action.id)).addClass('no-display');
+    angular.element(document.querySelector('#action-edit-' + action.id)).removeClass('no-display');
+
+    //disable all other edit, remove and add buttons
+    angular.element(document.querySelectorAll('.btn-action-edit, .btn-action-remove, .btn-action-add')).prop('disabled', true);
+  }
+
+  //confirm edit changes
+  $scope.confirmEditAction = function(action) {
+    //don't allow to insert an action with an empty field
+    if(getNumberOfFields(action) <= $scope.criteria.length) {
+      $scope.showActionFieldsError = true;
+      $scope.showActionNameError = false;
+    }
+    //don't actions with the same name
+    else {
+      $scope.showActionFieldsError = false;
+      $scope.showActionNameError = false;
+
+      for(act in $scope.actions) {
+        if(action.name == $scope.actions[act]['name'] && action.id != $scope.actions[act]['id']) {
+          $scope.showActionNameError = true;
+          break;
+        }
+      }
+
+      if(!$scope.showActionNameError) {
+        $http.get('/projects').success(function(res) {
+          //projects of the logged user
+          var user_proj;
+
+          for(user in res) {
+            if(res[user].username == $scope.username) {
+              user_proj = res[user];
+              break;
+            }
+          }
+
+          for(project in user_proj['projects']) {
+            if(user_proj['projects'][project]['id'] == proj_id) {
+              for(act in user_proj['projects'][project]['actions']) {
+                if(user_proj['projects'][project]['actions'][act]['id'] == action.id) {
+                  user_proj['projects'][project]['actions'][act] = action;
+                  break;
+                }
+              }
+            }
+          }
+
+          //get the id of the document and then remove it from the new one
+          var id_doc = user_proj['_id'];
+          delete user_proj['_id'];
+
+          //delete the previous document with the list of projects
+          $http.delete('/projects/' + id_doc).success(function(){
+            //add the new list of projects
+            $http.post('/projects', user_proj).success(function() {
+              //refresh the list of actions
+              getActions();
+              //enable the add button again
+              angular.element(document.querySelectorAll('.btn-action-add')).prop('disabled', false);
+            });
+          });
+        });
+      }
+    }
+  }
+
+  //cancel edit changes
+  $scope.cancelEditAction = function(action) {
+    //refresh the list of projects and the initial view
+    getActions();
+    //enable the add button again
+    angular.element(document.querySelectorAll('.btn-action-add')).prop('disabled', false);
   }
 
   $scope.deleteAction = function(action) {
@@ -494,10 +587,18 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
         }
       }
 
+      //if a comment has not been added
+      if(typeof $scope.new_execution == 'undefined') {
+        var comment = '';
+      }
+      else {
+        var comment = $scope.new_execution.comment;
+      }
+
       for(project in user_proj['projects']) {
         if(user_proj['projects'][project]['id'] == proj_id) {
           //insert action into database
-          user_proj['projects'][project]['executions'].push({'id':user_proj['projects'][project]['executions'].length,'criteria':$scope.criteria,'actions':$scope.actions,'order_by_criterion':selectedCriterion,'results':results,'comment':$scope.new_execution.comment,'execution_date':execution_date});
+          user_proj['projects'][project]['executions'].push({'id':user_proj['projects'][project]['executions'].length,'criteria':$scope.criteria,'actions':$scope.actions,'order_by_criterion':selectedCriterion,'results':results,'comment':comment,'execution_date':execution_date});
           break;
         }
       }
@@ -511,8 +612,82 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
         //add the new list of projects
         $http.post('/projects', user_proj).success(function() {
           getExecutions();
-          //reset the input fields
-          $scope.new_execution.comment = ''
+
+          //reset the comment input field, if it was filled
+          if(typeof $scope.new_execution != 'undefined')
+            $scope.new_execution.comment = '';
+        });
+      });
+    });
+  }
+
+  $scope.deleteExecution = function(execution) {
+    $http.get('/projects').success(function(res) {
+      //projects of the logged user
+      var user_proj;
+
+      for(user in res) {
+        if(res[user].username == $scope.username) {
+          user_proj = res[user];
+          break;
+        }
+      }
+
+      for(project in user_proj['projects']) {
+        if(user_proj['projects'][project]['id'] == proj_id) {
+          for(exec in user_proj['projects'][project]['executions']) {
+            if(user_proj['projects'][project]['executions'][exec]['id'] == execution.id) {
+              user_proj['projects'][project]['executions'].splice(exec, 1);
+              break;
+            }
+          }
+        }
+      }
+
+      //get the id of the document and then remove it from the new one
+      var id_doc = user_proj['_id'];
+      delete user_proj['_id'];
+
+      //delete the previous document with the list of projects
+      $http.delete('/projects/' + id_doc).success(function(){
+        //add the new list of projects
+        $http.post('/projects', user_proj).success(function() {
+          //refresh the list of projects
+          getExecutions();
+        });
+      });
+    });
+  }
+
+  $scope.deleteAllExecutions = function() {
+    $http.get('/projects').success(function(res) {
+      //projects of the logged user
+      var user_proj;
+
+      for(user in res) {
+        if(res[user].username == $scope.username) {
+          user_proj = res[user];
+          break;
+        }
+      }
+
+      for(project in user_proj['projects']) {
+        if(user_proj['projects'][project]['id'] == proj_id) {
+          user_proj['projects'][project]['executions'] = [];
+          break;
+        }
+      }
+
+      //get the id of the document and then remove it from the new one
+      var id_doc = user_proj['_id'];
+      delete user_proj['_id'];
+
+      //delete the previous document with the list of projects
+      $http.delete('/projects/' + id_doc).success(function(){
+        //add the new list of projects
+        $http.post('/projects', user_proj).success(function() {
+          //refresh the list of projects
+          getExecutions();
         });
       });
     });
