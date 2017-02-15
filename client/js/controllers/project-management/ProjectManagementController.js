@@ -49,7 +49,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
         //if the user did not create any projects previously
         if(user_proj == '') {
           //create the new project
-          var proj_text = '{"username":"' + $scope.username + '","projects":[{"id":1,"name":"' + $scope.project.name + '","method":"' + $scope.project.method + '","creation_date":"' + creation_date + '","last_update":"' + creation_date + '","criteria":[],"order_by_criterion":""}]}';
+          var proj_text = '{"username":"' + $scope.username + '","projects":[{"id":1,"name":"' + $scope.project.name + '","method":"' + $scope.project.method + '","creation_date":"' + creation_date + '","last_update":"' + creation_date + '","criteria":[],"order_by_criterion":"","actions":[],"executions":[]}]}';
 
           //transform to json
           var proj_obj = JSON.parse(proj_text);
@@ -74,7 +74,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
             id = 1;
 
           //add the new project to the list of projects of the logged user
-          user_proj['projects'].push({'id':id,'name':$scope.project.name,'method':$scope.project.method,'creation_date':creation_date,'last_update':creation_date,'criteria':[],'order_by_criterion':''});
+          user_proj['projects'].push({'id':id,'name':$scope.project.name,'method':$scope.project.method,'creation_date':creation_date,'last_update':creation_date,'criteria':[],'order_by_criterion':'','actions':[],'executions':[]});
 
           //get the id of the document and then remove it from the new one
           var id_doc = user_proj['_id'];
@@ -162,7 +162,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
       var id = user_proj['projects'][user_proj['projects'].length - 1]['id'] + 1;
 
       //add the new project to the list of projects of the logged user
-      user_proj['projects'].push({'id':id,'name':project.name,'method':project.method,'creation_date':creation_date,'last_update':creation_date});
+      user_proj['projects'].push({'id':id,'name':project.name,'method':project.method,'creation_date':creation_date,'last_update':creation_date,'criteria':project.criteria,'order_by_criterion':project.order_by_criterion,'actions':project.actions,'executions':project.results});
 
       //get the id of the document and then remove it from the new one
       var id_doc = user_proj['_id'];

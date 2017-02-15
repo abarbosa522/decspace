@@ -84,3 +84,21 @@ nav > div > ul > li {
   font-style: italic;
   font-size: 28px;
 }
+
+.header-2 {
+  font-style: italic;
+  font-size: 20px;
+}
+
+.header-3 {
+  font-style: italic;
+  font-size: 18px;
+}
+
+.header-4 {
+  font-size: 16px;
+}
+
+.no-display {
+  display: none;
+}
