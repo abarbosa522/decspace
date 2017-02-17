@@ -77,9 +77,19 @@
       <br>
 
       <form class = 'form-horizontal'>
-        <!-- Input Email -->
+        <!-- Input Name -->
         <div class = 'form-group'>
           <label for = 'input-name' class = 'col-sm-4 control-label'>
+            <span class = 'glyphicon glyphicon-user'></span>
+          </label>
+          <div id = 'input-name' class = 'col-sm-4'>
+            <input type = 'text' class = 'form-control' placeholder = 'Name' ng-model = 'signup.name'>
+          </div>
+        </div>
+
+        <!-- Input Email -->
+        <div class = 'form-group'>
+          <label for = 'input-email-div' class = 'col-sm-4 control-label'>
             <span class = 'glyphicon glyphicon-envelope'></span>
           </label>
           <div id = 'input-email-div' class = 'col-sm-4'>

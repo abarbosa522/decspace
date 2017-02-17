@@ -99,6 +99,16 @@ nav > div > ul > li {
   font-size: 16px;
 }
 
+.header-5 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
 .no-display {
   display: none;
+}
+
+.icon-custom {
+  font-size: 100px;
+  color: #191461;
 }

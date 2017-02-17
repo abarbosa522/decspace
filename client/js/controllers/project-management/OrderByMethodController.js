@@ -10,8 +10,18 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
     $http.get('/requestlogin').success(function(res) {
       if(typeof res.user == 'undefined')
         $window.location.href = '../homepage/login.html';
-      else
+      else {
         $scope.username = res.user;
+        //get all accounts and find the name of the logged user
+        $http.get('/accounts').success(function(response) {
+          for(account in response) {
+            if(response[account].email == $scope.username) {
+              $scope.name = response[account].name;
+              break;
+            }
+          }
+        });
+      }
     });
   }
 

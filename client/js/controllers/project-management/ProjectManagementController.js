@@ -4,8 +4,18 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
     $http.get('/requestlogin').success(function(res) {
       if(typeof res.user == 'undefined')
         $window.location.href = '../homepage/login.html';
-      else
+      else {
         $scope.username = res.user;
+        //get all accounts and find the name of the logged user
+        $http.get('/accounts').success(function(response) {
+          for(account in response) {
+            if(response[account].email == $scope.username) {
+              $scope.name = response[account].name;
+              break;
+            }
+          }
+        });
+      }
     });
   }
 
@@ -101,7 +111,6 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
       //hide alert, in case it was showing before
       $scope.showErrorAlert = false;
 
-
       //get all projects from the database
       $http.get('/projects').success(function(res) {
         var user_proj = '';
@@ -114,7 +123,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
 
         //get current date
         var current_date = new Date();
-        var creation_date = current_date.getDate() + '/' + (current_date.getMonth() + 1) + '/' + current_date.getFullYear();
+        var creation_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
 
         //if the user did not create any projects previously
         if(user_proj == '') {

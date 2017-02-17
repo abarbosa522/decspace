@@ -45,7 +45,7 @@
         <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
         <ul class = 'nav navbar-nav navbar-right'>
           <li>
-            <p class = 'navbar-text'>Welcome, {{username}}</p>
+            <p class = 'navbar-text' ng-cloak>Welcome, {{name}}</p>
           </li>
 
           <li>
@@ -69,29 +69,34 @@
       <div class = 'row' ng-repeat = 'project in projects'>
 
         <div id = 'proj-list-{{project.id}}'>
-          <div class = 'col-md-3'>
+          <div class = 'col-md-1'>
+          </div>
+
+          <div class = 'col-md-1'>
+            <button type = 'button' class = 'btn btn-default btn-star-empty' ng-click = 'starProject(project)' ng-if = 'project.starred == "false"' ng-cloak>
+              <span class = 'glyphicon glyphicon-star-empty glyph-custom'></span>
+            </button>
+
+            <button type = 'button' class = 'btn btn-default btn-star' ng-click = 'unstarProject(project)' ng-if = 'project.starred == "true"' ng-cloak>
+              <span class = 'glyphicon glyphicon-star glyph-custom'></span>
+            </button>
+          </div>
+
+          <div class = 'col-md-2'>
             {{project.name}}
           </div>
 
-          <div class = 'col-md-3'>
+          <div class = 'col-md-2'>
             {{project.method}}
           </div>
 
           <div class = 'col-md-3'>
-            Creation Date: {{project.creation_date}}
+            <strong>Creation Date:</strong> {{project.creation_date}}
             <br>
-            Last Update: {{project.last_update}}
+            <strong>Last Update:</strong> {{project.last_update}}
           </div>
 
           <div class = 'col-md-3'>
-            <button type = 'button' class = 'btn btn-default btn-star-empty' ng-click = 'starProject(project)' ng-if = 'project.starred == "false"' ng-cloak>
-              <span class = 'glyphicon glyphicon-star-empty'></span>
-            </button>
-
-            <button type = 'button' class = 'btn btn-default btn-star' ng-click = 'unstarProject(project)' ng-if = 'project.starred == "true"' ng-cloak>
-              <span class = 'glyphicon glyphicon-star'></span>
-            </button>
-
             <button type = 'button' class = 'btn btn-primary btn-open' ng-click = 'openProject(project)'>
               <span class = 'glyphicon glyphicon-folder-open'></span>
             </button>
@@ -111,19 +116,31 @@
         </div>
 
         <div id = 'proj-edit-{{project.id}}' class = 'no-display'>
+          <div class = 'col-md-1'>
+          </div>
 
-          <div class = 'col-md-3'>
+          <div class = 'col-md-1'>
+            <button type = 'button' class = 'btn btn-default btn-star-empty' ng-click = 'starProject(project)' ng-if = 'project.starred == "false"' ng-cloak>
+              <span class = 'glyphicon glyphicon-star-empty glyph-custom'></span>
+            </button>
+
+            <button type = 'button' class = 'btn btn-default btn-star' ng-click = 'unstarProject(project)' ng-if = 'project.starred == "true"' ng-cloak>
+              <span class = 'glyphicon glyphicon-star glyph-custom'></span>
+            </button>
+          </div>
+
+          <div class = 'col-md-2'>
             <input type = 'text' class = 'form-control' ng-model = 'project.name'>
           </div>
 
-          <div class = 'col-md-3'>
+          <div class = 'col-md-2'>
             {{project.method}}
           </div>
 
           <div class = 'col-md-3'>
-            Creation Date: {{project.creation_date}}
+            <strong>Creation Date:</strong> {{project.creation_date}}
             <br>
-            Last Update: {{project.last_update}}
+            <strong>Last Update:</strong> {{project.last_update}}
           </div>
 
           <div class = 'col-md-3'>
@@ -137,19 +154,31 @@
         </div>
 
         <div id = 'proj-delete-{{project.id}}' class = 'no-display'>
+          <div class = 'col-md-1'>
+          </div>
 
-          <div class = 'col-md-3'>
+          <div class = 'col-md-1'>
+            <button type = 'button' class = 'btn btn-default btn-star-empty' ng-click = 'starProject(project)' ng-if = 'project.starred == "false"' ng-cloak>
+              <span class = 'glyphicon glyphicon-star-empty glyph-custom'></span>
+            </button>
+
+            <button type = 'button' class = 'btn btn-default btn-star' ng-click = 'unstarProject(project)' ng-if = 'project.starred == "true"' ng-cloak>
+              <span class = 'glyphicon glyphicon-star glyph-custom'></span>
+            </button>
+          </div>
+
+          <div class = 'col-md-2'>
             {{project.name}}
           </div>
 
-          <div class = 'col-md-3'>
+          <div class = 'col-md-2'>
             {{project.method}}
           </div>
 
           <div class = 'col-md-3'>
-            Creation Date: {{project.creation_date}}
+            <strong>Creation Date:</strong> {{project.creation_date}}
             <br>
-            Last Update: {{project.last_update}}
+            <strong>Last Update:</strong> {{project.last_update}}
           </div>
 
           <div class = 'col-md-3'>
@@ -166,27 +195,29 @@
 
       <br><br>
 
+      <p class = 'header-2'>Add a new project</p>
+
       <!-- Form for adding a new project -->
       <div class = 'row'>
 
         <form class = 'form-inline'>
           <!-- New Project Name - Input Field -->
           <div class = 'form-group'>
-            <input type = 'text' class = 'form-control' placeholder = 'New Project' ng-model = 'project.name'>
+            <label for = 'input-name'>Name</label>
+            <input id = 'input-name' type = 'text' class = 'form-control' placeholder = 'New Project' ng-model = 'project.name'>
           </div>
 
           <!-- Method of the new project -->
           <div class = 'form-group'>
-            <select ng-model = 'project.method'>
-              <option value = '' selected disabled>Select a method</option>
+            <label for = 'input-method'>Method</label>
+            <select id = 'input-method' ng-model = 'project.method'>
+              <option value = '' selected disabled>-- Please Select --</option>
               <option>OrderBy</option>
             </select>
           </div>
 
           <!-- Add button -->
-          <div class = 'form-group'>
-            <button type = 'button' class = 'btn btn-success btn-add' ng-click = 'addProject()'>Add Project</button>
-          </div>
+            <button type = 'button' class = 'btn btn-success btn-add' ng-click = 'addProject()'>Add</button>
         </form>
 
       </div>

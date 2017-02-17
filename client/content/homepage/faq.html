@@ -73,7 +73,7 @@
     <div id = 'main-content' class = 'container'>
 
       <p class = 'header-1'>FAQ</p>
-      <p style = 'font-style: italic'>Frequently Asked Questions</p>
+      <p>Frequently Asked Questions</p>
 
       <!-- First set of questions -->
       <div id = 'faq-div'>
@@ -83,21 +83,25 @@
 
         <div class = 'col-sm-6 list-group'>
           <!-- Question 1 -->
-          <a href = '#answer1' class = 'list-group-item list-group-item-info title-question' data-toggle = 'collapse'>What is DecSpace?</a>
+          <a href = '#answer1' class = 'list-group-item title-set-questions' data-toggle = 'collapse'>What is DecSpace?</a>
           <div id = 'answer1' class = 'collapse'>
-            <a href = '' class = 'list-group-item'>DecSpace is a web application ...</a>
+            <p class = 'list-group-item title-set-answers'>DecSpace is a web application that makes use of MCDA methods to support the user during the decision process.
+              <br>
+              For more information, check the <a href = 'about.html'>About</a> page.</p>
           </div>
 
           <!-- Question 2 -->
-          <a href = '#answer2' class = 'list-group-item list-group-item-info title-question' data-toggle = 'collapse'>What is MCDA?</a>
+          <a href = '#answer2' class = 'list-group-item title-set-questions' data-toggle = 'collapse'>What is MCDA?</a>
           <div id = 'answer2' class = 'collapse'>
-            <a href = '' class = 'list-group-item'>MCDA is ...</a>
+            <p class = 'list-group-item title-set-answers'>MCDA (Multi-Criteria Decision Analysis) is one of the fields of stude of Operations Research.
+              <br>
+              It offers a wide variety of MCDA methods to support the user with the most diverse problems.</p>
           </div>
 
           <!-- Question 3 -->
-          <a href = '#answer3' class = 'list-group-item list-group-item-info title-question' data-toggle = 'collapse'>What use do MCDA methods have?</a>
+          <a href = '#answer3' class = 'list-group-item title-set-questions' data-toggle = 'collapse'>Which MCDA methods are currently available?</a>
           <div id = 'answer3' class = 'collapse'>
-            <a href = '' class = 'list-group-item'>MCDA methods ...</a>
+            <p class = 'list-group-item title-set-answers'>Right now, the MCDA methods available in DecSpace are: OrderBy.</p>
           </div>
         </div>
       </div>
@@ -105,17 +109,102 @@
       <!-- Second set of questions -->
       <div>
         <div class = 'col-sm-6 title-set-questions'>
-          <p>Project Management</p>
+          <p>Signing up and logging in</p>
         </div>
 
         <div class = 'col-sm-6 list-group'>
           <!-- Question 4 -->
-          <a href = '#answer4' class = 'list-group-item list-group-item-info title-question' data-toggle = 'collapse'>How do I create a new project?</a>
+          <a href = '#answer4' class = 'list-group-item title-set-questions' data-toggle = 'collapse'>How do I sign up?</a>
           <div id = 'answer4' class = 'collapse'>
-            <a href = '' class = 'list-group-item'>After loging in ...</a>
+            <p class = 'list-group-item title-set-answers'>On the upper right conner of the screen, you can find a button similar to this one:
+              <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'toSignUp()'>
+                <span class = 'glyphicon glyphicon-user'></span>
+                Sign Up
+              </button>
+              <br>
+              If you click it, you are asked to give your email address and a password. After you fill those fields, click the "register" button.</p>
+            </p>
+          </div>
+
+          <!-- Question 5 -->
+          <a href = '#answer5' class = 'list-group-item title-set-questions' data-toggle = 'collapse'>How do I log in?</a>
+          <div id = 'answer5' class = 'collapse'>
+            <p class = 'list-group-item' title-set-answers>Before you can log in, you have to make sure have signed up previously.
+              If you have, then you should click the "Log In" button that can also be found on the upper right corner of the screen.
+              <br>
+              It is similar to this button:
+              <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'toLogIn()'>
+                <span class = 'glyphicon glyphicon-log-in'></span>
+                Log In
+              </button>
+              <br>
+              After you click it, insert the credentials you used to sign up and click the "Log In" button.
+              You should be redirected to the dashboard.
+            </p>
+          </div>
+
+          <!-- Question 6 -->
+          <a href = '#answer6' class = 'list-group-item title-set-questions' data-toggle = 'collapse'>What if I forgot my password?</a>
+          <div id = 'answer6' class = 'collapse'>
+            <p class = 'list-group-item title-set-answers'>If you forgot your password, you can simply go the <a href = 'forgotpassword.html'>Forgot your password?</a> page. There you should introduce the email address you used to sign up and click the "Recover Password".
+              After that, a message is sent to that email address with the password previously defined.
+            </p>
           </div>
         </div>
       </div>
+
+      <!-- Third set of questions -->
+      <div>
+        <div class = 'col-sm-6 title-set-questions'>
+          <p>Project Management</p>
+        </div>
+
+        <div class = 'col-sm-6 list-group'>
+          <!-- Question 7 -->
+          <a href = '#answer7' class = 'list-group-item title-set-questions' data-toggle = 'collapse'>How do I create a new project?</a>
+          <div id = 'answer7' class = 'collapse'>
+            <p class = 'list-group-item title-set-answers'>When you are on the dashboard, click the "Project Management" button.
+              You are redirected to your list of projects and a form to create new ones.
+              All you need to do is choosing a name for your new project, select the method you wish to use in it and then click the "Add" button.</p>
+          </div>
+
+          <!-- Question 8 -->
+          <a href = '#answer8' class = 'list-group-item title-set-questions' data-toggle = 'collapse'>What are the main functionalities of this feature?</a>
+          <div id = 'answer8' class = 'collapse'>
+            <p class = 'list-group-item title-set-answers'>Besides creating new projects, in the "Project Management" page, you can also:
+              <br>
+              <button type = 'button' class = 'btn btn-primary btn-open'>
+                <span class = 'glyphicon glyphicon-folder-open'></span>
+              </button>
+              Open project - go to the "Project Area", where it is possible to insert data and run your project.
+              <br>
+              <button type = 'button' class = 'btn btn-warning btn-edit'>
+                <span class = 'glyphicon glyphicon-edit'></span>
+              </button>
+              Edit project - change the name of a certain project.
+              <br>
+              <button type = 'button' class = 'btn btn-info btn-duplicate'>
+                <span class = 'glyphicon glyphicon-duplicate'></span>
+              </button>
+              Duplicate project - create a project similar to the one that was selected.
+              <br>
+              <button type = 'button' class = 'btn btn-danger btn-delete'>
+                <span class = 'glyphicon glyphicon-trash'></span>
+              </button>
+              Delete project - eliminate a certain a project. It cannot be recovered after that.
+              <br>
+              <button type = 'button' class = 'btn btn-default btn-star-empty'>
+                <span class = 'glyphicon glyphicon-star-empty glyph-custom'></span>
+              </button>
+              <button type = 'button' class = 'btn btn-default btn-star'>
+                <span class = 'glyphicon glyphicon-star glyph-custom'></span>
+              </button>
+              "Favorite" / "Unfavorite" project - Make a project appear on the top/bottom of the list of all projects.
+            </p>
+          </div>
+        </div>
+      </div>
+
     </div>
   </body>
 </html>

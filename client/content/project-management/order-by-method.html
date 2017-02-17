@@ -47,7 +47,7 @@
         <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
         <ul class = 'nav navbar-nav navbar-right'>
           <li>
-            <p class = 'navbar-text'>Welcome, {{username}}</p>
+            <p class = 'navbar-text'>Welcome, {{name}}</p>
           </li>
 
           <li>
@@ -168,14 +168,14 @@
                       </td>
                       <td>
                         <select ng-model = 'new_criterion.type'>
-                          <option value = '' disabled>Select a type</option>
+                          <option value = '' disabled>-- Please Select ---</option>
                           <option>Text</option>
                           <option>Number</option>
                         </select>
                       </td>
                       <td>
                         <select ng-model = 'new_criterion.direction'>
-                          <option value = '' disabled>Select a direction</option>
+                          <option value = '' disabled>--- Please Select ---</option>
                           <option>Ascendant</option>
                           <option>Descendant</option>
                         </select>
@@ -290,7 +290,12 @@
           <p class = 'header-2'>Past Executions</p>
 
           <div class = 'list-group' ng-repeat = 'execution in executions'>
-            <a href = '#{{execution.id}}' class = 'list-group-item' data-toggle = 'collapse'>{{execution.execution_date}}</a>
+            <a href = '#{{execution.id}}' class = 'list-group-item' data-toggle = 'collapse'>
+              <p>
+              {{execution.execution_date}}
+              <button type = 'button' class = 'btn btn-danger' style = 'float:right'><span class = 'glyphicon glyphicon-minus'></span></button>
+            </p>
+            </a>
             <div id = '{{execution.id}}' class = 'collapse'>
               <a class = 'list-group-item'>
                 <p class = 'header-3'>Input Data</p>
@@ -359,10 +364,6 @@
                   <p class = 'header-3'>Comment</p>
                   <p>{{execution.comment}}</p>
                 </div>
-
-                <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteExecution(execution)'>
-                  <span class = 'glyphicon glyphicon-trash'></span>
-                </button>
               </a>
             </div>
           </div>
@@ -370,8 +371,7 @@
           <br>
 
           <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteAllExecutions()'>
-            <span class = 'glyphicon glyphicon-trash'></span>
-            Delete all executions
+            Delete Executions
           </button>
 
         </div>
