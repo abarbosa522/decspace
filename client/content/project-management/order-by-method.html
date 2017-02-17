@@ -110,7 +110,7 @@
                   </thead>
                   <tbody ng-repeat = 'criterion in criteria'>
                     <!-- Added criteria - List view-->
-                    <tr id = 'criterion-list-{{criterion.id}}'>
+                    <tr id = 'criterion-list-{{criterion.criterion_id}}'>
                       <!-- List view -->
                       <td>
                         <input type = 'radio' name = 'check-criterion-list-view' ng-checked = 'isCriterionSelected(criterion)' ng-click = 'selectCriterion(criterion)' >
@@ -128,7 +128,7 @@
                       </td>
                     </tr>
                     <!-- Added criteria - edit view -->
-                    <tr id = 'criterion-edit-{{criterion.id}}' class = 'no-display'>
+                    <tr id = 'criterion-edit-{{criterion.criterion_id}}' class = 'no-display'>
                       <td>
                         <input type = 'radio' name = 'check-criterion-edit-view' ng-checked = 'isCriterionSelected(criterion)' ng-click = 'selectCriterion(criterion)' >
                       </td>
@@ -153,7 +153,7 @@
                         <button type = 'button' class = 'btn btn-success' ng-click = 'confirmEditCriterion(criterion)'>
                           <span class = 'glyphicon glyphicon-ok'></span>
                         </button>
-                        <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelEditCriterion(criterion)'>
+                        <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelEditCriterion()'>
                           <span class = 'glyphicon glyphicon-remove'></span>
                         </button>
                       </td>
@@ -211,7 +211,7 @@
                   </thead>
                   <tbody ng-repeat = 'action in actions'>
                     <!-- List view of actions -->
-                    <tr id = 'action-list-{{action.id}}'>
+                    <tr id = 'action-list-{{action.action_id}}'>
                       <td>{{action.name}}</td>
                       <td ng-repeat = 'criterion in criteria'>{{action[criterion.name]}}</td>
                       <td>
@@ -224,7 +224,7 @@
                       </td>
                     </tr>
                     <!-- Edit view of actions -->
-                    <tr id = 'action-edit-{{action.id}}' class = 'no-display'>
+                    <tr id = 'action-edit-{{action.action_id}}' class = 'no-display'>
                       <td>
                         <input class = 'form-control' type = 'text' ng-model = 'action.name'>
                       </td>
@@ -235,7 +235,7 @@
                         <button type = 'button' class = 'btn btn-success' ng-click = 'confirmEditAction(action)'>
                           <span class = 'glyphicon glyphicon-ok'></span>
                         </button>
-                        <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelEditAction(action)'>
+                        <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelEditAction()'>
                           <span class = 'glyphicon glyphicon-remove'></span>
                         </button>
                       </td>
@@ -285,18 +285,31 @@
             <button type = 'button' class = 'btn btn-default' ng-click = 'getResults()'>Get Results</button>
           </form>
 
-          <br><br>
+          <br>
+
+          <div class = 'alert alert-danger' role = 'alert' ng-if = 'showOrderError' ng-cloak>
+            An order has <strong>not</strong> been chosen.
+          </div>
+
+          <div class = 'alert alert-danger' role = 'alert' ng-if = 'showNoCriteriaError' ng-cloak>
+            <strong>No</strong> criteria have been added.
+          </div>
+
+          <div class = 'alert alert-danger' role = 'alert' ng-if = 'showNoActionsError' ng-cloak>
+            <strong>No</strong> action have been added.
+          </div>
+          <br>
 
           <p class = 'header-2'>Past Executions</p>
 
           <div class = 'list-group' ng-repeat = 'execution in executions'>
-            <a href = '#{{execution.id}}' class = 'list-group-item' data-toggle = 'collapse'>
+            <a href = '#{{execution.execution_id}}' class = 'list-group-item' data-toggle = 'collapse'>
               <p>
               {{execution.execution_date}}
-              <button type = 'button' class = 'btn btn-danger' style = 'float:right'><span class = 'glyphicon glyphicon-minus'></span></button>
+              <button type = 'button' class = 'btn btn-danger' style = 'float:right' ng-click = 'deleteExecution(execution)'><span class = 'glyphicon glyphicon-minus'></span></button>
             </p>
             </a>
-            <div id = '{{execution.id}}' class = 'collapse'>
+            <div id = '{{execution.execution_id}}' class = 'collapse'>
               <a class = 'list-group-item'>
                 <p class = 'header-3'>Input Data</p>
 

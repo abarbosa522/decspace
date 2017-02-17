@@ -34,37 +34,31 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
   //change "last update" field to current date and get the selected method
   function rewriteLastUpdate() {
     //get all projects from database
-    $http.get('/projects').success(function(res) {
+    $http.get('/projects').success(function(response) {
+      var id_doc, proj_res;
+
       //get current date
       var current_date = new Date();
-      var last_update = current_date.getDate() + '/' + (current_date.getMonth() + 1) + '/' + current_date.getFullYear();
+      var last_update = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
 
-      //projects of the logged user
-      var user_proj;
-
-      for(user in res) {
-        if(res[user].username == $scope.username) {
-          user_proj = res[user];
+      //get the selected project
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+          //change the name of the project
+          response[proj]['last_update'] = last_update;
+          //get the id of the document, so that it can be removed from the db
+          id_doc = response[proj]['_id'];
+          //project to store in the db and remove the id of the document
+          proj_res = response[proj];
+          delete proj_res['_id'];
           break;
         }
       }
-
-      for(project in user_proj['projects']) {
-        if(user_proj['projects'][project]['id'] == proj_id) {
-          //rewrite "last_update"
-          user_proj['projects'][project]['last_update'] = last_update;
-          break;
-        }
-      }
-
-      //get the id of the document and then remove it from the new one
-      var id_doc = user_proj['_id'];
-      delete user_proj['_id'];
 
       //delete the previous document with the list of projects
       $http.delete('/projects/' + id_doc).success(function(){
         //add the new list of projects
-        $http.post('/projects', user_proj).success(function() {
+        $http.post('/projects', proj_res).success(function() {
           getCriteria();
           getSelectedCriterion();
           getActions();
@@ -75,21 +69,11 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
   }
 
   function getCriteria() {
-    $http.get('/projects').success(function(res) {
-      //projects of the logged user
-      var user_proj;
-
-      for(user in res) {
-        if(res[user].username == $scope.username) {
-          user_proj = res[user];
-          break;
-        }
-      }
-
-      for(project in user_proj['projects']) {
-        if(user_proj['projects'][project]['id'] == proj_id) {
-          //get the criteria previously added
-          $scope.criteria = user_proj['projects'][project]['criteria'];
+    $http.get('/projects').success(function(response) {
+      //get the selected project
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+          $scope.criteria = response[proj]['criteria'];
           break;
         }
       }
@@ -125,39 +109,34 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
       }
 
       if(!$scope.showCriterionNameError) {
-        $http.get('/projects').success(function(res) {
-          //projects of the logged user
-          var user_proj;
+        $http.get('/projects').success(function(response) {
+          var id_doc, proj_res;
 
-          for(user in res) {
-            if(res[user].username == $scope.username) {
-              user_proj = res[user];
+          for(proj in response) {
+            if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+              //get the largest criteria_id
+              if(response[proj]['criteria'].length == 0) {
+                $scope.new_criterion.criterion_id = 1;
+              }
+              else {
+                $scope.new_criterion.criterion_id = response[proj]['criteria'][response[proj]['criteria'].length - 1]['criterion_id'] + 1;
+              }
+
+              //insert criterion into the project
+              response[proj]['criteria'].push($scope.new_criterion);
+              //get the id of the document, so that it can be removed from the db
+              id_doc = response[proj]['_id'];
+              //project to store in the db
+              proj_res = response[proj];
+              delete proj_res['_id'];
               break;
             }
           }
-
-          for(project in user_proj['projects']) {
-            if(user_proj['projects'][project]['id'] == proj_id) {
-              //define id of the criteria
-              if(user_proj['projects'][project]['criteria'].length == 0)
-                $scope.new_criterion.id = 1;
-              else
-                $scope.new_criterion.id = user_proj['projects'][project]['criteria'][user_proj['projects'][project]['criteria'].length - 1]['id'] + 1;
-
-              //insert criterion into database
-              user_proj['projects'][project]['criteria'].push($scope.new_criterion);
-              break;
-            }
-          }
-
-          //get the id of the document and then remove it from the new one
-          var id_doc = user_proj['_id'];
-          delete user_proj['_id'];
 
           //delete the previous document with the list of projects
-          $http.delete('/projects/' + id_doc).success(function(){
+          $http.delete('/projects/' + id_doc).success(function() {
             //add the new list of projects
-            $http.post('/projects', user_proj).success(function() {
+            $http.post('/projects', proj_res).success(function() {
               //refresh the list of projects
               getCriteria();
               //reset the input fields
@@ -174,8 +153,8 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
   //edit a certain criterion
   $scope.editCriterion = function(criterion) {
     //hide the listed project and show the edit view
-    angular.element(document.querySelector('#criterion-list-' + criterion.id)).addClass('no-display');
-    angular.element(document.querySelector('#criterion-edit-' + criterion.id)).removeClass('no-display');
+    angular.element(document.querySelector('#criterion-list-' + criterion.criterion_id)).addClass('no-display');
+    angular.element(document.querySelector('#criterion-edit-' + criterion.criterion_id)).removeClass('no-display');
 
     //disable all other edit, remove and add buttons
     angular.element(document.querySelectorAll('.btn-crt-edit, .btn-crt-remove, .btn-crt-add')).prop('disabled', true);
@@ -183,7 +162,6 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
 
   //confirm edit changes
   $scope.confirmEditCriterion = function(criterion) {
-
     //don't allow any of the fields to be empty - name, type and direction
     if(getNumberOfFields(criterion) < 3 || criterion.name == '' || criterion.type == '' || criterion.direction == '') {
       $scope.showCriterionFieldsError = true;
@@ -195,7 +173,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
       $scope.showCriterionNameError = false;
 
       for(crt in $scope.criteria) {
-        if(criterion.name == $scope.criteria[crt]['name'] && criterion.id != $scope.criteria[crt]['id']) {
+        if(criterion.name == $scope.criteria[crt]['name'] && criterion.criterion_id != $scope.criteria[crt]['criterion_id']) {
           $scope.showCriterionNameError = true;
           break;
         }
@@ -203,35 +181,32 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
 
       if(!$scope.showCriterionNameError) {
         //get all projects from the database
-        $http.get('/projects').success(function(res) {
-          var user_proj = '';
+        $http.get('/projects').success(function(response) {
+          var id_doc, proj_res;
 
-          //get the other previously stored projects by the logged user
-          for(user in res) {
-            if(res[user].username == $scope.username)
-              user_proj = res[user];
-          }
+          for(proj in response) {
+            if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+              for(crt in response[proj]['criteria']) {
+                if(response[proj]['criteria'][crt]['criterion_id'] == criterion.criterion_id) {
+                  //change the edited fields
+                  response[proj]['criteria'][crt] = criterion;
 
-          //find project
-          for(proj in user_proj['projects']) {
-            if(user_proj['projects'][proj]['id'] == proj_id) {
-              for(crt in user_proj['projects'][proj]['criteria']) {
-                if(user_proj['projects'][proj]['criteria'][crt]['id'] == criterion.id) {
-                  user_proj['projects'][proj]['criteria'][crt]['name'] = criterion.name;
-                  user_proj['projects'][proj]['criteria'][crt]['type'] = criterion.type;
-                  user_proj['projects'][proj]['criteria'][crt]['direction'] = criterion.direction;
+                  //get the id of the document, so that it can be removed from the db
+                  id_doc = response[proj]['_id'];
+                  //project to store in the db
+                  proj_res = response[proj];
+                  delete proj_res['_id'];
+                  break;
                 }
               }
+              break;
             }
           }
 
-          var id_doc = user_proj['_id'];
-          delete user_proj['_id'];
-
           //delete the previous document with the list of projects
-          $http.delete('/projects/' + id_doc).success(function(){
+          $http.delete('/projects/' + id_doc).success(function() {
             //add the new list of projects
-            $http.post('/projects', user_proj).success(function() {
+            $http.post('/projects', proj_res).success(function() {
               //refresh the list of projects and the initial view
               getCriteria();
               //enable the add button again
@@ -244,7 +219,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
   }
 
   //cancel edit changes
-  $scope.cancelEditCriterion = function(criterion) {
+  $scope.cancelEditCriterion = function() {
     //refresh the list of projects and the initial view
     getCriteria();
     //enable the add button again
@@ -252,28 +227,25 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
   }
 
   $scope.deleteCriterion = function(criterion) {
-    $http.get('/projects').success(function(res) {
-      //projects of the logged user
-      var user_proj;
+    $http.get('/projects').success(function(response) {
+      var id_doc, proj_res;
 
-      for(user in res) {
-        if(res[user].username == $scope.username) {
-          user_proj = res[user];
-          break;
-        }
-      }
-
-      for(project in user_proj['projects']) {
-        if(user_proj['projects'][project]['id'] == proj_id) {
-          for(crt in user_proj['projects'][project]['criteria']) {
-            if(user_proj['projects'][project]['criteria'][crt]['name'] == criterion.name) {
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+          for(crt in response[proj]['criteria']) {
+            if(response[proj]['criteria'][crt]['criterion_id'] == criterion.criterion_id) {
               //search for criterion and delete it from the database
-              user_proj['projects'][project]['criteria'].splice(crt, 1);
+              response[proj]['criteria'].splice(crt, 1);
 
               //if it is the selected criterion, then rewrite it
               if(selectedCriterion == criterion.name)
-                user_proj['projects'][project]['order_by_criterion'] = '';
+                response[proj]['order_by_criterion'] = '';
 
+              //get the id of the document, so that it can be removed from the db
+              id_doc = response[proj]['_id'];
+              //project to store in the db
+              proj_res = response[proj];
+              delete proj_res['_id'];
               break;
             }
           }
@@ -281,14 +253,10 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
         }
       }
 
-      //get the id of the document and then remove it from the new one
-      var id_doc = user_proj['_id'];
-      delete user_proj['_id'];
-
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function(){
+      $http.delete('/projects/' + id_doc).success(function() {
         //add the new list of projects
-        $http.post('/projects', user_proj).success(function() {
+        $http.post('/projects', proj_res).success(function() {
           //refresh the list of projects
           getCriteria();
         });
@@ -297,49 +265,39 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
   }
 
   function getSelectedCriterion() {
-    $http.get('/projects').success(function(res) {
+    $http.get('/projects').success(function(response) {
       //projects of the logged user
-      var user_proj;
-
-      for(user in res) {
-        if(res[user].username == $scope.username)
-          user_proj = res[user];
-      }
-
-      for(project in user_proj['projects']) {
-        if(user_proj['projects'][project]['id'] == proj_id) {
+      for(proj in response) {
+        if(response[proj]['project_id'] == proj_id) {
           //get the selected criterion
-          selectedCriterion = user_proj['projects'][project]['order_by_criterion'];
+          selectedCriterion = response[proj]['order_by_criterion'];
         }
       }
     });
   }
 
   $scope.selectCriterion = function(criterion) {
-    $http.get('/projects').success(function(res) {
+    $http.get('/projects').success(function(response) {
+      var id_doc, proj_res;
       //projects of the logged user
-      var user_proj;
-
-      for(user in res) {
-        if(res[user].username == $scope.username)
-          user_proj = res[user];
-      }
-
-      for(project in user_proj['projects']) {
-        if(user_proj['projects'][project]['id'] == proj_id) {
+      for(proj in response) {
+        if(response[proj]['project_id'] == proj_id) {
           //insert or "rewrite" selected criterion in db
-          user_proj['projects'][project]['order_by_criterion'] = criterion.name;
+          response[proj]['order_by_criterion'] = criterion.name;
+
+          //get the id of the document, so that it can be removed from the db
+          id_doc = response[proj]['_id'];
+          //project to store in the db
+          proj_res = response[proj];
+          delete proj_res['_id'];
+          break;
         }
       }
 
-      //get the id of the document and then remove it from the new one
-      var id_doc = user_proj['_id'];
-      delete user_proj['_id'];
-
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function(){
+      $http.delete('/projects/' + id_doc).success(function() {
         //add the new list of projects
-        $http.post('/projects', user_proj).success(function() {
+        $http.post('/projects', proj_res).success(function() {
           selectedCriterion = criterion.name;
         });
       });
@@ -354,21 +312,11 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
   }
 
   function getActions() {
-    $http.get('/projects').success(function(res) {
-      //projects of the logged user
-      var user_proj;
-
-      for(user in res) {
-        if(res[user].username == $scope.username) {
-          user_proj = res[user];
-          break;
-        }
-      }
-
-      for(project in user_proj['projects']) {
-        if(user_proj['projects'][project]['id'] == proj_id) {
+    $http.get('/projects').success(function(response) {
+      for(proj in response) {
+        if(response[proj]['project_id'] == proj_id) {
           //get the actions previously added
-          $scope.actions = user_proj['projects'][project]['actions'];
+          $scope.actions = response[proj]['actions'];
           break;
         }
       }
@@ -394,39 +342,32 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
       }
 
       if(!$scope.showActionNameError) {
-        $http.get('/projects').success(function(res) {
-          //projects of the logged user
-          var user_proj;
+        $http.get('/projects').success(function(response) {
+          var id_doc, proj_res;
 
-          for(user in res) {
-            if(res[user].username == $scope.username) {
-              user_proj = res[user];
-              break;
-            }
-          }
-
-          for(project in user_proj['projects']) {
-            if(user_proj['projects'][project]['id'] == proj_id) {
-              //define id of the criteria
-              if(user_proj['projects'][project]['actions'].length == 0)
-                $scope.new_action.id = 1;
+          for(proj in response) {
+            if(response[proj]['project_id'] == proj_id) {
+              //define id of the action
+              if(response[proj]['actions'].length == 0)
+                $scope.new_action.action_id = 1;
               else
-                $scope.new_action.id = user_proj['projects'][project]['actions'][user_proj['projects'][project]['actions'].length - 1]['id'] + 1;
+                $scope.new_action.action_id = response[proj]['actions'][response[proj]['actions'].length - 1]['action_id'] + 1;
 
               //insert action into database
-              user_proj['projects'][project]['actions'].push($scope.new_action);
+              response[proj]['actions'].push($scope.new_action);
+              //get the id of the document, so that it can be removed from the db
+              id_doc = response[proj]['_id'];
+              //project to store in the db
+              proj_res = response[proj];
+              delete proj_res['_id'];
               break;
             }
           }
-
-          //get the id of the document and then remove it from the new one
-          var id_doc = user_proj['_id'];
-          delete user_proj['_id'];
 
           //delete the previous document with the list of projects
           $http.delete('/projects/' + id_doc).success(function(){
             //add the new list of projects
-            $http.post('/projects', user_proj).success(function() {
+            $http.post('/projects', proj_res).success(function() {
               //refresh the list of actions
               getActions();
               //reset the input fields
@@ -441,8 +382,8 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
   //edit a certain action
   $scope.editAction = function(action) {
     //hide the listed project and show the edit view
-    angular.element(document.querySelector('#action-list-' + action.id)).addClass('no-display');
-    angular.element(document.querySelector('#action-edit-' + action.id)).removeClass('no-display');
+    angular.element(document.querySelector('#action-list-' + action.action_id)).addClass('no-display');
+    angular.element(document.querySelector('#action-edit-' + action.action_id)).removeClass('no-display');
 
     //disable all other edit, remove and add buttons
     angular.element(document.querySelectorAll('.btn-action-edit, .btn-action-remove, .btn-action-add')).prop('disabled', true);
@@ -461,43 +402,36 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
       $scope.showActionNameError = false;
 
       for(act in $scope.actions) {
-        if(action.name == $scope.actions[act]['name'] && action.id != $scope.actions[act]['id']) {
+        if(action.name == $scope.actions[act]['name'] && action.action_id != $scope.actions[act]['action_id']) {
           $scope.showActionNameError = true;
           break;
         }
       }
 
       if(!$scope.showActionNameError) {
-        $http.get('/projects').success(function(res) {
-          //projects of the logged user
-          var user_proj;
+        $http.get('/projects').success(function(response) {
+          var id_doc, proj_res;
 
-          for(user in res) {
-            if(res[user].username == $scope.username) {
-              user_proj = res[user];
-              break;
-            }
-          }
-
-          for(project in user_proj['projects']) {
-            if(user_proj['projects'][project]['id'] == proj_id) {
-              for(act in user_proj['projects'][project]['actions']) {
-                if(user_proj['projects'][project]['actions'][act]['id'] == action.id) {
-                  user_proj['projects'][project]['actions'][act] = action;
+          for(proj in response) {
+            if(response[proj]['project_id'] == proj_id) {
+              for(act in response[proj]['actions']) {
+                if(response[proj]['actions'][act]['action_id'] == action.action_id) {
+                  response[proj]['actions'][act] = action;
+                  //get the id of the document, so that it can be removed from the db
+                  id_doc = response[proj]['_id'];
+                  //project to store in the db
+                  proj_res = response[proj];
+                  delete proj_res['_id'];
                   break;
                 }
               }
             }
           }
 
-          //get the id of the document and then remove it from the new one
-          var id_doc = user_proj['_id'];
-          delete user_proj['_id'];
-
           //delete the previous document with the list of projects
           $http.delete('/projects/' + id_doc).success(function(){
             //add the new list of projects
-            $http.post('/projects', user_proj).success(function() {
+            $http.post('/projects', proj_res).success(function() {
               //refresh the list of actions
               getActions();
               //enable the add button again
@@ -518,23 +452,20 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
   }
 
   $scope.deleteAction = function(action) {
-    $http.get('/projects').success(function(res) {
-      //projects of the logged user
-      var user_proj;
+    $http.get('/projects').success(function(response) {
+      var id_doc, proj_res;
 
-      for(user in res) {
-        if(res[user].username == $scope.username) {
-          user_proj = res[user];
-          break;
-        }
-      }
-
-      for(project in user_proj['projects']) {
-        if(user_proj['projects'][project]['id'] == proj_id) {
-          for(act in user_proj['projects'][project]['actions']) {
-            if(user_proj['projects'][project]['actions'][act]['name'] == action.name) {
+      for(proj in response) {
+        if(response[proj]['project_id'] == proj_id) {
+          for(act in response[proj]['actions']) {
+            if(response[proj]['actions'][act]['action_id'] == action.action_id) {
               //search for action and delete it from the database
-              user_proj['projects'][project]['actions'].splice(act, 1);
+              response[proj]['actions'].splice(act, 1);
+              //get the id of the document, so that it can be removed from the db
+              id_doc = response[proj]['_id'];
+              //project to store in the db
+              proj_res = response[proj];
+              delete proj_res['_id'];
               break;
             }
           }
@@ -542,14 +473,10 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
         }
       }
 
-      //get the id of the document and then remove it from the new one
-      var id_doc = user_proj['_id'];
-      delete user_proj['_id'];
-
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function(){
+      $http.delete('/projects/' + id_doc).success(function() {
         //add the new list of projects
-        $http.post('/projects', user_proj).success(function() {
+        $http.post('/projects', proj_res).success(function() {
           //refresh the list of projects
           getActions();
         });
@@ -558,21 +485,11 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
   }
 
   function getExecutions() {
-    $http.get('/projects').success(function(res) {
-      //projects of the logged user
-      var user_proj;
-
-      for(user in res) {
-        if(res[user].username == $scope.username) {
-          user_proj = res[user];
-          break;
-        }
-      }
-
-      for(project in user_proj['projects']) {
-        if(user_proj['projects'][project]['id'] == proj_id) {
+    $http.get('/projects').success(function(response) {
+      for(proj in response) {
+        if(response[proj]['project_id'] == proj_id) {
           //get the actions previously added
-          $scope.executions = user_proj['projects'][project]['executions'];
+          $scope.executions = response[proj]['executions'];
           break;
         }
       }
@@ -580,88 +497,105 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
   }
 
   $scope.getResults = function() {
-    var results = OrderByService.getResults($scope.criteria, $scope.actions, selectedCriterion);
+    //check if any criteria was added
+    if($scope.criteria.length == 0) {
+      $scope.showNoCriteriaError = true;
+      $scope.showNoActionsError = false;
+      $scope.showOrderError = false;
+    }
+    //check if any actions were added
+    else if($scope.actions.length == 0) {
+      $scope.showNoCriteriaError = false;
+      $scope.showNoActionsError = true;
+      $scope.showOrderError = false;
+    }
+    //check if a criterion was selected
+    else if(selectedCriterion == '') {
+      $scope.showNoCriteriaError = false;
+      $scope.showNoActionsError = false;
+      $scope.showOrderError = true;
+    }
+    else {
+      $scope.showNoCriteriaError = false;
+      $scope.showNoActionsError = false;
+      $scope.showOrderError = false;
 
-    $http.get('/projects').success(function(res) {
-      //get current date
-      var current_date = new Date();
-      var execution_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear() + ' ' + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
+      var results = OrderByService.getResults($scope.criteria, $scope.actions, selectedCriterion);
 
-      //projects of the logged user
-      var user_proj;
+      $http.get('/projects').success(function(response) {
+        //get current date
+        var current_date = new Date();
+        var execution_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear() + ' ' + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
 
-      for(user in res) {
-        if(res[user].username == $scope.username) {
-          user_proj = res[user];
+        //if a comment has not been added
+        if(typeof $scope.new_execution == 'undefined') {
+          var comment = '';
+        }
+        else {
+          var comment = $scope.new_execution.comment;
+        }
+
+        for(proj in response) {
+          if(response[proj]['project_id'] == proj_id) {
+            //get the largest execution_id
+            if(response[proj]['executions'].length == 0) {
+              var execution_id = 1;
+            }
+            else {
+              var execution_id = response[proj]['executions'][response[proj]['executions'].length - 1]['execution_id'] + 1;
+            }
+
+            //insert action into database
+            response[proj]['executions'].push({'execution_id':execution_id,'criteria':$scope.criteria,'actions':$scope.actions,'order_by_criterion':selectedCriterion,'results':results,'comment':comment,'execution_date':execution_date});
+            //get the id of the document, so that it can be removed from the db
+            id_doc = response[proj]['_id'];
+            //project to store in the db
+            proj_res = response[proj];
+            delete proj_res['_id'];
+            break;
+          }
+        }
+
+        //delete the previous document with the list of projects
+        $http.delete('/projects/' + id_doc).success(function() {
+          //add the new list of projects
+          $http.post('/projects', proj_res).success(function() {
+            getExecutions();
+
+            //reset the comment input field, if it was filled
+            if(typeof $scope.new_execution != 'undefined')
+              $scope.new_execution.comment = '';
+          });
+        });
+      });
+    }
+  }
+
+  $scope.deleteExecution = function(execution) {
+    $http.get('/projects').success(function(response) {
+      var id_doc, proj_res;
+
+      for(proj in response) {
+        if(response[proj]['project_id'] == proj_id) {
+          for(exec in response[proj]['executions']) {
+            if(response[proj]['executions'][exec]['execution_id'] == execution.execution_id) {
+              response[proj]['executions'].splice(exec, 1);
+              //get the id of the document, so that it can be removed from the db
+              id_doc = response[proj]['_id'];
+              //project to store in the db
+              proj_res = response[proj];
+              delete proj_res['_id'];
+              break;
+            }
+          }
           break;
         }
       }
-
-      //if a comment has not been added
-      if(typeof $scope.new_execution == 'undefined') {
-        var comment = '';
-      }
-      else {
-        var comment = $scope.new_execution.comment;
-      }
-
-      for(project in user_proj['projects']) {
-        if(user_proj['projects'][project]['id'] == proj_id) {
-          //insert action into database
-          user_proj['projects'][project]['executions'].push({'id':user_proj['projects'][project]['executions'].length,'criteria':$scope.criteria,'actions':$scope.actions,'order_by_criterion':selectedCriterion,'results':results,'comment':comment,'execution_date':execution_date});
-          break;
-        }
-      }
-
-      //get the id of the document and then remove it from the new one
-      var id_doc = user_proj['_id'];
-      delete user_proj['_id'];
 
       //delete the previous document with the list of projects
       $http.delete('/projects/' + id_doc).success(function() {
         //add the new list of projects
-        $http.post('/projects', user_proj).success(function() {
-          getExecutions();
-
-          //reset the comment input field, if it was filled
-          if(typeof $scope.new_execution != 'undefined')
-            $scope.new_execution.comment = '';
-        });
-      });
-    });
-  }
-
-  $scope.deleteExecution = function(execution) {
-    $http.get('/projects').success(function(res) {
-      //projects of the logged user
-      var user_proj;
-
-      for(user in res) {
-        if(res[user].username == $scope.username) {
-          user_proj = res[user];
-          break;
-        }
-      }
-
-      for(project in user_proj['projects']) {
-        if(user_proj['projects'][project]['id'] == proj_id) {
-          for(exec in user_proj['projects'][project]['executions']) {
-            if(user_proj['projects'][project]['executions'][exec]['id'] == execution.id) {
-              user_proj['projects'][project]['executions'].splice(exec, 1);
-              break;
-            }
-          }
-        }
-      }
-
-      //get the id of the document and then remove it from the new one
-      var id_doc = user_proj['_id'];
-      delete user_proj['_id'];
-
-      //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function(){
-        //add the new list of projects
-        $http.post('/projects', user_proj).success(function() {
+        $http.post('/projects', proj_res).success(function() {
           //refresh the list of projects
           getExecutions();
         });
@@ -670,32 +604,25 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
   }
 
   $scope.deleteAllExecutions = function() {
-    $http.get('/projects').success(function(res) {
-      //projects of the logged user
-      var user_proj;
+    $http.get('/projects').success(function(response) {
+      var id_doc, proj_res;
 
-      for(user in res) {
-        if(res[user].username == $scope.username) {
-          user_proj = res[user];
+      for(proj in response) {
+        if(response[proj]['project_id'] == proj_id) {
+          response[proj]['executions'] = [];
+          //get the id of the document, so that it can be removed from the db
+          id_doc = response[proj]['_id'];
+          //project to store in the db
+          proj_res = response[proj];
+          delete proj_res['_id'];
           break;
         }
       }
-
-      for(project in user_proj['projects']) {
-        if(user_proj['projects'][project]['id'] == proj_id) {
-          user_proj['projects'][project]['executions'] = [];
-          break;
-        }
-      }
-
-      //get the id of the document and then remove it from the new one
-      var id_doc = user_proj['_id'];
-      delete user_proj['_id'];
 
       //delete the previous document with the list of projects
       $http.delete('/projects/' + id_doc).success(function(){
         //add the new list of projects
-        $http.post('/projects', user_proj).success(function() {
+        $http.post('/projects', proj_res).success(function() {
           //refresh the list of projects
           getExecutions();
         });

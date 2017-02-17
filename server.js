@@ -12,7 +12,7 @@ var session = require('client-sessions');
 app.use(session({
   cookieName: 'session',
   secret: 'random_string_goes_here',
-  duration: 30 * 60 * 1000,
+  duration: 30 * 60 * 1000 * 4,
   activeDuration: 5 * 60 * 1000
 }));
 
@@ -145,19 +145,12 @@ app.delete('/accounts/:id', function(req, res) {
 var db2 = mongojs('mongodb://' + username + ':' + password + '@ds157247.mlab.com:57247/decspace_users', ['projects']);
 
 //db2 functions - projects
-//get all projects from db
+//get all projects from db - order by project_id
 app.get('/projects', function(req, res) {
-  db2.projects.find().sort( {name: 1}, function (err, doc) {
+  db2.projects.find().sort( {project_id: 1}, function (err, doc) {
     res.json(doc);
   });
 });
-
-function getProjects(req, res, next) {
-  db2.projects.find().sort( {name: 1}, function (err, doc) {
-    req.body.projects = doc;
-    next();
-  });
-}
 
 //insert new project
 app.post('/projects', function(req, res) {

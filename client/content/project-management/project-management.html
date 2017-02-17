@@ -68,7 +68,7 @@
       <!-- Previously created methods -->
       <div class = 'row' ng-repeat = 'project in projects'>
 
-        <div id = 'proj-list-{{project.id}}'>
+        <div id = 'proj-list-{{project.project_id}}'>
           <div class = 'col-md-1'>
           </div>
 
@@ -115,7 +115,7 @@
           </div>
         </div>
 
-        <div id = 'proj-edit-{{project.id}}' class = 'no-display'>
+        <div id = 'proj-edit-{{project.project_id}}' class = 'no-display'>
           <div class = 'col-md-1'>
           </div>
 
@@ -147,13 +147,13 @@
             <button type = 'button' class = 'btn btn-success' ng-click = 'confirmEdit(project)'>
               <span class = 'glyphicon glyphicon-ok'></span>
             </button>
-            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelEdit(project)'>
+            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelEdit()'>
               <span class = 'glyphicon glyphicon-remove'></span>
             </button>
           </div>
         </div>
 
-        <div id = 'proj-delete-{{project.id}}' class = 'no-display'>
+        <div id = 'proj-delete-{{project.project_id}}' class = 'no-display'>
           <div class = 'col-md-1'>
           </div>
 
@@ -185,7 +185,7 @@
             <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDelete(project)'>
               <span class = 'glyphicon glyphicon-ok'></span>
             </button>
-            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDelete(project)'>
+            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDelete()'>
               <span class = 'glyphicon glyphicon-remove'></span>
             </button>
           </div>
@@ -224,8 +224,12 @@
 
       <br>
 
-      <div class = 'alert alert-danger' role = 'alert' ng-if = 'showErrorAlert' ng-cloak>
+      <div class = 'alert alert-danger' role = 'alert' ng-if = 'showMethodErrorAlert' ng-cloak>
         A method has <strong>not</strong> been chosen.
+      </div>
+
+      <div class = 'alert alert-danger' role = 'alert' ng-if = 'showNameErrorAlert' ng-cloak>
+        A name was <strong>not</strong> been defined.
       </div>
 
     </div>

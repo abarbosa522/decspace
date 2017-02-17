@@ -25,32 +25,30 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
     });
   }
 
+  //favorite a project, so that it shows on the top of the list of all projects
   $scope.starProject = function(project) {
     //get all projects from the database
-    $http.get('/projects').success(function(res) {
-      var user_proj = '';
+    $http.get('/projects').success(function(response) {
+      var id_doc, proj_res;
 
-      //get the other previously stored projects by the logged user
-      for(proj in res) {
-        if(res[proj].username == $scope.username)
-          user_proj = res[proj];
-      }
-
-      for(proj in user_proj['projects']) {
-        if(user_proj['projects'][proj]['id'] == project.id) {
-          user_proj['projects'][proj]['starred'] = 'true';
+      //get the selected project
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == project['project_id']) {
+          //change the starred state to true
+          response[proj]['starred'] = 'true';
+          //get the id of the document, so that it can be removed from the db
+          id_doc = response[proj]['_id'];
+          //project to store in the db
+          proj_res = response[proj];
+          delete proj_res['_id'];
           break;
         }
       }
 
-      //get the id of the document and then remove it from the new one
-      var id_doc = user_proj['_id'];
-      delete user_proj['_id'];
-
       //delete the previous document with the list of projects
       $http.delete('/projects/' + id_doc).success(function() {
         //add the new list of projects
-        $http.post('/projects', user_proj).success(function() {
+        $http.post('/projects', proj_res).success(function() {
           //refresh the list of projects
           getProjects();
         });
@@ -58,32 +56,30 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
     });
   }
 
+  //unfavorite a project, so that it appears on the bottom
   $scope.unstarProject = function(project) {
     //get all projects from the database
-    $http.get('/projects').success(function(res) {
-      var user_proj = '';
+    $http.get('/projects').success(function(response) {
+      var id_doc, proj_res;
 
-      //get the other previously stored projects by the logged user
-      for(proj in res) {
-        if(res[proj].username == $scope.username)
-          user_proj = res[proj];
-      }
-
-      for(proj in user_proj['projects']) {
-        if(user_proj['projects'][proj]['id'] == project.id) {
-          user_proj['projects'][proj]['starred'] = 'false';
+      //get the selected project
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == project['project_id']) {
+          //change the starred state to false
+          response[proj]['starred'] = 'false';
+          //get the id of the document, so that it can be removed from the db
+          id_doc = response[proj]['_id'];
+          //project to store in the db
+          proj_res = response[proj];
+          delete proj_res['_id'];
           break;
         }
       }
 
-      //get the id of the document and then remove it from the new one
-      var id_doc = user_proj['_id'];
-      delete user_proj['_id'];
-
       //delete the previous document with the list of projects
       $http.delete('/projects/' + id_doc).success(function() {
         //add the new list of projects
-        $http.post('/projects', user_proj).success(function() {
+        $http.post('/projects', proj_res).success(function() {
           //refresh the list of projects
           getProjects();
         });
@@ -95,7 +91,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
   $scope.openProject = function(project) {
     switch(project.method) {
       case 'OrderBy':
-        $window.location.href = 'order-by-method.html?id=' + project.id;
+        $window.location.href = 'order-by-method.html?id=' + project['project_id'];
         break;
     }
   }
@@ -103,74 +99,52 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
   //add a new project
   $scope.addProject = function() {
     //if a method has not chosen
-    if(typeof $scope.project.method == 'undefined') {
-      //show alert and don't add the project
-      $scope.showErrorAlert = true;
+    if(typeof $scope.project.method == 'undefined' || $scope.project.method == '') {
+      //show method alert and don't add the project
+      $scope.showMethodErrorAlert = true;
+      //hide the name error alert
+      $scope.showNameErrorAlert = false;
+    }
+    else if(typeof $scope.project.name == 'undefined' || $scope.project.name == '') {
+      //show name alert and don't add the project
+      $scope.showNameErrorAlert = true;
+      //hide the method error alert
+      $scope.showMethodErrorAlert = false;
     }
     else {
-      //hide alert, in case it was showing before
-      $scope.showErrorAlert = false;
+      //hide alerts, in case they were showing before
+      $scope.showMethodErrorAlert = false;
+      $scope.showNameErrorAlert = false;
 
       //get all projects from the database
-      $http.get('/projects').success(function(res) {
-        var user_proj = '';
-
-        //get the other previously stored projects by the logged user
-        for(project in res) {
-          if(res[project].username == $scope.username)
-            user_proj = res[project];
-        }
-
+      $http.get('/projects').success(function(response) {
         //get current date
         var current_date = new Date();
         var creation_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
 
-        //if the user did not create any projects previously
-        if(user_proj == '') {
-          //create the new project
-          var proj_text = '{"username":"' + $scope.username + '","projects":[{"id":1,"name":"' + $scope.project.name + '","starred":"false","method":"' + $scope.project.method + '","creation_date":"' + creation_date + '","last_update":"' + creation_date + '","criteria":[],"order_by_criterion":"","actions":[],"executions":[]}]}';
+        //get the biggest project_id of the logged user
+        var project_id = 0;
 
-          //transform to json
-          var proj_obj = JSON.parse(proj_text);
-
-          //add the new project to the database
-          $http.post('/projects', proj_obj).success(function() {
-            //refresh the list of projects
-            getProjects();
-            //reset the input fields
-            $scope.project.name = '';
-            $scope.project.method = '';
-          });
+        for(project in response) {
+          if(response[project]['username'] == $scope.username && response[project]['project_id'] > project_id)
+            project_id = response[project]['project_id'];
         }
-        else {
-          //get the id of the last added project and increment it
-          var id;
+        project_id++;
 
-          //if there are other added projects
-          if(user_proj['projects'].length >= 1)
-            id = user_proj['projects'][user_proj['projects'].length - 1]['id'] + 1;
-          else
-            id = 1;
+        //create the new project
+        var proj_text = '{"project_id":"' + project_id + '","username":"' + $scope.username + '","name":"' + $scope.project.name + '","method":"' + $scope.project.method + '","starred":"false","creation_date":"' + creation_date + '","last_update":"' + creation_date + '","criteria":[],"order_by_criterion":"","actions":[],"executions":[]}';
 
-          //add the new project to the list of projects of the logged user
-          user_proj['projects'].push({'id':id,'name':$scope.project.name,'starred':'false','method':$scope.project.method,'creation_date':creation_date,'last_update':creation_date,'criteria':[],'order_by_criterion':'','actions':[],'executions':[]});
+        //transform to json
+        var proj_obj = JSON.parse(proj_text);
 
-          //get the id of the document and then remove it from the new one
-          var id_doc = user_proj['_id'];
-          delete user_proj['_id'];
-
-          //delete the previous document with the list of projects
-          $http.delete('/projects/' + id_doc).success(function(){
-            //add the new list of projects
-            $http.post('/projects', user_proj).success(function() {
-              //refresh the list of projects
-              getProjects();
-              //reset the input fields
-              $scope.project.name = '';
-              $scope.project.method = '';
-            });
-          });
-        }
+        //add the new project to the database
+        $http.post('/projects', proj_obj).success(function() {
+          //refresh the list of projects
+          getProjects();
+          //reset the input fields
+          $scope.project.name = '';
+          $scope.project.method = '';
+        });
       });
     }
   }
@@ -178,8 +152,8 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
   //edit the name of a certain project
   $scope.editProject = function(project) {
     //hide the listed project and show the edit view
-    angular.element(document.querySelector('#proj-list-' + project.id)).addClass('no-display');
-    angular.element(document.querySelector('#proj-edit-' + project.id)).removeClass('no-display');
+    angular.element(document.querySelector('#proj-list-' + project['project_id'])).addClass('no-display');
+    angular.element(document.querySelector('#proj-edit-' + project['project_id'])).removeClass('no-display');
 
     //disable all other open, edit, duplicate or delete buttons
     angular.element(document.querySelectorAll('.btn-open, .btn-edit, .btn-duplicate, .btn-delete, .btn-star-empty, .btn-star, .btn-add')).prop('disabled', true);
@@ -188,28 +162,28 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
   //confirm edit changes
   $scope.confirmEdit = function(project) {
     //get all projects from the database
-    $http.get('/projects').success(function(res) {
-      var user_proj = '';
+    $http.get('/projects').success(function(response) {
+      var id_doc, proj_res;
 
-      //get the other previously stored projects by the logged user
-      for(user in res) {
-        if(res[user].username == $scope.username)
-          user_proj = res[user];
+      //get the selected project
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == project['project_id']) {
+          //change the name of the project
+          response[proj]['name'] = project.name;
+          //get the id of the document, so that it can be removed from the db
+          id_doc = response[proj]['_id'];
+          //project to store in the db
+          proj_res = response[proj];
+          delete proj_res['_id'];
+          break;
+        }
       }
 
-      //find project
-      for(proj in user_proj['projects'])
-        if(user_proj['projects'][proj]['id'] == project.id)
-          user_proj['projects'][proj]['name'] = project.name;
-
-      var id_doc = user_proj['_id'];
-      delete user_proj['_id'];
-
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function(){
+      $http.delete('/projects/' + id_doc).success(function() {
         //add the new list of projects
-        $http.post('/projects', user_proj).success(function() {
-          //refresh the list of projects and the initial view
+        $http.post('/projects', proj_res).success(function() {
+          //refresh the list of projects
           getProjects();
           //enable the add button
           angular.element(document.querySelectorAll('.btn-add')).prop('disabled', false);
@@ -219,7 +193,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
   }
 
   //cancel edit changes
-  $scope.cancelEdit = function(project) {
+  $scope.cancelEdit = function() {
     getProjects();
     //enable the add button
     angular.element(document.querySelectorAll('.btn-add')).prop('disabled', false);
@@ -228,36 +202,31 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
   //duplicate a project
   $scope.duplicateProject = function(project) {
     //get all projects from the database
-    $http.get('/projects').success(function(res) {
-      var user_proj;
-
-      //get the other previously stored projects by the logged user
-      for(proj in res) {
-        if(res[proj].username == $scope.username)
-          user_proj = res[proj];
-      }
-
+    $http.get('/projects').success(function(response) {
       //get current date
       var current_date = new Date();
-      var creation_date = current_date.getDate() + '/' + (current_date.getMonth() + 1) + '/' + current_date.getFullYear();
+      var creation_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
 
-      //get the id of the last added project and increment it
-      var id = user_proj['projects'][user_proj['projects'].length - 1]['id'] + 1;
+      //get the biggest project_id of the logged user
+      var project_id = 0;
 
-      //add the new project to the list of projects of the logged user
-      user_proj['projects'].push({'id':id,'name':project.name,'starred':project.starred,'method':project.method,'creation_date':creation_date,'last_update':creation_date,'criteria':project.criteria,'order_by_criterion':project.order_by_criterion,'actions':project.actions,'executions':project.results});
+      for(proj in response) {
+        if(response[proj]['username'] == $scope.username && response[proj]['project_id'] > project_id)
+          project_id = response[proj]['project_id'];
+      }
+      project_id++;
 
-      //get the id of the document and then remove it from the new one
-      var id_doc = user_proj['_id'];
-      delete user_proj['_id'];
+      //create the new project
+      var proj_text = '{"project_id":"' + project_id + '","username":"' + $scope.username + '","name":"' + project.name + '","method":"' + project.method + '","starred":"' + project.starred + '","creation_date":"' + creation_date + '","last_update":"' + creation_date + '","criteria":' + JSON.stringify(project.criteria) +
+      ',"order_by_criterion":"' + project.order_by_criterion + '","actions":' + JSON.stringify(project.actions) + ',"executions":' + JSON.stringify(project.executions) + '}';
 
-      //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function(){
-        //add the new list of projects
-        $http.post('/projects', user_proj).success(function() {
-          //refresh the list of projects
-          getProjects();
-        });
+      //transform to json
+      var proj_obj = JSON.parse(proj_text);
+
+      //add the new list of projects
+      $http.post('/projects', proj_obj).success(function() {
+        //refresh the list of projects
+        getProjects();
       });
     });
   }
@@ -265,62 +234,53 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
   //delete a certain project
   $scope.deleteProject = function(project) {
     //hide the listed project and show the edit view
-    angular.element(document.querySelector('#proj-list-' + project.id)).addClass('no-display');
-    angular.element(document.querySelector('#proj-delete-' + project.id)).removeClass('no-display');
+    angular.element(document.querySelector('#proj-list-' + project['project_id'])).addClass('no-display');
+    angular.element(document.querySelector('#proj-delete-' + project['project_id'])).removeClass('no-display');
 
     //disable all other open, edit, duplicate or delete buttons
     angular.element(document.querySelectorAll('.btn-open, .btn-edit, .btn-duplicate, .btn-delete, .btn-star-empty, .btn-star, .btn-add')).prop('disabled', true);
   }
 
   $scope.confirmDelete = function(project) {
-    $http.get('/projects').success(function(res) {
-      var user_proj;
+    $http.get('/projects').success(function(response) {
+      var id_doc;
 
-      //find the projects of the logged user
-      for(user in res)
-        if(res[user].username == $scope.username)
-          user_proj = res[user];
-
-      //find the project to be deleted by its id
-      for(proj in user_proj['projects'])
-        if(user_proj['projects'][proj]['id'] == project['id'])
+      //get the selected project
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == project['project_id']) {
+          //get the id of the document, so that it can be removed from the db
+          id_doc = response[proj]['_id'];
           break;
+        }
+      }
 
-      //delete the project from the json object
-      user_proj['projects'].splice(proj, 1);
-
-      //store and delete the id of the document
-      var id = user_proj['_id'];
-      delete user_proj['_id'];
-
-      $http.delete('/projects/' + id).success(function() {
-        $http.post('/projects', user_proj).success(function() {
-          //refresh the list of projects
-          getProjects();
-          //enable the add button
-          angular.element(document.querySelectorAll('.btn-add')).prop('disabled', false);
-        });
+      $http.delete('/projects/' + id_doc).success(function() {
+        //refresh the list of projects
+        getProjects();
+        //enable the add button
+        angular.element(document.querySelectorAll('.btn-add')).prop('disabled', false);
       });
     });
   }
 
-  $scope.cancelDelete = function(project) {
+  $scope.cancelDelete = function() {
     getProjects();
     //enable the add button
     angular.element(document.querySelectorAll('.btn-add')).prop('disabled', false);
   }
 
   function getProjects() {
-    $http.get('/projects').success(function(res) {
+    $http.get('/projects').success(function(response) {
       var starred_projects = [], unstarred_projects = [];
-      //get the other previously stored project by the logged user
-      for(user in res) {
-        if(res[user].username == $scope.username) {
-          for(project in res[user]['projects']) {
-            if(res[user]['projects'][project]['starred'] == 'true')
-              starred_projects.push(res[user]['projects'][project])
-            else
-              unstarred_projects.push(res[user]['projects'][project])
+
+      //get the created projects by the logged user
+      for(project in response) {
+        if(response[project].username == $scope.username) {
+          if(response[project]['starred'] == 'true') {
+            starred_projects.push(response[project]);
+          }
+          else {
+            unstarred_projects.push(response[project]);
           }
         }
       }
