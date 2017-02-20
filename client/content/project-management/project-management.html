@@ -193,6 +193,55 @@
 
       </div>
 
+      <div id = 'delete-projects-list' ng-if = 'showDeleteAll' ng-cloak>
+        <div class = 'col-md-1'>
+        </div>
+
+        <div class = 'col-md-1'>
+        </div>
+
+        <div class = 'col-md-2'>
+        </div>
+
+        <div class = 'col-md-2'>
+        </div>
+
+        <div class = 'col-md-3'>
+        </div>
+
+        <div class = 'col-md-3'>
+          <button id = 'delete-projects' type = 'button' class = 'btn btn-danger btn-delete-all' ng-click = 'deleteAllProjects()'>
+            Delete All Projects
+          </button>
+        </div>
+      </div>
+
+      <div id = 'delete-projects-confirm' class = 'no-display'>
+        <div class = 'col-md-1'>
+        </div>
+
+        <div class = 'col-md-1'>
+        </div>
+
+        <div class = 'col-md-2'>
+        </div>
+
+        <div class = 'col-md-2'>
+        </div>
+
+        <div class = 'col-md-3'>
+        </div>
+
+        <div class = 'col-md-3'>
+          <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAll()'>
+            <span class = 'glyphicon glyphicon-ok'></span>
+          </button>
+          <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAll()'>
+            <span class = 'glyphicon glyphicon-remove'></span>
+          </button>
+        </div>
+      </div>
+
       <br><br>
 
       <p class = 'header-2'>Add a new project</p>

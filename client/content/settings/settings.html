@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DecSpace - Project Management</title>
+
+    <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
+
+    <!-- CSS Stylesheet -->
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css' />
+
+    <!-- jQuery -->
+    <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
+    <script type = 'text/javascript' src = '../../js/shared/jquery-ui-1.12.0/jquery-ui.js'></script>
+
+    <!-- AngularJS -->
+    <script src = '../../js/shared/angular.min.js'></script>
+
+    <!-- AngularJS Modules -->
+    <script src = '../../js/app.js'></script>
+
+    <!-- AngularJS Controllers -->
+    <script src = '../../js/controllers/settings/SettingsController.js'></script>
+
+    <!-- Bootstrap -->
+    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css' />
+    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap-theme.min.css' />
+    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.js'></script>
+    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.min.js'></script>
+
+    <!-- Google Web Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600i" rel="stylesheet">
+  </head>
+
+  <body ng-app = 'decspace' ng-controller = 'SettingsController'>
+
+    <!-- Navigation Bar -->
+    <nav class = 'navbar navbar-custom navbar-fixed-top'>
+      <div class = 'container'>
+        <!-- Title -->
+        <div class = 'navbar-header'>
+          <a class = 'navbar-brand' href = '../dashboard/dashboard.html'>DecSpace</a>
+        </div>
+
+        <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
+        <ul class = 'nav navbar-nav navbar-right'>
+          <li>
+            <p class = 'navbar-text' ng-cloak>Welcome, {{name}}</p>
+          </li>
+
+          <li>
+            <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'logOut()'>
+              <span class = 'glyphicon glyphicon-log-out'></span>
+              Log Out
+            </button>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div id = 'main-content' class = 'container'>
+
+      <p class = 'header-1'>Settings</p>
+
+      <!-- Horizontal divider -->
+      <hr/>
+
+      <p class = 'header-2'>Password Reset</p>
+
+      <form class = 'form-horizontal'>
+        <!-- Current Password -->
+        <div class = 'form-group'>
+          <label for = 'input-current-password' class = 'col-sm-4 control-label'>
+            Current Password
+          </label>
+
+          <div class = 'col-sm-4 input-group'>
+            <input type = '{{inputTypeCurrent}}' class = 'form-control' ng-model = 'password.current'>
+
+            <span class = 'input-group-btn'>
+              <button class = 'btn btn-default' type = 'button' ng-click = 'showCurrentPassword()'>
+                <span id = 'eye-1' class = 'glyphicon glyphicon-eye-open'></span>
+              </button>
+            </span>
+          </div>
+        </div>
+
+        <!-- Old Password -->
+        <div class = 'form-group'>
+          <label for = 'input-new-password' class = 'col-sm-4 control-label'>
+            New Password
+          </label>
+
+          <div class = 'col-sm-4 input-group'>
+            <input type = '{{inputTypeNew}}' class = 'form-control' ng-model = 'password.new'>
+
+            <span class = 'input-group-btn'>
+              <button class = 'btn btn-default' type = 'button' ng-click = 'showNewPassword()'>
+                <span id = 'eye-2' class = 'glyphicon glyphicon-eye-open'></span>
+              </button>
+            </span>
+          </div>
+        </div>
+
+        <button class = 'btn btn-primary' ng-click = 'passwordReset()'>Reset</button>
+      </form>
+
+      <br>
+
+      <div class = 'alert alert-danger' role = 'alert' ng-if = 'showPasswordError' ng-cloak>
+        <strong>The</strong> current password was not correctly introduced.
+      </div>
+
+      <div class = 'alert alert-success' role = 'alert' ng-if = 'showPasswordSuccess' ng-cloak>
+        Your password was <strong>successfully</strong> changed!
+      </div>
+
+      <div class = 'alert alert-danger' role = 'alert' ng-if = 'showFieldsError' ng-cloak>
+        <strong>Please</strong> fill both fields shown above.
+      </div>
+
+    </div>
+
+  </body>
+</html>

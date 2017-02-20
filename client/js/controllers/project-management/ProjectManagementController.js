@@ -156,7 +156,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
     angular.element(document.querySelector('#proj-edit-' + project['project_id'])).removeClass('no-display');
 
     //disable all other open, edit, duplicate or delete buttons
-    angular.element(document.querySelectorAll('.btn-open, .btn-edit, .btn-duplicate, .btn-delete, .btn-star-empty, .btn-star, .btn-add')).prop('disabled', true);
+    angular.element(document.querySelectorAll('.btn-open, .btn-edit, .btn-duplicate, .btn-delete, .btn-star-empty, .btn-star, .btn-add, .btn-delete-all')).prop('disabled', true);
   }
 
   //confirm edit changes
@@ -186,7 +186,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
           //refresh the list of projects
           getProjects();
           //enable the add button
-          angular.element(document.querySelectorAll('.btn-add')).prop('disabled', false);
+          angular.element(document.querySelectorAll('.btn-add, .btn-delete-all')).prop('disabled', false);
         });
       });
     });
@@ -196,7 +196,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
   $scope.cancelEdit = function() {
     getProjects();
     //enable the add button
-    angular.element(document.querySelectorAll('.btn-add')).prop('disabled', false);
+    angular.element(document.querySelectorAll('.btn-add, .btn-delete-all')).prop('disabled', false);
   }
 
   //duplicate a project
@@ -238,7 +238,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
     angular.element(document.querySelector('#proj-delete-' + project['project_id'])).removeClass('no-display');
 
     //disable all other open, edit, duplicate or delete buttons
-    angular.element(document.querySelectorAll('.btn-open, .btn-edit, .btn-duplicate, .btn-delete, .btn-star-empty, .btn-star, .btn-add')).prop('disabled', true);
+    angular.element(document.querySelectorAll('.btn-open, .btn-edit, .btn-duplicate, .btn-delete, .btn-star-empty, .btn-star, .btn-add, .btn-delete-all')).prop('disabled', true);
   }
 
   $scope.confirmDelete = function(project) {
@@ -258,7 +258,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
         //refresh the list of projects
         getProjects();
         //enable the add button
-        angular.element(document.querySelectorAll('.btn-add')).prop('disabled', false);
+        angular.element(document.querySelectorAll('.btn-add, .btn-delete-all')).prop('disabled', false);
       });
     });
   }
@@ -266,7 +266,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
   $scope.cancelDelete = function() {
     getProjects();
     //enable the add button
-    angular.element(document.querySelectorAll('.btn-add')).prop('disabled', false);
+    angular.element(document.querySelectorAll('.btn-add, .btn-delete-all')).prop('disabled', false);
   }
 
   function getProjects() {
@@ -289,7 +289,53 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
       $scope.projects = starred_projects;
       for(project in unstarred_projects)
         $scope.projects.push(unstarred_projects[project]);
+
+      //show/hide the "delete all projects" button
+      if($scope.projects.length == 0)
+        $scope.showDeleteAll = false;
+      else
+        $scope.showDeleteAll = true;
     });
+  }
+
+  $scope.deleteAllProjects = function() {
+    //hide the listed project and show the edit view
+    angular.element(document.querySelector('#delete-projects-list')).addClass('no-display');
+    angular.element(document.querySelector('#delete-projects-confirm')).removeClass('no-display');
+    //disable all other open, edit, duplicate or delete buttons
+    angular.element(document.querySelectorAll('.btn-open, .btn-edit, .btn-duplicate, .btn-delete, .btn-star-empty, .btn-star, .btn-add')).prop('disabled', true);
+  }
+
+  $scope.confirmDeleteAll = function() {
+    $http.get('/projects').success(function(response) {
+      var id_doc;
+
+      //get the selected project
+      for(proj in response) {
+        if(response[proj].username == $scope.username) {
+          //get the id of the document, so that it can be removed from the db
+          id_doc = response[proj]['_id'];
+          $http.delete('/projects/' + id_doc);
+        }
+      }
+
+      //refresh the list of projects
+      getProjects();
+      //hide the listed project and show the edit view
+      angular.element(document.querySelector('#delete-projects-confirm')).addClass('no-display');
+      angular.element(document.querySelector('#delete-projects-list')).removeClass('no-display');
+      //enable the add button
+      angular.element(document.querySelectorAll('.btn-add')).prop('disabled', false);
+    });
+  }
+
+  $scope.cancelDeleteAll = function() {
+    getProjects();
+    //hide the listed project and show the edit view
+    angular.element(document.querySelector('#delete-projects-confirm')).addClass('no-display');
+    angular.element(document.querySelector('#delete-projects-list')).removeClass('no-display');
+    //enable the add button
+    angular.element(document.querySelectorAll('.btn-add')).prop('disabled', false);
   }
 
   requestLogIn();
