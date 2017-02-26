@@ -44,7 +44,9 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
       //get the selected project
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          //change the name of the project
+          //get the name of the project
+          $scope.project_name = response[proj]['name'];
+          //change the date of the last update of the project
           response[proj]['last_update'] = last_update;
           //get the id of the document, so that it can be removed from the db
           id_doc = response[proj]['_id'];
@@ -226,7 +228,17 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
     angular.element(document.querySelectorAll('.btn-crt-add')).prop('disabled', false);
   }
 
+  //delete a certain criterion
   $scope.deleteCriterion = function(criterion) {
+    //hide the listed project and show the edit view
+    angular.element(document.querySelector('#criterion-list-' + criterion.criterion_id)).addClass('no-display');
+    angular.element(document.querySelector('#criterion-delete-' + criterion.criterion_id)).removeClass('no-display');
+
+    //disable all other edit, remove and add buttons
+    angular.element(document.querySelectorAll('.btn-crt-edit, .btn-crt-remove, .btn-crt-add')).prop('disabled', true);
+  }
+
+  $scope.confirmDeleteCriterion = function(criterion) {
     $http.get('/projects').success(function(response) {
       var id_doc, proj_res;
 
@@ -259,16 +271,26 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
         $http.post('/projects', proj_res).success(function() {
           //refresh the list of projects
           getCriteria();
+          //enable the add button again
+          angular.element(document.querySelectorAll('.btn-crt-add')).prop('disabled', false);
         });
       });
     });
+  }
+
+  //cancel delete changes
+  $scope.cancelDeleteCriterion = function() {
+    //refresh the list of projects and the initial view
+    getCriteria();
+    //enable the add button again
+    angular.element(document.querySelectorAll('.btn-crt-add')).prop('disabled', false);
   }
 
   function getSelectedCriterion() {
     $http.get('/projects').success(function(response) {
       //projects of the logged user
       for(proj in response) {
-        if(response[proj]['project_id'] == proj_id) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
           //get the selected criterion
           selectedCriterion = response[proj]['order_by_criterion'];
         }
@@ -281,7 +303,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
       var id_doc, proj_res;
       //projects of the logged user
       for(proj in response) {
-        if(response[proj]['project_id'] == proj_id) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
           //insert or "rewrite" selected criterion in db
           response[proj]['order_by_criterion'] = criterion.name;
 
@@ -314,7 +336,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
   function getActions() {
     $http.get('/projects').success(function(response) {
       for(proj in response) {
-        if(response[proj]['project_id'] == proj_id) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
           //get the actions previously added
           $scope.actions = response[proj]['actions'];
           break;
@@ -346,7 +368,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
           var id_doc, proj_res;
 
           for(proj in response) {
-            if(response[proj]['project_id'] == proj_id) {
+            if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
               //define id of the action
               if(response[proj]['actions'].length == 0)
                 $scope.new_action.action_id = 1;
@@ -365,7 +387,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
           }
 
           //delete the previous document with the list of projects
-          $http.delete('/projects/' + id_doc).success(function(){
+          $http.delete('/projects/' + id_doc).success(function() {
             //add the new list of projects
             $http.post('/projects', proj_res).success(function() {
               //refresh the list of actions
@@ -413,7 +435,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
           var id_doc, proj_res;
 
           for(proj in response) {
-            if(response[proj]['project_id'] == proj_id) {
+            if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
               for(act in response[proj]['actions']) {
                 if(response[proj]['actions'][act]['action_id'] == action.action_id) {
                   response[proj]['actions'][act] = action;
@@ -429,7 +451,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
           }
 
           //delete the previous document with the list of projects
-          $http.delete('/projects/' + id_doc).success(function(){
+          $http.delete('/projects/' + id_doc).success(function() {
             //add the new list of projects
             $http.post('/projects', proj_res).success(function() {
               //refresh the list of actions
@@ -451,12 +473,22 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
     angular.element(document.querySelectorAll('.btn-action-add')).prop('disabled', false);
   }
 
+  //delete a certain action
   $scope.deleteAction = function(action) {
+    //hide the listed project and show the edit view
+    angular.element(document.querySelector('#action-list-' + action.action_id)).addClass('no-display');
+    angular.element(document.querySelector('#action-delete-' + action.action_id)).removeClass('no-display');
+
+    //disable all other edit, remove and add buttons
+    angular.element(document.querySelectorAll('.btn-action-edit, .btn-action-remove, .btn-action-add')).prop('disabled', true);
+  }
+
+  $scope.confirmDeleteAction = function(action) {
     $http.get('/projects').success(function(response) {
       var id_doc, proj_res;
 
       for(proj in response) {
-        if(response[proj]['project_id'] == proj_id) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
           for(act in response[proj]['actions']) {
             if(response[proj]['actions'][act]['action_id'] == action.action_id) {
               //search for action and delete it from the database
@@ -479,15 +511,25 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
         $http.post('/projects', proj_res).success(function() {
           //refresh the list of projects
           getActions();
+          //enable the add button again
+          angular.element(document.querySelectorAll('.btn-action-add')).prop('disabled', false);
         });
       });
     });
   }
 
+  //cancel delete
+  $scope.cancelDeleteAction = function(action) {
+    //refresh the list of projects and the initial view
+    getActions();
+    //enable the add button again
+    angular.element(document.querySelectorAll('.btn-action-add')).prop('disabled', false);
+  }
+
   function getExecutions() {
     $http.get('/projects').success(function(response) {
       for(proj in response) {
-        if(response[proj]['project_id'] == proj_id) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
           //get the actions previously added
           $scope.executions = response[proj]['executions'];
           break;
@@ -536,7 +578,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
         }
 
         for(proj in response) {
-          if(response[proj]['project_id'] == proj_id) {
+          if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
             //get the largest execution_id
             if(response[proj]['executions'].length == 0) {
               var execution_id = 1;
@@ -572,11 +614,20 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
   }
 
   $scope.deleteExecution = function(execution) {
+    //hide the listed execution and show the delete view
+    angular.element(document.querySelector('#execution-list-' + execution.execution_id)).addClass('no-display');
+    angular.element(document.querySelector('#execution-delete-' + execution.execution_id)).removeClass('no-display');
+
+    //disable all other edit, remove and add buttons
+    angular.element(document.querySelectorAll('.btn-execution-delete, #btn-delete-all, #btn-get-results')).prop('disabled', true);
+  }
+
+  $scope.confirmDeleteExecution = function(execution) {
     $http.get('/projects').success(function(response) {
       var id_doc, proj_res;
 
       for(proj in response) {
-        if(response[proj]['project_id'] == proj_id) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
           for(exec in response[proj]['executions']) {
             if(response[proj]['executions'][exec]['execution_id'] == execution.execution_id) {
               response[proj]['executions'].splice(exec, 1);
@@ -598,17 +649,43 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
         $http.post('/projects', proj_res).success(function() {
           //refresh the list of projects
           getExecutions();
+          //enable the delete all and get results buttons again
+          angular.element(document.querySelectorAll('#btn-delete-all, #btn-get-results')).prop('disabled', false);
         });
       });
     });
   }
 
+  //cancel delete
+  $scope.cancelDeleteExecution = function(execution) {
+    //refresh the list of projects and the initial view
+    getExecutions();
+    //enable the delete all and get results buttons again
+    angular.element(document.querySelectorAll('#btn-delete-all, #btn-get-results')).prop('disabled', false);
+  }
+
   $scope.deleteAllExecutions = function() {
+    //hide the list view and show the delete view of all executions
+    for(execution in $scope.executions) {
+      angular.element(document.querySelector('#execution-list-' + $scope.executions[execution].execution_id)).children().first().children().first().addClass('list-group-item-danger');
+    }
+
+    //disable the delete button of each execution
+    angular.element(document.querySelectorAll('.btn-execution-delete')).prop('disabled', true);
+    //hide the delete all button
+    angular.element(document.querySelector('#btn-delete-all-div')).addClass('no-display');
+    //show the confirm and cancel delete all executions
+    angular.element(document.querySelector('#delete-all-btn-group')).removeClass('no-display');
+    //disable get results button
+    angular.element(document.querySelector('#btn-get-results')).prop('disabled', true);
+  }
+
+  $scope.confirmDeleteAllExecutions = function() {
     $http.get('/projects').success(function(response) {
       var id_doc, proj_res;
 
       for(proj in response) {
-        if(response[proj]['project_id'] == proj_id) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
           response[proj]['executions'] = [];
           //get the id of the document, so that it can be removed from the db
           id_doc = response[proj]['_id'];
@@ -623,11 +700,28 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
       $http.delete('/projects/' + id_doc).success(function(){
         //add the new list of projects
         $http.post('/projects', proj_res).success(function() {
-          //refresh the list of projects
+          //refresh the list of executions
           getExecutions();
+          //show the delete all button
+          angular.element(document.querySelector('#btn-delete-all-div')).removeClass('no-display');
+          //hide the confirm and cancel delete all executions
+          angular.element(document.querySelector('#delete-all-btn-group')).addClass('no-display');
+          //enable get results button
+          angular.element(document.querySelector('#btn-get-results')).prop('disabled', false);
         });
       });
     });
+  }
+
+  $scope.cancelDeleteAllExecutions = function() {
+    //refresh the list of executions
+    getExecutions();
+    //show the delete all button
+    angular.element(document.querySelector('#btn-delete-all-div')).removeClass('no-display');
+    //hide the confirm and cancel delete all executions
+    angular.element(document.querySelector('#delete-all-btn-group')).addClass('no-display');
+    //enable get results button
+    angular.element(document.querySelector('#btn-get-results')).prop('disabled', false);
   }
 
   requestLogIn();

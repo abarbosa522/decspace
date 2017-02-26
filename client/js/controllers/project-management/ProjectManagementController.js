@@ -1,4 +1,6 @@
 app.controller('ProjectManagementController', function($scope, $window, $http) {
+  //order that projects should be retrieved from db
+  var currentOrder;
 
   function requestLogIn() {
     $http.get('/requestlogin').success(function(res) {
@@ -168,6 +170,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
       //get the selected project
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == project['project_id']) {
+
           //change the name of the project
           response[proj]['name'] = project.name;
           //get the id of the document, so that it can be removed from the db
@@ -217,7 +220,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
       project_id++;
 
       //create the new project
-      var proj_text = '{"project_id":"' + project_id + '","username":"' + $scope.username + '","name":"' + project.name + '","method":"' + project.method + '","starred":"' + project.starred + '","creation_date":"' + creation_date + '","last_update":"' + creation_date + '","criteria":' + JSON.stringify(project.criteria) +
+      var proj_text = '{"project_id":"' + project_id + '","username":"' + $scope.username + '","name":"' + project.name + ' - Copy' + '","method":"' + project.method + '","starred":"' + project.starred + '","creation_date":"' + creation_date + '","last_update":"' + creation_date + '","criteria":' + JSON.stringify(project.criteria) +
       ',"order_by_criterion":"' + project.order_by_criterion + '","actions":' + JSON.stringify(project.actions) + ',"executions":' + JSON.stringify(project.executions) + '}';
 
       //transform to json
@@ -270,7 +273,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
   }
 
   function getProjects() {
-    $http.get('/projects').success(function(response) {
+    $http.get(currentOrder).success(function(response) {
       var starred_projects = [], unstarred_projects = [];
 
       //get the created projects by the logged user
@@ -298,12 +301,21 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
     });
   }
 
+  function changeCurrentOrder(attr, order) {
+    currentOrder = '/projects-' + attr + '-' + order;
+
+    getProjects();
+  }
+
   $scope.deleteAllProjects = function() {
-    //hide the listed project and show the edit view
     angular.element(document.querySelector('#delete-projects-list')).addClass('no-display');
     angular.element(document.querySelector('#delete-projects-confirm')).removeClass('no-display');
     //disable all other open, edit, duplicate or delete buttons
     angular.element(document.querySelectorAll('.btn-open, .btn-edit, .btn-duplicate, .btn-delete, .btn-star-empty, .btn-star, .btn-add')).prop('disabled', true);
+
+    for(project in $scope.projects) {
+      angular.element(document.querySelector('#proj-list-' + $scope.projects[project].project_id)).addClass('danger');
+    }
   }
 
   $scope.confirmDeleteAll = function() {
@@ -330,6 +342,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
   }
 
   $scope.cancelDeleteAll = function() {
+    //refresh the list of projects
     getProjects();
     //hide the listed project and show the edit view
     angular.element(document.querySelector('#delete-projects-confirm')).addClass('no-display');
@@ -339,5 +352,6 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
   }
 
   requestLogIn();
-  getProjects();
+  changeCurrentOrder('id', 'ascendant');
+
 });

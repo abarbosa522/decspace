@@ -33,43 +33,93 @@
 
   <body ng-app = 'decspace' ng-controller = 'ContactUsController'>
 
-    <!-- Navigation Bar -->
-    <nav class = 'navbar navbar-custom navbar-fixed-top'>
-      <div class = 'container'>
-        <!-- Title -->
-        <div class = 'navbar-header'>
-          <a class = 'navbar-brand' href = '../../index.html'>DecSpace</a>
+    <div ng-if = '!loggedIn' ng-cloak>
+      <!-- Navigation Bar -->
+      <nav class = 'navbar navbar-custom navbar-fixed-top'>
+        <div class = 'container'>
+          <!-- Title -->
+          <div class = 'navbar-header'>
+            <a class = 'navbar-brand' href = '../../index.html'>DecSpace</a>
+          </div>
+
+          <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
+          <ul class = 'nav navbar-nav navbar-right'>
+            <li><a href = 'about.html'>About</a></li>
+            <li><a href = 'faq.html'>FAQ</a></li>
+            <li class = 'active'><a href = 'contactus.html'>Contact Us</a></li>
+
+            <li>
+              <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'toSignUp()'>
+                <span class = 'glyphicon glyphicon-user'></span>
+                Sign Up
+              </button>
+            </li>
+
+            <li>
+              <p class = 'navbar-text'>or</p>
+            </li>
+
+            <li>
+              <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'toLogIn()'>
+                <span class = 'glyphicon glyphicon-log-in'></span>
+                Log In
+              </button>
+            </li>
+          </ul>
+
         </div>
+      </nav>
+    </div>
 
-        <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
-        <ul class = 'nav navbar-nav navbar-right'>
-          <li><a href = 'about.html'>About</a></li>
-          <li><a href = 'faq.html'>FAQ</a></li>
-          <li class = 'active'><a href = 'contactus.html'>Contact Us</a></li>
+    <div ng-if = 'loggedIn' ng-cloak>
+      <!-- Navigation Bar -->
+      <nav class = 'navbar navbar-custom navbar-fixed-top'>
+        <div class = 'container'>
+          <!-- Title -->
+          <div class = 'navbar-header'>
+            <a class = 'navbar-brand' href = '../dashboard/dashboard.html'>DecSpace</a>
+          </div>
 
-          <li>
-            <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'toSignUp()'>
-              <span class = 'glyphicon glyphicon-user'></span>
-              Sign Up
-            </button>
-          </li>
+          <ul class = 'nav navbar-nav'>
 
-          <li>
-            <p class = 'navbar-text'>or</p>
-          </li>
+          </ul>
+          <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
+          <ul class = 'nav navbar-nav navbar-right'>
 
-          <li>
-            <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'toLogIn()'>
-              <span class = 'glyphicon glyphicon-log-in'></span>
-              Log In
-            </button>
-          </li>
-        </ul>
+            <li>
+              <p class = 'navbar-text' style = 'font-weight:600;font-style:italic'>Welcome, {{name}}!</p>
+            </li>
 
-      </div>
-    </nav>
+            <li><a href = '../homepage/about.html'>About</a></li>
+
+            <li><a href = '../homepage/faq.html'>FAQ</a></li>
+
+            <li class = 'active'><a href = '../homepage/contactus.html'>Contact Us</a></li>
+
+            <li>
+              <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'logOut()'>
+                <span class = 'glyphicon glyphicon-log-out'></span>
+                Log Out
+              </button>
+            </li>
+          </ul>
+
+        </div>
+      </nav>
+    </div>
 
     <div id = 'main-content' class = 'container'>
+
+      <div ng-if = 'loggedIn' ng-cloak>
+        <ul class = 'breadcrumb' style = 'text-align:center'>
+          <li><a href = '../dashboard/dashboard.html'>Dashboard</a></li>
+          <li class = 'active'>Contact Us</li>
+        </ul>
+      </div>
+
+      <div ng-if = '!loggedIn' ng-cloak>
+        <br>
+      </div>
 
       <p class = 'header-1'>Contact Us</p>
 

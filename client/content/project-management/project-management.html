@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>DecSpace - Project Management</title>
+    <title>DecSpace - Projects</title>
 
     <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
 
@@ -45,8 +45,14 @@
         <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
         <ul class = 'nav navbar-nav navbar-right'>
           <li>
-            <p class = 'navbar-text' ng-cloak>Welcome, {{name}}</p>
+            <p class = 'navbar-text' style = 'font-weight:600;font-style:italic'>Welcome, {{name}}!</p>
           </li>
+
+          <li><a href = '../homepage/about.html'>About</a></li>
+
+          <li><a href = '../homepage/faq.html'>FAQ</a></li>
+
+          <li><a href = '../homepage/contactus.html'>Contact Us</a></li>
 
           <li>
             <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'logOut()'>
@@ -61,152 +67,218 @@
 
     <div id = 'main-content' class = 'container'>
 
-      <p class = 'header-1'>Project Management</p>
+      <ul class = 'breadcrumb'>
+        <li><a href = '../dashboard/dashboard.html'>Dashboard</a></li>
+        <li class = 'active'>Projects</li>
+      </ul>
 
-      <br><br>
+      <p class = 'header-1'>Projects</p>
 
-      <!-- Previously created methods -->
-      <div class = 'row' ng-repeat = 'project in projects'>
+      <br>
 
-        <div id = 'proj-list-{{project.project_id}}'>
-          <div class = 'col-md-1'>
-          </div>
+      <table class = 'table table-bordered table-hover' data-toggle = 'table'>
+        <thead>
+          <tr>
+            <th></th>
+            <th class = 'text-center'>
+              Name
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = ''></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = ''></span></a>
+            </th>
+            <th class = 'text-center'>
+              Method
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = ''></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = ''></span></a>
+            </th>
+            <th class = 'text-center'>
+              Creation Date
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = ''></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = ''></span></a>
+            </th>
+            <th class = 'text-center'>
+              Last Update
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = ''></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = ''></span></a>
+            </th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody ng-repeat = 'project in projects'>
+          <!-- List View -->
+          <tr id = 'proj-list-{{project.project_id}}'>
+            <!-- Favorite/Unfavorite Button -->
+            <td>
+              <button type = 'button' class = 'btn btn-default btn-star-empty' ng-click = 'starProject(project)' ng-if = 'project.starred == "false"' data-toggle = 'tooltip' title = 'Favorite Project' ng-cloak>
+                <span class = 'glyphicon glyphicon-star-empty glyph-custom'></span>
+              </button>
 
-          <div class = 'col-md-1'>
-            <button type = 'button' class = 'btn btn-default btn-star-empty' ng-click = 'starProject(project)' ng-if = 'project.starred == "false"' ng-cloak>
-              <span class = 'glyphicon glyphicon-star-empty glyph-custom'></span>
-            </button>
+              <button type = 'button' class = 'btn btn-default btn-star' ng-click = 'unstarProject(project)' ng-if = 'project.starred == "true"' data-toggle = 'tooltip' title = 'Unfavorite Project' ng-cloak>
+                <span class = 'glyphicon glyphicon-star glyph-custom'></span>
+              </button>
+            </td>
 
-            <button type = 'button' class = 'btn btn-default btn-star' ng-click = 'unstarProject(project)' ng-if = 'project.starred == "true"' ng-cloak>
-              <span class = 'glyphicon glyphicon-star glyph-custom'></span>
-            </button>
-          </div>
+            <!-- Project Name -->
+            <td>
+              {{project.name}}
+            </td>
 
-          <div class = 'col-md-2'>
-            {{project.name}}
-          </div>
+            <!-- Project Method -->
+            <td>
+              {{project.method}}
+            </td>
 
-          <div class = 'col-md-2'>
-            {{project.method}}
-          </div>
+            <!-- Creation Date -->
+            <td>
+              {{project.creation_date}}
+            </td>
 
-          <div class = 'col-md-3'>
-            <strong>Creation Date:</strong> {{project.creation_date}}
-            <br>
-            <strong>Last Update:</strong> {{project.last_update}}
-          </div>
+            <!-- Last Update -->
+            <td>
+              {{project.last_update}}
+            </td>
 
-          <div class = 'col-md-3'>
-            <button type = 'button' class = 'btn btn-primary btn-open' ng-click = 'openProject(project)'>
-              <span class = 'glyphicon glyphicon-folder-open'></span>
-            </button>
+            <!-- Open, Edit, Duplicate and Delete Project -->
+            <td>
+              <button type = 'button' class = 'btn btn-primary btn-open' ng-click = 'openProject(project)' data-toggle = 'tooltip' title = 'Open Project'>
+                <span class = 'glyphicon glyphicon-folder-open'></span>
+              </button>
 
-            <button type = 'button' class = 'btn btn-warning btn-edit' ng-click = 'editProject(project)'>
-              <span class = 'glyphicon glyphicon-edit'></span>
-            </button>
+              <button type = 'button' class = 'btn btn-warning btn-edit' ng-click = 'editProject(project)' data-toggle = 'tooltip' title = 'Edit Project'>
+                <span class = 'glyphicon glyphicon-edit'></span>
+              </button>
 
-            <button type = 'button' class = 'btn btn-info btn-duplicate' ng-click = 'duplicateProject(project)'>
-              <span class = 'glyphicon glyphicon-duplicate'></span>
-            </button>
+              <button type = 'button' class = 'btn btn-info btn-duplicate' ng-click = 'duplicateProject(project)' data-toggle = 'tooltip' title = 'Duplicate Project'>
+                <span class = 'glyphicon glyphicon-duplicate'></span>
+              </button>
 
-            <button type = 'button' class = 'btn btn-danger btn-delete' ng-click = 'deleteProject(project)'>
-              <span class = 'glyphicon glyphicon-trash'></span>
-            </button>
-          </div>
-        </div>
+              <button type = 'button' class = 'btn btn-danger btn-delete' ng-click = 'deleteProject(project)' data-toggle = 'tooltip' title = 'Delete Project'>
+                <span class = 'glyphicon glyphicon-minus'></span>
+              </button>
+            </td>
+          </tr>
 
-        <div id = 'proj-edit-{{project.project_id}}' class = 'no-display'>
-          <div class = 'col-md-1'>
-          </div>
+          <!-- Edit View -->
+          <tr id = 'proj-edit-{{project.project_id}}' class = 'no-display warning'>
+            <!-- Favorite/Unfavorite button -->
+            <td>
+              <button type = 'button' class = 'btn btn-default btn-star-empty' ng-click = 'starProject(project)' ng-if = 'project.starred == "false"' data-toggle = 'tooltip' title = 'Favorite Project' ng-cloak>
+                <span class = 'glyphicon glyphicon-star-empty glyph-custom'></span>
+              </button>
 
-          <div class = 'col-md-1'>
-            <button type = 'button' class = 'btn btn-default btn-star-empty' ng-click = 'starProject(project)' ng-if = 'project.starred == "false"' ng-cloak>
-              <span class = 'glyphicon glyphicon-star-empty glyph-custom'></span>
-            </button>
+              <button type = 'button' class = 'btn btn-default btn-star' ng-click = 'unstarProject(project)' ng-if = 'project.starred == "true"' data-toggle = 'tooltip' title = 'Unfavorite Project' ng-cloak>
+                <span class = 'glyphicon glyphicon-star glyph-custom'></span>
+              </button>
+            </td>
 
-            <button type = 'button' class = 'btn btn-default btn-star' ng-click = 'unstarProject(project)' ng-if = 'project.starred == "true"' ng-cloak>
-              <span class = 'glyphicon glyphicon-star glyph-custom'></span>
-            </button>
-          </div>
+            <!-- Project Name -->
+            <td>
+              <input type = 'text' class = 'form-control' ng-model = 'project.name'>
+            </td>
 
-          <div class = 'col-md-2'>
-            <input type = 'text' class = 'form-control' ng-model = 'project.name'>
-          </div>
+            <!-- Project Method -->
+            <td>
+              {{project.method}}
+            </td>
 
-          <div class = 'col-md-2'>
-            {{project.method}}
-          </div>
+            <!-- Creation Date -->
+            <td>
+              {{project.creation_date}}
+            </td>
 
-          <div class = 'col-md-3'>
-            <strong>Creation Date:</strong> {{project.creation_date}}
-            <br>
-            <strong>Last Update:</strong> {{project.last_update}}
-          </div>
+            <!-- Last Update -->
+            <td>
+              {{project.last_update}}
+            </td>
 
-          <div class = 'col-md-3'>
-            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmEdit(project)'>
-              <span class = 'glyphicon glyphicon-ok'></span>
-            </button>
-            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelEdit()'>
-              <span class = 'glyphicon glyphicon-remove'></span>
-            </button>
-          </div>
-        </div>
+            <!-- Confirm And Cancel Buttons -->
+            <td>
+              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmEdit(project)' data-toggle = 'tooltip' title = 'Confirm Edit'>
+                <span class = 'glyphicon glyphicon-ok'></span>
+              </button>
+              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelEdit()' data-toggle = 'tooltip' title = 'Cancel Edit'>
+                <span class = 'glyphicon glyphicon-remove'></span>
+              </button>
+            </td>
+          </tr>
 
-        <div id = 'proj-delete-{{project.project_id}}' class = 'no-display'>
-          <div class = 'col-md-1'>
-          </div>
+          <!-- Delete View -->
+          <tr id = 'proj-delete-{{project.project_id}}' class = 'no-display danger'>
+            <!-- Favorite/Unfavorite Button -->
+            <td>
+              <button type = 'button' class = 'btn btn-default btn-star-empty' ng-click = 'starProject(project)' ng-if = 'project.starred == "false"' data-toggle = 'tooltip' title = 'Favorite Project' ng-cloak>
+                <span class = 'glyphicon glyphicon-star-empty glyph-custom'></span>
+              </button>
 
-          <div class = 'col-md-1'>
-            <button type = 'button' class = 'btn btn-default btn-star-empty' ng-click = 'starProject(project)' ng-if = 'project.starred == "false"' ng-cloak>
-              <span class = 'glyphicon glyphicon-star-empty glyph-custom'></span>
-            </button>
+              <button type = 'button' class = 'btn btn-default btn-star' ng-click = 'unstarProject(project)' ng-if = 'project.starred == "true"' data-toggle = 'tooltip' title = 'Unfavorite Project' ng-cloak>
+                <span class = 'glyphicon glyphicon-star glyph-custom'></span>
+              </button>
+            </td>
 
-            <button type = 'button' class = 'btn btn-default btn-star' ng-click = 'unstarProject(project)' ng-if = 'project.starred == "true"' ng-cloak>
-              <span class = 'glyphicon glyphicon-star glyph-custom'></span>
-            </button>
-          </div>
+            <!-- Project Name -->
+            <td>
+              {{project.name}}
+            </td>
 
-          <div class = 'col-md-2'>
-            {{project.name}}
-          </div>
+            <!-- Project Method -->
+            <td>
+              {{project.method}}
+            </td>
 
-          <div class = 'col-md-2'>
-            {{project.method}}
-          </div>
+            <!-- Creation Date -->
+            <td>
+              {{project.creation_date}}
+            </td>
 
-          <div class = 'col-md-3'>
-            <strong>Creation Date:</strong> {{project.creation_date}}
-            <br>
-            <strong>Last Update:</strong> {{project.last_update}}
-          </div>
+            <!-- Last Update -->
+            <td>
+              {{project.last_update}}
+            </td>
 
-          <div class = 'col-md-3'>
-            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDelete(project)'>
-              <span class = 'glyphicon glyphicon-ok'></span>
-            </button>
-            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDelete()'>
-              <span class = 'glyphicon glyphicon-remove'></span>
-            </button>
-          </div>
-        </div>
+            <!-- Confirm And Cancel Buttons -->
+            <td>
+              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDelete(project)' data-toggle = 'tooltip' title = 'Confirm Delete'>
+                <span class = 'glyphicon glyphicon-ok'></span>
+              </button>
+              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDelete()' data-toggle = 'tooltip' title = 'Cancel Delete'>
+                <span class = 'glyphicon glyphicon-remove'></span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
 
-      </div>
+        <tbody>
+          <tr>
+            <td></td>
+
+            <!-- Name Input -->
+            <td>
+              <input id = 'input-name' type = 'text' class = 'form-control' placeholder = 'New Project' ng-model = 'project.name'>
+            </td>
+
+            <!-- Method List -->
+            <td>
+              <select id = 'input-method' ng-model = 'project.method'>
+                <option value = '' selected disabled>-- Please Select --</option>
+                <option>OrderBy</option>
+              </select>
+            </td>
+
+            <td></td>
+
+            <td></td>
+
+            <!-- Add Button -->
+            <td>
+              <button type = 'button' class = 'btn btn-success btn-add' ng-click = 'addProject()' data-toggle = 'tooltip' title = 'Add Project'>
+                <span class = 'glyphicon glyphicon-plus'></span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
       <div id = 'delete-projects-list' ng-if = 'showDeleteAll' ng-cloak>
-        <div class = 'col-md-1'>
-        </div>
-
-        <div class = 'col-md-1'>
-        </div>
-
-        <div class = 'col-md-2'>
-        </div>
-
-        <div class = 'col-md-2'>
-        </div>
-
-        <div class = 'col-md-3'>
+        <div class = 'col-md-9'>
         </div>
 
         <div class = 'col-md-3'>
@@ -217,61 +289,20 @@
       </div>
 
       <div id = 'delete-projects-confirm' class = 'no-display'>
-        <div class = 'col-md-1'>
-        </div>
-
-        <div class = 'col-md-1'>
-        </div>
-
-        <div class = 'col-md-2'>
-        </div>
-
-        <div class = 'col-md-2'>
+        <div class = 'col-md-9'>
         </div>
 
         <div class = 'col-md-3'>
-        </div>
-
-        <div class = 'col-md-3'>
-          <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAll()'>
+          <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAll()' data-toggle = 'tooltip' title = 'Confirm Delete'>
             <span class = 'glyphicon glyphicon-ok'></span>
           </button>
-          <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAll()'>
+          <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAll()' data-toggle = 'tooltip' title = 'Cancel Delete'>
             <span class = 'glyphicon glyphicon-remove'></span>
           </button>
         </div>
       </div>
 
       <br><br>
-
-      <p class = 'header-2'>Add a new project</p>
-
-      <!-- Form for adding a new project -->
-      <div class = 'row'>
-
-        <form class = 'form-inline'>
-          <!-- New Project Name - Input Field -->
-          <div class = 'form-group'>
-            <label for = 'input-name'>Name</label>
-            <input id = 'input-name' type = 'text' class = 'form-control' placeholder = 'New Project' ng-model = 'project.name'>
-          </div>
-
-          <!-- Method of the new project -->
-          <div class = 'form-group'>
-            <label for = 'input-method'>Method</label>
-            <select id = 'input-method' ng-model = 'project.method'>
-              <option value = '' selected disabled>-- Please Select --</option>
-              <option>OrderBy</option>
-            </select>
-          </div>
-
-          <!-- Add button -->
-            <button type = 'button' class = 'btn btn-success btn-add' ng-click = 'addProject()'>Add</button>
-        </form>
-
-      </div>
-
-      <br>
 
       <div class = 'alert alert-danger' role = 'alert' ng-if = 'showMethodErrorAlert' ng-cloak>
         A method has <strong>not</strong> been chosen.

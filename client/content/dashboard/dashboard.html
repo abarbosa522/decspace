@@ -42,11 +42,21 @@
           <a class = 'navbar-brand' href = 'dashboard.html'>DecSpace</a>
         </div>
 
+        <ul class = 'nav navbar-nav'>
+
+        </ul>
         <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
         <ul class = 'nav navbar-nav navbar-right'>
+
           <li>
-            <p class = 'navbar-text'>Welcome, {{name}}</p>
+            <p class = 'navbar-text' style = 'font-weight:600;font-style:italic'>Welcome, {{name}}!</p>
           </li>
+
+          <li><a href = '../homepage/about.html'>About</a></li>
+
+          <li><a href = '../homepage/faq.html'>FAQ</a></li>
+
+          <li><a href = '../homepage/contactus.html'>Contact Us</a></li>
 
           <li>
             <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'logOut()'>
@@ -60,12 +70,13 @@
     </nav>
 
     <div id = 'main-content' class = 'container'>
+      <ul class = 'breadcrumb'>
+        <li class = 'active'>Dashboard</li>
+      </ul>
 
       <p class = 'header-1'>Dashboard</p>
 
       <hr/>
-
-      <br>
 
       <div class = 'row'>
         <div class = 'col-md-4'>
@@ -89,7 +100,7 @@
 
       <div class = 'row'>
         <div class = 'col-md-4'>
-          <span>Project Management</span>
+          <span>Projects</span>
         </div>
 
         <div class = 'col-md-4'>
@@ -103,7 +114,7 @@
 
       <br>
       <br>
-      
+
       <div class = 'row'>
         <div class = 'col-md-4'>
           <button type = 'button' class = 'btn btn-default btn-lg' ng-click = 'toSettings()'>
