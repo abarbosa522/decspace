@@ -1,4 +1,5 @@
 app.controller('SettingsController', function($scope, $window, $http) {
+  //types of the input fields of the current and new password
   $scope.inputTypeCurrent = 'password';
   $scope.inputTypeNew = 'password';
 
@@ -73,6 +74,8 @@ app.controller('SettingsController', function($scope, $window, $http) {
 
   $scope.passwordReset = function() {
     if(getNumberOfFields($scope.password) < 2 || $scope.password.current == '' || $scope.password.new == '') {
+      $scope.showPasswordError = false;
+      $scope.showPasswordSuccess = false;
       $scope.showFieldsError = true;
     }
     else {

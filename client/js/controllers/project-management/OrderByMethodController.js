@@ -6,6 +6,9 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
   //keep the value of the selectedCriterion
   var selectedCriterion = '';
 
+  //order that data should be retrieved from db
+  var currentOrderCriteria = ['', ''], currentOrderActions = ['', ''];
+
   function requestLogIn() {
     $http.get('/requestlogin').success(function(res) {
       if(typeof res.user == 'undefined')
@@ -76,10 +79,39 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
           $scope.criteria = response[proj]['criteria'];
+
+          if(currentOrderCriteria[0] != '' && currentOrderCriteria[1] != '') {
+            $scope.criteria.sort(sortData(currentOrderCriteria[0], currentOrderCriteria[1]));
+          }
+
           break;
         }
       }
     });
+  }
+
+  $scope.changeCurrentOrderCriteria = function(attr, dir) {
+    currentOrderCriteria = [attr, dir];
+    getCriteria();
+  }
+
+  function sortData(order, direction) {
+    return function(a, b) {
+      if(direction == 'ascendant') {
+        if(a[order] < b[order])
+          return -1;
+        if(a[order] > b[order])
+          return 1;
+        return 0;
+      }
+      else {
+        if(a[order] < b[order])
+          return 1;
+        if(a[order] > b[order])
+          return -1;
+        return 0;
+      }
+    }
   }
 
   //get the number of parameters of a scope variable
@@ -339,10 +371,19 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
           //get the actions previously added
           $scope.actions = response[proj]['actions'];
+
+          if(currentOrderActions[0] != '' && currentOrderActions[1] != '')
+            $scope.actions.sort(sortData(currentOrderActions[0], currentOrderActions[1]));
+
           break;
         }
       }
     });
+  }
+
+  $scope.changeCurrentOrderActions = function(attr, dir) {
+    currentOrderActions = [attr, dir];
+    getActions();
   }
 
   $scope.addAction = function() {

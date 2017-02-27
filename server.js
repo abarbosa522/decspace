@@ -146,7 +146,7 @@ var db2 = mongojs('mongodb://' + username + ':' + password + '@ds157247.mlab.com
 
 //db2 functions - projects
 //get all projects from db - order by project_id ascendant
-app.get('/projects-id-ascendant', function(req, res) {
+app.get('/projects', function(req, res) {
   db2.projects.find().sort( {project_id: 1}, function (err, doc) {
     res.json(doc);
   });

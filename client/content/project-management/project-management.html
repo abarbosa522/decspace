@@ -79,26 +79,25 @@
       <table class = 'table table-bordered table-hover' data-toggle = 'table'>
         <thead>
           <tr>
-            <th></th>
             <th class = 'text-center'>
               Name
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = ''></span></a>
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = ''></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrder("name", "descendant")'></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrder("name", "ascendant")'></span></a>
             </th>
             <th class = 'text-center'>
               Method
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = ''></span></a>
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = ''></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrder("method", "descendant")'></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrder("method", "ascendant")'></span></a>
             </th>
             <th class = 'text-center'>
               Creation Date
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = ''></span></a>
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = ''></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrder("creationdate", "descendant")'></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrder("creationdate", "ascendant")'></span></a>
             </th>
             <th class = 'text-center'>
               Last Update
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = ''></span></a>
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = ''></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrder("lastupdate", "descendant")'></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrder("lastupdate", "ascendant")'></span></a>
             </th>
             <th></th>
           </tr>
@@ -106,17 +105,6 @@
         <tbody ng-repeat = 'project in projects'>
           <!-- List View -->
           <tr id = 'proj-list-{{project.project_id}}'>
-            <!-- Favorite/Unfavorite Button -->
-            <td>
-              <button type = 'button' class = 'btn btn-default btn-star-empty' ng-click = 'starProject(project)' ng-if = 'project.starred == "false"' data-toggle = 'tooltip' title = 'Favorite Project' ng-cloak>
-                <span class = 'glyphicon glyphicon-star-empty glyph-custom'></span>
-              </button>
-
-              <button type = 'button' class = 'btn btn-default btn-star' ng-click = 'unstarProject(project)' ng-if = 'project.starred == "true"' data-toggle = 'tooltip' title = 'Unfavorite Project' ng-cloak>
-                <span class = 'glyphicon glyphicon-star glyph-custom'></span>
-              </button>
-            </td>
-
             <!-- Project Name -->
             <td>
               {{project.name}}
@@ -159,17 +147,6 @@
 
           <!-- Edit View -->
           <tr id = 'proj-edit-{{project.project_id}}' class = 'no-display warning'>
-            <!-- Favorite/Unfavorite button -->
-            <td>
-              <button type = 'button' class = 'btn btn-default btn-star-empty' ng-click = 'starProject(project)' ng-if = 'project.starred == "false"' data-toggle = 'tooltip' title = 'Favorite Project' ng-cloak>
-                <span class = 'glyphicon glyphicon-star-empty glyph-custom'></span>
-              </button>
-
-              <button type = 'button' class = 'btn btn-default btn-star' ng-click = 'unstarProject(project)' ng-if = 'project.starred == "true"' data-toggle = 'tooltip' title = 'Unfavorite Project' ng-cloak>
-                <span class = 'glyphicon glyphicon-star glyph-custom'></span>
-              </button>
-            </td>
-
             <!-- Project Name -->
             <td>
               <input type = 'text' class = 'form-control' ng-model = 'project.name'>
@@ -203,17 +180,6 @@
 
           <!-- Delete View -->
           <tr id = 'proj-delete-{{project.project_id}}' class = 'no-display danger'>
-            <!-- Favorite/Unfavorite Button -->
-            <td>
-              <button type = 'button' class = 'btn btn-default btn-star-empty' ng-click = 'starProject(project)' ng-if = 'project.starred == "false"' data-toggle = 'tooltip' title = 'Favorite Project' ng-cloak>
-                <span class = 'glyphicon glyphicon-star-empty glyph-custom'></span>
-              </button>
-
-              <button type = 'button' class = 'btn btn-default btn-star' ng-click = 'unstarProject(project)' ng-if = 'project.starred == "true"' data-toggle = 'tooltip' title = 'Unfavorite Project' ng-cloak>
-                <span class = 'glyphicon glyphicon-star glyph-custom'></span>
-              </button>
-            </td>
-
             <!-- Project Name -->
             <td>
               {{project.name}}
@@ -248,8 +214,6 @@
 
         <tbody>
           <tr>
-            <td></td>
-
             <!-- Name Input -->
             <td>
               <input id = 'input-name' type = 'text' class = 'form-control' placeholder = 'New Project' ng-model = 'project.name'>

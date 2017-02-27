@@ -27,68 +27,6 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
     });
   }
 
-  //favorite a project, so that it shows on the top of the list of all projects
-  $scope.starProject = function(project) {
-    //get all projects from the database
-    $http.get('/projects').success(function(response) {
-      var id_doc, proj_res;
-
-      //get the selected project
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == project['project_id']) {
-          //change the starred state to true
-          response[proj]['starred'] = 'true';
-          //get the id of the document, so that it can be removed from the db
-          id_doc = response[proj]['_id'];
-          //project to store in the db
-          proj_res = response[proj];
-          delete proj_res['_id'];
-          break;
-        }
-      }
-
-      //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function() {
-        //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
-          //refresh the list of projects
-          getProjects();
-        });
-      });
-    });
-  }
-
-  //unfavorite a project, so that it appears on the bottom
-  $scope.unstarProject = function(project) {
-    //get all projects from the database
-    $http.get('/projects').success(function(response) {
-      var id_doc, proj_res;
-
-      //get the selected project
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == project['project_id']) {
-          //change the starred state to false
-          response[proj]['starred'] = 'false';
-          //get the id of the document, so that it can be removed from the db
-          id_doc = response[proj]['_id'];
-          //project to store in the db
-          proj_res = response[proj];
-          delete proj_res['_id'];
-          break;
-        }
-      }
-
-      //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function() {
-        //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
-          //refresh the list of projects
-          getProjects();
-        });
-      });
-    });
-  }
-
   //open project
   $scope.openProject = function(project) {
     switch(project.method) {
@@ -134,7 +72,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
         project_id++;
 
         //create the new project
-        var proj_text = '{"project_id":"' + project_id + '","username":"' + $scope.username + '","name":"' + $scope.project.name + '","method":"' + $scope.project.method + '","starred":"false","creation_date":"' + creation_date + '","last_update":"' + creation_date + '","criteria":[],"order_by_criterion":"","actions":[],"executions":[]}';
+        var proj_text = '{"project_id":"' + project_id + '","username":"' + $scope.username + '","name":"' + $scope.project.name + '","method":"' + $scope.project.method + '","creation_date":"' + creation_date + '","last_update":"' + creation_date + '","criteria":[],"order_by_criterion":"","actions":[],"executions":[]}';
 
         //transform to json
         var proj_obj = JSON.parse(proj_text);
@@ -220,7 +158,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
       project_id++;
 
       //create the new project
-      var proj_text = '{"project_id":"' + project_id + '","username":"' + $scope.username + '","name":"' + project.name + ' - Copy' + '","method":"' + project.method + '","starred":"' + project.starred + '","creation_date":"' + creation_date + '","last_update":"' + creation_date + '","criteria":' + JSON.stringify(project.criteria) +
+      var proj_text = '{"project_id":"' + project_id + '","username":"' + $scope.username + '","name":"' + project.name + ' - Copy' + '","method":"' + project.method + '","creation_date":"' + creation_date + '","last_update":"' + creation_date + '","criteria":' + JSON.stringify(project.criteria) +
       ',"order_by_criterion":"' + project.order_by_criterion + '","actions":' + JSON.stringify(project.actions) + ',"executions":' + JSON.stringify(project.executions) + '}';
 
       //transform to json
@@ -274,24 +212,16 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
 
   function getProjects() {
     $http.get(currentOrder).success(function(response) {
-      var starred_projects = [], unstarred_projects = [];
+      var user_projects = [];
 
       //get the created projects by the logged user
       for(project in response) {
         if(response[project].username == $scope.username) {
-          if(response[project]['starred'] == 'true') {
-            starred_projects.push(response[project]);
-          }
-          else {
-            unstarred_projects.push(response[project]);
-          }
+          user_projects.push(response[project]);
         }
       }
 
-      //put starred_projects first
-      $scope.projects = starred_projects;
-      for(project in unstarred_projects)
-        $scope.projects.push(unstarred_projects[project]);
+      $scope.projects = user_projects;
 
       //show/hide the "delete all projects" button
       if($scope.projects.length == 0)
@@ -301,9 +231,13 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
     });
   }
 
-  function changeCurrentOrder(attr, order) {
-    currentOrder = '/projects-' + attr + '-' + order;
-
+  $scope.changeCurrentOrder = function(attr, order) {
+    if(attr == '' && order == '') {
+      currentOrder = '/projects';
+    }
+    else {
+      currentOrder = '/projects-' + attr + '-' + order;
+    }
     getProjects();
   }
 
@@ -352,6 +286,5 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
   }
 
   requestLogIn();
-  changeCurrentOrder('id', 'ascendant');
-
+  $scope.changeCurrentOrder('', '');
 });

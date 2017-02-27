@@ -58,12 +58,16 @@
     </nav>
 
     <div id = 'main-content' class = 'container'>
+      <ul class = 'breadcrumb'>
+        <li><a href = '../dashboard/dashboard.html'>Dashboard</a></li>
+        <li class = 'active'>Settings</li>
+      </ul>
 
       <p class = 'header-1'>Settings</p>
 
-      <!-- Horizontal divider -->
-      <hr/>
-
+      <br>
+      
+      <!-- Password Reset -->
       <p class = 'header-2'>Password Reset</p>
 
       <form class = 'form-horizontal'>
@@ -84,7 +88,7 @@
           </div>
         </div>
 
-        <!-- Old Password -->
+        <!-- New Password -->
         <div class = 'form-group'>
           <label for = 'input-new-password' class = 'col-sm-4 control-label'>
             New Password
@@ -107,7 +111,7 @@
       <br>
 
       <div class = 'alert alert-danger' role = 'alert' ng-if = 'showPasswordError' ng-cloak>
-        <strong>The</strong> current password was not correctly introduced.
+        The current password was <strong>not</strong> correctly introduced.
       </div>
 
       <div class = 'alert alert-success' role = 'alert' ng-if = 'showPasswordSuccess' ng-cloak>
