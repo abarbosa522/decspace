@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DecSpace - Project Area</title>
+
+    <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
+
+    <!-- CSS Stylesheet -->
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css' />
+
+    <!-- jQuery -->
+    <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
+    <script type = 'text/javascript' src = '../../js/shared/jquery-ui-1.12.0/jquery-ui.js'></script>
+
+    <!-- AngularJS -->
+    <script src = '../../js/shared/angular.min.js'></script>
+
+    <!-- AngularJS Modules -->
+    <script src = '../../js/app.js'></script>
+
+    <!-- AngularJS Controllers -->
+    <script src = '../../js/controllers/project-management/CATSDMethodController.js'></script>
+
+    <!-- AngularJS Services -->
+    <script src = '../../js/services/CATSDService.js'></script>
+
+    <!-- Bootstrap -->
+    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css' />
+    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap-theme.min.css' />
+    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.js'></script>
+    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.min.js'></script>
+
+    <!-- Google Web Fonts -->
+    <link href = 'https://fonts.googleapis.com/css?family=Open+Sans:400,600i' rel = 'stylesheet'>
+
+    <!-- MathJax -->
+    <script type="text/javascript" async
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML"></script>
+  </head>
+
+  <body ng-app = 'decspace' ng-controller = 'CATSDMethodController'>
+
+    <!-- Navigation Bar -->
+    <nav class = 'navbar navbar-custom navbar-fixed-top'>
+      <div class = 'container'>
+        <!-- Title -->
+        <div class = 'navbar-header'>
+          <a class = 'navbar-brand' href = '../dashboard/dashboard.html'>DecSpace</a>
+        </div>
+
+        <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
+        <ul class = 'nav navbar-nav navbar-right'>
+          <li>
+            <p class = 'navbar-text' style = 'font-weight:600;font-style:italic'>Welcome, {{name}}!</p>
+          </li>
+
+          <li><a href = '../homepage/about.html'>About</a></li>
+
+          <li><a href = '../homepage/faq.html'>FAQ</a></li>
+
+          <li><a href = '../homepage/contactus.html'>Contact Us</a></li>
+
+          <li>
+            <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'logOut()'>
+              <span class = 'glyphicon glyphicon-log-out'></span>
+              Log Out
+            </button>
+          </li>
+        </ul>
+
+      </div>
+    </nav>
+
+    <div id = 'main-content' class = 'container'>
+      <ul class = 'breadcrumb'>
+        <li><a href = '../dashboard/dashboard.html'>Dashboard</a></li>
+        <li><a href = 'project-management.html'>Projects</a></li>
+        <li class = 'active'>Project - {{project_name}}</li>
+      </ul>
+
+      <!-- Main tabs - Method Description, Data Input and Results and Execution -->
+      <ul class = 'nav nav-tabs nav-justified'>
+        <li role = 'presentation' class = 'active'><a data-toggle = 'tab' href= '#description'>Method Description</a></li>
+        <li role = 'presentation'><a data-toggle = 'tab' href= '#data-input'>Data Input</a></li>
+        <li role = 'presentation'><a data-toggle = 'tab' href= '#results'>Results and Execution</a></li>
+      </ul>
+
+      <div class = 'tab-content'>
+        <!-- Method Description -->
+        <div id = 'description' class = 'tab-pane fade in active' style = 'text-align:left'>
+          <br>
+
+          <p class = 'header-1'>CAT-SD</p>
+
+          <br>
+
+          <p>A new multiple criteria decision-aiding method for nominal classification problems where the categories are pre-defined and no order exists among them.</p>
+          <p>It consists of assigning each action, assessed according to multiple criteria, to at least one category.</p>
+        </div>
+
+        <!-- Data Input -->
+        <div id = 'data-input' class = 'tab-pane fade'>
+
+          <br>
+
+          <p class = 'header-1  '>Criteria</p>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center'>Name</th>
+                <th class = 'text-center'>Direction</th>
+                <th class = 'text-center'>Weight</th>
+                <th class = 'col-md-2'></th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Added Criteria  -->
+              <tr ng-repeat = 'criterion in criteria' ng-class = '{danger: criterion.id == deleteIdCriterion}'>
+                <td>
+                  <input class = 'form-control' type = 'text' value = '{{criterion.name}}'>
+                </td>
+                <td>
+                  <select>
+                    <option value = '' disabled>--- Please Select ---</option>
+                    <option ng-selected = 'criterion.direction == "Minimize"'>Minimize</option>
+                    <option ng-selected = 'criterion.direction == "Maximize"'>Maximize</option>
+                  </select>
+                </td>
+                <td>
+                  <input class = 'form-control' type = 'number' ng-value = '{{criterion.weight}}'>
+                </td>
+                <td ng-if = 'criterion.id != deleteIdCriterion'>
+                  <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteCriterion(criterion)' data-toggle = 'tooltip' title = 'Delete Criterion'>
+                    <span class = 'glyphicon glyphicon-minus'></span>
+                  </button>
+                </td>
+                <td ng-if = 'criterion.id == deleteIdCriterion'>
+                  <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteCriterion(criterion)' data-toggle = 'tooltip' title = 'Confirm Delete'>
+                    <span class = 'glyphicon glyphicon-ok'></span>
+                  </button>
+                  <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteCriterion()' data-toggle = 'tooltip' title = 'Cancel Delete'>
+                    <span class = 'glyphicon glyphicon-remove'></span>
+                  </button>
+                </td>
+              </tr>
+              <!-- Form to add a criterion -->
+              <tr>
+                <td>
+                  <input class = 'form-control' type = 'text' ng-model = 'new_criterion.name'>
+                </td>
+                <td>
+                  <select ng-model = 'new_criterion.direction'>
+                    <option value = '' disabled>--- Please Select ---</option>
+                    <option>Minimize</option>
+                    <option>Maximize</option>
+                  </select>
+                </td>
+                <td>
+                  <input class = 'form-control' type = 'number' ng-model = 'new_criterion.weight'>
+                </td>
+                <td>
+                  <button type = 'button' class = 'btn btn-success' ng-click = 'addCriterion()' data-toggle = 'tooltip' title = 'Add Criterion'>
+                    <span class = 'glyphicon glyphicon-plus'></span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <br>
+
+          <p class = 'header-1'>Scales and Functions</p>
+
+          <div ng-repeat = 'criterion in criteria'>
+            <p class = 'header-2'>Criterion {{criterion.name}}</p>
+
+            <!-- Scales -->
+            <table class = 'table table-bordered table-hover'>
+              <thead>
+                <tr>
+                  <th class = 'text-center'>Type</th>
+                  <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Minimum Value</th>
+                  <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Maximum Value</th>
+                  <th class = 'text-center' ng-if = 'criterion.scale.type == "Categorical"'>Number of Categories</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <select ng-model = 'criterion.scale.type'>
+                      <option value = '' disabled>--- Please Select ---</option>
+                      <option>Numerical</option>
+                      <option>Categorical</option>
+                    </select>
+                  </td>
+                  <td ng-if = 'criterion.scale.type == "Numerical"'>
+                    <input class = 'form-control' type = 'number' ng-model = 'criterion.scale.min'>
+                  </td>
+                  <td ng-if = 'criterion.scale.type == "Numerical"'>
+                    <input class = 'form-control' type = 'number' ng-model = 'criterion.scale.max'>
+                  </td>
+                  <td ng-if = 'criterion.scale.type == "Categorical"'>
+                    <input class = 'form-control' type = 'number' ng-model = 'criterion.scale.num_categories'>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Functions -->
+            <table class = 'table table-bordered table-hover'>
+              <thead>
+                <tr>
+                  <th class = 'text-center' colspan = 2>Function</th>
+                  <th class = 'text-center' colspan = 2>Condition</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Added Branches List -->
+                <tr ng-repeat = 'branch in criterion.branches' ng-class = '{danger: criterion.id == deleteIdBranch[0] && branch.id == deleteIdBranch[1]}'>
+                  <td class = 'col-md-2'>
+                    <input class = 'form-control' type = 'text' ng-model = 'branch.function'>
+                  </td>
+                  <td class = 'col-md-3'>
+                    <p math-jax-bind = 'branch.function'></p>
+                  </td>
+                  <td class = 'col-md-2'>
+                    <input class = 'form-control' type = 'text' ng-model = 'branch.condition'>
+                  </td>
+                  <td class = 'col-md-3'>
+                    <p math-jax-bind = 'branch.condition'></p>
+                  </td>
+                  <td class = 'col-md-2' ng-if = 'criterion.id != deleteIdBranch[0] || (criterion.id == deleteIdBranch[0] && branch.id != deleteIdBranch[1])'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteBranch(criterion, branch)' data-toggle = 'tooltip' title = 'Delete Branch'>
+                      <span class = 'glyphicon glyphicon-minus'></span>
+                    </button>
+                  </td>
+                  <td class = 'col-md-2' ng-if = 'criterion.id == deleteIdBranch[0] && branch.id == deleteIdBranch[1]'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteBranch(criterion, branch)' data-toggle = 'tooltip' title = 'Confirm Delete Branch'>
+                      <span class = 'glyphicon glyphicon-ok'></span>
+                    </button>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteBranch()' data-toggle = 'tooltip' title = 'Cancel Delete Branch'>
+                      <span class = 'glyphicon glyphicon-remove'></span>
+                    </button>
+                  </td>
+                </tr>
+                <!-- Form to add function branches -->
+                <tr>
+                  <td class = 'col-md-2'>
+                    <input class = 'form-control' type = 'text' ng-model = 'new_branch[criterion.id].function'>
+                  </td>
+                  <td class = 'col-md-3'>
+                    <p math-jax-bind = 'new_branch[criterion.id].function'></p>
+                  </td>
+                  <td class = 'col-md-2'>
+                    <input class = 'form-control' type = 'text' ng-model = 'new_branch[criterion.id].condition'>
+                  </td>
+                  <td class = 'col-md-3'>
+                    <p math-jax-bind = 'new_branch[criterion.id].condition'></p>
+                  </td>
+                  <td class = 'col-md-2'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'addBranch(criterion.id)' data-toggle = 'tooltip' title = 'Add Branch'>
+                      <span class = 'glyphicon glyphicon-plus'></span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class = 'header-1'>Actions</p>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center'>Actions</th>
+                <th class = 'text-center' ng-repeat = 'criterion in criteria'>{{criterion.name}}</th>
+                <th class = 'col-md-2'></th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Added Actions -->
+              <tr ng-repeat = 'action in actions' ng-class = '{danger: action.id == deleteIdAction}'>
+                <td>
+                  <input class = 'form-control' type = 'text' ng-model = 'action.name'>
+                </td>
+                <td ng-repeat = 'criterion in criteria'>
+                  <input class = 'form-control' type = 'number' ng-model = 'action[criterion.name]'>
+                </td>
+                <td ng-if = 'action.id != deleteIdAction'>
+                  <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteAction(action)' data-toggle = 'tooltip' title = 'Delete Action'>
+                    <span class = 'glyphicon glyphicon-minus'></span>
+                  </button>
+                </td>
+                <td ng-if = 'action.id == deleteIdAction'>
+                  <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAction(action)' data-toggle = 'tooltip' title = 'Confirm Delete Action'>
+                    <span class = 'glyphicon glyphicon-ok'></span>
+                  </button>
+                  <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAction()' data-toggle = 'tooltip' title = 'Cancel Delete Action'>
+                    <span class = 'glyphicon glyphicon-remove'></span>
+                  </button>
+                </td>
+              </tr>
+              <!-- Form to add action -->
+              <tr>
+                <td>
+                  <input class = 'form-control' type = 'text' ng-model = 'new_action.name'>
+                </td>
+                <td ng-repeat = 'criterion in criteria'>
+                  <input class = 'form-control' type = 'number' ng-model = 'new_action[criterion.name]'>
+                </td>
+                <td>
+                  <button type = 'button' class = 'btn btn-success' ng-click = 'addAction()' data-toggle = 'tooltip' title = 'Add Action'>
+                    <span class = 'glyphicon glyphicon-plus'></span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p class = 'header-1'>Categories</p>
+
+          <p class = 'header-2'>Weights</p>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <th class = 'text-center'>Categories</th>
+              <th class = 'text-center' ng-repeat = 'criterion in criteria'>{{criterion.name}}</th>
+            </thead>
+            <tbody>
+              <!-- Form to add new category -->
+              <tr>
+                <td>
+                  
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <button type = 'button' class = 'btn btn-primary' ng-click = '' data-toggle = 'tooltip' title = 'Save Data'>
+            <span class = 'glyphicon glyphicon-floppy-save'></span>
+          </button>
+
+        </div>
+
+        <!-- Results and Execution -->
+        <div id = 'results' class = 'tab-pane fade'>
+
+          <br>
+
+          <p class = 'header-2'>New Execution</p>
+
+          <form class = 'form-inline'>
+            <div class = 'form-group'>
+              <input type = 'text' class = 'form-control' id = 'input-control' placeholder = 'Comment' ng-model = 'new_execution.comment'>
+            </div>
+            <button id = 'btn-get-results' type = 'button' class = 'btn btn-default' ng-click = 'getResults()'>Get Results</button>
+          </form>
+
+          <br>
+
+          <!-- Errors with input data -->
+
+          <br>
+
+          <p class = 'header-2'>Past Executions</p>
+
+          <div class = 'row' ng-repeat = 'execution in executions'>
+
+          </div>
+
+          <br>
+
+          <!-- Delete All Executions button -->
+          <div id = 'btn-delete-all-div'>
+            <button id = 'btn-delete-all' type = 'button' class = 'btn btn-danger' ng-click = 'deleteAllExecutions()'>
+              Delete All Executions
+            </button>
+          </div>
+
+          <!-- Confirm and Cancel Delete All Executions buttons -->
+          <div id = 'delete-all-btn-group' class = 'no-display'>
+            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAllExecutions()' data-toggle = 'tooltip' title = 'Confirm Delete'>
+              <span class = 'glyphicon glyphicon-ok'></span>
+            </button>
+            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAllExecutions()' data-toggle = 'tooltip' title = 'Cancel Delete'>
+              <span class = 'glyphicon glyphicon-remove'></span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

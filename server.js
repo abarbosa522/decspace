@@ -152,62 +152,6 @@ app.get('/projects', function(req, res) {
   });
 });
 
-//get all projects from db - order by name ascendant
-app.get('/projects-name-ascendant', function(req, res) {
-  db2.projects.find().sort( {name: 1}, function (err, doc) {
-    res.json(doc);
-  });
-});
-
-//get all projects from db - order by name descendant
-app.get('/projects-name-descendant', function(req, res) {
-  db2.projects.find().sort( {name: -1}, function (err, doc) {
-    res.json(doc);
-  });
-});
-
-//get all projects from db - order by method ascendant
-app.get('/projects-method-ascendant', function(req, res) {
-  db2.projects.find().sort( {method: 1}, function (err, doc) {
-    res.json(doc);
-  });
-});
-
-//get all projects from db - order by method descendant
-app.get('/projects-method-descendant', function(req, res) {
-  db2.projects.find().sort( {method: -1}, function (err, doc) {
-    res.json(doc);
-  });
-});
-
-//get all projects from db - order by creation_date ascendant
-app.get('/projects-creationdate-ascendant', function(req, res) {
-  db2.projects.find().sort( {creation_date: 1}, function (err, doc) {
-    res.json(doc);
-  });
-});
-
-//get all projects from db - order by creation_date descendant
-app.get('/projects-creationdate-descendant', function(req, res) {
-  db2.projects.find().sort( {creation_date: -1}, function (err, doc) {
-    res.json(doc);
-  });
-});
-
-//get all projects from db - order by last_update ascendant
-app.get('/projects-lastupdate-ascendant', function(req, res) {
-  db2.projects.find().sort( {last_update: 1}, function (err, doc) {
-    res.json(doc);
-  });
-});
-
-//get all projects from db - order by last_update descendant
-app.get('/projects-lastupdate-descendant', function(req, res) {
-  db2.projects.find().sort( {last_update: -1}, function (err, doc) {
-    res.json(doc);
-  });
-});
-
 //insert new project
 app.post('/projects', function(req, res) {
   db2.projects.insert(req.body, function(err, doc) {

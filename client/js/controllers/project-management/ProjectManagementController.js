@@ -1,6 +1,6 @@
 app.controller('ProjectManagementController', function($scope, $window, $http) {
   //order that projects should be retrieved from db
-  var currentOrder;
+  var currentOrder = ['', ''];
 
   function requestLogIn() {
     $http.get('/requestlogin').success(function(res) {
@@ -32,6 +32,9 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
     switch(project.method) {
       case 'OrderBy':
         $window.location.href = 'order-by-method.html?id=' + project['project_id'];
+        break;
+      case 'CAT-SD':
+        $window.location.href = 'cat-sd.html?id=' + project['project_id'];
         break;
     }
   }
@@ -211,7 +214,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
   }
 
   function getProjects() {
-    $http.get(currentOrder).success(function(response) {
+    $http.get('/projects').success(function(response) {
       var user_projects = [];
 
       //get the created projects by the logged user
@@ -223,6 +226,11 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
 
       $scope.projects = user_projects;
 
+      //sort projects
+      if(currentOrder[0] != '' && currentOrder[1] != '') {
+        $scope.projects.sort(sortData(currentOrder[0], currentOrder[1]));
+      }
+
       //show/hide the "delete all projects" button
       if($scope.projects.length == 0)
         $scope.showDeleteAll = false;
@@ -231,14 +239,28 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
     });
   }
 
-  $scope.changeCurrentOrder = function(attr, order) {
-    if(attr == '' && order == '') {
-      currentOrder = '/projects';
-    }
-    else {
-      currentOrder = '/projects-' + attr + '-' + order;
-    }
+  $scope.changeCurrentOrder = function(attr, dir) {
+    currentOrder = [attr, dir];
     getProjects();
+  }
+
+  function sortData(order, direction) {
+    return function(a, b) {
+      if(direction == 'ascendant') {
+        if(a[order] < b[order])
+          return -1;
+        if(a[order] > b[order])
+          return 1;
+        return 0;
+      }
+      else {
+        if(a[order] < b[order])
+          return 1;
+        if(a[order] > b[order])
+          return -1;
+        return 0;
+      }
+    }
   }
 
   $scope.deleteAllProjects = function() {

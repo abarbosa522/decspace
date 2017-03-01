@@ -91,13 +91,13 @@
             </th>
             <th class = 'text-center'>
               Creation Date
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrder("creationdate", "descendant")'></span></a>
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrder("creationdate", "ascendant")'></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrder("creation_date", "descendant")'></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrder("creation_date", "ascendant")'></span></a>
             </th>
             <th class = 'text-center'>
               Last Update
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrder("lastupdate", "descendant")'></span></a>
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrder("lastupdate", "ascendant")'></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrder("last_update", "descendant")'></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrder("last_update", "ascendant")'></span></a>
             </th>
             <th></th>
           </tr>
@@ -222,8 +222,9 @@
             <!-- Method List -->
             <td>
               <select id = 'input-method' ng-model = 'project.method'>
-                <option value = '' selected disabled>-- Please Select --</option>
+                <option value = '' selected disabled>--- Please Select ---</option>
                 <option>OrderBy</option>
+                <option>CAT-SD</option>
               </select>
             </td>
 
