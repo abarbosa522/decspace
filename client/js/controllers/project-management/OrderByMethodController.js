@@ -78,7 +78,10 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
       //get the selected project
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          $scope.criteria = response[proj]['criteria'];
+          if(typeof response[proj]['criteria'] == 'undefined')
+            $scope.criteria = [];
+          else
+            $scope.criteria = response[proj]['criteria'];
 
           if(currentOrderCriteria[0] != '' && currentOrderCriteria[1] != '') {
             $scope.criteria.sort(sortData(currentOrderCriteria[0], currentOrderCriteria[1]));
@@ -324,7 +327,10 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
           //get the selected criterion
-          selectedCriterion = response[proj]['order_by_criterion'];
+          if(typeof response[proj]['order_by_criterion'] == 'undefined')
+            selectedCriterion = '';
+          else
+            selectedCriterion = response[proj]['order_by_criterion'];
         }
       }
     });
@@ -370,7 +376,10 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
           //get the actions previously added
-          $scope.actions = response[proj]['actions'];
+          if(typeof response[proj]['actions'] == 'undefined')
+            $scope.actions = [];
+          else
+            $scope.actions = response[proj]['actions'];
 
           if(currentOrderActions[0] != '' && currentOrderActions[1] != '')
             $scope.actions.sort(sortData(currentOrderActions[0], currentOrderActions[1]));

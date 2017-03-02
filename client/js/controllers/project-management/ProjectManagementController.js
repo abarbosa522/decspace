@@ -75,7 +75,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
         project_id++;
 
         //create the new project
-        var proj_text = '{"project_id":"' + project_id + '","username":"' + $scope.username + '","name":"' + $scope.project.name + '","method":"' + $scope.project.method + '","creation_date":"' + creation_date + '","last_update":"' + creation_date + '","criteria":[],"order_by_criterion":"","actions":[],"executions":[]}';
+        var proj_text = '{"project_id":"' + project_id + '","username":"' + $scope.username + '","name":"' + $scope.project.name + '","method":"' + $scope.project.method + '","creation_date":"' + creation_date + '","last_update":"' + creation_date + '","executions":[]}';
 
         //transform to json
         var proj_obj = JSON.parse(proj_text);
@@ -161,14 +161,15 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
       project_id++;
 
       //create the new project
-      var proj_text = '{"project_id":"' + project_id + '","username":"' + $scope.username + '","name":"' + project.name + ' - Copy' + '","method":"' + project.method + '","creation_date":"' + creation_date + '","last_update":"' + creation_date + '","criteria":' + JSON.stringify(project.criteria) +
-      ',"order_by_criterion":"' + project.order_by_criterion + '","actions":' + JSON.stringify(project.actions) + ',"executions":' + JSON.stringify(project.executions) + '}';
-
-      //transform to json
-      var proj_obj = JSON.parse(proj_text);
+      var new_proj = angular.copy(project);
+      delete new_proj['_id'];
+      new_proj['project_id'] = project_id;
+      new_proj['name'] += ' - Copy';
+      new_proj['creation_date'] = creation_date;
+      new_proj['last_update'] = creation_date;
 
       //add the new list of projects
-      $http.post('/projects', proj_obj).success(function() {
+      $http.post('/projects', new_proj).success(function() {
         //refresh the list of projects
         getProjects();
       });
