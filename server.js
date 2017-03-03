@@ -103,6 +103,21 @@ app.post('/password', function(req, res) {
   });
 });
 
+//EXPRESSION PARSER
+var Parser = require('expr-eval').Parser;
+
+var parser = new Parser();
+
+//evaluate expression
+app.post('/expr-eval', function(req, res) {
+  var condition = parser.parse(req.body.function);
+  var result = condition.evaluate({x: req.body.x, y: req.body.y});
+  console.log(req.body.function);
+  console.log('x: ' + req.body.x + ',y: ' + req.body.y);
+  console.log(result);
+  res.json(result);
+});
+
 //DATABASE CONNECTIONS
 var mongojs = require('mongojs');
 var username = 'abarbosa';

@@ -110,7 +110,6 @@
               <tr>
                 <th class = 'text-center'>Name</th>
                 <th class = 'text-center'>Direction</th>
-                <th class = 'text-center'>Weight</th>
                 <th class = 'col-md-2'></th>
               </tr>
             </thead>
@@ -126,9 +125,6 @@
                     <option ng-selected = 'criterion.direction == "Minimize"'>Minimize</option>
                     <option ng-selected = 'criterion.direction == "Maximize"'>Maximize</option>
                   </select>
-                </td>
-                <td>
-                  <input class = 'form-control' type = 'number' ng-value = '{{criterion.weight}}'>
                 </td>
                 <td ng-if = 'criterion.id != deleteIdCriterion'>
                   <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteCriterion(criterion)' data-toggle = 'tooltip' title = 'Delete Criterion'>
@@ -155,9 +151,6 @@
                     <option>Minimize</option>
                     <option>Maximize</option>
                   </select>
-                </td>
-                <td>
-                  <input class = 'form-control' type = 'number' ng-model = 'new_criterion.weight'>
                 </td>
                 <td>
                   <button type = 'button' class = 'btn btn-success' ng-click = 'addCriterion()' data-toggle = 'tooltip' title = 'Add Criterion'>
@@ -187,7 +180,7 @@
                   <select>
                     <option ng-selected = 'interaction.type == ""' disabled>--- Please Select ---</option>
                     <option ng-selected = 'interaction.type == "Mutual-Strengthening Effect"'>Mutual-Strengthening Effect</option>
-                    <option ng-selected = 'interaction.type == "Mutual-Weaking Effect"'>Mutual-Weaking Effect</option>
+                    <option ng-selected = 'interaction.type == "Mutual-Weakening Effect"'>Mutual-Weakening Effect</option>
                     <option ng-selected = 'interaction.type == "Antagonistic Effect"'>Antagonistic Effect</option>
                   </select>
                 </td>
@@ -226,7 +219,7 @@
                   <select ng-model = 'new_interaction_effect.type'>
                     <option value = '' disabled>--- Please Select ---</option>
                     <option>Mutual-Strengthening Effect</option>
-                    <option>Mutual-Weaking Effect</option>
+                    <option>Mutual-Weakening Effect</option>
                     <option>Antagonistic Effect</option>
                   </select>
                 </td>
@@ -520,6 +513,9 @@
             <span class = 'glyphicon glyphicon-floppy-save'></span>
           </button>
 
+          <button type = 'button' class = 'btn btn-default' ng-click = 'getResults()' data-toggle = 'tooltip'>
+            Get Results
+          </button>
 
         </div>
 
