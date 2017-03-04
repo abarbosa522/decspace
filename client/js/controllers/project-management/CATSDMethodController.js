@@ -334,7 +334,10 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
 
   $scope.getResults = function() {
     var results = CATSDService.getResults($scope.criteria, $scope.interaction_effects, $scope.actions, $scope.categories);
-    console.log(results);
+
+    results.then(function(resolve) {
+      console.log(resolve);
+    });
   }
 
   requestLogIn();

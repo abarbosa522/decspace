@@ -109,13 +109,24 @@ var Parser = require('expr-eval').Parser;
 var parser = new Parser();
 
 //evaluate expression
-app.post('/expr-eval', function(req, res) {
-  var condition = parser.parse(req.body.function);
-  var result = condition.evaluate({x: req.body.x, y: req.body.y});
-  console.log(req.body.function);
-  console.log('x: ' + req.body.x + ',y: ' + req.body.y);
-  console.log(result);
-  res.json(result);
+app.get('/expr-eval', function(req, res) {
+  var condition = parser.parse(req.query.condition);
+  var result = condition.evaluate({x: Number(req.query.x), y: Number(req.query.y)});
+
+  if(result == true) {
+    var func_branch = parser.parse(req.query.function);
+    result = func_branch.evaluate({x: Number(req.query.x), y: Number(req.query.y)});
+  }
+  else {
+    result = 'false';
+  }
+  
+  var result_obj = {};
+  result_obj['criterion'] = req.query.criterion;
+  result_obj['action'] = req.query.action;
+  result_obj['reference_action'] = req.query.reference_action;
+  result_obj['result'] = result;
+  res.json(result_obj);
 });
 
 //DATABASE CONNECTIONS

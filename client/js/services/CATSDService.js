@@ -1,22 +1,45 @@
-app.service('CATSDService', function($http) {
-
+app.service('CATSDService', function($http, $q) {
   //input data
   var criteria, interaction_effects, actions, categories;
 
   //criteria pairs of mutual interaction effects
   var mutualSet = [], antagonisticSet = [];
 
+  //assigned actions and corresponding categories
+  var assignedActions = {};
+
+  //similarity array
+  var similarityValues = [];
+
   this.getResults = function(crt, inter_eff, acts, cats) {
+    var deferred = $q.defer();
+
     criteria = crt;
     interaction_effects = inter_eff;
     actions = acts;
     categories = cats;
 
+    for(category in categories) {
+      assignedActions[categories[category]['name']] = [];
+    }
+    assignedActions['Cq+1'] = [];
+
     interactionEffectsSets();
 
     if(!nonNegativityCondition()) {
-      return false;
+      deferred.resolve(false);
     }
+
+    var result = applyCriterionFunction();
+
+    result.then(function(resolve) {
+      assignActions();
+
+      deferred.resolve(assignedActions);
+
+    });
+
+    return deferred.promise;
   }
 
   //set M (mutual effect) and set O (antagonistic)
@@ -61,58 +84,97 @@ app.service('CATSDService', function($http) {
     return true;
   }
 
-  function applyCriterionFunction(criterion, action, reference_action) {
-    //arguments used in the functions
-    var x = action[criterion['name']];
-    var y = reference_action[criterion['name']];
+  function applyCriterionFunction() {
+    var deferred = $q.defer();
 
-    //different counter duo to http asynchronous calls
-    var branch_counter = 0;
+    var total_ref = 0;
 
-    for(branch in criterion['branches']) {
-      var expr = {};
-      expr.x = x;
-      expr.y = y;
-      expr.function = criterion['branches'][branch]['condition'];
-
-      if((expr.function.indexOf('=') != -1) && (expr.function.indexOf('<=') == -1) && (expr.function.indexOf('=>') == -1) && (expr.function.indexOf('!=') == -1)) {
-        var a = criterion['branches'][branch]['condition'];
-        var b = '=';
-        var position = criterion['branches'][branch]['condition'].indexOf('=');
-        expr.function = [a.slice(0, position), b, a.slice(position)].join('');
+    for(category in categories) {
+      for(reference_action in categories[category]['reference_actions']) {
+        total_ref++;
       }
-      //console.log(expr);
-      $http.post('/expr-eval', expr).success(function(res) {
-        if(res) {
-          var new_expr = {};
-          new_expr.x = x;
-          new_expr.y = y;
-          new_expr.function = criterion['branches'][branch_counter]['function'];
-          $http.post('/expr-eval', new_expr).success(function(res2) {
-            return res2;
-          });
-        }
-        branch_counter++;
-      });
     }
+
+    var total_it = criteria.length * actions.length * total_ref * 2;
+    var current_it = 0;
+
+    for(criterion in criteria) {
+      for(action in actions) {
+        for(category in categories) {
+          for(reference_action in categories[category]['reference_actions']) {
+            //arguments used in the functions
+            var x = actions[action][criteria[criterion]['name']];
+            var y = categories[category]['reference_actions'][reference_action][criteria[criterion]['name']];
+
+
+            for(branch in criteria[criterion]['branches']) {
+              var condition = criteria[criterion]['branches'][branch]['condition'];
+              var func = criteria[criterion]['branches'][branch]['function'];
+
+              if((condition.indexOf('=') != -1) && (condition.indexOf('<=') == -1) && (condition.indexOf('>=') == -1) && (condition.indexOf('!=') == -1)) {
+                var a = criteria[criterion]['branches'][branch]['condition'];
+                var b = '=';
+                var position = criteria[criterion]['branches'][branch]['condition'].indexOf('=');
+                condition = [a.slice(0, position), b, a.slice(position)].join('');
+              }
+
+              $http.get('/expr-eval', {params: {'criterion':criteria[criterion]['name'], 'action':actions[action]['name'], 'reference_action':categories[category]['reference_actions'][reference_action]['name'], 'function':func, 'condition':condition, 'x':x, 'y':y}}).success(function(res) {
+                if(res.result != 'false') {
+                  similarityValues.push(res);
+                  current_it++;
+                }
+                if(current_it == total_it) {
+                  deferred.resolve(res);
+                }
+              });
+
+              $http.get('/expr-eval', {params: {'criterion':criteria[criterion]['name'], 'action':categories[category]['reference_actions'][reference_action]['name'], 'reference_action':actions[action]['name'], 'function':func, 'condition':condition, 'x':y, 'y':x}}).success(function(res) {
+                if(res.result != 'false') {
+                  similarityValues.push(res);
+                  current_it++;
+                }
+                if(current_it == total_it) {
+                  deferred.resolve(res);
+                }
+              });
+            }
+          }
+        }
+      }
+    }
+    return deferred.promise;
   }
 
   //when fj(gj(a)) is non-negative, similarity coefficient is sj(a,b)
   function sj(criterion, action, reference_action) {
-    var result = applyCriterionFunction(criterion, action, reference_action);
+    var result;
+
+    for(item in similarityValues) {
+      if(similarityValues[item]['criterion'] == criterion && similarityValues[item]['action'] == action && similarityValues[item]['reference_action'] == reference_action) {
+        result = similarityValues[item]['result'];
+        break;
+      }
+    }
 
     if(result >= 0)
-      return result
+      return result;
     else
       return 0;
   }
 
   //when fj(gj(a)) is non-negative, similarity coefficient is dj(a,b)
   function dj(criterion, action, reference_action) {
-    var result = applyCriterionFunction(criterion, action, reference_action);
+    var result;
 
-    if(result <= 0)
-      return result
+    for(item in similarityValues) {
+      if(similarityValues[item]['criterion'] == criterion && similarityValues[item]['action'] == action && similarityValues[item]['reference_action'] == reference_action) {
+        result = similarityValues[item]['result'];
+        break;
+      }
+    }
+
+    if(result >= 0)
+      return result;
     else
       return 0;
   }
@@ -124,48 +186,114 @@ app.service('CATSDService', function($http) {
 
   function k(action, reference_action, category) {
     var result = 0;
-    for(criterion in criteria)
-      result += categories[category][criterion['name']];
+
+    for(criterion in criteria) {
+      result += category[criteria[criterion]['name']];
+    }
 
     for(pair in mutualSet) {
-      var s1 = sj(mutualSet[pair]['criterion1'], action, reference_action);
-      var s2 = sj(mutualSet[pair]['criterion2'], action, reference_action);
+      var s1 = sj(mutualSet[pair]['criterion1'], action['name'], reference_action['name']);
+      var s2 = sj(mutualSet[pair]['criterion2'], action['name'], reference_action['name']);
       result += z(s1, s2) * mutualSet[pair]['value'];
     }
 
     for(pair2 in antagonisticSet) {
-      var s3 = sj(antagonisticSet[pair2]['criterion1'], action, reference_action);
-      var s4 = sj(antagonisticSet[pair2]['criterion2'], reference_action, action);
+      var s3 = sj(antagonisticSet[pair2]['criterion1'], action['name'], reference_action['name']);
+      var s4 = sj(antagonisticSet[pair2]['criterion2'], reference_action['name'], action['name']);
       result += z(s3, s4) * antagonisticSet[pair2]['value'];
     }
 
     return result;
   }
 
+  //a non-additive similarity function
   function s(action, reference_action, category) {
     var result = 0;
+
     for(criterion in criteria)
-      result += categories[category][criterion['name']] * sj(criterion, action, reference_action);
+      result += category[criteria[criterion]['name']] * sj(criteria[criterion]['name'], action, reference_action);
 
     for(pair in mutualSet) {
-      var s1 = sj(mutualSet[pair]['criterion1'], action, reference_action);
-      var s2 = sj(mutualSet[pair]['criterion2'], action, reference_action);
+      var s1 = sj(mutualSet[pair]['criterion1'], action['name'], reference_action['name']);
+      var s2 = sj(mutualSet[pair]['criterion2'], action['name'], reference_action['name']);
       result += z(s1, s2) * mutualSet[pair]['value'];
     }
 
     for(pair2 in antagonisticSet) {
-      var s3 = sj(antagonisticSet[pair2]['criterion1'], action, reference_action);
-      var s4 = sj(antagonisticSet[pair2]['criterion2'], reference_action, action);
+      var s3 = sj(antagonisticSet[pair2]['criterion1'], action['name'], reference_action['name']);
+      var s4 = sj(antagonisticSet[pair2]['criterion2'], reference_action['name'], action['name']);
       result += z(s3, s4) * mutualSet[pair]['value'];
     }
 
     return result/k(action, reference_action, category);
   }
 
-  function dPlus(action, reference_action, category) {
-    var result = 0;
+  //a non-linear dissimilarity function
+  function dPlus(action, reference_action) {
+    var result = 1;
     for(criterion in criteria) {
-      
+      if(action[criteria[criterion]['name']] > reference_action[criteria[criterion]['name']]) {
+        result *= (1 + dj(criteria[criterion]['name'], action['name'], reference_action['name']));
+      }
+    }
+    return result - 1;
+  }
+
+  function dMinus(action, reference_action) {
+    var result = 1;
+    for(criterion in criteria) {
+      if(reference_action[criteria[criterion]['name']] > action[criteria[criterion]['name']]) {
+        console.log(result);
+        result *= (1 + dj(criteria[criterion]['name'], action['name'], reference_action['name']));
+      }
+    }
+    return result - 1;
+  }
+
+  //a multiplicative comprehensive similarity function
+  function delta(action, reference_action, category) {
+    return s(action, reference_action, category) * (1 - dPlus(action, reference_action)) * (1 - dMinus(action, reference_action));
+  }
+
+  function deltaMax(action, category) {
+    var result;
+    for(reference_action in category['reference_actions']) {
+      var res = delta(action, category['reference_actions'][reference_action], category);
+
+      console.log(res);
+      if(reference_action == 0) {
+        result = res;
+      }
+      else {
+        if(res > result) {
+          result = res;
+        }
+      }
+    }
+    return result;
+  }
+
+  //similarity assignment procedure
+  function assignActions() {
+    for(action in actions) {
+      //set K - categories to assign action to
+      var k_set = [];
+      //compare action with set B of category
+      for(category in categories) {
+        var result = deltaMax(actions[action], categories[category]);
+
+        if(result >= categories[category]['membership_degree'])
+          k_set.push(categories[category]['name']);
+      }
+
+      if(k_set.length == 0) {
+        assignedActions['Cq+1'].push(actions[action]['name']);
+      }
+      else {
+        for(cat in k_set) {
+          assignedActions[cat].push(actions[action]['name']);
+        }
+      }
     }
   }
 });
