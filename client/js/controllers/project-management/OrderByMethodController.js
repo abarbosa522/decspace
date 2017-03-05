@@ -637,7 +637,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
               var execution_id = response[proj]['executions'][response[proj]['executions'].length - 1]['execution_id'] + 1;
             }
 
-            //insert action into database
+            //insert execution into database
             response[proj]['executions'].push({'execution_id':execution_id,'criteria':$scope.criteria,'actions':$scope.actions,'order_by_criterion':selectedCriterion,'results':results,'comment':comment,'execution_date':execution_date});
             //get the id of the document, so that it can be removed from the db
             id_doc = response[proj]['_id'];

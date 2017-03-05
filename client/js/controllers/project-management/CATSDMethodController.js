@@ -77,6 +77,7 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
         //add the new list of projects
         $http.post('/projects', proj_res).success(function() {
           getData();
+          getExecutions();
         });
       });
     });
@@ -332,11 +333,70 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
     });
   }
 
+  function getExecutions() {
+    $http.get('/projects').success(function(response) {
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+          //get the actions previously added
+          $scope.executions = response[proj]['executions'];
+          break;
+        }
+      }
+    });
+  }
+
   $scope.getResults = function() {
     var results = CATSDService.getResults($scope.criteria, $scope.interaction_effects, $scope.actions, $scope.categories);
 
     results.then(function(resolve) {
       console.log(resolve);
+
+      $http.get('/projects').success(function(response) {
+        //get current date
+        var current_date = new Date();
+        var execution_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear() + ' ' + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
+
+        //if a comment has not been added
+        if(typeof $scope.new_execution == 'undefined') {
+          var comment = '';
+        }
+        else {
+          var comment = $scope.new_execution.comment;
+        }
+
+        for(proj in response) {
+          if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+            //get the largest execution_id
+            if(response[proj]['executions'].length == 0) {
+              var execution_id = 1;
+            }
+            else {
+              var execution_id = response[proj]['executions'][response[proj]['executions'].length - 1]['execution_id'] + 1;
+            }
+
+            //insert execution into database
+            response[proj]['executions'].push({'execution_id':execution_id,'criteria':$scope.criteria,'actions':$scope.actions,'categories':$scope.categories,'interaction_effects':$scope.interaction_effects,'results':results,'comment':comment,'execution_date':execution_date});
+            //get the id of the document, so that it can be removed from the db
+            id_doc = response[proj]['_id'];
+            //project to store in the db
+            proj_res = response[proj];
+            delete proj_res['_id'];
+            break;
+          }
+        }
+
+        //delete the previous document with the list of projects
+        $http.delete('/projects/' + id_doc).success(function() {
+          //add the new list of projects
+          $http.post('/projects', proj_res).success(function() {
+            getExecutions();
+
+            //reset the comment input field, if it was filled
+            if(typeof $scope.new_execution != 'undefined')
+              $scope.new_execution.comment = '';
+          });
+        });
+      });
     });
   }
 

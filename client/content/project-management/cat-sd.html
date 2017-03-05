@@ -542,7 +542,187 @@
           <p class = 'header-2'>Past Executions</p>
 
           <div class = 'row' ng-repeat = 'execution in executions'>
+            <!-- List View -->
+            <div id = 'execution-list-{{execution.execution_id}}'>
+              <div class = 'list-group col-md-10'>
+                <a href = '#list-{{execution.execution_id}}' class = 'list-group-item' data-toggle = 'collapse'>
+                  <p>{{execution.execution_date}}</p>
+                </a>
+                <div id = 'list-{{execution.execution_id}}' class = 'collapse'>
+                  <a class = 'list-group-item'>
+                    <p class = 'header-3'>Input Data</p>
 
+                    <!-- Input Criteria Names and Direction -->
+                    <p class = 'header-4'>Criteria</p>
+
+                    <div class = 'row'>
+                      <table class = 'table table-bordered table-condensed'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>Name</th>
+                            <th class = 'text-center'>Direction</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat = 'criterion in execution.criteria'>
+                            <td>{{criterion.name}}</td>
+                            <td>{{criterion.direction}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <!-- Input Interaction Effects -->
+                    <p class = 'header-4'>Interaction Effects</p>
+
+                    <div class = 'row'>
+                      <table class = 'table table-bordered table-condensed'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>Type Of Effect</th>
+                            <th class = 'text-center'>Criterion 1</th>
+                            <th class = 'text-center'>Criterion 2</th>
+                            <th class = 'text-center'>Value</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat = 'interaction_effect in execution.interaction_effects'>
+                            <td>{{interaction_effect.type}}</td>
+                            <td>{{interaction_effect.criterion1}}</td>
+                            <td>{{interaction_effect.criterion2}}</td>
+                            <td>{{interaction_effect.value}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <!-- Input Scales and Functions -->
+                    <p class = 'header-4'>Scales and Functions</p>
+
+                    <div ng-repeat = 'criterion in execution.criteria'>
+
+                      <p class = 'header-5'>Criterion "{{criterion.name}}"</p>
+
+                      <div class = 'row'>
+                        <table class = 'table table-bordered table-condensed'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Type</th>
+                              <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Minimum Value</th>
+                              <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Maximum Value</th>
+                              <th class = 'text-center' ng-if = 'criterion.scale.type == "Categorical"'>Number of Categories</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>{{criterion.scale.type}}</td>
+                              <td ng-if = 'criterion.scale.type == "Numerical"'>{{criterion.scale.min}}</td>
+                              <td ng-if = 'criterion.scale.type == "Numerical"'>{{criterion.scale.max}}</td>
+                              <td ng-if = 'criterion.scale.type == "Categorical"'>{{criterion.scale.num_categories}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div class = 'row'>
+                        <table class = 'table table-bordered table-condensed'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Function</th>
+                              <th class = 'text-center'>Condition</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'branch in criterion.branches'>
+                              <td>
+                                <p math-jax-bind = 'branch.function'></p>
+                              </td>
+                              <td>
+                                <p math-jax-bind = 'branch.condition'></p>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <!-- Input Actions -->
+                    <p class = 'header-4'>Actions</p>
+
+                    <div class = 'row'>
+                      <table class = 'table table-bordered table-condensed'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>Action</th>
+                            <th class = 'text-center' ng-repeat = 'criterion in execution.criteria'>{{criterion.name}}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat = 'action in execution.actions'>
+                            <td>{{action.name}}</td>
+                            <td ng-repeat = 'criterion in execution.criteria'>{{action[criterion.name]}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <!-- Input Categories -->
+                    <p class = 'header-4'>Categories</p>
+
+                    <div class = 'row'>
+                      <table class = 'table table-bordered table-condensed'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>Category</th>
+                            <th class = 'text-center'>Membership Degree</th>
+                            <th class = 'text-center' ng-repeat = 'criterion in execution.criteria'>{{criterion.name}}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat = 'category in execution.categories'>
+                            <td>{{category.name}}</td>
+                            <td>{{category.membership_degree}}</td>
+                            <td ng-repeat = 'criterion in execution.criteria'>{{category[criterion.name]}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <!-- Input Reference Actions -->
+                    <p class = 'header-4'>Reference Actions</p>
+
+                    <div class = 'row'>
+                      <table class = 'table table-bordered table-condensed'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>Category</th>
+                            <th class = 'text-center'>Reference Action</th>
+                            <th class = 'text-center' ng-repeat = 'criterion in execution.criteria'>{{criterion.name}}</th>
+                          </tr>
+                        </thead>
+                        <tbody ng-repeat = 'category in execution.categories'>
+                          <tr ng-repeat = 'reference_action in category.reference_actions'>
+                            <td>{{category.name}}</td>
+                            <td>{{reference_action.name}}</td>
+                            <td ng-repeat = 'criterion in execution.criteria'>{{reference_action[criterion.name]}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <!-- Results -->
+
+                    <!-- Comment -->
+                  </a>
+                </div>
+              </div>
+              <div class = 'col-md-2'>
+                <!-- Delete button -->
+                <button type = 'button' class = 'btn btn-danger exec-btn btn-execution-delete' ng-click = 'deleteExecution(execution)' data-toggle = 'tooltip' title = 'Delete Execution' style = 'margin-top:5%;'>
+                  <span class = 'glyphicon glyphicon-minus'></span>
+                </button>
+              </div>
+            </div>
           </div>
 
           <br>
