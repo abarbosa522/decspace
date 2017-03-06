@@ -105,6 +105,11 @@ nav > div > ul > li {
   font-weight: 600;
 }
 
+.header-6 {
+  font-weight: 600;
+  font-size: 15px;
+}
+
 .no-display {
   display: none;
 }
@@ -112,4 +117,20 @@ nav > div > ul > li {
 .icon-custom {
   font-size: 100px;
   color: #191461;
+}
+
+/* Loading Button */
+.glyphicon-refresh-animate {
+  -animation: spin 3s infinite linear;
+  -webkit-animation: spin2 3s infinite linear;
+}
+
+@-webkit-keyframes spin2 {
+  from { -webkit-transform: rotate(0deg);}
+  to { -webkit-transform: rotate(360deg);}
+}
+
+@keyframes spin {
+  from { transform: scale(1) rotate(0deg);}
+  to { transform: scale(1) rotate(360deg);}
 }

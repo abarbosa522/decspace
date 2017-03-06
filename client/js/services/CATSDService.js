@@ -14,10 +14,17 @@ app.service('CATSDService', function($http, $q) {
   this.getResults = function(crt, inter_eff, acts, cats) {
     var deferred = $q.defer();
 
+    //initialize data variables
     criteria = crt;
     interaction_effects = inter_eff;
     actions = acts;
     categories = cats;
+
+    //reset the set variables
+    mutualSet = [];
+    antagonisticSet = [];
+    assignedActions = {};
+    similarityValues = [];
 
     for(category in categories) {
       assignedActions[categories[category]['name']] = [];
@@ -33,10 +40,10 @@ app.service('CATSDService', function($http, $q) {
     var result = applyCriterionFunction();
 
     result.then(function(resolve) {
+      console.log(similarityValues);
       assignActions();
 
       deferred.resolve(assignedActions);
-
     });
 
     return deferred.promise;
@@ -56,6 +63,9 @@ app.service('CATSDService', function($http, $q) {
 
   //guarantee that the weights of the criteria never become negative after considering the interaction effects
   function nonNegativityCondition() {
+    console.log(mutualSet);
+    console.log(antagonisticSet);
+
     for(criterion in criteria) {
       for(category in categories) {
         var name = criteria[criterion]['name'];
@@ -243,7 +253,6 @@ app.service('CATSDService', function($http, $q) {
     var result = 1;
     for(criterion in criteria) {
       if(reference_action[criteria[criterion]['name']] > action[criteria[criterion]['name']]) {
-        console.log(result);
         result *= (1 + dj(criteria[criterion]['name'], action['name'], reference_action['name']));
       }
     }
@@ -260,7 +269,6 @@ app.service('CATSDService', function($http, $q) {
     for(reference_action in category['reference_actions']) {
       var res = delta(action, category['reference_actions'][reference_action], category);
 
-      console.log(res);
       if(reference_action == 0) {
         result = res;
       }

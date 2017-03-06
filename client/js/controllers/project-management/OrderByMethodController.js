@@ -152,8 +152,9 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
           for(proj in response) {
             if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
               //get the largest criteria_id
-              if(response[proj]['criteria'].length == 0) {
+              if(!response[proj].hasOwnProperty('criteria')) {
                 $scope.new_criterion.criterion_id = 1;
+                response[proj]['criteria'] = [];
               }
               else {
                 $scope.new_criterion.criterion_id = response[proj]['criteria'][response[proj]['criteria'].length - 1]['criterion_id'] + 1;
@@ -420,8 +421,10 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
           for(proj in response) {
             if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
               //define id of the action
-              if(response[proj]['actions'].length == 0)
+              if(!response[proj].hasOwnProperty('actions')) {
                 $scope.new_action.action_id = 1;
+                response[proj]['actions'] = [];
+              }
               else
                 $scope.new_action.action_id = response[proj]['actions'][response[proj]['actions'].length - 1]['action_id'] + 1;
 

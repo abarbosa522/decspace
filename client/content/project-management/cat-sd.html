@@ -103,67 +103,100 @@
 
           <br>
 
-          <p class = 'header-1'>Criteria</p>
+          <!-- Button Bar -->
+          <div class = 'row'>
+            <!-- Save Button -->
+            <button type = 'button' class = 'btn btn-primary' ng-click = 'saveData()' data-toggle = 'tooltip' title = 'Save Data' style = 'float:left; margin-left: 1.5%'>
+              <span class = 'glyphicon glyphicon-floppy-save'></span>
+            </button>
 
-          <table class = 'table table-bordered table-hover'>
-            <thead>
-              <tr>
-                <th class = 'text-center'>Name</th>
-                <th class = 'text-center'>Direction</th>
-                <th class = 'col-md-2'></th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Added Criteria  -->
-              <tr ng-repeat = 'criterion in criteria' ng-class = '{danger: criterion.id == deleteIdCriterion}'>
-                <td>
-                  <input class = 'form-control' type = 'text' value = '{{criterion.name}}'>
-                </td>
-                <td>
-                  <select>
-                    <option ng-selected = 'criterion.direction == ""' disabled>--- Please Select ---</option>
-                    <option ng-selected = 'criterion.direction == "Minimize"'>Minimize</option>
-                    <option ng-selected = 'criterion.direction == "Maximize"'>Maximize</option>
-                  </select>
-                </td>
-                <td ng-if = 'criterion.id != deleteIdCriterion'>
-                  <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteCriterion(criterion)' data-toggle = 'tooltip' title = 'Delete Criterion'>
-                    <span class = 'glyphicon glyphicon-minus'></span>
-                  </button>
-                </td>
-                <td ng-if = 'criterion.id == deleteIdCriterion'>
-                  <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteCriterion(criterion)' data-toggle = 'tooltip' title = 'Confirm Delete Criterion'>
-                    <span class = 'glyphicon glyphicon-ok'></span>
-                  </button>
-                  <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteCriterion()' data-toggle = 'tooltip' title = 'Cancel Delete Criterion'>
-                    <span class = 'glyphicon glyphicon-remove'></span>
-                  </button>
-                </td>
-              </tr>
-              <!-- Form to add a criterion -->
-              <tr>
-                <td>
-                  <input class = 'form-control' type = 'text' ng-model = 'new_criterion.name'>
-                </td>
-                <td>
-                  <select ng-model = 'new_criterion.direction'>
-                    <option value = '' disabled>--- Please Select ---</option>
-                    <option>Minimize</option>
-                    <option>Maximize</option>
-                  </select>
-                </td>
-                <td>
-                  <button type = 'button' class = 'btn btn-success' ng-click = 'addCriterion()' data-toggle = 'tooltip' title = 'Add Criterion'>
-                    <span class = 'glyphicon glyphicon-plus'></span>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+            <!-- Import Button -->
+            <button type = 'button' class = 'btn btn-info' ng-click = '' data-toggle = 'tooltip' title = 'Import Data' style = 'float:left; margin-left: 1%'>
+              <span class = 'glyphicon glyphicon-download'></span>
+            </button>
+
+            <!-- Export Button -->
+            <button type = 'button' class = 'btn btn-info' ng-click = '' data-toggle = 'tooltip' title = 'Export Data' style = 'float:left; margin-left: 1%'>
+              <span class = 'glyphicon glyphicon-upload'></span>
+            </button>
+          </div>
+
+          <!-- Data Saved Alert -->
+          <div class = 'alert alert-success alert-dismissible' role = 'alert' ng-if = 'showSaveSuccess' ng-cloak>
+            <button type = 'button' class = 'close' data-dismiss = 'alert' aria-label = 'Close'>
+              <span aria-hidden = 'true'>&times;</span>
+            </button>
+            Data <strong>successfully</strong> saved.
+          </div>
+
+          <div class = 'row'>
+            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#criteria-table' style = 'float:right'>
+              <span class = 'glyphicon glyphicon-eye-open'></span>
+            </button>
+            <p class = 'header-1'>Criteria</p>
+          </div>
+
+          <div id = 'criteria-table' class = 'collapse in'>
+            <table class = 'table table-bordered table-hover'>
+              <thead>
+                <tr>
+                  <th class = 'text-center'>Name</th>
+                  <th class = 'text-center'>Direction</th>
+                  <th class = 'col-md-2'></th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Added Criteria  -->
+                <tr ng-repeat = 'criterion in criteria' ng-class = '{danger: criterion.id == deleteIdCriterion}'>
+                  <td>
+                    <input class = 'form-control' type = 'text' value = '{{criterion.name}}'>
+                  </td>
+                  <td>
+                    <select>
+                      <option ng-selected = 'criterion.direction == ""' disabled>--- Please Select ---</option>
+                      <option ng-selected = 'criterion.direction == "Minimize"'>Minimize</option>
+                      <option ng-selected = 'criterion.direction == "Maximize"'>Maximize</option>
+                    </select>
+                  </td>
+                  <td ng-if = 'criterion.id != deleteIdCriterion'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteCriterion(criterion)' data-toggle = 'tooltip' title = 'Delete Criterion'>
+                      <span class = 'glyphicon glyphicon-minus'></span>
+                    </button>
+                  </td>
+                  <td ng-if = 'criterion.id == deleteIdCriterion'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteCriterion(criterion)' data-toggle = 'tooltip' title = 'Confirm Delete Criterion'>
+                      <span class = 'glyphicon glyphicon-ok'></span>
+                    </button>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteCriterion()' data-toggle = 'tooltip' title = 'Cancel Delete Criterion'>
+                      <span class = 'glyphicon glyphicon-remove'></span>
+                    </button>
+                  </td>
+                </tr>
+                <!-- Form to add a criterion -->
+                <tr class = 'active'>
+                  <td>
+                    <input class = 'form-control' type = 'text' ng-model = 'new_criterion.name'>
+                  </td>
+                  <td>
+                    <select ng-model = 'new_criterion.direction'>
+                      <option value = '' disabled>--- Please Select ---</option>
+                      <option>Minimize</option>
+                      <option>Maximize</option>
+                    </select>
+                  </td>
+                  <td>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'addCriterion()' data-toggle = 'tooltip' title = 'Add Criterion'>
+                      <span class = 'glyphicon glyphicon-plus'></span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
           <br>
 
-          <p class = 'header-2'>Interaction effects</p>
+          <p class = 'header-1'>Interaction effects</p>
 
           <table class = 'table table-bordered table-hover'>
             <thead>
@@ -214,7 +247,7 @@
                 </td>
               </tr>
               <!-- Form to add interaction -->
-              <tr>
+              <tr class = 'active'>
                 <td>
                   <select ng-model = 'new_interaction_effect.type'>
                     <option value = '' disabled>--- Please Select ---</option>
@@ -252,10 +285,10 @@
           <p class = 'header-1'>Scales and Functions</p>
 
           <div ng-repeat = 'criterion in criteria'>
-            <p class = 'header-2'>Criterion {{criterion.name}}</p>
+            <p class = 'header-2'>Criterion:  {{criterion.name}}</p>
 
             <!-- Scales -->
-            <table class = 'table table-bordered table-hover'>
+            <table class = 'table table-bordered table-hover table-striped'>
               <thead>
                 <tr>
                   <th class = 'text-center'>Type</th>
@@ -265,7 +298,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
+                <tr class = 'active'>
                   <td>
                     <select ng-model = 'criterion.scale.type'>
                       <option value = '' disabled>--- Please Select ---</option>
@@ -325,7 +358,7 @@
                   </td>
                 </tr>
                 <!-- Form to add function branches -->
-                <tr>
+                <tr class = 'active'>
                   <td class = 'col-md-2'>
                     <input class = 'form-control' type = 'text' ng-model = 'new_branch[criterion.id].function'>
                   </td>
@@ -353,7 +386,7 @@
           <table class = 'table table-bordered table-hover'>
             <thead>
               <tr>
-                <th class = 'text-center'>Actions</th>
+                <th class = 'text-center'>Action</th>
                 <th class = 'text-center' ng-repeat = 'criterion in criteria'>{{criterion.name}}</th>
                 <th class = 'col-md-2'></th>
               </tr>
@@ -382,7 +415,7 @@
                 </td>
               </tr>
               <!-- Form to add action -->
-              <tr>
+              <tr class = 'active'>
                 <td>
                   <input class = 'form-control' type = 'text' ng-model = 'new_action.name'>
                 </td>
@@ -404,7 +437,7 @@
 
           <table class = 'table table-bordered table-hover'>
             <thead>
-              <th class = 'text-center'>Categories</th>
+              <th class = 'text-center'>Category</th>
               <th class = 'text-center'>Membership Degree</th>
               <th class = 'text-center' ng-repeat = 'criterion in criteria'>{{criterion.name}}</th>
               <th class = 'col-md-2'></th>
@@ -436,7 +469,7 @@
                 </td>
               </tr>
               <!-- Form to add new category -->
-              <tr>
+              <tr class = 'active'>
                 <td>
                   <input class = 'form-control' type = 'text' ng-model = 'new_category.name'>
                 </td>
@@ -455,12 +488,12 @@
             </tbody>
           </table>
 
-          <p class = 'header-2'>Reference Actions</p>
+          <p class = 'header-1'>Reference Actions</p>
 
           <table class = 'table table-bordered table-hover'>
             <thead>
-              <th class = 'text-center'>Categories</th>
-              <th class = 'text-center'>Reference Actions</th>
+              <th class = 'text-center'>Category</th>
+              <th class = 'text-center'>Reference Action</th>
               <th class = 'text-center' ng-repeat = 'criterion in criteria'>{{criterion.name}}</th>
               <th class = 'col-md-2'></th>
             </thead>
@@ -487,7 +520,7 @@
                 </td>
               </tr>
               <!-- Form to add new reference action -->
-              <tr>
+              <tr class = 'active'>
                 <td>{{category.name}}</td>
                 <td>b{{$index + 1}}{{category.reference_actions.length + 1}}</td>
                 <td ng-repeat = 'criterion in criteria'>
@@ -502,21 +535,6 @@
             </tbody>
           </table>
 
-          <div class = 'alert alert-success alert-dismissible' role = 'alert' ng-if = 'showSaveSuccess' ng-cloak>
-            <button type = 'button' class = 'close' data-dismiss = 'alert' aria-label = 'Close'>
-              <span aria-hidden = 'true'>&times;</span>
-            </button>
-            Data <strong>successfully</strong> saved.
-          </div>
-
-          <button type = 'button' class = 'btn btn-primary' ng-click = 'saveData()' data-toggle = 'tooltip' title = 'Save Data'>
-            <span class = 'glyphicon glyphicon-floppy-save'></span>
-          </button>
-
-          <button type = 'button' class = 'btn btn-default' ng-click = 'getResults()' data-toggle = 'tooltip'>
-            Get Results
-          </button>
-
         </div>
 
         <!-- Results and Execution -->
@@ -528,9 +546,14 @@
 
           <form class = 'form-inline'>
             <div class = 'form-group'>
-              <input type = 'text' class = 'form-control' id = 'input-control' placeholder = 'Comment' ng-model = 'new_execution.comment'>
+              <input type = 'text' class = 'form-control' placeholder = 'Comment' ng-model = 'new_execution.comment'>
             </div>
-            <button id = 'btn-get-results' type = 'button' class = 'btn btn-default' ng-click = 'getResults()'>Get Results</button>
+            <button type = 'button' class = 'btn btn-default' ng-click = 'getResults()' ng-if = '!isLoading' title = 'Execute Method'>
+              <span class = 'glyphicon glyphicon-play'></span>
+            </button>
+            <button class = 'btn btn-default active' ng-if = 'isLoading' title = 'Loading'>
+              <span class = 'glyphicon glyphicon-refresh glyphicon-refresh-animate'></span>
+            </button>
           </form>
 
           <br>
@@ -542,18 +565,16 @@
           <p class = 'header-2'>Past Executions</p>
 
           <div class = 'row' ng-repeat = 'execution in executions'>
-            <!-- List View -->
-            <div id = 'execution-list-{{execution.execution_id}}'>
               <div class = 'list-group col-md-10'>
-                <a href = '#list-{{execution.execution_id}}' class = 'list-group-item' data-toggle = 'collapse'>
+                <a href = '#list-{{execution.execution_id}}' class = 'list-group-item' data-toggle = 'collapse' ng-class = '{"list-group-item-danger":  execution.execution_id == deleteIdExecution || deleteIdExecution == "all"}'>
                   <p>{{execution.execution_date}}</p>
                 </a>
                 <div id = 'list-{{execution.execution_id}}' class = 'collapse'>
                   <a class = 'list-group-item'>
-                    <p class = 'header-3'>Input Data</p>
+                    <p class = 'header-2'>Input Data</p>
 
                     <!-- Input Criteria Names and Direction -->
-                    <p class = 'header-4'>Criteria</p>
+                    <p class = 'header-3'>Criteria</p>
 
                     <div class = 'row'>
                       <table class = 'table table-bordered table-condensed'>
@@ -573,7 +594,7 @@
                     </div>
 
                     <!-- Input Interaction Effects -->
-                    <p class = 'header-4'>Interaction Effects</p>
+                    <p class = 'header-3'>Interaction Effects</p>
 
                     <div class = 'row'>
                       <table class = 'table table-bordered table-condensed'>
@@ -597,11 +618,11 @@
                     </div>
 
                     <!-- Input Scales and Functions -->
-                    <p class = 'header-4'>Scales and Functions</p>
+                    <p class = 'header-3'>Scales and Functions</p>
 
                     <div ng-repeat = 'criterion in execution.criteria'>
 
-                      <p class = 'header-5'>Criterion "{{criterion.name}}"</p>
+                      <p class = 'header-6'>Criterion "{{criterion.name}}"</p>
 
                       <div class = 'row'>
                         <table class = 'table table-bordered table-condensed'>
@@ -647,7 +668,7 @@
                     </div>
 
                     <!-- Input Actions -->
-                    <p class = 'header-4'>Actions</p>
+                    <p class = 'header-3'>Actions</p>
 
                     <div class = 'row'>
                       <table class = 'table table-bordered table-condensed'>
@@ -667,7 +688,7 @@
                     </div>
 
                     <!-- Input Categories -->
-                    <p class = 'header-4'>Categories</p>
+                    <p class = 'header-3'>Categories</p>
 
                     <div class = 'row'>
                       <table class = 'table table-bordered table-condensed'>
@@ -689,7 +710,7 @@
                     </div>
 
                     <!-- Input Reference Actions -->
-                    <p class = 'header-4'>Reference Actions</p>
+                    <p class = 'header-3'>Reference Actions</p>
 
                     <div class = 'row'>
                       <table class = 'table table-bordered table-condensed'>
@@ -711,31 +732,64 @@
                     </div>
 
                     <!-- Results -->
+                    <p class = 'header-2'>Results</p>
+
+                    <div class = 'row'>
+                      <table class = 'table table-bordered table-condensed'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>Action</th>
+                            <th class = 'text-center' ng-repeat = '(key, value) in execution.results'>{{key}}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat = 'action in execution.actions'>
+                            <td>{{action.name}}</td>
+                            <td ng-repeat = 'result in execution.results'>
+                              <span class = 'glyphicon glyphicon-ok' style = 'color:green;' ng-if = 'result.includes(action.name)'></span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
 
                     <!-- Comment -->
+                    <div ng-if = 'execution.comment != ""'>
+                      <p class = 'header-2'>Comment</p>
+                      <p>{{execution.comment}}</p>
+                    </div>
                   </a>
                 </div>
               </div>
-              <div class = 'col-md-2'>
-                <!-- Delete button -->
+              <!-- Delete button -->
+              <div class = 'col-md-2' ng-if = 'execution.execution_id != deleteIdExecution'>
                 <button type = 'button' class = 'btn btn-danger exec-btn btn-execution-delete' ng-click = 'deleteExecution(execution)' data-toggle = 'tooltip' title = 'Delete Execution' style = 'margin-top:5%;'>
                   <span class = 'glyphicon glyphicon-minus'></span>
                 </button>
               </div>
+
+              <!-- Confirm and Cancel Delete Button -->
+              <div class = 'col-md-2' ng-if = 'execution.execution_id == deleteIdExecution'>
+                <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteExecution(execution)' data-toggle = 'tooltip' title = 'Confirm Delete Execution' style = 'margin-top:5%'>
+                  <span class = 'glyphicon glyphicon-ok'></span>
+                </button>
+                <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteExecution()' data-toggle = 'tooltip' title = 'Cancel Delete Execution' style = 'margin-top:5%'>
+                  <span class = 'glyphicon glyphicon-remove'></span>
+                </button>
             </div>
           </div>
 
           <br>
 
           <!-- Delete All Executions button -->
-          <div id = 'btn-delete-all-div'>
+          <div id = 'btn-delete-all-div' ng-if = 'deleteIdExecution != "all"'>
             <button id = 'btn-delete-all' type = 'button' class = 'btn btn-danger' ng-click = 'deleteAllExecutions()'>
               Delete All Executions
             </button>
           </div>
 
           <!-- Confirm and Cancel Delete All Executions buttons -->
-          <div id = 'delete-all-btn-group' class = 'no-display'>
+          <div id = 'delete-all-btn-group' ng-if = 'deleteIdExecution == "all"'>
             <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAllExecutions()' data-toggle = 'tooltip' title = 'Confirm Delete'>
               <span class = 'glyphicon glyphicon-ok'></span>
             </button>

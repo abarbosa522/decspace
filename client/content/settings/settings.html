@@ -44,8 +44,14 @@
         <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
         <ul class = 'nav navbar-nav navbar-right'>
           <li>
-            <p class = 'navbar-text' ng-cloak>Welcome, {{name}}</p>
+            <p class = 'navbar-text' style = 'font-weight:600;font-style:italic'>Welcome, {{name}}!</p>
           </li>
+
+          <li><a href = '../homepage/about.html'>About</a></li>
+
+          <li><a href = '../homepage/faq.html'>FAQ</a></li>
+
+          <li><a href = '../homepage/contactus.html'>Contact Us</a></li>
 
           <li>
             <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'logOut()'>
@@ -54,6 +60,7 @@
             </button>
           </li>
         </ul>
+
       </div>
     </nav>
 
@@ -66,7 +73,7 @@
       <p class = 'header-1'>Settings</p>
 
       <br>
-      
+
       <!-- Password Reset -->
       <p class = 'header-2'>Password Reset</p>
 

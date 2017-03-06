@@ -21,6 +21,10 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
   $scope.new_reference_action = [];
   $scope.deleteIdReferenceAction = ['', ''];
 
+  $scope.deleteIdExecution = '';
+
+  $scope.isLoading = false;
+
   function requestLogIn() {
     $http.get('/requestlogin').success(function(res) {
       if(typeof res.user == 'undefined')
@@ -346,6 +350,9 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
   }
 
   $scope.getResults = function() {
+    //show loading button
+    $scope.isLoading = true;
+
     var results = CATSDService.getResults($scope.criteria, $scope.interaction_effects, $scope.actions, $scope.categories);
 
     results.then(function(resolve) {
@@ -375,7 +382,7 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
             }
 
             //insert execution into database
-            response[proj]['executions'].push({'execution_id':execution_id,'criteria':$scope.criteria,'actions':$scope.actions,'categories':$scope.categories,'interaction_effects':$scope.interaction_effects,'results':results,'comment':comment,'execution_date':execution_date});
+            response[proj]['executions'].push({'execution_id':execution_id,'criteria':$scope.criteria,'actions':$scope.actions,'categories':$scope.categories,'interaction_effects':$scope.interaction_effects,'results':resolve,'comment':comment,'execution_date':execution_date});
             //get the id of the document, so that it can be removed from the db
             id_doc = response[proj]['_id'];
             //project to store in the db
@@ -394,10 +401,90 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
             //reset the comment input field, if it was filled
             if(typeof $scope.new_execution != 'undefined')
               $scope.new_execution.comment = '';
+
+            //hide loading button
+            $scope.isLoading = false;
           });
         });
       });
     });
+  }
+
+  $scope.deleteExecution = function(execution) {
+    $scope.deleteIdExecution = execution.execution_id;
+  }
+
+  $scope.confirmDeleteExecution = function(execution) {
+    $http.get('/projects').success(function(response) {
+      var id_doc, proj_res;
+
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+          for(exec in response[proj]['executions']) {
+            if(response[proj]['executions'][exec]['execution_id'] == execution.execution_id) {
+              response[proj]['executions'].splice(exec, 1);
+              //get the id of the document, so that it can be removed from the db
+              id_doc = response[proj]['_id'];
+              //project to store in the db
+              proj_res = response[proj];
+              delete proj_res['_id'];
+              break;
+            }
+          }
+          break;
+        }
+      }
+
+      //delete the previous document with the list of projects
+      $http.delete('/projects/' + id_doc).success(function() {
+        //add the new list of projects
+        $http.post('/projects', proj_res).success(function() {
+          //refresh the list of projects
+          getExecutions();
+        });
+      });
+    });
+  }
+
+  $scope.cancelDeleteExecution = function() {
+    $scope.deleteIdExecution = '';
+  }
+
+  $scope.deleteAllExecutions = function() {
+    $scope.deleteIdExecution = 'all';
+  }
+
+  $scope.confirmDeleteAllExecutions = function() {
+    $http.get('/projects').success(function(response) {
+      var id_doc, proj_res;
+
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+          response[proj]['executions'] = [];
+          //get the id of the document, so that it can be removed from the db
+          id_doc = response[proj]['_id'];
+          //project to store in the db
+          proj_res = response[proj];
+          delete proj_res['_id'];
+          break;
+        }
+      }
+
+      //delete the previous document with the list of projects
+      $http.delete('/projects/' + id_doc).success(function(){
+        //add the new list of projects
+        $http.post('/projects', proj_res).success(function() {
+          //refresh the list of executions
+          getExecutions();
+          //reset delete variable
+          $scope.deleteIdExecution = '';
+        });
+      });
+    });
+  }
+
+  $scope.cancelDeleteAllExecutions = function() {
+    $scope.deleteIdExecution = '';
   }
 
   requestLogIn();
