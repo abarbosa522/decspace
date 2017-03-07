@@ -25,6 +25,14 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
 
   $scope.isLoading = false;
 
+  //eye icons variables
+  $scope.criteria_eye = 1;
+  $scope.interaction_effects_eye = 1;
+  $scope.scales_functions_eye = 1;
+  $scope.actions_eye = 1;
+  $scope.categories_eye = 1;
+  $scope.reference_actions_eye = 1;
+
   function requestLogIn() {
     $http.get('/requestlogin').success(function(res) {
       if(typeof res.user == 'undefined')

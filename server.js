@@ -120,7 +120,7 @@ app.get('/expr-eval', function(req, res) {
   else {
     result = 'false';
   }
-  
+
   var result_obj = {};
   result_obj['criterion'] = req.query.criterion;
   result_obj['action'] = req.query.action;
@@ -192,7 +192,6 @@ app.delete('/projects/:id', function(req, res) {
     res.json(doc);
   });
 });
-
 
 app.listen(8082);
 console.log("Server running on port 8082");

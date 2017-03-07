@@ -36,6 +36,9 @@
     <!-- MathJax -->
     <script type="text/javascript" async
     src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML"></script>
+
+    <!-- ng-draggable module -->
+    <script src = '../../js/shared/ng-draggable/ngDraggable.js'></script>
   </head>
 
   <body ng-app = 'decspace' ng-controller = 'CATSDMethodController'>
@@ -107,17 +110,17 @@
           <div class = 'row'>
             <!-- Save Button -->
             <button type = 'button' class = 'btn btn-primary' ng-click = 'saveData()' data-toggle = 'tooltip' title = 'Save Data' style = 'float:left; margin-left: 1.5%'>
-              <span class = 'glyphicon glyphicon-floppy-save'></span>
+              <span class = 'glyphicon glyphicon-floppy-disk' style = 'font-size:16px'></span>
             </button>
 
             <!-- Import Button -->
             <button type = 'button' class = 'btn btn-info' ng-click = '' data-toggle = 'tooltip' title = 'Import Data' style = 'float:left; margin-left: 1%'>
-              <span class = 'glyphicon glyphicon-download'></span>
+              <span class = 'glyphicon glyphicon-import' style = 'font-size:16px'></span>
             </button>
 
             <!-- Export Button -->
             <button type = 'button' class = 'btn btn-info' ng-click = '' data-toggle = 'tooltip' title = 'Export Data' style = 'float:left; margin-left: 1%'>
-              <span class = 'glyphicon glyphicon-upload'></span>
+              <span class = 'glyphicon glyphicon-export' style = 'font-size:16px'></span>
             </button>
           </div>
 
@@ -129,9 +132,10 @@
             Data <strong>successfully</strong> saved.
           </div>
 
+          <!-- Criteria -->
           <div class = 'row'>
-            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#criteria-table' style = 'float:right'>
-              <span class = 'glyphicon glyphicon-eye-open'></span>
+            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#criteria-table' style = 'float:right' ng-click = 'criteria_eye = (criteria_eye == 0 ? 1 : 0)' title = 'Hide/Show Criteria'>
+              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : criteria_eye == 0, "glyphicon-eye-close" : criteria_eye == 1}'></span>
             </button>
             <p class = 'header-1'>Criteria</p>
           </div>
@@ -196,183 +200,89 @@
 
           <br>
 
-          <p class = 'header-1'>Interaction Effects</p>
+          <div class = 'row'>
+            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#interaction-effects-table' style = 'float:right' ng-click = 'interaction_effects_eye = (interaction_effects_eye == 0 ? 1 : 0)' title = 'Hide/Show Interaction Effects'>
+              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : interaction_effects_eye == 0, "glyphicon-eye-close" : interaction_effects_eye == 1}'></span>
+            </button>
+            <p class = 'header-1'>Interaction Effects</p>
+          </div>
 
-          <table class = 'table table-bordered table-hover'>
-            <thead>
-              <th class = 'text-center'>Type Of Effect</th>
-              <th class = 'text-center'>Criterion 1</th>
-              <th class = 'text-center'>Criterion 2</th>
-              <th class = 'text-center'>Value</th>
-              <th class = 'col-md-2'></th>
-            </thead>
-            <tbody>
-              <!-- Added Interaction Effects -->
-              <tr ng-repeat = 'interaction in interaction_effects' ng-class = '{danger: interaction.id == deleteIdInteractionEffect}'>
-                <td>
-                  <select>
-                    <option ng-selected = 'interaction.type == ""' disabled>--- Please Select ---</option>
-                    <option ng-selected = 'interaction.type == "Mutual-Strengthening Effect"'>Mutual-Strengthening Effect</option>
-                    <option ng-selected = 'interaction.type == "Mutual-Weakening Effect"'>Mutual-Weakening Effect</option>
-                    <option ng-selected = 'interaction.type == "Antagonistic Effect"'>Antagonistic Effect</option>
-                  </select>
-                </td>
-                <td>
-                  <select>
-                    <option ng-selected = 'interaction.criterion1 == ""' disabled>--- Please Select ---</option>
-                    <option ng-repeat = 'criterion in criteria' ng-selected = 'interaction.criterion1 == "{{criterion.name}}"'>{{criterion.name}}</option>
-                  </select>
-                </td>
-                <td>
-                  <select>
-                    <option ng-selected = 'interaction.criterion2 == ""' disabled>--- Please Select ---</option>
-                    <option ng-repeat = 'criterion in criteria' ng-selected = 'interaction.criterion2 == "{{criterion.name}}"'>{{criterion.name}}</option>
-                  </select>
-                </td>
-                <td>
-                  <input class = 'form-control' type = 'number' ng-model = 'interaction.value'>
-                </td>
-                <td ng-if = 'interaction.id != deleteIdInteractionEffect'>
-                  <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInteractionEffect(interaction)' data-toggle = 'tooltip' title = 'Delete Interaction Effect'>
-                    <span class = 'glyphicon glyphicon-minus'></span>
-                  </button>
-                </td>
-                <td ng-if = 'interaction.id == deleteIdInteractionEffect'>
-                  <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInteractionEffect(interaction)' data-toggle = 'tooltip' title = 'Confirm Delete Interaction Effect'>
-                    <span class = 'glyphicon glyphicon-ok'></span>
-                  </button>
-                  <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInteractionEffect()' data-toggle = 'tooltip' title = 'Cancel Delete Interaction Effect'>
-                    <span class = 'glyphicon glyphicon-remove'></span>
-                  </button>
-                </td>
-              </tr>
-              <!-- Form to add interaction -->
-              <tr class = 'active'>
-                <td>
-                  <select ng-model = 'new_interaction_effect.type'>
-                    <option value = '' disabled>--- Please Select ---</option>
-                    <option>Mutual-Strengthening Effect</option>
-                    <option>Mutual-Weakening Effect</option>
-                    <option>Antagonistic Effect</option>
-                  </select>
-                </td>
-                <td>
-                  <select ng-model = 'new_interaction_effect.criterion1'>
-                    <option value = '' disabled>--- Please Select ---</option>
-                    <option ng-repeat = 'criterion in criteria'>{{criterion.name}}</option>
-                  </select>
-                </td>
-                <td>
-                  <select ng-model = 'new_interaction_effect.criterion2'>
-                    <option value = '' disabled>--- Please Select ---</option>
-                    <option ng-repeat = 'criterion in criteria'>{{criterion.name}}</option>
-                  </select>
-                </td>
-                <td>
-                  <input class = 'form-control' type = 'number' ng-model = 'new_interaction_effect.value'>
-                </td>
-                <td class = 'col-md-2'>
-                  <button type = 'button' class = 'btn btn-success' ng-click = 'addInteractionEffect()' data-toggle = 'tooltip' title = 'Add Interaction Effect'>
-                    <span class = 'glyphicon glyphicon-plus'></span>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <br>
-
-          <p class = 'header-1'>Scales and Functions</p>
-
-          <div ng-repeat = 'criterion in criteria'>
-            <p class = 'header-2'>Criterion:  {{criterion.name}}</p>
-
-            <!-- Scales -->
-            <table class = 'table table-bordered table-hover table-striped'>
-              <thead>
-                <tr>
-                  <th class = 'text-center'>Type</th>
-                  <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Minimum Value</th>
-                  <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Maximum Value</th>
-                  <th class = 'text-center' ng-if = 'criterion.scale.type == "Categorical"'>Number of Categories</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class = 'active'>
-                  <td>
-                    <select ng-model = 'criterion.scale.type'>
-                      <option value = '' disabled>--- Please Select ---</option>
-                      <option>Numerical</option>
-                      <option>Categorical</option>
-                    </select>
-                  </td>
-                  <td ng-if = 'criterion.scale.type == "Numerical"'>
-                    <input class = 'form-control' type = 'number' ng-model = 'criterion.scale.min'>
-                  </td>
-                  <td ng-if = 'criterion.scale.type == "Numerical"'>
-                    <input class = 'form-control' type = 'number' ng-model = 'criterion.scale.max'>
-                  </td>
-                  <td ng-if = 'criterion.scale.type == "Categorical"'>
-                    <input class = 'form-control' type = 'number' ng-model = 'criterion.scale.num_categories'>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
-            <!-- Functions -->
+          <div id = 'interaction-effects-table' class = 'collapse in'>
             <table class = 'table table-bordered table-hover'>
               <thead>
-                <tr>
-                  <th class = 'text-center' colspan = 2>Function</th>
-                  <th class = 'text-center' colspan = 2>Condition</th>
-                  <th></th>
-                </tr>
+                <th class = 'text-center'>Type Of Effect</th>
+                <th class = 'text-center'>Criterion 1</th>
+                <th class = 'text-center'>Criterion 2</th>
+                <th class = 'text-center'>Value</th>
+                <th class = 'col-md-2'></th>
               </thead>
               <tbody>
-                <!-- Added Branches List -->
-                <tr ng-repeat = 'branch in criterion.branches' ng-class = '{danger: criterion.id == deleteIdBranch[0] && branch.id == deleteIdBranch[1]}'>
-                  <td class = 'col-md-2'>
-                    <input class = 'form-control' type = 'text' ng-model = 'branch.function'>
+                <!-- Added Interaction Effects -->
+                <tr ng-repeat = 'interaction in interaction_effects' ng-class = '{danger: interaction.id == deleteIdInteractionEffect}'>
+                  <td>
+                    <select>
+                      <option ng-selected = 'interaction.type == ""' disabled>--- Please Select ---</option>
+                      <option ng-selected = 'interaction.type == "Mutual-Strengthening Effect"'>Mutual-Strengthening Effect</option>
+                      <option ng-selected = 'interaction.type == "Mutual-Weakening Effect"'>Mutual-Weakening Effect</option>
+                      <option ng-selected = 'interaction.type == "Antagonistic Effect"'>Antagonistic Effect</option>
+                    </select>
                   </td>
-                  <td class = 'col-md-3'>
-                    <p math-jax-bind = 'branch.function'></p>
+                  <td>
+                    <select>
+                      <option ng-selected = 'interaction.criterion1 == ""' disabled>--- Please Select ---</option>
+                      <option ng-repeat = 'criterion in criteria' ng-selected = 'interaction.criterion1 == "{{criterion.name}}"'>{{criterion.name}}</option>
+                    </select>
                   </td>
-                  <td class = 'col-md-2'>
-                    <input class = 'form-control' type = 'text' ng-model = 'branch.condition'>
+                  <td>
+                    <select>
+                      <option ng-selected = 'interaction.criterion2 == ""' disabled>--- Please Select ---</option>
+                      <option ng-repeat = 'criterion in criteria' ng-selected = 'interaction.criterion2 == "{{criterion.name}}"'>{{criterion.name}}</option>
+                    </select>
                   </td>
-                  <td class = 'col-md-3'>
-                    <p math-jax-bind = 'branch.condition'></p>
+                  <td>
+                    <input class = 'form-control' type = 'number' ng-model = 'interaction.value'>
                   </td>
-                  <td class = 'col-md-2' ng-if = 'criterion.id != deleteIdBranch[0] || (criterion.id == deleteIdBranch[0] && branch.id != deleteIdBranch[1])'>
-                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteBranch(criterion, branch)' data-toggle = 'tooltip' title = 'Delete Branch'>
+                  <td ng-if = 'interaction.id != deleteIdInteractionEffect'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInteractionEffect(interaction)' data-toggle = 'tooltip' title = 'Delete Interaction Effect'>
                       <span class = 'glyphicon glyphicon-minus'></span>
                     </button>
                   </td>
-                  <td class = 'col-md-2' ng-if = 'criterion.id == deleteIdBranch[0] && branch.id == deleteIdBranch[1]'>
-                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteBranch(criterion, branch)' data-toggle = 'tooltip' title = 'Confirm Delete Branch'>
+                  <td ng-if = 'interaction.id == deleteIdInteractionEffect'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInteractionEffect(interaction)' data-toggle = 'tooltip' title = 'Confirm Delete Interaction Effect'>
                       <span class = 'glyphicon glyphicon-ok'></span>
                     </button>
-                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteBranch()' data-toggle = 'tooltip' title = 'Cancel Delete Branch'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInteractionEffect()' data-toggle = 'tooltip' title = 'Cancel Delete Interaction Effect'>
                       <span class = 'glyphicon glyphicon-remove'></span>
                     </button>
                   </td>
                 </tr>
-                <!-- Form to add function branches -->
+                <!-- Form to add interaction -->
                 <tr class = 'active'>
+                  <td>
+                    <select ng-model = 'new_interaction_effect.type'>
+                      <option value = '' disabled>--- Please Select ---</option>
+                      <option>Mutual-Strengthening Effect</option>
+                      <option>Mutual-Weakening Effect</option>
+                      <option>Antagonistic Effect</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select ng-model = 'new_interaction_effect.criterion1'>
+                      <option value = '' disabled>--- Please Select ---</option>
+                      <option ng-repeat = 'criterion in criteria'>{{criterion.name}}</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select ng-model = 'new_interaction_effect.criterion2'>
+                      <option value = '' disabled>--- Please Select ---</option>
+                      <option ng-repeat = 'criterion in criteria'>{{criterion.name}}</option>
+                    </select>
+                  </td>
+                  <td>
+                    <input class = 'form-control' type = 'number' ng-model = 'new_interaction_effect.value'>
+                  </td>
                   <td class = 'col-md-2'>
-                    <input class = 'form-control' type = 'text' ng-model = 'new_branch[criterion.id].function'>
-                  </td>
-                  <td class = 'col-md-3'>
-                    <p math-jax-bind = 'new_branch[criterion.id].function'></p>
-                  </td>
-                  <td class = 'col-md-2'>
-                    <input class = 'form-control' type = 'text' ng-model = 'new_branch[criterion.id].condition'>
-                  </td>
-                  <td class = 'col-md-3'>
-                    <p math-jax-bind = 'new_branch[criterion.id].condition'></p>
-                  </td>
-                  <td class = 'col-md-2'>
-                    <button type = 'button' class = 'btn btn-success' ng-click = 'addBranch(criterion)' data-toggle = 'tooltip' title = 'Add Branch'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'addInteractionEffect()' data-toggle = 'tooltip' title = 'Add Interaction Effect'>
                       <span class = 'glyphicon glyphicon-plus'></span>
                     </button>
                   </td>
@@ -381,159 +291,289 @@
             </table>
           </div>
 
-          <p class = 'header-1'>Actions</p>
+          <br>
 
-          <table class = 'table table-bordered table-hover'>
-            <thead>
-              <tr>
-                <th class = 'text-center'>Action</th>
+          <div class = 'row'>
+            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#scales-functions-table' style = 'float:right' ng-click = 'scales_functions_eye = (scales_functions_eye == 0 ? 1 : 0)' title = 'Hide/Show Scales and Functions'>
+              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : scales_functions_eye == 0, "glyphicon-eye-close" : scales_functions_eye == 1}'></span>
+            </button>
+            <p class = 'header-1'>Scales and Functions</p>
+          </div>
+
+          <div id = 'scales-functions-table' class = 'collapse in'>
+            <div ng-repeat = 'criterion in criteria'>
+              <p class = 'header-2'>Criterion:  {{criterion.name}}</p>
+
+              <!-- Scales -->
+              <table class = 'table table-bordered table-hover table-striped'>
+                <thead>
+                  <tr>
+                    <th class = 'text-center'>Type</th>
+                    <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Minimum Value</th>
+                    <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Maximum Value</th>
+                    <th class = 'text-center' ng-if = 'criterion.scale.type == "Categorical"'>Number of Categories</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class = 'active'>
+                    <td>
+                      <select ng-model = 'criterion.scale.type'>
+                        <option value = '' disabled>--- Please Select ---</option>
+                        <option>Numerical</option>
+                        <option>Categorical</option>
+                      </select>
+                    </td>
+                    <td ng-if = 'criterion.scale.type == "Numerical"'>
+                      <input class = 'form-control' type = 'number' ng-model = 'criterion.scale.min'>
+                    </td>
+                    <td ng-if = 'criterion.scale.type == "Numerical"'>
+                      <input class = 'form-control' type = 'number' ng-model = 'criterion.scale.max'>
+                    </td>
+                    <td ng-if = 'criterion.scale.type == "Categorical"'>
+                      <input class = 'form-control' type = 'number' ng-model = 'criterion.scale.num_categories'>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <!-- Functions -->
+              <table class = 'table table-bordered table-hover'>
+                <thead>
+                  <tr>
+                    <th class = 'text-center' colspan = 2>Function</th>
+                    <th class = 'text-center' colspan = 2>Condition</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Added Branches List -->
+                  <tr ng-repeat = 'branch in criterion.branches' ng-class = '{danger: criterion.id == deleteIdBranch[0] && branch.id == deleteIdBranch[1]}'>
+                    <td class = 'col-md-2'>
+                      <input class = 'form-control' type = 'text' ng-model = 'branch.function'>
+                    </td>
+                    <td class = 'col-md-3'>
+                      <p math-jax-bind = 'branch.function'></p>
+                    </td>
+                    <td class = 'col-md-2'>
+                      <input class = 'form-control' type = 'text' ng-model = 'branch.condition'>
+                    </td>
+                    <td class = 'col-md-3'>
+                      <p math-jax-bind = 'branch.condition'></p>
+                    </td>
+                    <td class = 'col-md-2' ng-if = 'criterion.id != deleteIdBranch[0] || (criterion.id == deleteIdBranch[0] && branch.id != deleteIdBranch[1])'>
+                      <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteBranch(criterion, branch)' data-toggle = 'tooltip' title = 'Delete Branch'>
+                        <span class = 'glyphicon glyphicon-minus'></span>
+                      </button>
+                    </td>
+                    <td class = 'col-md-2' ng-if = 'criterion.id == deleteIdBranch[0] && branch.id == deleteIdBranch[1]'>
+                      <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteBranch(criterion, branch)' data-toggle = 'tooltip' title = 'Confirm Delete Branch'>
+                        <span class = 'glyphicon glyphicon-ok'></span>
+                      </button>
+                      <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteBranch()' data-toggle = 'tooltip' title = 'Cancel Delete Branch'>
+                        <span class = 'glyphicon glyphicon-remove'></span>
+                      </button>
+                    </td>
+                  </tr>
+                  <!-- Form to add function branches -->
+                  <tr class = 'active'>
+                    <td class = 'col-md-2'>
+                      <input class = 'form-control' type = 'text' ng-model = 'new_branch[criterion.id].function'>
+                    </td>
+                    <td class = 'col-md-3'>
+                      <p math-jax-bind = 'new_branch[criterion.id].function'></p>
+                    </td>
+                    <td class = 'col-md-2'>
+                      <input class = 'form-control' type = 'text' ng-model = 'new_branch[criterion.id].condition'>
+                    </td>
+                    <td class = 'col-md-3'>
+                      <p math-jax-bind = 'new_branch[criterion.id].condition'></p>
+                    </td>
+                    <td class = 'col-md-2'>
+                      <button type = 'button' class = 'btn btn-success' ng-click = 'addBranch(criterion)' data-toggle = 'tooltip' title = 'Add Branch'>
+                        <span class = 'glyphicon glyphicon-plus'></span>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <br>
+
+          <div class = 'row'>
+            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#actions-table' style = 'float:right' ng-click = 'actions_eye = (actions_eye == 0 ? 1 : 0)' title = 'Hide/Show Actions'>
+              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : actions_eye == 0, "glyphicon-eye-close" : actions_eye == 1}'></span>
+            </button>
+            <p class = 'header-1'>Actions</p>
+          </div>
+
+          <div id = 'actions-table' class = 'collapse in'>
+            <table class = 'table table-bordered table-hover'>
+              <thead>
+                <tr>
+                  <th class = 'text-center'>Action</th>
+                  <th class = 'text-center' ng-repeat = 'criterion in criteria'>{{criterion.name}}</th>
+                  <th class = 'col-md-2'></th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Added Actions -->
+                <tr ng-repeat = 'action in actions' ng-class = '{danger: action.id == deleteIdAction}'>
+                  <td>
+                    <input class = 'form-control' type = 'text' ng-model = 'action.name'>
+                  </td>
+                  <td ng-repeat = 'criterion in criteria'>
+                    <input class = 'form-control' type = 'number' ng-model = 'action[criterion.name]'>
+                  </td>
+                  <td ng-if = 'action.id != deleteIdAction'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteAction(action)' data-toggle = 'tooltip' title = 'Delete Action'>
+                      <span class = 'glyphicon glyphicon-minus'></span>
+                    </button>
+                  </td>
+                  <td ng-if = 'action.id == deleteIdAction'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAction(action)' data-toggle = 'tooltip' title = 'Confirm Delete Action'>
+                      <span class = 'glyphicon glyphicon-ok'></span>
+                    </button>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAction()' data-toggle = 'tooltip' title = 'Cancel Delete Action'>
+                      <span class = 'glyphicon glyphicon-remove'></span>
+                    </button>
+                  </td>
+                </tr>
+                <!-- Form to add action -->
+                <tr class = 'active'>
+                  <td>
+                    <input class = 'form-control' type = 'text' ng-model = 'new_action.name'>
+                  </td>
+                  <td ng-repeat = 'criterion in criteria'>
+                    <input class = 'form-control' type = 'number' ng-model = 'new_action[criterion.name]'>
+                  </td>
+                  <td>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'addAction()' data-toggle = 'tooltip' title = 'Add Action'>
+                      <span class = 'glyphicon glyphicon-plus'></span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <br>
+
+          <div class = 'row'>
+            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#categories-table' style = 'float:right' ng-click = 'categories_eye = (categories_eye == 0 ? 1 : 0)' title = 'Hide/Show Categories'>
+              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : categories_eye == 0, "glyphicon-eye-close" : categories_eye == 1}'></span>
+            </button>
+            <p class = 'header-1'>Categories</p>
+          </div>
+
+          <div id = 'categories-table' class = 'collapse in'>
+            <table class = 'table table-bordered table-hover'>
+              <thead>
+                <th class = 'text-center'>Category</th>
+                <th class = 'text-center'>Membership Degree</th>
                 <th class = 'text-center' ng-repeat = 'criterion in criteria'>{{criterion.name}}</th>
                 <th class = 'col-md-2'></th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Added Actions -->
-              <tr ng-repeat = 'action in actions' ng-class = '{danger: action.id == deleteIdAction}'>
-                <td>
-                  <input class = 'form-control' type = 'text' ng-model = 'action.name'>
-                </td>
-                <td ng-repeat = 'criterion in criteria'>
-                  <input class = 'form-control' type = 'number' ng-model = 'action[criterion.name]'>
-                </td>
-                <td ng-if = 'action.id != deleteIdAction'>
-                  <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteAction(action)' data-toggle = 'tooltip' title = 'Delete Action'>
-                    <span class = 'glyphicon glyphicon-minus'></span>
-                  </button>
-                </td>
-                <td ng-if = 'action.id == deleteIdAction'>
-                  <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAction(action)' data-toggle = 'tooltip' title = 'Confirm Delete Action'>
-                    <span class = 'glyphicon glyphicon-ok'></span>
-                  </button>
-                  <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAction()' data-toggle = 'tooltip' title = 'Cancel Delete Action'>
-                    <span class = 'glyphicon glyphicon-remove'></span>
-                  </button>
-                </td>
-              </tr>
-              <!-- Form to add action -->
-              <tr class = 'active'>
-                <td>
-                  <input class = 'form-control' type = 'text' ng-model = 'new_action.name'>
-                </td>
-                <td ng-repeat = 'criterion in criteria'>
-                  <input class = 'form-control' type = 'number' ng-model = 'new_action[criterion.name]'>
-                </td>
-                <td>
-                  <button type = 'button' class = 'btn btn-success' ng-click = 'addAction()' data-toggle = 'tooltip' title = 'Add Action'>
-                    <span class = 'glyphicon glyphicon-plus'></span>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                <!-- Added Categories -->
+                <tr ng-repeat = 'category in categories' ng-class = '{danger: category.id == deleteIdCategory}'>
+                  <td>
+                    <input class = 'form-control' type = 'text' ng-model = 'category.name'>
+                  </td>
+                  <td>
+                    <input class = 'form-control' type = 'number' ng-model = 'category.membership_degree'>
+                  </td>
+                  <td ng-repeat = 'criterion in criteria'>
+                    <input class = 'form-control' type = 'number' ng-model = 'category[criterion.name]'>
+                  </td>
+                  <td ng-if = 'category.id != deleteIdCategory'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteCategory(category)' data-toggle = 'tooltip' title = 'Delete Category'>
+                      <span class = 'glyphicon glyphicon-minus'></span>
+                    </button>
+                  </td>
+                  <td ng-if = 'category.id == deleteIdCategory'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteCategory(category)' data-toggle = 'tooltip' title = 'Confirm Delete Category'>
+                      <span class = 'glyphicon glyphicon-ok'></span>
+                    </button>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteCategory()' data-toggle = 'tooltip' title = 'Cancel Delete Category'>
+                      <span class = 'glyphicon glyphicon-remove'></span>
+                    </button>
+                  </td>
+                </tr>
+                <!-- Form to add new category -->
+                <tr class = 'active'>
+                  <td>
+                    <input class = 'form-control' type = 'text' ng-model = 'new_category.name'>
+                  </td>
+                  <td>
+                    <input class = 'form-control' type = 'number' ng-model = 'new_category.membership_degree'>
+                  </td>
+                  <td ng-repeat = 'criterion in criteria'>
+                    <input class = 'form-control' type = 'number' ng-model = 'new_category[criterion.name]'>
+                  </td>
+                  <td>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'addCategory()' data-toggle = 'tooltip' title = 'Add Category'>
+                      <span class = 'glyphicon glyphicon-plus'></span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-          <p class = 'header-1'>Categories</p>
+          <br>
 
-          <p class = 'header-2'>Weights and Membership degrees</p>
+          <div class = 'row'>
+            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#reference-actions-table' style = 'float:right' ng-click = 'reference_actions_eye = (reference_actions_eye == 0 ? 1 : 0)' title = 'Hide/Show Reference Actions'>
+              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : reference_actions_eye == 0, "glyphicon-eye-close" : reference_actions_eye == 1}'></span>
+            </button>
+            <p class = 'header-1'>Reference Actions</p>
+          </div>
 
-          <table class = 'table table-bordered table-hover'>
-            <thead>
-              <th class = 'text-center'>Category</th>
-              <th class = 'text-center'>Membership Degree</th>
-              <th class = 'text-center' ng-repeat = 'criterion in criteria'>{{criterion.name}}</th>
-              <th class = 'col-md-2'></th>
-            </thead>
-            <tbody>
-              <!-- Added Categories -->
-              <tr ng-repeat = 'category in categories' ng-class = '{danger: category.id == deleteIdCategory}'>
-                <td>
-                  <input class = 'form-control' type = 'text' ng-model = 'category.name'>
-                </td>
-                <td>
-                  <input class = 'form-control' type = 'number' ng-model = 'category.membership_degree'>
-                </td>
-                <td ng-repeat = 'criterion in criteria'>
-                  <input class = 'form-control' type = 'number' ng-model = 'category[criterion.name]'>
-                </td>
-                <td ng-if = 'category.id != deleteIdCategory'>
-                  <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteCategory(category)' data-toggle = 'tooltip' title = 'Delete Category'>
-                    <span class = 'glyphicon glyphicon-minus'></span>
-                  </button>
-                </td>
-                <td ng-if = 'category.id == deleteIdCategory'>
-                  <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteCategory(category)' data-toggle = 'tooltip' title = 'Confirm Delete Category'>
-                    <span class = 'glyphicon glyphicon-ok'></span>
-                  </button>
-                  <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteCategory()' data-toggle = 'tooltip' title = 'Cancel Delete Category'>
-                    <span class = 'glyphicon glyphicon-remove'></span>
-                  </button>
-                </td>
-              </tr>
-              <!-- Form to add new category -->
-              <tr class = 'active'>
-                <td>
-                  <input class = 'form-control' type = 'text' ng-model = 'new_category.name'>
-                </td>
-                <td>
-                  <input class = 'form-control' type = 'number' ng-model = 'new_category.membership_degree'>
-                </td>
-                <td ng-repeat = 'criterion in criteria'>
-                  <input class = 'form-control' type = 'number' ng-model = 'new_category[criterion.name]'>
-                </td>
-                <td>
-                  <button type = 'button' class = 'btn btn-success' ng-click = 'addCategory()' data-toggle = 'tooltip' title = 'Add Category'>
-                    <span class = 'glyphicon glyphicon-plus'></span>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <p class = 'header-1'>Reference Actions</p>
-
-          <table class = 'table table-bordered table-hover'>
-            <thead>
-              <th class = 'text-center'>Category</th>
-              <th class = 'text-center'>Reference Action</th>
-              <th class = 'text-center' ng-repeat = 'criterion in criteria'>{{criterion.name}}</th>
-              <th class = 'col-md-2'></th>
-            </thead>
-            <tbody ng-repeat = 'category in categories'>
-              <!-- Added Reference Actions -->
-              <tr ng-repeat = 'ref in category.reference_actions' ng-class = '{danger: category.id == deleteIdReferenceAction[0] && ref.id == deleteIdReferenceAction[1]}'>
-                <td>{{category.name}}</td>
-                <td>{{ref.name}}</td>
-                <td ng-repeat = 'criterion in criteria'>
-                  <input class = 'form-control' type = 'number' ng-model = 'ref[criterion.name]'>
-                </td>
-                <td ng-if = 'category.id != deleteIdReferenceAction[0] || category.id == deleteIdReferenceAction[0] && ref.id != deleteIdReferenceAction[1]'>
-                  <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteReferenceAction(category, ref)' data-toggle = 'tooltip' title = 'Delete Reference Action'>
-                    <span class = 'glyphicon glyphicon-minus'></span>
-                  </button>
-                </td>
-                <td ng-if = 'category.id == deleteIdReferenceAction[0] && ref.id == deleteIdReferenceAction[1]'>
-                  <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteReferenceAction(category, ref)' data-toggle = 'tooltip' title = 'Confirm Delete Reference Action'>
-                    <span class = 'glyphicon glyphicon-ok'></span>
-                  </button>
-                  <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteReferenceAction()' data-toggle = 'tooltip' title = 'Cancel Delete Reference Action'>
-                    <span class = 'glyphicon glyphicon-remove'></span>
-                  </button>
-                </td>
-              </tr>
-              <!-- Form to add new reference action -->
-              <tr class = 'active'>
-                <td>{{category.name}}</td>
-                <td>b{{$index + 1}}{{category.reference_actions.length + 1}}</td>
-                <td ng-repeat = 'criterion in criteria'>
-                  <input class = 'form-control' type = 'number' ng-model = 'new_reference_action[category.id][criterion.name]'>
-                </td>
-                <td>
-                  <button type = 'button' class = 'btn btn-success' ng-click = 'addReferenceAction(category, $index)' data-toggle = 'tooltip' title = 'Add Reference Action'>
-                    <span class = 'glyphicon glyphicon-plus'></span>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div id = 'reference-actions-table' class = 'collapse in'>
+            <table class = 'table table-bordered table-hover'>
+              <thead>
+                <th class = 'text-center'>Category</th>
+                <th class = 'text-center' ng-repeat = 'criterion in criteria'>{{criterion.name}}</th>
+                <th class = 'col-md-2'></th>
+              </thead>
+              <tbody ng-repeat = 'category in categories'>
+                <!-- Added Reference Actions -->
+                <tr ng-repeat = 'ref in category.reference_actions' ng-class = '{danger: category.id == deleteIdReferenceAction[0] && ref.id == deleteIdReferenceAction[1]}'>
+                  <td ng-if = '$index == 0' rowspan = '{{category.reference_actions.length + 1}}'>{{category.name}}</td>
+                  <td ng-repeat = 'criterion in criteria'>
+                    <input class = 'form-control' type = 'number' ng-model = 'ref[criterion.name]'>
+                  </td>
+                  <td ng-if = 'category.id != deleteIdReferenceAction[0] || category.id == deleteIdReferenceAction[0] && ref.id != deleteIdReferenceAction[1]'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteReferenceAction(category, ref)' data-toggle = 'tooltip' title = 'Delete Reference Action'>
+                      <span class = 'glyphicon glyphicon-minus'></span>
+                    </button>
+                  </td>
+                  <td ng-if = 'category.id == deleteIdReferenceAction[0] && ref.id == deleteIdReferenceAction[1]'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteReferenceAction(category, ref)' data-toggle = 'tooltip' title = 'Confirm Delete Reference Action'>
+                      <span class = 'glyphicon glyphicon-ok'></span>
+                    </button>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteReferenceAction()' data-toggle = 'tooltip' title = 'Cancel Delete Reference Action'>
+                      <span class = 'glyphicon glyphicon-remove'></span>
+                    </button>
+                  </td>
+                </tr>
+                <!-- Form to add new reference action -->
+                <tr class = 'active'>
+                  <td ng-if = '[category.reference_actions.length] == 0'>{{category.name}}</td>
+                  <td ng-repeat = 'criterion in criteria'>
+                    <input class = 'form-control' type = 'number' ng-model = 'new_reference_action[category.id][criterion.name]'>
+                  </td>
+                  <td>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'addReferenceAction(category, $index)' data-toggle = 'tooltip' title = 'Add Reference Action'>
+                      <span class = 'glyphicon glyphicon-plus'></span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
         </div>
 

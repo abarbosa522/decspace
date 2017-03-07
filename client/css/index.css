@@ -134,3 +134,8 @@ nav > div > ul > li {
   from { transform: scale(1) rotate(0deg);}
   to { transform: scale(1) rotate(360deg);}
 }
+
+/*Save, Import and Export Buttons' Icons Size*/
+.icon-large {
+  font-size: 16px;
+}
