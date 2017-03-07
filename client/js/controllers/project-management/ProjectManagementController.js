@@ -36,6 +36,9 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
       case 'CAT-SD':
         $window.location.href = 'cat-sd.html?id=' + project['project_id'];
         break;
+      case 'Sort':
+        $window.location.href = 'sort.html?id=' + project['project_id'];
+        break;
     }
   }
 

@@ -15,10 +15,10 @@ app.service('CATSDService', function($http, $q) {
     var deferred = $q.defer();
 
     //initialize data variables
-    criteria = crt;
-    interaction_effects = inter_eff;
-    actions = acts;
-    categories = cats;
+    criteria = angular.copy(crt);
+    interaction_effects = angular.copy(inter_eff);
+    actions = angular.copy(acts);
+    categories = angular.copy(cats);
 
     //reset the set variables
     mutualSet = [];
@@ -31,6 +31,10 @@ app.service('CATSDService', function($http, $q) {
     }
     assignedActions['Cq+1'] = [];
 
+    //invert the values of criteria to minimize
+    minimizeCriteria();
+
+    //calculate the sets of the interaction effects
     interactionEffectsSets();
 
     if(!nonNegativityCondition()) {
@@ -49,6 +53,21 @@ app.service('CATSDService', function($http, $q) {
     return deferred.promise;
   }
 
+  function minimizeCriteria() {
+    for(criterion in criteria) {
+      if(criteria[criterion]['direction'] == 'Minimize') {
+        for(action in actions)
+          actions[action][criteria[criterion]['name']] = - actions[action][criteria[criterion]['name']];
+
+        for(category in categories) {
+          for(reference_action in categories[category]['reference_actions']) {
+            categories[category]['reference_actions'][reference_action][criteria[criterion]['name']] = - categories[category]['reference_actions'][reference_action][criteria[criterion]['name']];
+          }
+        }
+      }
+    }
+  }
+
   //set M (mutual effect) and set O (antagonistic)
   function interactionEffectsSets() {
     for(effect in interaction_effects) {
@@ -63,9 +82,6 @@ app.service('CATSDService', function($http, $q) {
 
   //guarantee that the weights of the criteria never become negative after considering the interaction effects
   function nonNegativityCondition() {
-    console.log(mutualSet);
-    console.log(antagonisticSet);
-
     for(criterion in criteria) {
       for(category in categories) {
         var name = criteria[criterion]['name'];
@@ -162,10 +178,14 @@ app.service('CATSDService', function($http, $q) {
     for(item in similarityValues) {
       if(similarityValues[item]['criterion'] == criterion && similarityValues[item]['action'] == action && similarityValues[item]['reference_action'] == reference_action) {
         result = similarityValues[item]['result'];
+        //console.log('here');
         break;
       }
     }
-
+    /*console.log(criterion);
+    console.log(action);
+    console.log(reference_action);
+    console.log(result);*/
     if(result >= 0)
       return result;
     else
@@ -182,8 +202,9 @@ app.service('CATSDService', function($http, $q) {
         break;
       }
     }
-
-    if(result >= 0)
+    /*console.log(criterion, action, reference_action);
+    console.log(result);*/
+    if(result <= 0)
       return result;
     else
       return 0;
@@ -202,6 +223,7 @@ app.service('CATSDService', function($http, $q) {
     }
 
     for(pair in mutualSet) {
+      //console.log(action['name']);
       var s1 = sj(mutualSet[pair]['criterion1'], action['name'], reference_action['name']);
       var s2 = sj(mutualSet[pair]['criterion2'], action['name'], reference_action['name']);
       result += z(s1, s2) * mutualSet[pair]['value'];
@@ -221,12 +243,17 @@ app.service('CATSDService', function($http, $q) {
     var result = 0;
 
     for(criterion in criteria)
-      result += category[criteria[criterion]['name']] * sj(criteria[criterion]['name'], action, reference_action);
+      result += category[criteria[criterion]['name']] * sj(criteria[criterion]['name'], action['name'], reference_action['name']);
 
     for(pair in mutualSet) {
       var s1 = sj(mutualSet[pair]['criterion1'], action['name'], reference_action['name']);
       var s2 = sj(mutualSet[pair]['criterion2'], action['name'], reference_action['name']);
+      /*console.log('s1 and s2');
+      console.log(s1);
+      console.log(s2);
+      console.log(mutualSet[pair]['value'])*/
       result += z(s1, s2) * mutualSet[pair]['value'];
+      //console.log(s1 * s2 * mutualSet[pair]['value']);
     }
 
     for(pair2 in antagonisticSet) {
@@ -235,7 +262,11 @@ app.service('CATSDService', function($http, $q) {
       result += z(s3, s4) * mutualSet[pair]['value'];
     }
 
-    return result/k(action, reference_action, category);
+    var res2 = result/k(action, reference_action, category);
+    /*console.log(action['name']);
+    console.log(reference_action['name']);
+    console.log(res2);*/
+    return res2;
   }
 
   //a non-linear dissimilarity function
@@ -244,8 +275,15 @@ app.service('CATSDService', function($http, $q) {
     for(criterion in criteria) {
       if(action[criteria[criterion]['name']] > reference_action[criteria[criterion]['name']]) {
         result *= (1 + dj(criteria[criterion]['name'], action['name'], reference_action['name']));
+        console.log(action['name'] + ' ' + reference_action['name'] + ' ' + criteria[criterion]['name']);
+        //console.log(action[criteria[criterion]['name']], reference_action[criteria[criterion]['name']]);
+
+        console.log(dj(criteria[criterion]['name'], action['name'], reference_action['name']));
       }
     }
+    /*console.log(action[criteria[criterion]['name']], reference_action[criteria[criterion]['name']]);
+    console.log(action['name'] + ' ' + reference_action['name']);
+    console.log(result - 1);*/
     return result - 1;
   }
 
@@ -268,14 +306,14 @@ app.service('CATSDService', function($http, $q) {
     var result;
     for(reference_action in category['reference_actions']) {
       var res = delta(action, category['reference_actions'][reference_action], category);
-
-      if(reference_action == 0) {
+      /*console.log(action['name'])
+      console.log(category['reference_actions'][reference_action]['name']);
+      console.log(res);*/
+      if(Number(reference_action) == 0) {
         result = res;
       }
-      else {
-        if(res > result) {
-          result = res;
-        }
+      else if(res > result) {
+        result = res;
       }
     }
     return result;
@@ -289,7 +327,8 @@ app.service('CATSDService', function($http, $q) {
       //compare action with set B of category
       for(category in categories) {
         var result = deltaMax(actions[action], categories[category]);
-
+        /*console.log(actions[action]['name']);
+        console.log(result);*/
         if(result >= categories[category]['membership_degree'])
           k_set.push(categories[category]['name']);
       }
@@ -299,7 +338,7 @@ app.service('CATSDService', function($http, $q) {
       }
       else {
         for(cat in k_set) {
-          assignedActions[cat].push(actions[action]['name']);
+          assignedActions[k_set[cat]].push(actions[action]['name']);
         }
       }
     }
