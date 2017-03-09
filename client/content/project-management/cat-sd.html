@@ -34,8 +34,7 @@
     <link href = 'https://fonts.googleapis.com/css?family=Open+Sans:400,600i' rel = 'stylesheet'>
 
     <!-- MathJax -->
-    <script type="text/javascript" async
-    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML"></script>
+    <script type = 'text/javascript' async src = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML'></script>
 
     <!-- ng-draggable module -->
     <script src = '../../js/shared/ng-draggable/ngDraggable.js'></script>
@@ -109,24 +108,24 @@
           <!-- Button Bar -->
           <div class = 'row'>
             <!-- Save Button -->
-            <button type = 'button' class = 'btn btn-primary' ng-click = 'saveData()' data-toggle = 'tooltip' title = 'Save Data' style = 'float:left; margin-left: 1.5%'>
+            <button type = 'button' class = 'btn btn-primary' ng-click = 'saveData()' title = 'Save Data' style = 'float:left; margin-left: 1.5%'>
               <span class = 'glyphicon glyphicon-floppy-disk' style = 'font-size:16px'></span>
             </button>
 
             <!-- Import Button -->
-            <button type = 'button' class = 'btn btn-info' ng-click = '' data-toggle = 'tooltip' title = 'Import Data' style = 'float:left; margin-left: 1%'>
+            <button type = 'button' class = 'btn btn-info' title = 'Import Data'>
               <span class = 'glyphicon glyphicon-import' style = 'font-size:16px'></span>
             </button>
 
             <!-- Export Button -->
-            <button type = 'button' class = 'btn btn-info' ng-click = '' data-toggle = 'tooltip' title = 'Export Data' style = 'float:left; margin-left: 1%'>
+            <button type = 'button' class = 'btn btn-info' title = 'Export Data'>
               <span class = 'glyphicon glyphicon-export' style = 'font-size:16px'></span>
             </button>
           </div>
 
           <!-- Data Saved Alert -->
           <div class = 'alert alert-success alert-dismissible' role = 'alert' ng-if = 'showSaveSuccess' ng-cloak>
-            <button type = 'button' class = 'close' data-dismiss = 'alert' aria-label = 'Close'>
+            <button type = 'button' class = 'close' data-dismiss = 'alert' aria-label = 'Close' ng-click = 'changeSaveSuccess()'>
               <span aria-hidden = 'true'>&times;</span>
             </button>
             Data <strong>successfully</strong> saved.
@@ -163,15 +162,15 @@
                     </select>
                   </td>
                   <td ng-if = 'criterion.id != deleteIdCriterion'>
-                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteCriterion(criterion)' data-toggle = 'tooltip' title = 'Delete Criterion'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteCriterion(criterion)' title = 'Delete Criterion'>
                       <span class = 'glyphicon glyphicon-minus'></span>
                     </button>
                   </td>
                   <td ng-if = 'criterion.id == deleteIdCriterion'>
-                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteCriterion(criterion)' data-toggle = 'tooltip' title = 'Confirm Delete Criterion'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteCriterion(criterion)' title = 'Confirm Delete Criterion'>
                       <span class = 'glyphicon glyphicon-ok'></span>
                     </button>
-                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteCriterion()' data-toggle = 'tooltip' title = 'Cancel Delete Criterion'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteCriterion()' title = 'Cancel Delete Criterion'>
                       <span class = 'glyphicon glyphicon-remove'></span>
                     </button>
                   </td>
@@ -189,7 +188,7 @@
                     </select>
                   </td>
                   <td>
-                    <button type = 'button' class = 'btn btn-success' ng-click = 'addCriterion()' data-toggle = 'tooltip' title = 'Add Criterion'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'addCriterion()' title = 'Add Criterion'>
                       <span class = 'glyphicon glyphicon-plus'></span>
                     </button>
                   </td>
@@ -243,15 +242,15 @@
                     <input class = 'form-control' type = 'number' ng-model = 'interaction.value'>
                   </td>
                   <td ng-if = 'interaction.id != deleteIdInteractionEffect'>
-                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInteractionEffect(interaction)' data-toggle = 'tooltip' title = 'Delete Interaction Effect'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInteractionEffect(interaction)' title = 'Delete Interaction Effect'>
                       <span class = 'glyphicon glyphicon-minus'></span>
                     </button>
                   </td>
                   <td ng-if = 'interaction.id == deleteIdInteractionEffect'>
-                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInteractionEffect(interaction)' data-toggle = 'tooltip' title = 'Confirm Delete Interaction Effect'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInteractionEffect(interaction)' title = 'Confirm Delete Interaction Effect'>
                       <span class = 'glyphicon glyphicon-ok'></span>
                     </button>
-                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInteractionEffect()' data-toggle = 'tooltip' title = 'Cancel Delete Interaction Effect'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInteractionEffect()' title = 'Cancel Delete Interaction Effect'>
                       <span class = 'glyphicon glyphicon-remove'></span>
                     </button>
                   </td>
@@ -282,7 +281,7 @@
                     <input class = 'form-control' type = 'number' ng-model = 'new_interaction_effect.value'>
                   </td>
                   <td class = 'col-md-2'>
-                    <button type = 'button' class = 'btn btn-success' ng-click = 'addInteractionEffect()' data-toggle = 'tooltip' title = 'Add Interaction Effect'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'addInteractionEffect()' title = 'Add Interaction Effect'>
                       <span class = 'glyphicon glyphicon-plus'></span>
                     </button>
                   </td>
@@ -361,15 +360,15 @@
                       <p math-jax-bind = 'branch.condition'></p>
                     </td>
                     <td class = 'col-md-2' ng-if = 'criterion.id != deleteIdBranch[0] || (criterion.id == deleteIdBranch[0] && branch.id != deleteIdBranch[1])'>
-                      <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteBranch(criterion, branch)' data-toggle = 'tooltip' title = 'Delete Branch'>
+                      <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteBranch(criterion, branch)' title = 'Delete Branch'>
                         <span class = 'glyphicon glyphicon-minus'></span>
                       </button>
                     </td>
                     <td class = 'col-md-2' ng-if = 'criterion.id == deleteIdBranch[0] && branch.id == deleteIdBranch[1]'>
-                      <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteBranch(criterion, branch)' data-toggle = 'tooltip' title = 'Confirm Delete Branch'>
+                      <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteBranch(criterion, branch)' title = 'Confirm Delete Branch'>
                         <span class = 'glyphicon glyphicon-ok'></span>
                       </button>
-                      <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteBranch()' data-toggle = 'tooltip' title = 'Cancel Delete Branch'>
+                      <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteBranch()' title = 'Cancel Delete Branch'>
                         <span class = 'glyphicon glyphicon-remove'></span>
                       </button>
                     </td>
@@ -389,7 +388,7 @@
                       <p math-jax-bind = 'new_branch[criterion.id].condition'></p>
                     </td>
                     <td class = 'col-md-2'>
-                      <button type = 'button' class = 'btn btn-success' ng-click = 'addBranch(criterion)' data-toggle = 'tooltip' title = 'Add Branch'>
+                      <button type = 'button' class = 'btn btn-success' ng-click = 'addBranch(criterion)' title = 'Add Branch'>
                         <span class = 'glyphicon glyphicon-plus'></span>
                       </button>
                     </td>
@@ -427,15 +426,15 @@
                     <input class = 'form-control' type = 'number' ng-model = 'action[criterion.name]'>
                   </td>
                   <td ng-if = 'action.id != deleteIdAction'>
-                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteAction(action)' data-toggle = 'tooltip' title = 'Delete Action'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteAction(action)' title = 'Delete Action'>
                       <span class = 'glyphicon glyphicon-minus'></span>
                     </button>
                   </td>
                   <td ng-if = 'action.id == deleteIdAction'>
-                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAction(action)' data-toggle = 'tooltip' title = 'Confirm Delete Action'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAction(action)' title = 'Confirm Delete Action'>
                       <span class = 'glyphicon glyphicon-ok'></span>
                     </button>
-                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAction()' data-toggle = 'tooltip' title = 'Cancel Delete Action'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAction()' title = 'Cancel Delete Action'>
                       <span class = 'glyphicon glyphicon-remove'></span>
                     </button>
                   </td>
@@ -449,7 +448,7 @@
                     <input class = 'form-control' type = 'number' ng-model = 'new_action[criterion.name]'>
                   </td>
                   <td>
-                    <button type = 'button' class = 'btn btn-success' ng-click = 'addAction()' data-toggle = 'tooltip' title = 'Add Action'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'addAction()' title = 'Add Action'>
                       <span class = 'glyphicon glyphicon-plus'></span>
                     </button>
                   </td>
@@ -488,15 +487,15 @@
                     <input class = 'form-control' type = 'number' ng-model = 'category[criterion.name]'>
                   </td>
                   <td ng-if = 'category.id != deleteIdCategory'>
-                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteCategory(category)' data-toggle = 'tooltip' title = 'Delete Category'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteCategory(category)' title = 'Delete Category'>
                       <span class = 'glyphicon glyphicon-minus'></span>
                     </button>
                   </td>
                   <td ng-if = 'category.id == deleteIdCategory'>
-                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteCategory(category)' data-toggle = 'tooltip' title = 'Confirm Delete Category'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteCategory(category)' title = 'Confirm Delete Category'>
                       <span class = 'glyphicon glyphicon-ok'></span>
                     </button>
-                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteCategory()' data-toggle = 'tooltip' title = 'Cancel Delete Category'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteCategory()' title = 'Cancel Delete Category'>
                       <span class = 'glyphicon glyphicon-remove'></span>
                     </button>
                   </td>
@@ -513,7 +512,7 @@
                     <input class = 'form-control' type = 'number' ng-model = 'new_category[criterion.name]'>
                   </td>
                   <td>
-                    <button type = 'button' class = 'btn btn-success' ng-click = 'addCategory()' data-toggle = 'tooltip' title = 'Add Category'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'addCategory()' title = 'Add Category'>
                       <span class = 'glyphicon glyphicon-plus'></span>
                     </button>
                   </td>
@@ -546,15 +545,15 @@
                     <input class = 'form-control' type = 'number' ng-model = 'ref[criterion.name]'>
                   </td>
                   <td ng-if = 'category.id != deleteIdReferenceAction[0] || category.id == deleteIdReferenceAction[0] && ref.id != deleteIdReferenceAction[1]'>
-                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteReferenceAction(category, ref)' data-toggle = 'tooltip' title = 'Delete Reference Action'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteReferenceAction(category, ref)' title = 'Delete Reference Action'>
                       <span class = 'glyphicon glyphicon-minus'></span>
                     </button>
                   </td>
                   <td ng-if = 'category.id == deleteIdReferenceAction[0] && ref.id == deleteIdReferenceAction[1]'>
-                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteReferenceAction(category, ref)' data-toggle = 'tooltip' title = 'Confirm Delete Reference Action'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteReferenceAction(category, ref)' title = 'Confirm Delete Reference Action'>
                       <span class = 'glyphicon glyphicon-ok'></span>
                     </button>
-                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteReferenceAction()' data-toggle = 'tooltip' title = 'Cancel Delete Reference Action'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteReferenceAction()' title = 'Cancel Delete Reference Action'>
                       <span class = 'glyphicon glyphicon-remove'></span>
                     </button>
                   </td>
@@ -566,7 +565,7 @@
                     <input class = 'form-control' type = 'number' ng-model = 'new_reference_action[category.id][criterion.name]'>
                   </td>
                   <td>
-                    <button type = 'button' class = 'btn btn-success' ng-click = 'addReferenceAction(category, $index)' data-toggle = 'tooltip' title = 'Add Reference Action'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'addReferenceAction(category, $index)' title = 'Add Reference Action'>
                       <span class = 'glyphicon glyphicon-plus'></span>
                     </button>
                   </td>
@@ -803,17 +802,17 @@
               </div>
               <!-- Delete button -->
               <div class = 'col-md-2' ng-if = 'execution.execution_id != deleteIdExecution'>
-                <button type = 'button' class = 'btn btn-danger exec-btn btn-execution-delete' ng-click = 'deleteExecution(execution)' data-toggle = 'tooltip' title = 'Delete Execution' style = 'margin-top:5%;'>
+                <button type = 'button' class = 'btn btn-danger exec-btn btn-execution-delete' ng-click = 'deleteExecution(execution)' title = 'Delete Execution' style = 'margin-top:5%;'>
                   <span class = 'glyphicon glyphicon-minus'></span>
                 </button>
               </div>
 
               <!-- Confirm and Cancel Delete Button -->
               <div class = 'col-md-2' ng-if = 'execution.execution_id == deleteIdExecution'>
-                <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteExecution(execution)' data-toggle = 'tooltip' title = 'Confirm Delete Execution' style = 'margin-top:5%'>
+                <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteExecution(execution)' title = 'Confirm Delete Execution' style = 'margin-top:5%'>
                   <span class = 'glyphicon glyphicon-ok'></span>
                 </button>
-                <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteExecution()' data-toggle = 'tooltip' title = 'Cancel Delete Execution' style = 'margin-top:5%'>
+                <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteExecution()' title = 'Cancel Delete Execution' style = 'margin-top:5%'>
                   <span class = 'glyphicon glyphicon-remove'></span>
                 </button>
             </div>
@@ -830,10 +829,10 @@
 
           <!-- Confirm and Cancel Delete All Executions buttons -->
           <div id = 'delete-all-btn-group' ng-if = 'deleteIdExecution == "all"'>
-            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAllExecutions()' data-toggle = 'tooltip' title = 'Confirm Delete'>
+            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAllExecutions()' title = 'Confirm Delete'>
               <span class = 'glyphicon glyphicon-ok'></span>
             </button>
-            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAllExecutions()' data-toggle = 'tooltip' title = 'Cancel Delete'>
+            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAllExecutions()' title = 'Cancel Delete'>
               <span class = 'glyphicon glyphicon-remove'></span>
             </button>
           </div>

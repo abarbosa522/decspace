@@ -1,10 +1,12 @@
-app.controller('SortMethodController', function($scope, $http) {
+app.controller('SortMethodController', function($scope, $http, $window) {
   //get the id of the open project
   var url = window.location.href;
   var proj_id = Number(url.substr(url.indexOf('?id=') + 4));
 
   //draggable objects
   $scope.draggableObjects = [];
+
+  $scope.deleteIdExecution = '';
 
   function requestLogIn() {
     $http.get('/requestlogin').success(function(res) {
@@ -65,6 +67,7 @@ app.controller('SortMethodController', function($scope, $http) {
         //add the new list of projects
         $http.post('/projects', proj_res).success(function() {
           getData();
+          getExecutions();
         });
       });
     });
@@ -105,6 +108,10 @@ app.controller('SortMethodController', function($scope, $http) {
         });
       });
     });
+  }
+
+  $scope.changeSaveSuccess = function() {
+    $scope.showSaveSuccess = false;
   }
 
   function getData() {
@@ -165,22 +172,129 @@ app.controller('SortMethodController', function($scope, $http) {
         }
       }
 
-        //delete the previous document with the list of projects
-        $http.delete('/projects/' + id_doc).success(function() {
-          //add the new list of projects
-          $http.post('/projects', proj_res).success(function() {
-            getExecutions();
+      //delete the previous document with the list of projects
+      $http.delete('/projects/' + id_doc).success(function() {
+        //add the new list of projects
+        $http.post('/projects', proj_res).success(function() {
+          getExecutions();
 
-            //reset the comment input field, if it was filled
-            if(typeof $scope.new_execution != 'undefined')
-              $scope.new_execution.comment = '';
+          //reset the comment input field, if it was filled
+          if(typeof $scope.new_execution != 'undefined')
+            $scope.new_execution.comment = '';
 
-            //hide loading button
-            $scope.isLoading = false;
-          });
+          //hide loading button
+          $scope.isLoading = false;
         });
       });
     });
+  }
+
+  function getExecutions() {
+    $http.get('/projects').success(function(response) {
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+          //get the actions previously added
+          $scope.executions = response[proj]['executions'];
+          break;
+        }
+      }
+    });
+  }
+
+  $scope.deleteExecution = function(execution) {
+    $scope.deleteIdExecution = execution.execution_id;
+  }
+
+  $scope.confirmDeleteExecution = function(execution) {
+    $http.get('/projects').success(function(response) {
+      var id_doc, proj_res;
+
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+          for(exec in response[proj]['executions']) {
+            if(response[proj]['executions'][exec]['execution_id'] == execution.execution_id) {
+              response[proj]['executions'].splice(exec, 1);
+              //get the id of the document, so that it can be removed from the db
+              id_doc = response[proj]['_id'];
+              //project to store in the db
+              proj_res = response[proj];
+              delete proj_res['_id'];
+              break;
+            }
+          }
+          break;
+        }
+      }
+
+      //delete the previous document with the list of projects
+      $http.delete('/projects/' + id_doc).success(function() {
+        //add the new list of projects
+        $http.post('/projects', proj_res).success(function() {
+          //refresh the list of projects
+          getExecutions();
+        });
+      });
+    });
+  }
+
+  $scope.cancelDeleteExecution = function() {
+    $scope.deleteIdExecution = '';
+  }
+
+  $scope.deleteAllExecutions = function() {
+    $scope.deleteIdExecution = 'all';
+  }
+
+  $scope.confirmDeleteAllExecutions = function() {
+    $http.get('/projects').success(function(response) {
+      var id_doc, proj_res;
+
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+          response[proj]['executions'] = [];
+          //get the id of the document, so that it can be removed from the db
+          id_doc = response[proj]['_id'];
+          //project to store in the db
+          proj_res = response[proj];
+          delete proj_res['_id'];
+          break;
+        }
+      }
+
+      //delete the previous document with the list of projects
+      $http.delete('/projects/' + id_doc).success(function(){
+        //add the new list of projects
+        $http.post('/projects', proj_res).success(function() {
+          //refresh the list of executions
+          getExecutions();
+          //reset delete variable
+          $scope.deleteIdExecution = '';
+        });
+      });
+    });
+  }
+
+  $scope.cancelDeleteAllExecutions = function() {
+    $scope.deleteIdExecution = '';
+  }
+
+  $scope.reloadData = function() {
+    $http.get('/projects').success(function(response) {
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+          $scope.draggableObjects = response[proj]['sorted_objects'];
+          break;
+        }
+      }
+    });
+  }
+
+  $scope.resetData = function() {
+    $scope.draggableObjects = [
+      {name : 'Object 1'},
+      {name : 'Object 2'},
+      {name : 'Object 3'}
+    ];
   }
 
   requestLogIn();

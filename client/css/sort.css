@@ -10,9 +10,10 @@
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  cursor: move;
 }
 
-[ng-drag] {
+[ng-drag], .drag-obj {
   width: 100px;
   height: 100px;
   background: rgba(0, 0, 255, 0.8);
@@ -20,14 +21,13 @@
   text-align: center;
   padding-top: 40px;
   display: block;
-  cursor: move;
 }
 
 [ng-drag].dragging {
   opacity: 0.5;
 }
 
-[ng-drop] {
+[ng-drop], .drop-obj {
   text-align: center;
   display: block;
   position: relative;

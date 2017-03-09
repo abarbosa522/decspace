@@ -495,6 +495,10 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
     $scope.deleteIdExecution = '';
   }
 
+  $scope.changeSaveSuccess = function() {
+    $scope.showSaveSuccess = false;
+  }
+  
   requestLogIn();
   rewriteLastUpdate();
 });

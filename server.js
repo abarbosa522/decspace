@@ -110,23 +110,139 @@ var parser = new Parser();
 
 //evaluate expression
 app.get('/expr-eval', function(req, res) {
-  var condition = parser.parse(req.query.condition);
-  var result = condition.evaluate({x: Number(req.query.x), y: Number(req.query.y)});
+  var criteria = [];
 
-  if(result == true) {
-    var func_branch = parser.parse(req.query.function);
-    result = func_branch.evaluate({x: Number(req.query.x), y: Number(req.query.y)});
+  if(typeof req.query.criteria == 'string') {
+    criteria = JSON.parse(req.query.criteria);
   }
   else {
-    result = 'false';
+    for(criterion in req.query.criteria)
+      criteria.push(JSON.parse(req.query.criteria[criterion]));
   }
 
-  var result_obj = {};
-  result_obj['criterion'] = req.query.criterion;
-  result_obj['action'] = req.query.action;
-  result_obj['reference_action'] = req.query.reference_action;
-  result_obj['result'] = result;
-  res.json(result_obj);
+  var actions = [];
+
+  if(typeof req.query.actions == 'string') {
+    actions = JSON.parse(req.query.actions);
+  }
+  else {
+    for(action in req.query.actions)
+      actions.push(JSON.parse(req.query.actions[action]));
+  }
+
+  var categories = [];
+
+  if(typeof req.query.categories == 'string') {
+    categories = JSON.parse(req.query.categories);
+  }
+  else {
+    for(category in req.query.categories)
+      categories.push(JSON.parse(req.query.categories[category]));
+  }
+
+  var antagonisticSet = [];
+
+  if(typeof req.query.antagonisticSet == 'string') {
+    antagonisticSet = JSON.parse(req.query.antagonisticSet);
+  }
+  else {
+    for(item in req.query.antagonisticSet)
+      antagonisticSet.push(JSON.parse(req.query.antagonisticSet[item]));
+  }
+
+  /*console.log(criteria);
+  console.log(actions);
+  console.log(categories);
+  console.log(antagonisticSet);*/
+
+  var similarityValues = [];
+
+  for(criterion in criteria) {
+    for(action in actions) {
+      for(category in categories) {
+        for(reference_action in categories[category]['reference_actions']) {
+          //arguments used in the functions
+          var arg1 = actions[action][criteria[criterion]['name']];
+          var arg2 = categories[category]['reference_actions'][reference_action][criteria[criterion]['name']];
+
+          for(branch in criteria[criterion]['branches']) {
+
+            var condition = criteria[criterion]['branches'][branch]['condition'];
+
+            if((condition.indexOf('=') != -1) && (condition.indexOf('<=') == -1) && (condition.indexOf('>=') == -1) && (condition.indexOf('!=') == -1)) {
+              var a = criteria[criterion]['branches'][branch]['condition'];
+              var b = '=';
+              var position = criteria[criterion]['branches'][branch]['condition'].indexOf('=');
+              condition = [a.slice(0, position), b, a.slice(position)].join('');
+            }
+
+            var cond = parser.parse(condition);
+            var result = cond.evaluate({x: Number(arg1), y: Number(arg2)});
+
+            if(result == true) {
+              var func_branch = parser.parse(criteria[criterion]['branches'][branch]['function']);
+              result = func_branch.evaluate({x: Number(arg1), y: Number(arg2)});
+
+              var result_obj = {};
+              result_obj['criterion'] = criteria[criterion]['name'];
+              result_obj['action'] = actions[action]['name'];
+              result_obj['reference_action'] = categories[category]['reference_actions'][reference_action]['name'];
+              result_obj['result'] = result;
+              similarityValues.push(result_obj);
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  for(item in antagonisticSet) {
+    for(criterion in criteria) {
+      if(criteria[criterion]['name'] == antagonisticSet[item]['criterion2']) {
+        for(action in actions) {
+          for(category in categories) {
+            for(reference_action in categories[category]['reference_actions']) {
+              //arguments used in the functions
+              var arg1 = actions[action][criteria[criterion]['name']];
+              var arg2 = categories[category]['reference_actions'][reference_action][criteria[criterion]['name']];
+
+              for(branch in criteria[criterion]['branches']) {
+
+                var condition = criteria[criterion]['branches'][branch]['condition'];
+
+                if((condition.indexOf('=') != -1) && (condition.indexOf('<=') == -1) && (condition.indexOf('>=') == -1) && (condition.indexOf('!=') == -1)) {
+                  var a = criteria[criterion]['branches'][branch]['condition'];
+                  var b = '=';
+                  var position = criteria[criterion]['branches'][branch]['condition'].indexOf('=');
+                  condition = [a.slice(0, position), b, a.slice(position)].join('');
+                }
+
+                var cond = parser.parse(condition);
+                var result = cond.evaluate({x: Number(arg2), y: Number(arg1)});
+
+                if(result == true) {
+                  var func_branch = parser.parse(criteria[criterion]['branches'][branch]['function']);
+                  result = func_branch.evaluate({x: Number(arg2), y: Number(arg1)});
+
+                  var result_obj = {};
+                  result_obj['criterion'] = criteria[criterion]['name'];
+                  result_obj['reference_action'] = actions[action]['name'];
+                  result_obj['action'] = categories[category]['reference_actions'][reference_action]['name'];
+                  result_obj['result'] = result;
+                  similarityValues.push(result_obj);
+                  break;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  //console.log(similarityValues);
+  res.json(similarityValues);
 });
 
 //DATABASE CONNECTIONS

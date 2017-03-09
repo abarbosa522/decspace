@@ -22,14 +22,9 @@
     <!-- AngularJS Controllers -->
     <script src = '../../js/controllers/project-management/SortMethodController.js'></script>
 
-    <!-- AngularJS Services -->
-    <!-- <script src = '../../js/services/SortService.js'></script> -->
-
     <!-- Bootstrap -->
     <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css' />
-    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap-theme.min.css' />
     <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.js'></script>
-    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.min.js'></script>
 
     <!-- Google Web Fonts -->
     <link href = 'https://fonts.googleapis.com/css?family=Open+Sans:400,600i' rel = 'stylesheet'>
@@ -94,7 +89,7 @@
 
           <br>
 
-          <p>Given n objects, sort them by importance.</p>
+          <p>Given 3 different objects, reorder them by their importance. The object on the left should be the most important and the object on the right should be the least important.</p>
         </div>
 
         <!-- Data Input -->
@@ -103,29 +98,58 @@
           <br>
 
           <!-- Button Bar -->
-          <div class = 'row'>
-            <!-- Save Button -->
-            <button type = 'button' class = 'btn btn-primary' ng-click = 'saveData()' data-toggle = 'tooltip' title = 'Save Data' style = 'float:left; margin-left: 1.5%'>
-              <span class = 'glyphicon glyphicon-floppy-save icon-large'></span>
-            </button>
+          <div class = 'btn-toolbar' role = 'toolbar'>
+            <div class = 'btn-group' role = 'group'>
+              <!-- Save Button -->
+              <button type = 'button' class = 'btn btn-primary' ng-click = 'saveData()' title = 'Save Data'>
+                <span class = 'glyphicon glyphicon-floppy-save icon-large'></span>
+              </button>
 
-            <!-- Import Button -->
-            <button type = 'button' class = 'btn btn-info' ng-click = '' data-toggle = 'tooltip' title = 'Import Data' style = 'float:left; margin-left: 1%'>
-              <span class = 'glyphicon glyphicon-import icon-large'></span>
-            </button>
+              <!-- Reload Data Button -->
+              <button type = 'button' class = 'btn btn-info' ng-click = 'reloadData()' title = 'Reload Data'>
+                <span class = 'glyphicon glyphicon-refresh'></span>
+              </button>
 
-            <!-- Export Button -->
-            <button type = 'button' class = 'btn btn-info' ng-click = '' data-toggle = 'tooltip' title = 'Export Data' style = 'float:left; margin-left: 1%'>
-              <span class = 'glyphicon glyphicon-export icon-large'></span>
-            </button>
+              <!-- Reset Data Button -->
+              <button type = 'button' class = 'btn btn-danger' ng-click = 'resetData()' title = 'Reset Data'>
+                <span class = 'glyphicon glyphicon-trash'></span>
+              </button>
+            </div>
+
+            <div class = 'btn-group' role = 'group'>
+              <!-- Import Button -->
+              <button type = 'button' class = 'btn btn-warning' title = 'Import Data' data-toggle = 'modal' data-target = '#import-modal'>
+                <span class = 'glyphicon glyphicon-import icon-large'></span>
+              </button>
+
+              <!-- Export Button -->
+              <button type = 'button' class = 'btn btn-warning' title = 'Export Data' >
+                <span class = 'glyphicon glyphicon-export icon-large'></span>
+              </button>
+            </div>
           </div>
 
           <!-- Data Saved Alert -->
           <div class = 'alert alert-success alert-dismissible' role = 'alert' ng-if = 'showSaveSuccess' ng-cloak>
-            <button type = 'button' class = 'close' data-dismiss = 'alert' aria-label = 'Close'>
+            <button type = 'button' class = 'close' data-dismiss = 'alert' aria-label = 'Close' ng-click = 'changeSaveSuccess()'>
               <span aria-hidden = 'true'>&times;</span>
             </button>
             Data <strong>successfully</strong> saved.
+          </div>
+
+          <!-- Import Modal -->
+          <div class = 'modal fade' id = 'import-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>Modal Header</h4>
+                </div>
+                <div class = 'modal-body'>
+                  <p>Some text in the modal.</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           <br>
@@ -175,21 +199,49 @@
           <div class = 'row' ng-repeat = 'execution in executions'>
 
             <div class = 'list-group col-md-10'>
+              <a href = '#list-{{execution.execution_id}}' class = 'list-group-item' data-toggle = 'collapse' ng-class = '{"list-group-item-danger":  execution.execution_id == deleteIdExecution || deleteIdExecution == "all"}'>
+                <p>{{execution.execution_date}}</p>
+              </a>
+              <div id = 'list-{{execution.execution_id}}' class = 'collapse'>
+                <a class = 'list-group-item'>
+                  <p class = 'header-2'>Order</p>
+
+                  <!-- Dragged Objects -->
+                  <div class = 'row text-center'>
+                    <ul class = 'draglist'>
+                      <li class = 'drop-obj' ng-repeat = 'obj in execution.results'>
+                        <div class = 'drag-obj'>
+                          {{obj.name}}
+                        </div>
+                        <p ng-if = '$index == 0'>Most Important</p>
+                        <p ng-if = '$index == draggableObjects.length - 1'>Least Important</p>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <br><br>
+
+                  <div ng-if = 'execution.comment != ""'>
+                    <p class = 'header-2'>Comment</p>
+                    <p>{{execution.comment}}</p>
+                  </div>
+                </a>
+              </div>
             </div>
 
             <!-- Delete button -->
             <div class = 'col-md-2' ng-if = 'execution.execution_id != deleteIdExecution'>
-              <button type = 'button' class = 'btn btn-danger exec-btn btn-execution-delete' ng-click = 'deleteExecution(execution)' data-toggle = 'tooltip' title = 'Delete Execution' style = 'margin-top:5%;'>
+              <button type = 'button' class = 'btn btn-danger exec-btn btn-execution-delete' ng-click = 'deleteExecution(execution)' title = 'Delete Execution' style = 'margin-top:5%;'>
                 <span class = 'glyphicon glyphicon-minus'></span>
               </button>
             </div>
 
             <!-- Confirm and Cancel Delete Button -->
             <div class = 'col-md-2' ng-if = 'execution.execution_id == deleteIdExecution'>
-              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteExecution(execution)' data-toggle = 'tooltip' title = 'Confirm Delete Execution' style = 'margin-top:5%'>
+              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteExecution(execution)' title = 'Confirm Delete Execution' style = 'margin-top:5%'>
                 <span class = 'glyphicon glyphicon-ok'></span>
               </button>
-              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteExecution()' data-toggle = 'tooltip' title = 'Cancel Delete Execution' style = 'margin-top:5%'>
+              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteExecution()' title = 'Cancel Delete Execution' style = 'margin-top:5%'>
                 <span class = 'glyphicon glyphicon-remove'></span>
               </button>
             </div>
@@ -206,10 +258,10 @@
 
           <!-- Confirm and Cancel Delete All Executions buttons -->
           <div id = 'delete-all-btn-group' ng-if = 'deleteIdExecution == "all"'>
-            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAllExecutions()' data-toggle = 'tooltip' title = 'Confirm Delete'>
+            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAllExecutions()' title = 'Confirm Delete'>
               <span class = 'glyphicon glyphicon-ok'></span>
             </button>
-            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAllExecutions()' data-toggle = 'tooltip' title = 'Cancel Delete'>
+            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAllExecutions()' title = 'Cancel Delete'>
               <span class = 'glyphicon glyphicon-remove'></span>
             </button>
           </div>
