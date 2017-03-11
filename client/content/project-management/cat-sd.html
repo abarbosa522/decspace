@@ -25,10 +25,8 @@
     <script src = '../../js/services/CATSDService.js'></script>
 
     <!-- Bootstrap -->
-    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css' />
-    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap-theme.min.css' />
+    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
     <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.js'></script>
-    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.min.js'></script>
 
     <!-- Google Web Fonts -->
     <link href = 'https://fonts.googleapis.com/css?family=Open+Sans:400,600i' rel = 'stylesheet'>
@@ -106,22 +104,38 @@
           <br>
 
           <!-- Button Bar -->
-          <div class = 'row'>
-            <!-- Save Button -->
-            <button type = 'button' class = 'btn btn-primary' ng-click = 'saveData()' title = 'Save Data' style = 'float:left; margin-left: 1.5%'>
-              <span class = 'glyphicon glyphicon-floppy-disk' style = 'font-size:16px'></span>
-            </button>
+          <div class = 'btn-toolbar' role = 'toolbar'>
+            <div class = 'btn-group' role = 'group'>
+              <!-- Save Button -->
+              <button type = 'button' class = 'btn btn-primary' ng-click = 'saveData()' title = 'Save Data'>
+                <span class = 'glyphicon glyphicon-floppy-save icon-large'></span>
+              </button>
 
-            <!-- Import Button -->
-            <button type = 'button' class = 'btn btn-info' title = 'Import Data'>
-              <span class = 'glyphicon glyphicon-import' style = 'font-size:16px'></span>
-            </button>
+              <!-- Reload Data Button -->
+              <button type = 'button' class = 'btn btn-info' ng-click = 'reloadData()' title = 'Reload Data'>
+                <span class = 'glyphicon glyphicon-refresh'></span>
+              </button>
 
-            <!-- Export Button -->
-            <button type = 'button' class = 'btn btn-info' title = 'Export Data'>
-              <span class = 'glyphicon glyphicon-export' style = 'font-size:16px'></span>
-            </button>
+              <!-- Reset Data Button -->
+              <button type = 'button' class = 'btn btn-danger' ng-click = 'resetData()' title = 'Reset Data'>
+                <span class = 'glyphicon glyphicon-trash'></span>
+              </button>
+            </div>
+
+            <div class = 'btn-group' role = 'group'>
+              <!-- Import Button -->
+              <button type = 'button' class = 'btn btn-warning' title = 'Import Data' data-toggle = 'modal' data-target = '#import-modal'>
+                <span class = 'glyphicon glyphicon-import icon-large'></span>
+              </button>
+
+              <!-- Export Button -->
+              <button type = 'button' class = 'btn btn-warning' title = 'Export Data' data-toggle = 'modal' data-target = '#export-modal'>
+                <span class = 'glyphicon glyphicon-export icon-large'></span>
+              </button>
+            </div>
           </div>
+
+          <br>
 
           <!-- Data Saved Alert -->
           <div class = 'alert alert-success alert-dismissible' role = 'alert' ng-if = 'showSaveSuccess' ng-cloak>
@@ -129,6 +143,203 @@
               <span aria-hidden = 'true'>&times;</span>
             </button>
             Data <strong>successfully</strong> saved.
+          </div>
+
+          <!-- Import Modal -->
+          <div class = 'modal fade' id = 'import-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>Import Data</h4>
+                </div>
+                <div class = 'modal-body'>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group col-md-6'>
+                      <input id = 'import-criteria-check' type = 'checkbox'/>
+                      <label for = 'import-criteria-check'>Criteria</label>
+                    </div>
+                    <div class = 'form-group col-md-4'>
+                      <input id = 'import-criteria-file' type = 'file'/>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group col-md-6'>
+                      <input id = 'import-interaction-effects-check' type = 'checkbox'/>
+                      <label for = 'import-interaction-effects-check'>Interaction Effects</label>
+                    </div>
+                    <div class = 'form-group col-md-4'>
+                      <input id = 'import-interaction-effects-file' type = 'file'/>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group col-md-6'>
+                      <input id = 'import-scales-check' type = 'checkbox'/>
+                      <label for = 'import-scales-check'>Scales</label>
+                    </div>
+                    <div class = 'form-group col-md-4'>
+                      <input id = 'import-scales-file' type = 'file'/>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group col-md-6'>
+                      <input id = 'import-functions-check' type = 'checkbox'/>
+                      <label for = 'import-functions-check'>Functions</label>
+                    </div>
+                    <div class = 'form-group col-md-4'>
+                      <input id = 'import-functions-file' type = 'file'/>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group col-md-6'>
+                      <input id = 'import-actions-check' type = 'checkbox'/>
+                      <label for = 'import-actions-check'>Actions</label>
+                    </div>
+                    <div class = 'form-group col-md-4'>
+                      <input id = 'import-actions-file' type = 'file'/>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group col-md-6'>
+                      <input id = 'import-categories-check' type = 'checkbox'/>
+                      <label for = 'import-categories-check'>Categories</label>
+                    </div>
+                    <div class = 'form-group col-md-4'>
+                      <input id = 'import-categories-file' type = 'file'/>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group col-md-6'>
+                      <input id = 'import-reference-actions-check' type = 'checkbox'/>
+                      <label for = 'import-reference-actions-check'>Reference Actions</label>
+                    </div>
+                    <div class = 'form-group col-md-4'>
+                      <input id = 'import-reference-actions-file' type = 'file'/>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <button type = 'button' class = 'btn btn-default' ng-click = 'importData()' data-dismiss = 'modal'>
+                    Submit
+                  </button>
+                  <p><sub>CSV and JSON formats are accepted.</sub></p>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Export Modal -->
+          <div class = 'modal fade' id = 'export-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>Export Data</h4>
+                </div>
+                <div class = 'modal-body'>
+                  <form>
+                    <div class = 'col-md-4'>
+                      Data Formats:
+                    </div>
+                    <div class = 'col-md-4'>
+                      <input  type = 'radio' id = 'csv-radio' name = 'format' value = 'csv'> CSV
+                    </div>
+                    <div class = 'col-md-4'>
+                      <input type = 'radio' id = 'json-radio' name = 'format' value = 'json'> JSON
+                    </div>
+                  </form>
+
+                  <br><br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group'>
+                      <input id = 'export-criteria-check' type = 'checkbox'/>
+                      <label for = 'export-criteria-check'>Criteria</label>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group'>
+                      <input id = 'export-interaction-effects-check' type = 'checkbox'/>
+                      <label for = 'export-interaction-effects-check'>Interaction Effects</label>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group'>
+                      <input id = 'export-scales-check' type = 'checkbox'/>
+                      <label for = 'export-scales-check'>Scales</label>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group'>
+                      <input id = 'export-functions-check' type = 'checkbox'/>
+                      <label for = 'export-functions-check'>Functions</label>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group'>
+                      <input id = 'export-actions-check' type = 'checkbox'/>
+                      <label for = 'export-actions-check'>Actions</label>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group'>
+                      <input id = 'export-categories-check' type = 'checkbox'/>
+                      <label for = 'export-categories-check'>Categories</label>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group'>
+                      <input id = 'export-reference-actions-check' type = 'checkbox'/>
+                      <label for = 'export-reference-actions-check'>Reference Actions</label>
+                    </div>
+                  </form>
+
+                  <br>
+                  <button type = 'button' class = 'btn btn-default' ng-click = 'exportData()' data-dismiss = 'modal'>
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Criteria -->
@@ -584,9 +795,7 @@
           <p class = 'header-2'>New Execution</p>
 
           <form class = 'form-inline'>
-            <div class = 'form-group'>
-              <input type = 'text' class = 'form-control' placeholder = 'Comment' ng-model = 'new_execution.comment'>
-            </div>
+            <input type = 'text' class = 'form-control' placeholder = 'Comment' ng-model = 'new_execution.comment'>
             <button type = 'button' class = 'btn btn-default' ng-click = 'getResults()' ng-if = '!isLoading' title = 'Execute Method'>
               <span class = 'glyphicon glyphicon-play'></span>
             </button>

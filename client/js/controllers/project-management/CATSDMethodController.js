@@ -109,7 +109,6 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
 
     //reset the input fields
     $scope.new_criterion.direction = '';
-    $scope.new_criterion.weight = '';
     $scope.new_criterion.name = '';
   }
 
@@ -498,7 +497,563 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
   $scope.changeSaveSuccess = function() {
     $scope.showSaveSuccess = false;
   }
-  
+
+  $scope.reloadData = function() {
+    $http.get('/projects').success(function(response) {
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+          $scope.criteria = response[proj]['criteria'];
+          $scope.interaction_effects = response[proj]['interaction_effects'];
+          $scope.actions = response[proj]['actions'];
+          $scope.categories = response[proj]['categories'];
+          break;
+        }
+      }
+    });
+  }
+
+  $scope.resetData = function() {
+    $scope.criteria = [];
+    $scope.interaction_effects = [];
+    $scope.actions = [];
+    $scope.categories = [];
+  }
+
+  $scope.importData = function() {
+    if(angular.element(document.querySelector('#import-criteria-check')).prop('checked')) {
+      importFile('import-criteria-file');
+    }
+    if(angular.element(document.querySelector('#import-interaction-effects-check')).prop('checked')) {
+      importFile('import-interaction-effects-file');
+    }
+    if(angular.element(document.querySelector('#import-scales-check')).prop('checked')) {
+      importFile('import-scales-file');
+    }
+    if(angular.element(document.querySelector('#import-functions-check')).prop('checked')) {
+      importFile('import-functions-file');
+    }
+    if(angular.element(document.querySelector('#import-actions-check')).prop('checked')) {
+      importFile('import-actions-file');
+    }
+    if(angular.element(document.querySelector('#import-categories-check')).prop('checked')) {
+      importFile('import-categories-file');
+    }
+    if(angular.element(document.querySelector('#import-reference-actions-check')).prop('checked')) {
+      importFile('import-reference-actions-file');
+    }
+  }
+
+  function importFile(input_id) {
+    var file_input = document.getElementById(input_id);
+
+    var reader = new FileReader();
+
+    var data = [];
+
+    //called when readAsText is performed
+    reader.onload = (function(file) {
+      var file_extension = file.name.split('.').pop();
+
+      //imported file is a csv file
+      if(file_extension == 'csv') {
+        return function(e) {
+          var rows = e.target.result.split("\n");
+
+          for(row in rows)
+            rows[row] = rows[row].trim();
+
+          var columns = rows[0].split(";");
+
+          //remove whitespaces and empty strings
+          for(column in columns)
+            columns[column] = columns[column].trim();
+
+          for(var i = 1; i < rows.length; i++) {
+            var cells = rows[i].split(";");
+            var element = {};
+
+            for(var j = 0; j < cells.length; j++)
+              if(cells[j].trim() != '' && columns[j].trim() != '')
+                element[columns[j]] = cells[j];
+
+            if(!angular.equals(element, {}))
+              data.push(element);
+          }
+          $scope.$apply(fileConverter(input_id, data));
+        };
+      }
+      //imported file is a json file
+      else if(file_extension == 'json') {
+        return function(e) {
+          var rows = e.target.result.split("\n");
+
+          var data = [];
+          for(row in rows)
+            data.push(JSON.parse(rows[row]));
+
+          $scope.$apply(fileConverter(input_id,data));
+        }
+      }
+    })(file_input.files[0]);
+
+    //get the data from the file
+    reader.readAsText(file_input.files[0]);
+  }
+
+  function fileConverter(input_id, data) {
+    switch(input_id) {
+      case 'import-criteria-file':
+        $scope.criteria = data;
+        break;
+
+      case 'import-interaction-effects-file':
+        for(item in data)
+          data[item]['value'] = Number(data[item]['value']);
+
+        $scope.interaction_effects = data;
+        break;
+
+      case 'import-scales-file':
+        for(item in data) {
+          for(criterion in $scope.criteria) {
+            if(data[item]['criterion'] == $scope.criteria[criterion]['name']) {
+              if(data[item]['type'] == 'Numerical') {
+                $scope.criteria[criterion]['scale']['type'] = data[item]['type'];
+                $scope.criteria[criterion]['scale']['min'] = Number(data[item]['min']);
+                $scope.criteria[criterion]['scale']['max'] = Number(data[item]['max']);
+              }
+              else if(data[item]['type'] == 'Categorical') {
+                $scope.criteria[criterion]['scale']['type'] = data[item]['type'];
+                $scope.criteria[criterion]['scale']['num_categories'] = Number(data[item]['num_categories']);
+              }
+            }
+          }
+        }
+        break;
+
+      case 'import-functions-file':
+        //variable to keep track of which criterion's branches have already been cleared
+        var clear_array = [];
+        for(item in data)
+          clear_array[data[item]['criterion']] = false;
+
+        for(item in data) {
+          for(criterion in $scope.criteria) {
+            if(data[item]['criterion'] == $scope.criteria[criterion]['name']) {
+              if(!clear_array[data[item]['criterion']]) {
+                $scope.criteria[criterion]['branches'] = [];
+                clear_array[data[item]['criterion']] = true;
+              }
+              $scope.criteria[criterion]['branches'].push(data[item]);
+            }
+          }
+        }
+        break;
+
+      case 'import-actions-file':
+        for(action in data)
+          for(field in data[action])
+            if(field != 'name')
+              data[action][field] = Number(data[action][field]);
+
+        $scope.actions = data;
+        break;
+
+      case 'import-categories-file':
+        for(category in data)
+          for(field in data[category])
+            if(field != 'name')
+              data[category][field] = Number(data[category][field]);
+
+        $scope.categories = data;
+        break;
+
+      case 'import-reference-actions-file':
+        //variable to keep track of which categories' reference actions have already been cleared
+        var clear_array = [];
+
+        for(item in data)
+          clear_array[data[item]['category']] = false;
+
+        for(ref in data)
+          for(field in data[ref])
+            if(field != 'category')
+              data[ref][field] = Number(data[ref][field]);
+
+        for(item in data) {
+          for(category in $scope.categories) {
+            if(data[item]['category'] == $scope.categories[category]['name']) {
+              if(!clear_array[data[item]['category']]) {
+                $scope.categories[category]['reference_actions'] = [];
+                clear_array[data[item]['category']] = true;
+              }
+              data[item]['name'] = 'b' + (Number(category) + 1) + ($scope.categories[category].reference_actions.length + 1);
+              $scope.categories[category]['reference_actions'].push(data[item]);
+            }
+          }
+        }
+        break;
+    }
+  }
+
+  $scope.exportData = function() {
+    //export criteria to csv
+    if(angular.element(document.querySelector('#export-criteria-check')).prop('checked') && angular.element(document.querySelector('#csv-radio')).prop('checked')) {
+      var csv_str = '';
+
+      for(criterion in $scope.criteria) {
+        for(field in $scope.criteria[criterion])
+          if(field != 'id' && field != 'branches' && field != 'scale' && field != '$$hashKey')
+            csv_str += field + ';';
+
+        csv_str = csv_str.substring(0, csv_str.length - 1);
+        csv_str += '\n';
+        break;
+      }
+
+      for(criterion in $scope.criteria) {
+        for(field in $scope.criteria[criterion])
+          if(field != 'id' && field != 'branches' && field != 'scale' && field != '$$hashKey')
+            csv_str += $scope.criteria[criterion][field] + ';';
+
+        csv_str = csv_str.substring(0, csv_str.length - 1);
+        csv_str += '\n';
+      }
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'criteria.csv';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-criteria-check')).prop('checked') && angular.element(document.querySelector('#json-radio')).prop('checked')) {
+      var json_str = '';
+
+      for(criterion in $scope.criteria) {
+        var json_element = {};
+        for(field in $scope.criteria[criterion]) {
+          if(field != 'id' && field != 'branches' && field != 'scale' && field != '$$hashKey')
+            json_element[field] = $scope.criteria[criterion][field];
+        }
+
+        json_str += JSON.stringify(json_element) + '\n';
+      }
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/json;charset=utf-8,' + encodeURI(json_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'criteria.json';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-interaction-effects-check')).prop('checked') && angular.element(document.querySelector('#csv-radio')).prop('checked')) {
+      var csv_str = '';
+
+      for(inter in $scope.interaction_effects) {
+        for(field in $scope.interaction_effects[inter])
+          if(field != 'id' && field != '$$hashKey')
+            csv_str += field + ';';
+
+        csv_str = csv_str.substring(0, csv_str.length - 1);
+        csv_str += '\n';
+        break;
+      }
+
+      for(inter in $scope.interaction_effects) {
+        for(field in $scope.interaction_effects[inter])
+          if(field != 'id' && field != '$$hashKey')
+            csv_str += $scope.interaction_effects[inter][field] + ';';
+
+        csv_str = csv_str.substring(0, csv_str.length - 1);
+        csv_str += '\n';
+      }
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'interaction_effects.csv';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-interaction-effects-check')).prop('checked') && angular.element(document.querySelector('#json-radio')).prop('checked')) {
+      var json_str = '';
+
+      for(inter in $scope.interaction_effects) {
+        var json_element = {};
+        for(field in $scope.interaction_effects[inter]) {
+          if(field != 'id' && field != '$$hashKey')
+            json_element[field] = $scope.interaction_effects[inter][field];
+        }
+
+        json_str += JSON.stringify(json_element) + '\n';
+      }
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/json;charset=utf-8,' + encodeURI(json_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'interaction_effects.json';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-scales-check')).prop('checked') && angular.element(document.querySelector('#csv-radio')).prop('checked')) {
+      var csv_str = 'criterion;type;min;max;num_categories\n';
+
+      for(criterion in $scope.criteria) {
+        csv_str += $scope.criteria[criterion]['name'] + ';';
+
+        csv_str += $scope.criteria[criterion]['scale']['type'] + ';';
+
+        if($scope.criteria[criterion]['scale']['min'] != undefined)
+          csv_str += $scope.criteria[criterion]['scale']['min'] + ';';
+        else
+          csv_str += '-;';
+
+        if($scope.criteria[criterion]['scale']['max'] != undefined)
+          csv_str += $scope.criteria[criterion]['scale']['max'] + ';';
+        else
+          csv_str += '-;';
+
+        if($scope.criteria[criterion]['scale']['num_categories'] != undefined)
+          csv_str += $scope.criteria[criterion]['scale']['num_categories'];
+        else
+          csv_str += '-';
+
+        csv_str += '\n';
+      }
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'scales.csv';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-scales-check')).prop('checked') && angular.element(document.querySelector('#json-radio')).prop('checked')) {
+      var json_str = '';
+
+      for(criterion in $scope.criteria) {
+        var json_element = {};
+
+        json_element['criterion'] = $scope.criteria[criterion]['name'];
+
+        json_element['type'] = $scope.criteria[criterion]['scale']['type'];
+
+        if($scope.criteria[criterion]['scale']['min'] != undefined)
+          json_element['min'] = $scope.criteria[criterion]['scale']['min'] + ';';
+        else
+          json_element['min'] = '-;';
+
+        if($scope.criteria[criterion]['scale']['max'] != undefined)
+          json_element['max'] = $scope.criteria[criterion]['scale']['max'] + ';';
+        else
+          json_element['max'] = '-;';
+
+        if($scope.criteria[criterion]['scale']['num_categories'] != undefined)
+          json_element['num_categories'] = $scope.criteria[criterion]['scale']['num_categories'] + '';
+        else
+          json_element['num_categories'] = '-';
+
+        json_str += JSON.stringify(json_element) + '\n';
+      }
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/json;charset=utf-8,' + encodeURI(json_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'scales.json';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-functions-check')).prop('checked') && angular.element(document.querySelector('#csv-radio')).prop('checked')) {
+      var csv_str = 'criterion;function;condition\n';
+
+      for(criterion in $scope.criteria) {
+        for(branch in $scope.criteria[criterion]['branches']) {
+          csv_str += $scope.criteria[criterion]['name'] + ';';
+          csv_str += $scope.criteria[criterion]['branches'][branch]['function'] + ';';
+          csv_str += $scope.criteria[criterion]['branches'][branch]['condition'];
+
+          csv_str += '\n';
+        }
+      }
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'functions.csv';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-functions-check')).prop('checked') && angular.element(document.querySelector('#json-radio')).prop('checked')) {
+      var json_str = '';
+
+      for(criterion in $scope.criteria) {
+        for(branch in $scope.criteria[criterion]['branches']) {
+          var json_element = {};
+
+          json_element['criterion'] = $scope.criteria[criterion]['name'];
+
+          json_element['function'] = $scope.criteria[criterion]['branches'][branch]['function'];
+
+          json_element['condition'] = $scope.criteria[criterion]['branches'][branch]['condition'];
+
+          json_str += JSON.stringify(json_element) + '\n';
+        }
+      }
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/json;charset=utf-8,' + encodeURI(json_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'functions.json';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-actions-check')).prop('checked') && angular.element(document.querySelector('#csv-radio')).prop('checked')) {
+      var csv_str = '';
+
+      for(action in $scope.actions) {
+        for(field in $scope.actions[action])
+          if(field != 'id' && field != '$$hashKey')
+            csv_str += field + ';';
+
+        csv_str = csv_str.substring(0, csv_str.length - 1);
+        csv_str += '\n';
+        break;
+      }
+
+      for(action in $scope.actions) {
+        for(field in $scope.actions[action])
+          if(field != 'id' && field != '$$hashKey')
+            csv_str += $scope.actions[action][field] + ';';
+
+        csv_str = csv_str.substring(0, csv_str.length - 1);
+        csv_str += '\n';
+      }
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'actions.csv';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-actions-check')).prop('checked') && angular.element(document.querySelector('#json-radio')).prop('checked')) {
+      var json_str = '';
+
+      for(action in $scope.actions) {
+        var json_element = {};
+
+        for(field in $scope.actions[action]) {
+          if(field != 'id' && field != '$$hashKey')
+            json_element[field] = $scope.actions[action][field];
+        }
+
+        json_str += JSON.stringify(json_element) + '\n';
+      }
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/json;charset=utf-8,' + encodeURI(json_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'actions.json';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-categories-check')).prop('checked') && angular.element(document.querySelector('#csv-radio')).prop('checked')) {
+      var csv_str = '';
+
+      for(category in $scope.categories) {
+        for(field in $scope.categories[category])
+          if(field != 'id' && field != '$$hashKey' && field != 'reference_actions')
+            csv_str += field + ';';
+
+        csv_str = csv_str.substring(0, csv_str.length - 1);
+        csv_str += '\n';
+        break;
+      }
+
+      for(category in $scope.categories) {
+        for(field in $scope.categories[category])
+          if(field != 'id' && field != '$$hashKey' && field != 'reference_actions')
+            csv_str += $scope.categories[category][field] + ';';
+
+        csv_str = csv_str.substring(0, csv_str.length - 1);
+        csv_str += '\n';
+      }
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'categories.csv';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-categories-check')).prop('checked') && angular.element(document.querySelector('#json-radio')).prop('checked')) {
+      var json_str = '';
+
+      for(category in $scope.categories) {
+        var json_element = {};
+
+        for(field in $scope.categories[category]) {
+          if(field != 'id' && field != '$$hashKey' && field != 'reference_actions')
+            json_element[field] = $scope.categories[category][field];
+        }
+
+        json_str += JSON.stringify(json_element) + '\n';
+      }
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/json;charset=utf-8,' + encodeURI(json_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'categories.json';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-reference-actions-check')).prop('checked') && angular.element(document.querySelector('#csv-radio')).prop('checked')) {
+      var csv_str = 'category;';
+
+      for(category in $scope.categories) {
+        for(ref in $scope.categories[category]['reference_actions']) {
+          for(field in $scope.categories[category]['reference_actions'][ref]) {
+            if(field != 'id' && field != '$$hashKey' && field != 'name')
+              csv_str += field + ';';
+          }
+          csv_str = csv_str.substring(0, csv_str.length - 1);
+          csv_str += '\n';
+          break;
+        }
+        break;
+      }
+
+      for(category in $scope.categories) {
+        for(ref in $scope.categories[category]['reference_actions']) {
+          csv_str += $scope.categories[category]['name'] + ';';
+          for(field in $scope.categories[category]['reference_actions'][ref])
+            if(field != 'id' && field != '$$hashKey' && field != 'name')
+              csv_str += $scope.categories[category]['reference_actions'][ref][field] + ';';
+
+          csv_str = csv_str.substring(0, csv_str.length - 1);
+          csv_str += '\n';
+        }
+      }
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'reference_actions.csv';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-reference-actions-check')).prop('checked') && angular.element(document.querySelector('#json-radio')).prop('checked')) {
+      var json_str = '';
+
+      for(category in $scope.categories) {
+        var json_element = {};
+        for(ref in $scope.categories[category]['reference_actions']) {
+          json_element['category'] = $scope.categories[category]['name'];
+          for(field in $scope.categories[category]['reference_actions'][ref]) {
+            if(field != 'id' && field != '$$hashKey' && field != 'name')
+              json_element[field] = $scope.categories[category]['reference_actions'][ref][field];
+          }
+
+          json_str += JSON.stringify(json_element) + '\n';
+        }
+      }
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/json;charset=utf-8,' + encodeURI(json_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'reference_actions.json';
+      hidden_element.click();
+    }
+  }
+
   requestLogIn();
   rewriteLastUpdate();
 });

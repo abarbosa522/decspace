@@ -124,9 +124,9 @@ app.controller('SortMethodController', function($scope, $http, $window) {
             $scope.draggableObjects = response[proj]['sorted_objects'];
           else {
             $scope.draggableObjects = [
-              {name : 'Object 1'},
-              {name : 'Object 2'},
-              {name : 'Object 3'}
+              {'name' : 'Object 1'},
+              {'name' : 'Object 2'},
+              {'name' : 'Object 3'}
             ];
           }
         }
@@ -291,10 +291,110 @@ app.controller('SortMethodController', function($scope, $http, $window) {
 
   $scope.resetData = function() {
     $scope.draggableObjects = [
-      {name : 'Object 1'},
-      {name : 'Object 2'},
-      {name : 'Object 3'}
+      {'name' : 'Object 1'},
+      {'name' : 'Object 2'},
+      {'name' : 'Object 3'}
     ];
+  }
+
+  $scope.importData = function() {
+    var file_input = document.getElementById("import-file");
+
+    var reader = new FileReader();
+
+    var data = [];
+
+    //called when readAsText is performed
+    reader.onload = (function(file) {
+      var file_extension = file.name.split('.').pop();
+
+      //imported file is a csv file
+      if(file_extension == 'csv') {
+        return function(e) {
+          var rows = e.target.result.split("\n");
+
+          var columns = rows[0].split(";");
+
+          //remove whitespaces and empty strings
+          for(column in columns)
+            if(columns[column].trim() == '')
+              columns.splice(column, 1);
+
+          for(var i = 1; i < rows.length; i++) {
+            var cells = rows[i].split(";");
+            var element = {};
+
+            for(var j = 0; j < columns.length; j++)
+              if(cells[j].trim() != '')
+                element[columns[j]] = cells[j];
+
+            if(!angular.equals(element, {}))
+              data.push(element);
+          }
+          $scope.$apply(function () {
+            $scope.draggableObjects = data;
+          });
+      };
+    }
+    //imported file is a json file
+    else if(file_extension == 'json') {
+      return function(e) {
+        var rows = e.target.result.split("\n");
+
+        var data = [];
+        for(row in rows)
+          data.push(JSON.parse(rows[row]));
+
+        $scope.$apply(function () {
+          $scope.draggableObjects = data;
+        });
+      }
+    }
+  })(file_input.files[0]);
+
+    //get the data from the file
+    reader.readAsText(file_input.files[0]);
+  }
+
+  $scope.exportData = function() {
+    if(angular.element(document.querySelector('#csv-radio')).prop('checked')) {
+      var csv_str = '';
+
+      for(drag in $scope.draggableObjects) {
+        for(field in $scope.draggableObjects[drag])
+          csv_str += field + ';';
+
+        csv_str = csv_str.substring(0, csv_str.length - 1);
+        csv_str += '\n';
+        break;
+      }
+
+      for(drag in $scope.draggableObjects) {
+        for(field in $scope.draggableObjects[drag])
+          csv_str += $scope.draggableObjects[drag][field] + ';';
+
+        csv_str = csv_str.substring(0, csv_str.length - 1);
+        csv_str += '\n';
+      }
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'data.csv';
+      hidden_element.click();
+    }
+    else if(angular.element(document.querySelector('#json-radio')).prop('checked')) {
+      var json_str = '';
+
+      for(drag in $scope.draggableObjects)
+        json_str += JSON.stringify($scope.draggableObjects[drag]) + '\n';
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/json;charset=utf-8,' + encodeURI(json_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'data.json';
+      hidden_element.click();
+    }
   }
 
   requestLogIn();

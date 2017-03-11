@@ -78,7 +78,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
         project_id++;
 
         //create the new project
-        var proj_text = '{"project_id":"' + project_id + '","username":"' + $scope.username + '","name":"' + $scope.project.name + '","method":"' + $scope.project.method + '","creation_date":"' + creation_date + '","last_update":"' + creation_date + '","executions":[]}';
+        var proj_text = '{"project_id":' + project_id + ',"username":"' + $scope.username + '","name":"' + $scope.project.name + '","method":"' + $scope.project.method + '","creation_date":"' + creation_date + '","last_update":"' + creation_date + '","executions":[]}';
 
         //transform to json
         var proj_obj = JSON.parse(proj_text);
