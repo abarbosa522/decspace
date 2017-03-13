@@ -33,6 +33,8 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
   $scope.categories_eye = 1;
   $scope.reference_actions_eye = 1;
 
+  $scope.showResetData = false;
+
   function requestLogIn() {
     $http.get('/requestlogin').success(function(res) {
       if(typeof res.user == 'undefined')
@@ -502,10 +504,18 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
     $http.get('/projects').success(function(response) {
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          $scope.criteria = response[proj]['criteria'];
-          $scope.interaction_effects = response[proj]['interaction_effects'];
-          $scope.actions = response[proj]['actions'];
-          $scope.categories = response[proj]['categories'];
+          if(response[proj]['criteria'] != undefined)
+            $scope.criteria = response[proj]['criteria'];
+
+          if(response[proj]['interaction_effects'] != undefined)
+            $scope.interaction_effects = response[proj]['interaction_effects'];
+
+          if(response[proj]['actions'] != undefined)
+            $scope.actions = response[proj]['actions'];
+
+          if(response[proj]['categories'] != undefined)
+            $scope.categories = response[proj]['categories'];
+
           break;
         }
       }
@@ -513,10 +523,19 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
   }
 
   $scope.resetData = function() {
+    $scope.showResetData = true;
+  }
+
+  $scope.confirmResetData = function() {
     $scope.criteria = [];
     $scope.interaction_effects = [];
     $scope.actions = [];
     $scope.categories = [];
+    $scope.showResetData = false;
+  }
+
+  $scope.cancelResetData = function() {
+    $scope.showResetData = false;
   }
 
   $scope.importData = function() {
@@ -617,10 +636,13 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
         for(item in data) {
           for(criterion in $scope.criteria) {
             if(data[item]['criterion'] == $scope.criteria[criterion]['name']) {
+              if($scope.criteria[criterion]['scale'] == undefined) {
+                $scope.criteria[criterion]['scale'] = {};
+              }
               if(data[item]['type'] == 'Numerical') {
-                $scope.criteria[criterion]['scale']['type'] = data[item]['type'];
-                $scope.criteria[criterion]['scale']['min'] = Number(data[item]['min']);
-                $scope.criteria[criterion]['scale']['max'] = Number(data[item]['max']);
+                  $scope.criteria[criterion]['scale']['type'] = data[item]['type'];
+                  $scope.criteria[criterion]['scale']['min'] = Number(data[item]['min']);
+                  $scope.criteria[criterion]['scale']['max'] = Number(data[item]['max']);
               }
               else if(data[item]['type'] == 'Categorical') {
                 $scope.criteria[criterion]['scale']['type'] = data[item]['type'];

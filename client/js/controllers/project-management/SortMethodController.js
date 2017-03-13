@@ -8,6 +8,8 @@ app.controller('SortMethodController', function($scope, $http, $window) {
 
   $scope.deleteIdExecution = '';
 
+  $scope.showResetData = false;
+
   function requestLogIn() {
     $http.get('/requestlogin').success(function(res) {
 
@@ -282,7 +284,8 @@ app.controller('SortMethodController', function($scope, $http, $window) {
     $http.get('/projects').success(function(response) {
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          $scope.draggableObjects = response[proj]['sorted_objects'];
+          if(response[proj]['sorted_objects'] != undefined)
+            $scope.draggableObjects = response[proj]['sorted_objects'];
           break;
         }
       }
@@ -290,11 +293,21 @@ app.controller('SortMethodController', function($scope, $http, $window) {
   }
 
   $scope.resetData = function() {
+    $scope.showResetData = true;
+  }
+
+  $scope.confirmResetData = function() {
     $scope.draggableObjects = [
       {'name' : 'Object 1'},
       {'name' : 'Object 2'},
       {'name' : 'Object 3'}
     ];
+
+    $scope.showResetData = false;
+  }
+
+  $scope.cancelResetData = function() {
+    $scope.showResetData = false;
   }
 
   $scope.importData = function() {
@@ -313,19 +326,21 @@ app.controller('SortMethodController', function($scope, $http, $window) {
         return function(e) {
           var rows = e.target.result.split("\n");
 
+          for(row in rows)
+            rows[row] = rows[row].trim();
+
           var columns = rows[0].split(";");
 
           //remove whitespaces and empty strings
           for(column in columns)
-            if(columns[column].trim() == '')
-              columns.splice(column, 1);
+            columns[column] = columns[column].trim();
 
           for(var i = 1; i < rows.length; i++) {
             var cells = rows[i].split(";");
             var element = {};
 
-            for(var j = 0; j < columns.length; j++)
-              if(cells[j].trim() != '')
+            for(var j = 0; j < cells.length; j++)
+              if(cells[j].trim() != '' && columns[j].trim() != '')
                 element[columns[j]] = cells[j];
 
             if(!angular.equals(element, {}))
@@ -362,7 +377,8 @@ app.controller('SortMethodController', function($scope, $http, $window) {
 
       for(drag in $scope.draggableObjects) {
         for(field in $scope.draggableObjects[drag])
-          csv_str += field + ';';
+          if(field != '$$hashKey')
+            csv_str += field + ';';
 
         csv_str = csv_str.substring(0, csv_str.length - 1);
         csv_str += '\n';
@@ -371,7 +387,8 @@ app.controller('SortMethodController', function($scope, $http, $window) {
 
       for(drag in $scope.draggableObjects) {
         for(field in $scope.draggableObjects[drag])
-          csv_str += $scope.draggableObjects[drag][field] + ';';
+          if(field != '$$hashKey')
+            csv_str += $scope.draggableObjects[drag][field] + ';';
 
         csv_str = csv_str.substring(0, csv_str.length - 1);
         csv_str += '\n';
@@ -383,11 +400,18 @@ app.controller('SortMethodController', function($scope, $http, $window) {
       hidden_element.download = 'data.csv';
       hidden_element.click();
     }
-    else if(angular.element(document.querySelector('#json-radio')).prop('checked')) {
+    if(angular.element(document.querySelector('#json-radio')).prop('checked')) {
       var json_str = '';
 
-      for(drag in $scope.draggableObjects)
-        json_str += JSON.stringify($scope.draggableObjects[drag]) + '\n';
+      for(drag in $scope.draggableObjects) {
+        var json_element = {};
+
+        for(field in $scope.draggableObjects[drag])
+          if(field != '$$hashKey')
+            json_element[field] = $scope.draggableObjects[drag][field];
+
+        json_str += JSON.stringify(json_element) + '\n';
+      }
 
       var hidden_element = document.createElement('a');
       hidden_element.href = 'data:text/json;charset=utf-8,' + encodeURI(json_str);

@@ -1,0 +1,7 @@
+criterion;function;condition
+Age;0;abs(x-y)>100
+Name;1;x-y<50
+Height;5;x>7
+Age;2;x<68
+Name;5x;y<=30
+Height;6y+x;x+y>=9

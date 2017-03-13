@@ -1,0 +1,6 @@
+{"criterion":"Age","function":"0","condition":"abs(x-y)>100"}
+{"criterion":"Name","function":"1","condition":"x-y<50"}
+{"criterion":"Height","function":"5","condition":"x>7"}
+{"criterion":"Age","function":"2","condition":"x<68"}
+{"criterion":"Name","function":"5x","condition":"y>=30"}
+{"criterion":"Height","function":"6y+x","condition":"x+y>=9"}

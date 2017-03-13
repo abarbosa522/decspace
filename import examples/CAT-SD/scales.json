@@ -1,0 +1,3 @@
+{"criterion":"Age","type":"Numerical","min":10,"max":1001,"num_categories":"-"}
+{"criterion":"Height","type":"Numerical","min":25,"max":79,"num_categories":"-"}
+{"criterion":"Name","type":"Categorical","min":"-","max":"-","num_categories":5}

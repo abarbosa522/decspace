@@ -1,0 +1,4 @@
+criterion;type;min;max;num_categories
+Age;Numerical;10;1001;-
+Height;Numerical;25;79;-
+Name;Categorical;-;-;5
