@@ -249,9 +249,24 @@
 
                   <br>
 
-                  <button type = 'button' class = 'btn btn-default' ng-click = 'importData()' data-dismiss = 'modal'>
-                    Submit
-                  </button>
+                  <div class = 'row'>
+                    <div class = 'col-md-1'>
+                    </div>
+                    <button type = 'button' class = 'btn btn-default col-md-2' ng-click = 'selectAllImport()'>
+                      Select All
+                    </button>
+                    <button type = 'button' class = 'btn btn-default col-md-2' ng-click = 'selectNoneImport()'>
+                      Select None
+                    </button>
+                    <div class = 'col-md-4'>
+                    </div>
+                    <button type = 'button' class = 'btn btn-primary col-md-2' ng-click = 'importData()' data-dismiss = 'modal'>
+                      Submit
+                    </button>
+                    <div class = 'col-md-1'>
+                    </div>
+                  </div>
+
                   <p><sub>CSV and JSON formats are accepted.</sub></p>
 
                 </div>
@@ -344,9 +359,24 @@
                   </form>
 
                   <br>
-                  <button type = 'button' class = 'btn btn-default' ng-click = 'exportData()' data-dismiss = 'modal'>
-                    Submit
-                  </button>
+
+                  <div class = 'row'>
+                    <div class = 'col-md-1'>
+                    </div>
+                    <button type = 'button' class = 'btn btn-default col-md-2' ng-click = 'selectAllExport()'>
+                      Select All
+                    </button>
+                    <button type = 'button' class = 'btn btn-default col-md-2' ng-click = 'selectNoneExport()'>
+                      Select None
+                    </button>
+                    <div class = 'col-md-4'>
+                    </div>
+                    <button type = 'button' class = 'btn btn-primary col-md-2' ng-click = 'exportData()' data-dismiss = 'modal'>
+                      Submit
+                    </button>
+                    <div class = 'col-md-1'>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -373,13 +403,13 @@
                 <!-- Added Criteria  -->
                 <tr ng-repeat = 'criterion in criteria' ng-class = '{danger: criterion.id == deleteIdCriterion}'>
                   <td>
-                    <input class = 'form-control' type = 'text' value = '{{criterion.name}}'>
+                    <input class = 'form-control' type = 'text' ng-model = 'criterion.name'>
                   </td>
                   <td>
-                    <select>
-                      <option ng-selected = 'criterion.direction == ""' disabled>--- Please Select ---</option>
-                      <option ng-selected = 'criterion.direction == "Minimize"'>Minimize</option>
-                      <option ng-selected = 'criterion.direction == "Maximize"'>Maximize</option>
+                    <select ng-model = 'criterion.direction'>
+                      <option disabled>--- Please Select ---</option>
+                      <option>Minimize</option>
+                      <option>Maximize</option>
                     </select>
                   </td>
                   <td ng-if = 'criterion.id != deleteIdCriterion'>
@@ -440,23 +470,23 @@
                 <!-- Added Interaction Effects -->
                 <tr ng-repeat = 'interaction in interaction_effects' ng-class = '{danger: interaction.id == deleteIdInteractionEffect}'>
                   <td>
-                    <select>
-                      <option ng-selected = 'interaction.type == ""' disabled>--- Please Select ---</option>
-                      <option ng-selected = 'interaction.type == "Mutual-Strengthening Effect"'>Mutual-Strengthening Effect</option>
-                      <option ng-selected = 'interaction.type == "Mutual-Weakening Effect"'>Mutual-Weakening Effect</option>
-                      <option ng-selected = 'interaction.type == "Antagonistic Effect"'>Antagonistic Effect</option>
+                    <select ng-model = 'interaction.type'>
+                      <option disabled>--- Please Select ---</option>
+                      <option>Mutual-Strengthening Effect</option>
+                      <option>Mutual-Weakening Effect</option>
+                      <option>Antagonistic Effect</option>
                     </select>
                   </td>
                   <td>
-                    <select>
-                      <option ng-selected = 'interaction.criterion1 == ""' disabled>--- Please Select ---</option>
-                      <option ng-repeat = 'criterion in criteria' ng-selected = 'interaction.criterion1 == "{{criterion.name}}"'>{{criterion.name}}</option>
+                    <select ng-model = 'interaction.criterion1'>
+                      <option disabled>--- Please Select ---</option>
+                      <option ng-repeat = 'criterion in criteria'>{{criterion.name}}</option>
                     </select>
                   </td>
                   <td>
-                    <select>
-                      <option ng-selected = 'interaction.criterion2 == ""' disabled>--- Please Select ---</option>
-                      <option ng-repeat = 'criterion in criteria' ng-selected = 'interaction.criterion2 == "{{criterion.name}}"'>{{criterion.name}}</option>
+                    <select ng-model = 'interaction.criterion2'>
+                      <option disabled>--- Please Select ---</option>
+                      <option ng-repeat = 'criterion in criteria'>{{criterion.name}}</option>
                     </select>
                   </td>
                   <td>

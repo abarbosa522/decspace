@@ -1076,6 +1076,46 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
     }
   }
 
+  $scope.selectAllImport = function() {
+    document.getElementById('import-criteria-check').checked = true;
+    document.getElementById('import-interaction-effects-check').checked = true;
+    document.getElementById('import-scales-check').checked = true;
+    document.getElementById('import-functions-check').checked = true;
+    document.getElementById('import-actions-check').checked = true;
+    document.getElementById('import-categories-check').checked = true;
+    document.getElementById('import-reference-actions-check').checked = true;
+  }
+
+  $scope.selectNoneImport = function() {
+    document.getElementById('import-criteria-check').checked = false;
+    document.getElementById('import-interaction-effects-check').checked = false;
+    document.getElementById('import-scales-check').checked = false;
+    document.getElementById('import-functions-check').checked = false;
+    document.getElementById('import-actions-check').checked = false;
+    document.getElementById('import-categories-check').checked = false;
+    document.getElementById('import-reference-actions-check').checked = false;
+  }
+
+  $scope.selectAllExport = function() {
+    document.getElementById('export-criteria-check').checked = true;
+    document.getElementById('export-interaction-effects-check').checked = true;
+    document.getElementById('export-scales-check').checked = true;
+    document.getElementById('export-functions-check').checked = true;
+    document.getElementById('export-actions-check').checked = true;
+    document.getElementById('export-categories-check').checked = true;
+    document.getElementById('export-reference-actions-check').checked = true;
+  }
+
+  $scope.selectNoneExport = function() {
+    document.getElementById('export-criteria-check').checked = false;
+    document.getElementById('export-interaction-effects-check').checked = false;
+    document.getElementById('export-scales-check').checked = false;
+    document.getElementById('export-functions-check').checked = false;
+    document.getElementById('export-actions-check').checked = false;
+    document.getElementById('export-categories-check').checked = false;
+    document.getElementById('export-reference-actions-check').checked = false;
+  }
+
   requestLogIn();
   rewriteLastUpdate();
 });

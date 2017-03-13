@@ -29,7 +29,7 @@ app.service('CATSDService', function($http, $q) {
     for(category in categories) {
       assignedActions[categories[category]['name']] = [];
     }
-    assignedActions['Cq+1'] = [];
+    assignedActions['Not Assigned'] = [];
 
     //invert the values of criteria to minimize
     minimizeCriteria();
@@ -178,7 +178,9 @@ app.service('CATSDService', function($http, $q) {
       //console.log(action['name']);
       var s1 = sj(mutualSet[pair]['criterion1'], action['name'], reference_action['name']);
       var s2 = sj(mutualSet[pair]['criterion2'], action['name'], reference_action['name']);
-      kij += z(s1, s2) * mutualSet[pair]['value'];
+
+      if(z(s1, s2) > 0)
+        kij += z(s1, s2) * mutualSet[pair]['value'];
     }
 
     var kih = 0;
@@ -187,10 +189,16 @@ app.service('CATSDService', function($http, $q) {
       var s3 = sj(antagonisticSet[pair2]['criterion1'], action['name'], reference_action['name']);
       //console.log('s3: ' + s3);
       var s4 = sj(antagonisticSet[pair2]['criterion2'], reference_action['name'], action['name']);
-      /*console.log('s4: ' + s4);
-      console.log('k: ' + antagonisticSet[pair2]['value'])
+      //console.log('s4: ' + s4);
+      /*console.log('k: ' + antagonisticSet[pair2]['value'])
       console.log(action[antagonisticSet[pair2]['criterion2']]  > reference_action[antagonisticSet[pair2]['criterion2']])*/
-      kih += z(s3, s4) * antagonisticSet[pair2]['value'];
+      //console.log(s3*s4);
+      //console.log(z(s3, s4) * antagonisticSet[pair2]['value'])
+
+      if(reference_action[antagonisticSet[pair2]['criterion1']] > action[antagonisticSet[pair2]['criterion1']] && z(s3, s4) > 0) {
+        //console.log(s3 * s4 * antagonisticSet[pair2]['value']);
+        kih += z(s3, s4) * antagonisticSet[pair2]['value'];
+      }
     }
 
     /*console.log(action['name'] + ' ' + reference_action['name']);
@@ -211,18 +219,22 @@ app.service('CATSDService', function($http, $q) {
     for(pair in mutualSet) {
       var s1 = sj(mutualSet[pair]['criterion1'], action['name'], reference_action['name']);
       var s2 = sj(mutualSet[pair]['criterion2'], action['name'], reference_action['name']);
-      /*console.log('s1 and s2');
-      console.log(s1);
-      console.log(s2);
-      console.log(mutualSet[pair]['value'])*/
-      result += z(s1, s2) * mutualSet[pair]['value'];
+      /*console.log('s1 and s2');*/
+      /*console.log('s1: ' + s1);
+      console.log('s2: ' + s2);*/
+      /*console.log(mutualSet[pair]['value'])*/
+      if(z(s1, s2) > 0)
+        result += z(s1, s2) * mutualSet[pair]['value'];
       //console.log(s1 * s2 * mutualSet[pair]['value']);
     }
 
     for(pair2 in antagonisticSet) {
       var s3 = sj(antagonisticSet[pair2]['criterion1'], action['name'], reference_action['name']);
       var s4 = sj(antagonisticSet[pair2]['criterion2'], reference_action['name'], action['name']);
-      result += z(s3, s4) * mutualSet[pair]['value'];
+
+      //console.log(s3*s4);
+      if(reference_action[antagonisticSet[pair2]['criterion1']] > action[antagonisticSet[pair2]['criterion1']] && z(s3, s4) > 0)
+        result += z(s3, s4) * mutualSet[pair]['value'];
     }
 
     var res2 = result/k(action, reference_action, category);
@@ -263,21 +275,22 @@ app.service('CATSDService', function($http, $q) {
 
   //a multiplicative comprehensive similarity function
   function delta(action, reference_action, category) {
-    /*console.log(action['name'] + ' ' + reference_action['name'] + ' ' + category['name']);
-    console.log(s(action, reference_action, category));*/
-    return s(action, reference_action, category) * (1 - dPlus(action, reference_action)) * (1 - dMinus(action, reference_action));
+    console.log(action['name'] + ' ' + reference_action['name'] + ' ' + category['name']);
+    //console.log(s(action, reference_action, category));
+    console.log(s(action, reference_action, category));
+    console.log(dPlus(action, reference_action));
+    console.log(dMinus(action, reference_action));
+    return s(action, reference_action, category) * (1 + dPlus(action, reference_action)) * (1 + dMinus(action, reference_action));
   }
 
   function deltaMax(action, category) {
-    var result;
+    var result = 0;
+
     for(reference_action in category['reference_actions']) {
       var res = delta(action, category['reference_actions'][reference_action], category);
-      /*console.log(action['name'] + ' ' + category['reference_actions'][reference_action]['name']);
-      console.log(res);*/
-      if(Number(reference_action) == 0) {
-        result = res;
-      }
-      else if(res > result) {
+      console.log(action['name'] + ' ' + category['reference_actions'][reference_action]['name']);
+      console.log(res);
+      if(res > result) {
         result = res;
       }
     }
@@ -299,7 +312,7 @@ app.service('CATSDService', function($http, $q) {
       }
 
       if(k_set.length == 0) {
-        assignedActions['Cq+1'].push(actions[action]['name']);
+        assignedActions['Not Assigned'].push(actions[action]['name']);
       }
       else {
         for(cat in k_set) {
