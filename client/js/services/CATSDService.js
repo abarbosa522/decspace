@@ -128,16 +128,12 @@ app.service('CATSDService', function($http, $q) {
     for(item in similarityValues) {
       if(similarityValues[item]['criterion'] == criterion && similarityValues[item]['action'] == action && similarityValues[item]['reference_action'] == reference_action) {
         result = similarityValues[item]['result'];
-        //console.log('here');
         break;
       }
     }
 
     if(result < 0)
       result = 0;
-
-    /*console.log(criterion, action, reference_action);
-    console.log(result);*/
 
     return result;
   }
@@ -152,8 +148,7 @@ app.service('CATSDService', function($http, $q) {
         break;
       }
     }
-    /*console.log(criterion, action, reference_action);
-    console.log(result);*/
+
     if(result > 0)
       result = 0;
 
@@ -175,7 +170,6 @@ app.service('CATSDService', function($http, $q) {
 
     var kij = 0;
     for(pair in mutualSet) {
-      //console.log(action['name']);
       var s1 = sj(mutualSet[pair]['criterion1'], action['name'], reference_action['name']);
       var s2 = sj(mutualSet[pair]['criterion2'], action['name'], reference_action['name']);
 
@@ -185,26 +179,13 @@ app.service('CATSDService', function($http, $q) {
 
     var kih = 0;
     for(pair2 in antagonisticSet) {
-      //console.log(antagonisticSet[pair2]['criterion2']);
       var s3 = sj(antagonisticSet[pair2]['criterion1'], action['name'], reference_action['name']);
-      //console.log('s3: ' + s3);
       var s4 = sj(antagonisticSet[pair2]['criterion2'], reference_action['name'], action['name']);
-      //console.log('s4: ' + s4);
-      /*console.log('k: ' + antagonisticSet[pair2]['value'])
-      console.log(action[antagonisticSet[pair2]['criterion2']]  > reference_action[antagonisticSet[pair2]['criterion2']])*/
-      //console.log(s3*s4);
-      //console.log(z(s3, s4) * antagonisticSet[pair2]['value'])
 
       if(reference_action[antagonisticSet[pair2]['criterion1']] > action[antagonisticSet[pair2]['criterion1']] && z(s3, s4) > 0) {
-        //console.log(s3 * s4 * antagonisticSet[pair2]['value']);
         kih += z(s3, s4) * antagonisticSet[pair2]['value'];
       }
     }
-
-    /*console.log(action['name'] + ' ' + reference_action['name']);
-    console.log(result);*/
-    /*console.log(action['name'], reference_action['name']);
-    console.log('kj: ' + kj + ', kij: ' + kij + ', kih: ' + kih);*/
 
     return kj + kij + kih;
   }
@@ -219,28 +200,21 @@ app.service('CATSDService', function($http, $q) {
     for(pair in mutualSet) {
       var s1 = sj(mutualSet[pair]['criterion1'], action['name'], reference_action['name']);
       var s2 = sj(mutualSet[pair]['criterion2'], action['name'], reference_action['name']);
-      /*console.log('s1 and s2');*/
-      /*console.log('s1: ' + s1);
-      console.log('s2: ' + s2);*/
-      /*console.log(mutualSet[pair]['value'])*/
+
       if(z(s1, s2) > 0)
         result += z(s1, s2) * mutualSet[pair]['value'];
-      //console.log(s1 * s2 * mutualSet[pair]['value']);
     }
 
     for(pair2 in antagonisticSet) {
       var s3 = sj(antagonisticSet[pair2]['criterion1'], action['name'], reference_action['name']);
       var s4 = sj(antagonisticSet[pair2]['criterion2'], reference_action['name'], action['name']);
 
-      //console.log(s3*s4);
       if(reference_action[antagonisticSet[pair2]['criterion1']] > action[antagonisticSet[pair2]['criterion1']] && z(s3, s4) > 0)
         result += z(s3, s4) * mutualSet[pair]['value'];
     }
 
     var res2 = result/k(action, reference_action, category);
-    /*console.log(action['name']);
-    console.log(reference_action['name']);
-    console.log(res2);*/
+
     return res2;
   }
 
@@ -250,14 +224,9 @@ app.service('CATSDService', function($http, $q) {
     for(criterion in criteria) {
       if(action[criteria[criterion]['name']] > reference_action[criteria[criterion]['name']]) {
         result *= (1 + dj(criteria[criterion]['name'], action['name'], reference_action['name']));
-        //console.log(action['name'] + ' ' + reference_action['name'] + ' ' + criteria[criterion]['name']);
-        //console.log(action[criteria[criterion]['name']], reference_action[criteria[criterion]['name']]);
-
-        //console.log(dj(criteria[criterion]['name'], action['name'], reference_action['name']));
       }
     }
-    /*console.log(action['name'] + ' ' + reference_action['name']);
-    console.log(result - 1);*/
+
     return result - 1;
   }
 
@@ -268,18 +237,12 @@ app.service('CATSDService', function($http, $q) {
         result *= (1 + dj(criteria[criterion]['name'], action['name'], reference_action['name']));
       }
     }
-    /*console.log(action['name'] + ' ' + reference_action['name']);
-    console.log(result - 1);*/
+
     return result - 1;
   }
 
   //a multiplicative comprehensive similarity function
   function delta(action, reference_action, category) {
-    console.log(action['name'] + ' ' + reference_action['name'] + ' ' + category['name']);
-    //console.log(s(action, reference_action, category));
-    console.log(s(action, reference_action, category));
-    console.log(dPlus(action, reference_action));
-    console.log(dMinus(action, reference_action));
     return s(action, reference_action, category) * (1 + dPlus(action, reference_action)) * (1 + dMinus(action, reference_action));
   }
 
@@ -288,8 +251,7 @@ app.service('CATSDService', function($http, $q) {
 
     for(reference_action in category['reference_actions']) {
       var res = delta(action, category['reference_actions'][reference_action], category);
-      console.log(action['name'] + ' ' + category['reference_actions'][reference_action]['name']);
-      console.log(res);
+
       if(res > result) {
         result = res;
       }
@@ -305,8 +267,7 @@ app.service('CATSDService', function($http, $q) {
       //compare action with set B of category
       for(category in categories) {
         var result = deltaMax(actions[action], categories[category]);
-        /*console.log(actions[action]['name'] + ' ' + categories[category]['name']);
-        console.log(result);*/
+
         if(result >= categories[category]['membership_degree'])
           k_set.push(categories[category]['name']);
       }
