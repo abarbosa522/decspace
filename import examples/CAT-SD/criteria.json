@@ -1,3 +1,6 @@
-{"name":"Age","direction":"Maximize"}
-{"name":"Height","direction":"Minimize"}
-{"name":"Name","direction":"Maximize"}
+{"name":"Physical Fitness","direction":"Minimize"}
+{"name":"Mental Sharpness","direction":"Maximize"}
+{"name":"Mental Resilience","direction":"Maximize"}
+{"name":"Intelligence","direction":"Maximize"}
+{"name":"Teamwork Skills","direction":"Maximize"}
+{"name":"Motivation","direction":"Maximize"}

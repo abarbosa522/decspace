@@ -1,4 +1,7 @@
 criterion;type;min;max;num_categories
-Age;Numerical;10;1001;-
-Height;Numerical;25;79;-
-Name;Categorical;-;-;5
+Physical Fitness;Numerical;370;1281;-
+Mental Sharpness;Numerical;35;99;-
+Mental Resilience;Categorical;-;-;4
+Intelligence;Categorical;-;-;7
+Teamwork Skills;Categorical;-;-;7
+Motivation;Categorical;-;-;7

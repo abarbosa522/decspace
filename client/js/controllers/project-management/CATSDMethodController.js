@@ -1024,7 +1024,7 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
       for(category in $scope.categories) {
         for(ref in $scope.categories[category]['reference_actions']) {
           for(field in $scope.categories[category]['reference_actions'][ref]) {
-            if(field != 'id' && field != '$$hashKey' && field != 'name')
+            if(field != 'id' && field != '$$hashKey' && field != 'name' && field != 'category')
               csv_str += field + ';';
           }
           csv_str = csv_str.substring(0, csv_str.length - 1);
@@ -1038,7 +1038,7 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
         for(ref in $scope.categories[category]['reference_actions']) {
           csv_str += $scope.categories[category]['name'] + ';';
           for(field in $scope.categories[category]['reference_actions'][ref])
-            if(field != 'id' && field != '$$hashKey' && field != 'name')
+            if(field != 'id' && field != '$$hashKey' && field != 'name' && field != 'category')
               csv_str += $scope.categories[category]['reference_actions'][ref][field] + ';';
 
           csv_str = csv_str.substring(0, csv_str.length - 1);

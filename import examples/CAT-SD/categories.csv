@@ -1,3 +1,5 @@
-name;membership_degree;Age;Height;Name
-Technicians;0.3;6;5;4
-Musicians;0.76;45;56;67
+name;membership_degree;Physical Fitness;Mental Sharpness;Mental Resilience;Intelligence;Teamwork Skills;Motivation
+Snipers;0.75;10;15;20;20;5;15
+Breachers;0.60;25;15;20;5;10;5
+Communications Operators;0.65;10;20;15;20;15;10
+Heavy Weapons Operators;0.60;25;5;15;5;20;10

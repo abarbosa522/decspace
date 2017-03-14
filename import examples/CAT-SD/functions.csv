@@ -1,7 +1,21 @@
 criterion;function;condition
-Age;0;abs(x-y)>100
-Name;1;x-y<50
-Height;5;x>7
-Age;2;x<68
-Name;5x;y<=30
-Height;6y+x;x+y>=9
+Physical Fitness;1;abs(x-y)<=50
+Physical Fitness;(100-abs(x-y))/50;50<abs(x-y) and abs(x-y)<=100
+Physical Fitness;0;100<abs(x-y) and abs(x-y)<=150
+Physical Fitness;(150-abs(x-y))/50;150<abs(x-y) and abs(x-y)<=200
+Physical Fitness;-1;abs(x-y)>200
+Mental Sharpness;1;abs(x-y)<=5
+Mental Sharpness;(10-abs(x-y))/5;5<abs(x-y) and abs(x-y)<=10
+Mental Sharpness;0;(y-20<x and x<=y-10) or (y+10<x and x<=y+15)
+Mental Sharpness;(-(x-y)+15)/5;y+15<x and x<=y+20
+Mental Resilience;1;x=y
+Mental Resilience;-1;abs(x-y)>=1
+Intelligence;1;x=y
+Intelligence;0;abs(x-y)=1
+Intelligence;-1;abs(x-y)>=2
+Teamwork Skills;1;x=y
+Teamwork Skills;0;abs(x-y)=1
+Teamwork Skills;-1;abs(x-y)>=2
+Motivation;1;x=y
+Motivation;0;abs(x-y)=1
+Motivation;-1;abs(x-y)>=2

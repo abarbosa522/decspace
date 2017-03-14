@@ -1,4 +1,8 @@
-name;Age;Height;Name
-action 1;1;2;3
-2 action;22;44;66
-third action;3;33;333
+name;Physical Fitness;Mental Sharpness;Mental Resilience;Intelligence;Teamwork Skills;Motivation
+a1;740;74;4;7;4;6
+a2;950;82;2;4;4;4
+a3;720;58;3;5;5;5
+a4;920;78;2;5;5;5
+a5;850;66;3;5;6;5
+a6;1100;70;4;5;5;6
+a7;710;73;3;6;5;6

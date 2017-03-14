@@ -1,2 +1,3 @@
-{"type":"Mutual-Strengthening Effect","criterion1":"Age","criterion2":"Height","value":30}
-{"type":"Antagonistic Effect","criterion1":"Name","criterion2":"Age","value":-4}
+{"type":"Mutual-Strengthening Effect","criterion1":"Mental Sharpness","criterion2":"Mental Resilience","value":10}
+{"type":"Mutual-Weakening Effect","criterion1":"Physical Fitness","criterion2":"Teamwork Skills","value":-4}
+{"type":"Antagonistic Effect","criterion1":"Physical Fitness","criterion2":"Intelligence","value":-3}

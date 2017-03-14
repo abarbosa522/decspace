@@ -1,4 +1,7 @@
 name;direction
-Age;Maximize
-Height;Minimize
-Name;Maximize
+Physical Fitness;Minimize
+Mental Sharpness;Maximize
+Mental Resilience;Maximize
+Intelligence;Maximize
+Teamwork Skills;Maximize
+Motivation;Maximize

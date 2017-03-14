@@ -1,3 +1,4 @@
 type;criterion1;criterion2;value
-Mutual-Strengthening Effect;Age;Height;30
-Antagonistic Effect;Name;Age;-4
+Mutual-Strengthening Effect;Mental Sharpness;Mental Resilience;10
+Mutual-Weakening Effect;Physical Fitness;Teamwork Skills;-4
+Antagonistic Effect;Physical Fitness;Intelligence;-3
