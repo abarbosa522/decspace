@@ -139,3 +139,12 @@ nav > div > ul > li {
 .icon-large {
   font-size: 16px;
 }
+
+/*Execution Modal*/
+#execution-modal .modal-dialog {
+  width: 95%;
+}
+
+.break_words {
+  word-break: break-all;
+}

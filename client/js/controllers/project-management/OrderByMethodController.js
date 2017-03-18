@@ -17,8 +17,18 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
   $scope.criteria_eye = 1;
   $scope.actions_eye = 1;
 
+  //eye icons variables - executions
+  $scope.criteria_exec_eye = 1;
+  $scope.actions_exec_eye = 1;
+  $scope.results_exec_eye = 1;
+
+  $scope.currentExecution = '';
+  $scope.compareExecution = '';
+
   //order that data should be retrieved from db
   var currentOrderCriteria = ['', ''], currentOrderActions = ['', ''];
+
+  $scope.isLoading = false;
 
   function requestLogIn() {
     $http.get('/requestlogin').success(function(res) {
@@ -70,6 +80,9 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
           break;
         }
       }
+
+      console.log(id_doc);
+      console.log(proj_res);
 
       //delete the previous document with the list of projects
       $http.delete('/projects/' + id_doc).success(function(){
@@ -292,6 +305,9 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
       $scope.showNoActionsError = false;
       $scope.showOrderError = false;
 
+      //show loading button
+      $scope.isLoading = true;
+
       var results = OrderByService.getResults($scope.criteria, $scope.actions);
 
       $http.get('/projects').success(function(response) {
@@ -337,6 +353,8 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
             //reset the comment input field, if it was filled
             if(typeof $scope.new_execution != 'undefined')
               $scope.new_execution.comment = '';
+
+            $scope.isLoading = false;
           });
         });
       });
@@ -687,6 +705,15 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
     document.getElementById('export-actions-check').checked = false;
   }
 
+  $scope.showExecution = function(execution) {
+    $scope.currentExecution = execution;
+    $scope.compareExecution = '';
+  }
+
+  $scope.showCompareExecution = function(execution) {
+    $scope.compareExecution = execution;
+  }
+  
   requestLogIn();
   rewriteLastUpdate();
 });

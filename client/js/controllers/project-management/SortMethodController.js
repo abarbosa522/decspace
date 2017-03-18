@@ -421,6 +421,18 @@ app.controller('SortMethodController', function($scope, $http, $window) {
     }
   }
 
+  $scope.currentExecution = '';
+  $scope.compareExecution = '';
+
+  $scope.showExecution = function(execution) {
+    $scope.currentExecution = execution;
+    $scope.compareExecution = '';
+  }
+
+  $scope.showCompareExecution = function(execution) {
+    $scope.compareExecution = execution;
+  }
+
   requestLogIn();
   rewriteLastUpdate();
 });

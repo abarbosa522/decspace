@@ -219,96 +219,150 @@
 
           <br>
 
-          <p class = 'header-2'>New Execution</p>
+          <table class = 'table table-bordered table-hover table-striped'>
+            <thead>
+              <th class = 'text-center'>#</th>
+              <th class = 'text-center'>Date</th>
+              <th class = 'text-center'>Comment</th>
+              <th class = 'col-md-2'></th>
+            </thead>
+            <tbody>
+              <!-- Previous Executions -->
+              <tr ng-repeat = 'execution in executions' ng-class = '{"danger":  execution.execution_id == deleteIdExecution || deleteIdExecution == "all"}'>
+                <td>{{execution.execution_id}}</td>
+                <td>{{execution.execution_date}}</td>
+                <td>{{execution.comment}}</td>
+                <td ng-if = 'deleteIdExecution != execution.execution_id'>
+                  <button type = 'button' class = 'btn btn-primary' ng-click = 'showExecution(execution)' title = 'Show Execution Details' data-toggle = 'modal' data-target = '#execution-modal'>
+                    <span class = 'glyphicon glyphicon-new-window'></span>
+                  </button>
+                  <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteExecution(execution)' title = 'Delete Execution'>
+                    <span class = 'glyphicon glyphicon-minus'></span>
+                  </button>
+                </td>
+                <td ng-if = 'deleteIdExecution == execution.execution_id'>
+                  <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAllExecutions()' title = 'Confirm Delete'>
+                    <span class = 'glyphicon glyphicon-ok'></span>
+                  </button>
+                  <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAllExecutions()' title = 'Cancel Delete'>
+                    <span class = 'glyphicon glyphicon-remove'></span>
+                  </button>
+                </td>
+              </tr>
 
-          <form class = 'form-inline'>
-            <input type = 'text' class = 'form-control' placeholder = 'Comment' ng-model = 'new_execution.comment'>
-            <button type = 'button' class = 'btn btn-default' ng-click = 'getResults()' ng-if = '!isLoading' title = 'Execute Method'>
-              <span class = 'glyphicon glyphicon-play'></span>
-            </button>
-            <button class = 'btn btn-default active' ng-if = 'isLoading' title = 'Working...'>
-              <span class = 'glyphicon glyphicon-refresh glyphicon-refresh-animate'></span>
-            </button>
-          </form>
+              <!-- Form to run new execution -->
+              <tr class = 'active'>
+                <td></td>
+                <td></td>
+                <td>
+                  <input type = 'text' class = 'form-control' placeholder = 'Comment' ng-model = 'new_execution.comment'>
+                </td>
+                <td>
+                  <button type = 'button' class = 'btn btn-success' ng-click = 'getResults()' ng-if = '!isLoading' title = 'Execute Method'>
+                    <span class = 'glyphicon glyphicon-plus'></span>
+                  </button>
+                  <button class = 'btn btn-default active' ng-if = 'isLoading' title = 'Working...'>
+                    <span class = 'glyphicon glyphicon-refresh glyphicon-refresh-animate'></span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
 
-          <br>
+          <div class = 'row'>
+            <div class = 'col-md-10'>
+            </div>
 
-          <!-- Errors with input data -->
+            <div class = 'col-md-2'>
+              <!-- Delete All Executions button -->
+              <div id = 'btn-delete-all-div' ng-if = 'deleteIdExecution != "all"'>
+                <button id = 'btn-delete-all' type = 'button' class = 'btn btn-danger' ng-click = 'deleteAllExecutions()'>
+                  Delete All Executions
+                </button>
+              </div>
 
-          <br>
-
-          <p class = 'header-2'>Past Executions</p>
-
-          <div class = 'row' ng-repeat = 'execution in executions'>
-
-            <div class = 'list-group col-md-10'>
-              <a href = '#list-{{execution.execution_id}}' class = 'list-group-item' data-toggle = 'collapse' ng-class = '{"list-group-item-danger":  execution.execution_id == deleteIdExecution || deleteIdExecution == "all"}'>
-                <p>{{execution.execution_date}}</p>
-              </a>
-              <div id = 'list-{{execution.execution_id}}' class = 'collapse'>
-                <a class = 'list-group-item'>
-                  <p class = 'header-2'>Order</p>
-
-                  <!-- Dragged Objects -->
-                  <div class = 'row text-center'>
-                    <ul class = 'draglist'>
-                      <li class = 'drop-obj' ng-repeat = 'obj in execution.results'>
-                        <div class = 'drag-obj'>
-                          {{obj.name}}
-                        </div>
-                        <p ng-if = '$index == 0'>Most Important</p>
-                        <p ng-if = '$index == draggableObjects.length - 1'>Least Important</p>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <br><br>
-
-                  <div ng-if = 'execution.comment != ""'>
-                    <p class = 'header-2'>Comment</p>
-                    <p>{{execution.comment}}</p>
-                  </div>
-                </a>
+              <!-- Confirm and Cancel Delete All Executions buttons -->
+              <div id = 'delete-all-btn-group' ng-if = 'deleteIdExecution == "all"'>
+                <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAllExecutions()' title = 'Confirm Delete'>
+                  <span class = 'glyphicon glyphicon-ok'></span>
+                </button>
+                <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAllExecutions()' title = 'Cancel Delete'>
+                  <span class = 'glyphicon glyphicon-remove'></span>
+                </button>
               </div>
             </div>
+          </div>
 
-            <!-- Delete button -->
-            <div class = 'col-md-2' ng-if = 'execution.execution_id != deleteIdExecution'>
-              <button type = 'button' class = 'btn btn-danger exec-btn btn-execution-delete' ng-click = 'deleteExecution(execution)' title = 'Delete Execution' style = 'margin-top:5%;'>
-                <span class = 'glyphicon glyphicon-minus'></span>
-              </button>
+          <!-- Execution Modal -->
+          <div class = 'modal fade' id = 'execution-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+
+                  <h4 class = 'modal-title' ng-if = 'compareExecution == ""'>
+                    Execution {{currentExecution.execution_id}}
+                  </h4>
+
+                  <h4 class = 'modal-title' ng-if = 'compareExecution != ""'>
+                    Execution {{currentExecution.execution_id}} - Execution {{compareExecution.execution_id}}
+                  </h4>
+                </div>
+
+                <div class = 'modal-body'>
+                  <div class = 'container-fluid'>
+                    <!-- Dropdown Button -->
+                    <div class = 'dropdown row' style = 'float:left'>
+                      <button id = 'dropwdownbtn' class = 'btn btn-primary dropdown-toggle' type = 'button' data-toggle = 'dropdown' aria-haspopup = 'true' aria-expanded = 'true' title = 'Compare Executions'>
+                        <span class = 'glyphicon glyphicon-transfer'></span>
+                      </button>
+
+                      <ul class = 'dropdown-menu' aria-labelledby = 'dropdownbtn'>
+                        <li ng-repeat = 'execution in executions' ng-if = 'execution != currentExecution'>
+                          <a href = '' ng-click = 'showCompareExecution(execution)'>Execution {{execution.execution_id}}</a>
+                        </li>
+                        <li role = 'separator' class = 'divider'></li>
+                        <li><a href = '' ng-click = 'showCompareExecution("")'>None</a></li>
+                      </ul>
+                    </div>
+
+                    <!-- Results -->
+                    <p class = 'header-2'>Results</p>
+
+                    <div class = 'row'>
+                      <div class = 'text-center' ng-class = '{"col-md-6": compareExecution != ""}'>
+                        <ul class = 'draglist'>
+                          <li class = 'drop-obj' ng-repeat = 'obj in currentExecution.results'>
+                            <div class = 'drag-obj'>
+                              {{obj.name}}
+                            </div>
+                            <p ng-if = '$index == 0'>Most Important</p>
+                            <p ng-if = '$index == draggableObjects.length - 1'>Least Important</p>
+                          </li>
+                        </ul>
+                      </div>
+
+                      <div class = 'text-center col-md-6' ng-if = 'compareExecution != ""'>
+                        <ul class = 'draglist'>
+                          <li class = 'drop-obj' ng-repeat = 'obj in compareExecution.results'>
+                            <div class = 'drag-obj'>
+                              {{obj.name}}
+                            </div>
+                            <p ng-if = '$index == 0'>Most Important</p>
+                            <p ng-if = '$index == draggableObjects.length - 1'>Least Important</p>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <br>
+
+                  </div>
+                </div>
+              </div>
             </div>
-
-            <!-- Confirm and Cancel Delete Button -->
-            <div class = 'col-md-2' ng-if = 'execution.execution_id == deleteIdExecution'>
-              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteExecution(execution)' title = 'Confirm Delete Execution' style = 'margin-top:5%'>
-                <span class = 'glyphicon glyphicon-ok'></span>
-              </button>
-              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteExecution()' title = 'Cancel Delete Execution' style = 'margin-top:5%'>
-                <span class = 'glyphicon glyphicon-remove'></span>
-              </button>
-            </div>
           </div>
-
-          <br>
-
-          <!-- Delete All Executions button -->
-          <div id = 'btn-delete-all-div' ng-if = 'deleteIdExecution != "all"'>
-            <button id = 'btn-delete-all' type = 'button' class = 'btn btn-danger' ng-click = 'deleteAllExecutions()'>
-              Delete All Executions
-            </button>
-          </div>
-
-          <!-- Confirm and Cancel Delete All Executions buttons -->
-          <div id = 'delete-all-btn-group' ng-if = 'deleteIdExecution == "all"'>
-            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAllExecutions()' title = 'Confirm Delete'>
-              <span class = 'glyphicon glyphicon-ok'></span>
-            </button>
-            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAllExecutions()' title = 'Cancel Delete'>
-              <span class = 'glyphicon glyphicon-remove'></span>
-            </button>
-          </div>
-
         </div>
       </div>
     </div>

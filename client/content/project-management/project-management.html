@@ -154,19 +154,13 @@
             </td>
 
             <!-- Project Method -->
-            <td>
-              {{project.method}}
-            </td>
+            <td>{{project.method}}</td>
 
             <!-- Creation Date -->
-            <td>
-              {{project.creation_date}}
-            </td>
+            <td>{{project.creation_date}}</td>
 
             <!-- Last Update -->
-            <td>
-              {{project.last_update}}
-            </td>
+            <td>{{project.last_update}}</td>
 
             <!-- Confirm And Cancel Buttons -->
             <td>
@@ -182,24 +176,16 @@
           <!-- Delete View -->
           <tr id = 'proj-delete-{{project.project_id}}' class = 'no-display danger'>
             <!-- Project Name -->
-            <td>
-              {{project.name}}
-            </td>
+            <td>{{project.name}}</td>
 
             <!-- Project Method -->
-            <td>
-              {{project.method}}
-            </td>
+            <td>{{project.method}}</td>
 
             <!-- Creation Date -->
-            <td>
-              {{project.creation_date}}
-            </td>
+            <td>{{project.creation_date}}</td>
 
             <!-- Last Update -->
-            <td>
-              {{project.last_update}}
-            </td>
+            <td>{{project.last_update}}</td>
 
             <!-- Confirm And Cancel Buttons -->
             <td>
@@ -224,8 +210,9 @@
             <td>
               <select id = 'input-method' ng-model = 'project.method'>
                 <option value = '' selected disabled>--- Please Select ---</option>
-                <option>OrderBy</option>
                 <option>CAT-SD</option>
+                <option>Delphi</option>
+                <option>OrderBy</option>
                 <option>Sort</option>
               </select>
             </td>

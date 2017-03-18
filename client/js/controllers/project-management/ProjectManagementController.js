@@ -18,6 +18,8 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
           }
         });
       }
+
+      getProjects();
     });
   }
 
@@ -30,11 +32,14 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
   //open project
   $scope.openProject = function(project) {
     switch(project.method) {
-      case 'OrderBy':
-        $window.location.href = 'order-by-method.html?id=' + project['project_id'];
-        break;
       case 'CAT-SD':
         $window.location.href = 'cat-sd.html?id=' + project['project_id'];
+        break;
+      case 'Delphi':
+        $window.location.href = 'delphi.html?id=' + project['project_id'];
+        break;
+      case 'OrderBy':
+        $window.location.href = 'order-by-method.html?id=' + project['project_id'];
         break;
       case 'Sort':
         $window.location.href = 'sort.html?id=' + project['project_id'];
@@ -312,5 +317,4 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
   }
 
   requestLogIn();
-  $scope.changeCurrentOrder('', '');
 });

@@ -25,7 +25,7 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
 
   $scope.isLoading = false;
 
-  //eye icons variables
+  //eye icons variables - data input
   $scope.criteria_eye = 1;
   $scope.interaction_effects_eye = 1;
   $scope.scales_functions_eye = 1;
@@ -33,7 +33,19 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
   $scope.categories_eye = 1;
   $scope.reference_actions_eye = 1;
 
+  //eye icons variables - executions
+  $scope.criteria_exec_eye = 1;
+  $scope.interaction_effects_exec_eye = 1;
+  $scope.scales_functions_exec_eye = 1;
+  $scope.actions_exec_eye = 1;
+  $scope.categories_exec_eye = 1;
+  $scope.reference_actions_exec_eye = 1;
+  $scope.results_exec_eye = 1;
+
   $scope.showResetData = false;
+
+  $scope.currentExecution = '';
+  $scope.compareExecution = '';
 
   function requestLogIn() {
     $http.get('/requestlogin').success(function(res) {
@@ -365,7 +377,6 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
     var results = CATSDService.getResults($scope.criteria, $scope.interaction_effects, $scope.actions, $scope.categories);
 
     results.then(function(resolve) {
-      console.log(resolve);
 
       $http.get('/projects').success(function(response) {
         //get current date
@@ -1114,6 +1125,28 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
     document.getElementById('export-actions-check').checked = false;
     document.getElementById('export-categories-check').checked = false;
     document.getElementById('export-reference-actions-check').checked = false;
+  }
+
+  $scope.showExecution = function(execution) {
+    $scope.currentExecution = execution;
+    $scope.compareExecution = '';
+  }
+
+  $scope.showCompareExecution = function(execution) {
+    $scope.compareExecution = execution;
+  }
+
+  //check if criterion exists in criteria set of compareExecution
+  $scope.compareCriteria = function(criterion) {
+    if($scope.compareExecution == "")
+      return false;
+
+    for(criterion2 in $scope.currentExecution['criteria']) {
+      if($scope.currentExecution['criteria'][criterion2]['name'] == criterion['name'])
+        return false;
+    }
+
+    return true;
   }
 
   requestLogIn();

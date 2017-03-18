@@ -150,11 +150,6 @@ app.get('/expr-eval', function(req, res) {
       antagonisticSet.push(JSON.parse(req.query.antagonisticSet[item]));
   }
 
-  /*console.log(criteria);
-  console.log(actions);
-  console.log(categories);
-  console.log(antagonisticSet);*/
-
   var similarityValues = [];
 
   for(criterion in criteria) {
@@ -241,7 +236,6 @@ app.get('/expr-eval', function(req, res) {
     }
   }
 
-  //console.log(similarityValues);
   res.json(similarityValues);
 });
 

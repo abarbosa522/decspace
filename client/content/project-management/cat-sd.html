@@ -32,6 +32,14 @@
     <link href = 'https://fonts.googleapis.com/css?family=Open+Sans:400,600i' rel = 'stylesheet'>
 
     <!-- MathJax -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        CommonHTML: {
+          scale: 90,
+          linebreaks: { automatic: true }
+        }
+      });
+    </script>
     <script type = 'text/javascript' async src = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML'></script>
 
     <!-- ng-draggable module -->
@@ -547,7 +555,63 @@
             <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#scales-functions-table' style = 'float:right' ng-click = 'scales_functions_eye = (scales_functions_eye == 0 ? 1 : 0)' title = 'Hide/Show Scales and Functions'>
               <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : scales_functions_eye == 0, "glyphicon-eye-close" : scales_functions_eye == 1}'></span>
             </button>
-            <p class = 'header-1'>Scales and Functions</p>
+            <p class = 'header-1'>
+              Scales and Functions
+
+              <!-- Help Button -->
+              <a href = '#' data-toggle = 'modal' data-target = '#scales-help-modal'>
+                <span class = 'glyphicon glyphicon-question-sign' style = 'font-size:25px'></span>
+              </a>
+            </p>
+          </div>
+
+          <!-- Scales and Functions Help Modal -->
+          <div class = 'modal fade' id = 'scales-help-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>Scales and Functions - Help</h4>
+                </div>
+
+                <div class = 'modal-body'>
+                  <h3>Variables to use:</h3>
+                  <p>You should use the variable 'x' to represent the application of a certain criterion j on an action a.
+                    In a similar way, 'y' should be used to represent the application of a certain criterion j on a reference action b.</p>
+
+                  <h3>Ways to write the functions:</h3>
+
+                  <table class = 'table table-bordered table-hover table-striped'>
+                    <thead>
+                      <tr>
+                        <th class = 'text-center'>What You Want</th>
+                        <th class = 'text-center'>How It Looks</th>
+                        <th class = 'text-center'>How It Is Written</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Not Equal Sign</td>
+                        <td><p>`x != 10`</p></td>
+                        <td><p>x != 10</p></td>
+                      </tr>
+                      <tr>
+                        <td>Absolute Function</td>
+                        <td><p>`abs(x - y) / 100`</p></td>
+                        <td><p>abs(x - y) / 100</p></td>
+                      </tr>
+                      <tr>
+                        <td>Inequation</td>
+                        <td><p>`2 < x and x <= 3`</p></td>
+                        <td><p>2 < x and x <= 3</p></td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                </div>
+              </div>
+            </div>
           </div>
 
           <div id = 'scales-functions-table' class = 'collapse in'>
@@ -832,258 +896,562 @@
 
           <br>
 
-          <p class = 'header-2'>New Execution</p>
+          <table class = 'table table-bordered table-hover table-striped'>
+            <thead>
+              <th class = 'text-center'>#</th>
+              <th class = 'text-center'>Date</th>
+              <th class = 'text-center'>Comment</th>
+              <th class = 'col-md-2'></th>
+            </thead>
+            <tbody>
+              <!-- Previous Executions -->
+              <tr ng-repeat = 'execution in executions' ng-class = '{"danger":  execution.execution_id == deleteIdExecution || deleteIdExecution == "all"}'>
+                <td>{{execution.execution_id}}</td>
+                <td>{{execution.execution_date}}</td>
+                <td>{{execution.comment}}</td>
+                <td ng-if = 'deleteIdExecution != execution.execution_id'>
+                  <button type = 'button' class = 'btn btn-primary' ng-click = 'showExecution(execution)' title = 'Show Execution Details' data-toggle = 'modal' data-target = '#execution-modal'>
+                    <span class = 'glyphicon glyphicon-new-window'></span>
+                  </button>
+                  <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteExecution(execution)' title = 'Delete Execution'>
+                    <span class = 'glyphicon glyphicon-minus'></span>
+                  </button>
+                </td>
+                <td ng-if = 'deleteIdExecution == execution.execution_id'>
+                  <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAllExecutions()' title = 'Confirm Delete'>
+                    <span class = 'glyphicon glyphicon-ok'></span>
+                  </button>
+                  <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAllExecutions()' title = 'Cancel Delete'>
+                    <span class = 'glyphicon glyphicon-remove'></span>
+                  </button>
+                </td>
+              </tr>
 
-          <form class = 'form-inline'>
-            <input type = 'text' class = 'form-control' placeholder = 'Comment' ng-model = 'new_execution.comment'>
-            <button type = 'button' class = 'btn btn-default' ng-click = 'getResults()' ng-if = '!isLoading' title = 'Execute Method'>
-              <span class = 'glyphicon glyphicon-play'></span>
-            </button>
-            <button class = 'btn btn-default active' ng-if = 'isLoading' title = 'Working...'>
-              <span class = 'glyphicon glyphicon-refresh glyphicon-refresh-animate'></span>
-            </button>
-          </form>
+              <!-- Form to run new execution -->
+              <tr class = 'active'>
+                <td></td>
+                <td></td>
+                <td>
+                  <input type = 'text' class = 'form-control' placeholder = 'Comment' ng-model = 'new_execution.comment'>
+                </td>
+                <td>
+                  <button type = 'button' class = 'btn btn-success' ng-click = 'getResults()' ng-if = '!isLoading' title = 'Execute Method'>
+                    <span class = 'glyphicon glyphicon-plus'></span>
+                  </button>
+                  <button class = 'btn btn-default active' ng-if = 'isLoading' title = 'Working...'>
+                    <span class = 'glyphicon glyphicon-refresh glyphicon-refresh-animate'></span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
 
-          <br>
+          <!-- Execution Modal -->
+          <div class = 'modal fade' id = 'execution-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+
+                  <h4 class = 'modal-title' ng-if = 'compareExecution == ""'>
+                    Execution {{currentExecution.execution_id}}
+                  </h4>
+
+                  <h4 class = 'modal-title' ng-if = 'compareExecution != ""'>
+                    Execution {{currentExecution.execution_id}} - Execution {{compareExecution.execution_id}}
+                  </h4>
+                </div>
+
+                <div class = 'modal-body'>
+                  <div class = 'container-fluid'>
+                    <!-- Dropdown Button -->
+                    <div class = 'dropdown row' style = 'float:left'>
+                      <button id = 'dropwdownbtn' class = 'btn btn-primary dropdown-toggle' type = 'button' data-toggle = 'dropdown' aria-haspopup = 'true' aria-expanded = 'true' title = 'Compare Executions'>
+                        <span class = 'glyphicon glyphicon-transfer'></span>
+                      </button>
+
+                      <ul class = 'dropdown-menu' aria-labelledby = 'dropdownbtn'>
+                        <li ng-repeat = 'execution in executions' ng-if = 'execution != currentExecution'>
+                          <a href = '' ng-click = 'showCompareExecution(execution)'>Execution {{execution.execution_id}}</a>
+                        </li>
+                        <li role = 'separator' class = 'divider'></li>
+                        <li><a href = '' ng-click = 'showCompareExecution("")'>None</a></li>
+                      </ul>
+                    </div>
+
+                    <p class = 'header-2'>Input Data</p>
+
+                    <!-- Input Criteria -->
+                    <div class = 'row'>
+                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#criteria-exec-table' style = 'float:right' ng-click = 'criteria_exec_eye = (criteria_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Criteria'>
+                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : criteria_exec_eye == 0, "glyphicon-eye-close" : criteria_exec_eye == 1}'></span>
+                      </button>
+                      <p class = 'header-3'>Criteria</p>
+                    </div>
+
+                    <div id = 'criteria-exec-table' class = 'row collapse in'>
+                      <div ng-class = '{"col-md-6": compareExecution != ""}'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Name</th>
+                              <th class = 'text-center'>Direction</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'criterion in currentExecution.criteria'>
+                              <td>{{criterion.name}}</td>
+                              <td>{{criterion.direction}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Name</th>
+                              <th class = 'text-center'>Direction</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'criterion in compareExecution.criteria'>
+                              <td>{{criterion.name}}</td>
+                              <td>{{criterion.direction}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <br>
+
+                    <!-- Input Interaction Effects -->
+                    <div class = 'row'>
+                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#interaction-effects-exec-table' style = 'float:right' ng-click = 'interaction_effects_exec_eye = (interaction_effects_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Interaction Effects'>
+                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : interaction_effects_exec_eye == 0, "glyphicon-eye-close" : interaction_effects_exec_eye == 1}'></span>
+                      </button>
+                      <p class = 'header-3'>Interaction Effects</p>
+                    </div>
+
+                    <div id = 'interaction-effects-exec-table' class = 'row collapse in'>
+                      <div ng-class = '{"col-md-6": compareExecution != ""}'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Type Of Effect</th>
+                              <th class = 'text-center'>Criterion 1</th>
+                              <th class = 'text-center'>Criterion 2</th>
+                              <th class = 'text-center'>Value</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'interaction_effect in currentExecution.interaction_effects'>
+                              <td>{{interaction_effect.type}}</td>
+                              <td>{{interaction_effect.criterion1}}</td>
+                              <td>{{interaction_effect.criterion2}}</td>
+                              <td>{{interaction_effect.value}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Type Of Effect</th>
+                              <th class = 'text-center'>Criterion 1</th>
+                              <th class = 'text-center'>Criterion 2</th>
+                              <th class = 'text-center'>Value</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'interaction_effect in compareExecution.interaction_effects'>
+                              <td>{{interaction_effect.type}}</td>
+                              <td>{{interaction_effect.criterion1}}</td>
+                              <td>{{interaction_effect.criterion2}}</td>
+                              <td>{{interaction_effect.value}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <br>
+
+                    <!-- Input Scales and Functions -->
+                    <div class = 'row'>
+                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#scales-functions-exec-table' style = 'float:right' ng-click = 'scales_functions_exec_eye = (scales_functions_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Scales and Functions'>
+                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : scales_functions_exec_eye == 0, "glyphicon-eye-close" : scales_functions_exec_eye == 1}'></span>
+                      </button>
+                      <p class = 'header-3'>Scales and Functions</p>
+                    </div>
+
+                    <div class = 'collapse in' id = 'scales-functions-exec-table'>
+                      <div class = 'row' ng-repeat = 'criterion in currentExecution.criteria'>
+
+                        <p class = 'header-6'>Criterion "{{criterion.name}}"</p>
+
+                        <div ng-class = '{"col-md-6": compareExecution != ""}'>
+                          <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                            <thead>
+                              <tr>
+                                <th class = 'text-center'>Type</th>
+                                <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Minimum Value</th>
+                                <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Maximum Value</th>
+                                <th class = 'text-center' ng-if = 'criterion.scale.type == "Categorical"'>Number of Categories</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>{{criterion.scale.type}}</td>
+                                <td ng-if = 'criterion.scale.type == "Numerical"'>{{criterion.scale.min}}</td>
+                                <td ng-if = 'criterion.scale.type == "Numerical"'>{{criterion.scale.max}}</td>
+                                <td ng-if = 'criterion.scale.type == "Categorical"'>{{criterion.scale.num_categories}}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+
+                          <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                            <thead>
+                              <tr>
+                                <th class = 'text-center'>Function</th>
+                                <th class = 'text-center'>Condition</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr ng-repeat = 'branch in criterion.branches'>
+                                <td>
+                                  <p math-jax-bind = 'branch.function'></p>
+                                </td>
+                                <td>
+                                  <p math-jax-bind = 'branch.condition'></p>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+
+                        <div class = 'col-md-6' ng-repeat = 'criterion2 in compareExecution.criteria' ng-if = 'compareExecution != "" && criterion.name == criterion2.name'>
+                          <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                            <thead>
+                              <tr>
+                                <th class = 'text-center'>Type</th>
+                                <th class = 'text-center' ng-if = 'criterion2.scale.type == "Numerical"'>Minimum Value</th>
+                                <th class = 'text-center' ng-if = 'criterion2.scale.type == "Numerical"'>Maximum Value</th>
+                                <th class = 'text-center' ng-if = 'criterion2.scale.type == "Categorical"'>Number of Categories</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>{{criterion2.scale.type}}</td>
+                                <td ng-if = 'criterion2.scale.type == "Numerical"'>{{criterion2.scale.min}}</td>
+                                <td ng-if = 'criterion2.scale.type == "Numerical"'>{{criterion2.scale.max}}</td>
+                                <td ng-if = 'criterion2.scale.type == "Categorical"'>{{criterion2.scale.num_categories}}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+
+                          <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                            <thead>
+                              <tr>
+                                <th class = 'text-center'>Function</th>
+                                <th class = 'text-center'>Condition</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr ng-repeat = 'branch2 in criterion2.branches'>
+                                <td>
+                                  <p math-jax-bind = 'branch2.function'></p>
+                                </td>
+                                <td>
+                                  <p math-jax-bind = 'branch2.condition'></p>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+
+                      <div class = 'row' ng-repeat = 'criterion in compareExecution.criteria' ng-if = 'compareCriteria(criterion)'>
+
+                        <p class = 'header-6'>Criterion "{{criterion.name}}"</p>
+
+                        <div class = 'col-md-6'>
+                        </div>
+
+                        <div class = 'col-md-6'>
+                          <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                            <thead>
+                              <tr>
+                                <th class = 'text-center'>Type</th>
+                                <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Minimum Value</th>
+                                <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Maximum Value</th>
+                                <th class = 'text-center' ng-if = 'criterion.scale.type == "Categorical"'>Number of Categories</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>{{criterion.scale.type}}</td>
+                                <td ng-if = 'criterion.scale.type == "Numerical"'>{{criterion.scale.min}}</td>
+                                <td ng-if = 'criterion.scale.type == "Numerical"'>{{criterion.scale.max}}</td>
+                                <td ng-if = 'criterion.scale.type == "Categorical"'>{{criterion.scale.num_categories}}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+
+                        <div class = 'col-md-6'>
+                        </div>
+
+                        <div class = 'col-md-6'>
+                          <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                            <thead>
+                              <tr>
+                                <th class = 'text-center'>Function</th>
+                                <th class = 'text-center'>Condition</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr ng-repeat = 'branch in criterion.branches'>
+                                <td>
+                                  <p math-jax-bind = 'branch.function'></p>
+                                </td>
+                                <td>
+                                  <p math-jax-bind = 'branch.condition'></p>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+
+                    <br>
+
+                    <!-- Input Actions -->
+                    <div class = 'row'>
+                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#actions-exec-table' style = 'float:right' ng-click = 'actions_exec_eye = (actions_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Actions'>
+                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : actions_exec_eye == 0, "glyphicon-eye-close" : actions_exec_eye == 1}'></span>
+                      </button>
+                      <p class = 'header-3'>Actions</p>
+                    </div>
+
+                    <div class = 'row collapse in' id = 'actions-exec-table'>
+                      <div ng-class = '{"col-md-6": compareExecution != ""}'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center break_words'>Action</th>
+                              <th class = 'text-center break_words' ng-repeat = 'criterion in currentExecution.criteria'>{{criterion.name}}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'action in currentExecution.actions'>
+                              <td>{{action.name}}</td>
+                              <td ng-repeat = 'criterion in currentExecution.criteria'>{{action[criterion.name]}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center break_words'>Action</th>
+                              <th class = 'text-center break_words' ng-repeat = 'criterion in compareExecution.criteria'>{{criterion.name}}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'action in compareExecution.actions'>
+                              <td>{{action.name}}</td>
+                              <td ng-repeat = 'criterion in compareExecution.criteria'>{{action[criterion.name]}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <br>
+
+                    <!-- Input Categories -->
+                    <div class = 'row'>
+                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#categories-exec-table' style = 'float:right' ng-click = 'categories_exec_eye = (categories_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Categories'>
+                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : categories_exec_eye == 0, "glyphicon-eye-close" : categories_exec_eye == 1}'></span>
+                      </button>
+                      <p class = 'header-3'>Categories</p>
+                    </div>
+
+                    <div class = 'row collapse in' id = 'categories-exec-table'>
+                      <div ng-class = '{"col-md-6": compareExecution != ""}'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center break_words'>Category</th>
+                              <th class = 'text-center break_words'>Membership Degree</th>
+                              <th class = 'text-center break_words' ng-repeat = 'criterion in currentExecution.criteria'> {{criterion.name}}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'category in currentExecution.categories'>
+                              <td>{{category.name}}</td>
+                              <td>{{category.membership_degree}}</td>
+                              <td ng-repeat = 'criterion in currentExecution.criteria'>{{category[criterion.name]}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center break_words'>Category</th>
+                              <th class = 'text-center break_words'>Membership Degree</th>
+                              <th class = 'text-center break_words' ng-repeat = 'criterion in compareExecution.criteria'>{{criterion.name}}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'category in compareExecution.categories'>
+                              <td>{{category.name}}</td>
+                              <td>{{category.membership_degree}}</td>
+                              <td ng-repeat = 'criterion in compareExecution.criteria'>{{category[criterion.name]}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <br>
+
+                    <!-- Input Reference Actions -->
+                    <div class = 'row'>
+                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#reference-actions-exec-table' style = 'float:right' ng-click = 'reference_actions_exec_eye = (reference_actions_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Reference Actions'>
+                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : reference_actions_exec_eye == 0, "glyphicon-eye-close" : reference_actions_exec_eye == 1}'></span>
+                      </button>
+                      <p class = 'header-3'>Reference Actions</p>
+                    </div>
+
+                    <div class = 'row collapse in' id = 'reference-actions-exec-table'>
+                      <div ng-class = '{"col-md-6": compareExecution != ""}'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center break_words'>Category</th>
+                              <th class = 'text-center break_words' ng-repeat = 'criterion in currentExecution.criteria'>{{criterion.name}}</th>
+                            </tr>
+                          </thead>
+                          <tbody ng-repeat = 'category in currentExecution.categories'>
+                            <tr ng-repeat = 'reference_action in category.reference_actions'>
+                              <td ng-if = '$index == 0' rowspan = '{{category.reference_actions.length + 1}}'>{{category.name}}</td>
+                              <td ng-repeat = 'criterion in currentExecution.criteria'>{{reference_action[criterion.name]}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center break_words'>Category</th>
+                              <th class = 'text-center break_words' ng-repeat = 'criterion in compareExecution.criteria'>{{criterion.name}}</th>
+                            </tr>
+                          </thead>
+                          <tbody ng-repeat = 'category in compareExecution.categories'>
+                            <tr ng-repeat = 'reference_action in category.reference_actions'>
+                              <td ng-if = '$index == 0' rowspan = '{{category.reference_actions.length + 1}}'>{{category.name}}</td>
+                              <td ng-repeat = 'criterion in compareExecution.criteria'>{{reference_action[criterion.name]}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <br>
+
+                    <!-- Results -->
+                    <div class = 'row'>
+                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#results-exec-table' style = 'float:right' ng-click = 'results_exec_eye = (results_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Results'>
+                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : results_exec_eye == 0, "glyphicon-eye-close" : results_exec_eye == 1}'></span>
+                      </button>
+                      <p class = 'header-2'>Results</p>
+                    </div>
+
+                    <div class = 'row collapse in' id = 'results-exec-table'>
+                      <div ng-class = '{"col-md-6": compareExecution != ""}'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Action</th>
+                              <th class = 'text-center' ng-repeat = '(key, value) in currentExecution.results'>{{key}}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'action in currentExecution.actions'>
+                              <td>{{action.name}}</td>
+                              <td ng-repeat = 'result in currentExecution.results'>
+                                <span class = 'glyphicon glyphicon-ok' style = 'color:green;' ng-if = 'result.includes(action.name)'></span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center break_words'>Action</th>
+                              <th class = 'text-center break_words' ng-repeat = '(key, value) in compareExecution.results'>{{key}}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'action in compareExecution.actions'>
+                              <td>{{action.name}}</td>
+                              <td ng-repeat = 'result in compareExecution.results'>
+                                <span class = 'glyphicon glyphicon-ok' style = 'color:green;' ng-if = 'result.includes(action.name)'></span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <!-- Errors with input data -->
 
-          <br>
+          <div class = 'row'>
+            <div class = 'col-md-10'>
+            </div>
 
-          <p class = 'header-2'>Past Executions</p>
+            <div class = 'col-md-2'>
+              <!-- Delete All Executions button -->
+              <div id = 'btn-delete-all-div' ng-if = 'deleteIdExecution != "all"'>
+                <button id = 'btn-delete-all' type = 'button' class = 'btn btn-danger' ng-click = 'deleteAllExecutions()'>
+                  Delete All Executions
+                </button>
+              </div>
 
-          <div class = 'row' ng-repeat = 'execution in executions'>
-            <div class = 'list-group col-md-10'>
-              <a href = '#list-{{execution.execution_id}}' class = 'list-group-item' data-toggle = 'collapse' ng-class = '{"list-group-item-danger":  execution.execution_id == deleteIdExecution || deleteIdExecution == "all"}'>
-                <p>{{execution.execution_date}}</p>
-              </a>
-              <div id = 'list-{{execution.execution_id}}' class = 'collapse'>
-                <a class = 'list-group-item'>
-                  <p class = 'header-2'>Input Data</p>
-
-                  <!-- Input Criteria Names and Direction -->
-                  <p class = 'header-3'>Criteria</p>
-
-                  <div class = 'row'>
-                    <table class = 'table table-bordered table-condensed'>
-                      <thead>
-                        <tr>
-                          <th class = 'text-center'>Name</th>
-                          <th class = 'text-center'>Direction</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr ng-repeat = 'criterion in execution.criteria'>
-                          <td>{{criterion.name}}</td>
-                          <td>{{criterion.direction}}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <!-- Input Interaction Effects -->
-                  <p class = 'header-3'>Interaction Effects</p>
-
-                  <div class = 'row'>
-                    <table class = 'table table-bordered table-condensed'>
-                      <thead>
-                        <tr>
-                          <th class = 'text-center'>Type Of Effect</th>
-                          <th class = 'text-center'>Criterion 1</th>
-                          <th class = 'text-center'>Criterion 2</th>
-                          <th class = 'text-center'>Value</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr ng-repeat = 'interaction_effect in execution.interaction_effects'>
-                          <td>{{interaction_effect.type}}</td>
-                          <td>{{interaction_effect.criterion1}}</td>
-                          <td>{{interaction_effect.criterion2}}</td>
-                          <td>{{interaction_effect.value}}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <!-- Input Scales and Functions -->
-                  <p class = 'header-3'>Scales and Functions</p>
-
-                  <div ng-repeat = 'criterion in execution.criteria'>
-
-                    <p class = 'header-6'>Criterion "{{criterion.name}}"</p>
-
-                    <div class = 'row'>
-                      <table class = 'table table-bordered table-condensed'>
-                        <thead>
-                          <tr>
-                            <th class = 'text-center'>Type</th>
-                            <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Minimum Value</th>
-                            <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Maximum Value</th>
-                            <th class = 'text-center' ng-if = 'criterion.scale.type == "Categorical"'>Number of Categories</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>{{criterion.scale.type}}</td>
-                            <td ng-if = 'criterion.scale.type == "Numerical"'>{{criterion.scale.min}}</td>
-                            <td ng-if = 'criterion.scale.type == "Numerical"'>{{criterion.scale.max}}</td>
-                            <td ng-if = 'criterion.scale.type == "Categorical"'>{{criterion.scale.num_categories}}</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div class = 'row'>
-                      <table class = 'table table-bordered table-condensed'>
-                        <thead>
-                          <tr>
-                            <th class = 'text-center'>Function</th>
-                            <th class = 'text-center'>Condition</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr ng-repeat = 'branch in criterion.branches'>
-                            <td>
-                              <p math-jax-bind = 'branch.function'></p>
-                            </td>
-                            <td>
-                              <p math-jax-bind = 'branch.condition'></p>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-
-                  <!-- Input Actions -->
-                  <p class = 'header-3'>Actions</p>
-
-                  <div class = 'row'>
-                    <table class = 'table table-bordered table-condensed'>
-                      <thead>
-                        <tr>
-                          <th class = 'text-center'>Action</th>
-                          <th class = 'text-center' ng-repeat = 'criterion in execution.criteria'>{{criterion.name}}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr ng-repeat = 'action in execution.actions'>
-                          <td>{{action.name}}</td>
-                          <td ng-repeat = 'criterion in execution.criteria'>{{action[criterion.name]}}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <!-- Input Categories -->
-                  <p class = 'header-3'>Categories</p>
-
-                  <div class = 'row'>
-                    <table class = 'table table-bordered table-condensed'>
-                      <thead>
-                        <tr>
-                          <th class = 'text-center'>Category</th>
-                          <th class = 'text-center'>Membership Degree</th>
-                          <th class = 'text-center' ng-repeat = 'criterion in execution.criteria'>{{criterion.name}}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr ng-repeat = 'category in execution.categories'>
-                          <td>{{category.name}}</td>
-                          <td>{{category.membership_degree}}</td>
-                          <td ng-repeat = 'criterion in execution.criteria'>{{category[criterion.name]}}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <!-- Input Reference Actions -->
-                  <p class = 'header-3'>Reference Actions</p>
-
-                  <div class = 'row'>
-                    <table class = 'table table-bordered table-condensed'>
-                      <thead>
-                        <tr>
-                          <th class = 'text-center'>Category</th>
-                          <th class = 'text-center'>Reference Action</th>
-                          <th class = 'text-center' ng-repeat = 'criterion in execution.criteria'>{{criterion.name}}</th>
-                        </tr>
-                      </thead>
-                      <tbody ng-repeat = 'category in execution.categories'>
-                        <tr ng-repeat = 'reference_action in category.reference_actions'>
-                          <td>{{category.name}}</td>
-                          <td>{{reference_action.name}}</td>
-                          <td ng-repeat = 'criterion in execution.criteria'>{{reference_action[criterion.name]}}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <!-- Results -->
-                  <p class = 'header-2'>Results</p>
-
-                  <div class = 'row'>
-                    <table class = 'table table-bordered table-condensed'>
-                      <thead>
-                        <tr>
-                          <th class = 'text-center'>Action</th>
-                          <th class = 'text-center' ng-repeat = '(key, value) in execution.results'>{{key}}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr ng-repeat = 'action in execution.actions'>
-                          <td>{{action.name}}</td>
-                          <td ng-repeat = 'result in execution.results'>
-                            <span class = 'glyphicon glyphicon-ok' style = 'color:green;' ng-if = 'result.includes(action.name)'></span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <!-- Comment -->
-                  <div ng-if = 'execution.comment != ""'>
-                    <p class = 'header-2'>Comment</p>
-                    <p>{{execution.comment}}</p>
-                  </div>
-                </a>
+              <!-- Confirm and Cancel Delete All Executions buttons -->
+              <div id = 'delete-all-btn-group' ng-if = 'deleteIdExecution == "all"'>
+                <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAllExecutions()' title = 'Confirm Delete'>
+                  <span class = 'glyphicon glyphicon-ok'></span>
+                </button>
+                <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAllExecutions()' title = 'Cancel Delete'>
+                  <span class = 'glyphicon glyphicon-remove'></span>
+                </button>
               </div>
             </div>
-            <!-- Delete button -->
-            <div class = 'col-md-2' ng-if = 'execution.execution_id != deleteIdExecution'>
-              <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteExecution(execution)' title = 'Delete Execution' style = 'margin-top:5%;'>
-                <span class = 'glyphicon glyphicon-minus'></span>
-              </button>
-            </div>
-
-            <!-- Confirm and Cancel Delete Button -->
-            <div class = 'col-md-2' ng-if = 'execution.execution_id == deleteIdExecution'>
-              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteExecution(execution)' title = 'Confirm Delete Execution' style = 'margin-top:5%'>
-                <span class = 'glyphicon glyphicon-ok'></span>
-              </button>
-              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteExecution()' title = 'Cancel Delete Execution' style = 'margin-top:5%'>
-                <span class = 'glyphicon glyphicon-remove'></span>
-              </button>
-            </div>
-          </div>
-
-          <br>
-
-          <!-- Delete All Executions button -->
-          <div id = 'btn-delete-all-div' ng-if = 'deleteIdExecution != "all"'>
-            <button id = 'btn-delete-all' type = 'button' class = 'btn btn-danger' ng-click = 'deleteAllExecutions()'>
-              Delete All Executions
-            </button>
-          </div>
-
-          <!-- Confirm and Cancel Delete All Executions buttons -->
-          <div id = 'delete-all-btn-group' ng-if = 'deleteIdExecution == "all"'>
-            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAllExecutions()' title = 'Confirm Delete'>
-              <span class = 'glyphicon glyphicon-ok'></span>
-            </button>
-            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAllExecutions()' title = 'Cancel Delete'>
-              <span class = 'glyphicon glyphicon-remove'></span>
-            </button>
           </div>
 
         </div>

@@ -19,10 +19,7 @@
     <script src = '../../js/app.js'></script>
 
     <!-- AngularJS Controllers -->
-    <script src = '../../js/controllers/project-management/OrderByMethodController.js'></script>
-
-    <!-- AngularJS Services -->
-    <script src = '../../js/services/OrderByService.js'></script>
+    <script src = '../../js/controllers/project-management/DelphiMethodController.js'></script>
 
     <!-- Bootstrap -->
     <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
@@ -35,7 +32,7 @@
     <script src = '../../js/shared/ng-draggable/ngDraggable.js'></script>
   </head>
 
-  <body ng-app = 'decspace' ng-controller = 'OrderByMethodController'>
+  <body ng-app = 'decspace' ng-controller = 'DelphiMethodController'>
 
     <!-- Navigation Bar -->
     <nav class = 'navbar navbar-custom navbar-fixed-top'>
@@ -78,7 +75,7 @@
       <!-- Main tabs - Method Description, Data Input and Results and Execution -->
       <ul class = 'nav nav-tabs nav-justified'>
         <li role = 'presentation' class = 'active'><a data-toggle = 'tab' href= '#description'>Method Description</a></li>
-        <li role = 'presentation'><a data-toggle = 'tab' href= '#data-input'>Data Input</a></li>
+        <li role = 'presentation'><a data-toggle = 'tab' href= '#data-input'>Round Configuration</a></li>
         <li role = 'presentation'><a data-toggle = 'tab' href= '#results'>Results and Execution</a></li>
       </ul>
 
@@ -87,11 +84,13 @@
         <div id = 'description' class = 'tab-pane fade in active' style = 'text-align:left'>
           <br>
 
-          <p class = 'header-1'>Order By</p>
+          <p class = 'header-1'>Delphi</p>
 
           <br>
 
-          <p>Orders a given group of actions by a certain criterion in a specific direction (ascendant and descendant).</p>
+          <p>Mostly used for obtaining an opinion, judgment or choice consensus.</p>
+          <p>It is divided in various rounds. In each round, a survey is sent to the specialists.</p>
+          <p>The Q-Sort technique is used to answer the surveys.</p>
         </div>
 
         <!-- Data Input -->
@@ -163,11 +162,11 @@
 
                   <form class = 'form-inline row'>
                     <div class = 'form-group col-md-6'>
-                      <input id = 'import-criteria-check' type = 'checkbox'/>
-                      <label for = 'import-criteria-check'>Criteria</label>
+                      <input id = 'import-emails-check' type = 'checkbox'/>
+                      <label for = 'import-emails-check'>Specialists' Emails</label>
                     </div>
                     <div class = 'form-group col-md-4'>
-                      <input id = 'import-criteria-file' type = 'file'/>
+                      <input id = 'import-emails-file' type = 'file'/>
                     </div>
                   </form>
 
@@ -175,11 +174,11 @@
 
                   <form class = 'form-inline row'>
                     <div class = 'form-group col-md-6'>
-                      <input id = 'import-actions-check' type = 'checkbox'/>
-                      <label for = 'import-actions-check'>Actions</label>
+                      <input id = 'import-questions-check' type = 'checkbox'/>
+                      <label for = 'import-questions-check'>Questions</label>
                     </div>
                     <div class = 'form-group col-md-4'>
-                      <input id = 'import-actions-file' type = 'file'/>
+                      <input id = 'import-questions-file' type = 'file'/>
                     </div>
                   </form>
 
@@ -235,8 +234,8 @@
 
                   <form class = 'form-inline row'>
                     <div class = 'form-group'>
-                      <input id = 'export-criteria-check' type = 'checkbox'/>
-                      <label for = 'export-criteria-check'>Criteria</label>
+                      <input id = 'export-emails-check' type = 'checkbox'/>
+                      <label for = 'export-emails-check'>Specialists' Emails</label>
                     </div>
                   </form>
 
@@ -244,8 +243,8 @@
 
                   <form class = 'form-inline row'>
                     <div class = 'form-group'>
-                      <input id = 'export-actions-check' type = 'checkbox'/>
-                      <label for = 'export-actions-check'>Actions</label>
+                      <input id = 'export-questions-check' type = 'checkbox'/>
+                      <label for = 'export-questions-check'>Questions</label>
                     </div>
                   </form>
 
@@ -273,96 +272,47 @@
             </div>
           </div>
 
-          <!-- Criteria -->
+          <!-- Emails -->
           <div class = 'row'>
-            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#criteria-table' style = 'float:right' ng-click = 'criteria_eye = (criteria_eye == 0 ? 1 : 0)' title = 'Hide/Show Criteria'>
-              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : criteria_eye == 0, "glyphicon-eye-close" : criteria_eye == 1}'></span>
+            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#emails-table' style = 'float:right' ng-click = 'emails_eye = (emails_eye == 0 ? 1 : 0)' title = "Hide/Show Specialists' Emails">
+              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : emails_eye == 0, "glyphicon-eye-close" : emails_eye == 1}'></span>
             </button>
-            <p class = 'header-1'>Criteria</p>
+            <p class = 'header-1'>Specialists' Emails</p>
           </div>
 
-          <div id = 'criteria-table' class = 'collapse in'>
+          <div id = 'emails-table' class = 'collapse in'>
             <table class = 'table table-bordered table-hover'>
               <thead>
                 <tr>
-                  <th class = 'text-center'>Order by</th>
-                  <th class = 'text-center'>
-                    Name
-                    <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrderCriteria("name", "descendant")'></span></a>
-                    <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrderCriteria("name", "ascendant")'></span></a>
-                  </th>
-                  <th class = 'text-center'>
-                    Type
-                    <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrderCriteria("type", "descendant")'></span></a>
-                    <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrderCriteria("type", "ascendant")'></span></a>
-                  </th>
-                  <th class = 'text-center'>
-                    Direction
-                    <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrderCriteria("direction", "descendant")'></span></a>
-                    <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrderCriteria("direction", "ascendant")'></span></a>
-                  </th>
+                  <th class = 'text-center'>Email Address</th>
                   <th class = 'col-md-2'></th>
                 </tr>
               </thead>
-              <!-- Added Criteria -->
+              <!-- Added Emails -->
               <tbody>
-                <tr ng-repeat = 'criterion in criteria' ng-class = '{danger: criterion.criterion_id == deleteIdCriterion}'>
-                  <td>
-                    <input type = 'radio' ng-checked = 'criterion.selected == "true"' ng-click = 'selectCriterion(criterion)' >
-                  </td>
-                  <td>
-                    <input class = 'form-control' type = 'text' ng-model = 'criterion.name'>
-                  </td>
-                  <td>
-                    <select ng-model = 'criterion.type'>
-                      <option disabled>--- Please Select ---</option>
-                      <option>Text</option>
-                      <option>Number</option>
-                    </select>
-                  </td>
-                  <td>
-                    <select ng-model = 'criterion.direction'>
-                      <option disabled>--- Please Select ---</option>
-                      <option>Ascendant</option>
-                      <option>Descendant</option>
-                    </select>
-                  </td>
-                  <td ng-if = 'criterion.criterion_id != deleteIdCriterion'>
-                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteCriterion(criterion)' title = 'Delete Criterion'>
+                <tr ng-repeat = 'email in emails' ng-class = '{danger: email.id == delete_email}'>
+                  <td>{{email.address}}</td>
+                  <td ng-if = 'email.id != delete_email'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteEmail(email)' title = 'Delete Email'>
                       <span class = 'glyphicon glyphicon-minus'></span>
                     </button>
                   </td>
-                  <td ng-if = 'criterion.criterion_id == deleteIdCriterion'>
-                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteCriterion(criterion)' title = 'Confirm Delete Criterion'>
+                  <td ng-if = 'email.id == delete_email'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteEmail(email)' title = 'Confirm Delete Email'>
                       <span class = 'glyphicon glyphicon-ok'></span>
                     </button>
-                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteCriterion()' title = 'Cancel Delete Criterion'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteEmail()' title = 'Cancel Delete Email'>
                       <span class = 'glyphicon glyphicon-remove'></span>
                     </button>
                   </td>
                 </tr>
-                <!-- Form to add criteria -->
+                <!-- Form to add new email -->
                 <tr class = 'active'>
-                  <td></td>
                   <td>
-                    <input class = 'form-control' type = 'text' ng-model = 'new_criterion.name'>
+                    <input class = 'form-control' type = 'text' ng-model = 'new_email.address'>
                   </td>
                   <td>
-                    <select ng-model = 'new_criterion.type'>
-                      <option value = '' disabled>--- Please Select ---</option>
-                      <option>Text</option>
-                      <option>Number</option>
-                    </select>
-                  </td>
-                  <td>
-                    <select ng-model = 'new_criterion.direction'>
-                      <option value = '' disabled>--- Please Select ---</option>
-                      <option>Ascendant</option>
-                      <option>Descendant</option>
-                    </select>
-                  </td>
-                  <td>
-                    <button type = 'button' class = 'btn btn-success' ng-click = 'addCriterion()' data-toggle = 'tooltip' title = 'Add Criterion'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'addEmail()' title = 'Add Email'>
                       <span class = 'glyphicon glyphicon-plus'></span>
                     </button>
                   </td>
@@ -371,83 +321,55 @@
             </table>
           </div>
 
-          <div class = 'alert alert-danger' role = 'alert' ng-if = 'showCriterionFieldsError' ng-cloak>
-            <strong>Not</strong> all of the fields of the criterion have been filled.
-          </div>
+          <br>
 
-          <div class = 'alert alert-danger' role = 'alert' ng-if = 'showCriterionNameError' ng-cloak>
-            A criterion with the <strong>same name</strong> has already been added.
-          </div>
-
-          <!-- Actions -->
+          <!-- Questions -->
           <div class = 'row'>
-            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#performance-table' style = 'float:right' ng-click = 'actions_eye = (actions_eye == 0 ? 1 : 0)' title = 'Hide/Show Actions'>
-              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : actions_eye == 0, "glyphicon-eye-close" : actions_eye == 1}'></span>
+            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#questions-table' style = 'float:right' ng-click = 'questions_eye = (questions_eye == 0 ? 1 : 0)' title = "Hide/Show Questions">
+              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : questions_eye == 0, "glyphicon-eye-close" : questions_eye == 1}'></span>
             </button>
-            <p class = 'header-1'>Actions</p>
+            <p class = 'header-1'>Questions</p>
           </div>
 
-          <div id = 'performance-table' class = 'collapse in'>
+          <div id = 'questions-table' class = 'collapse in'>
             <table class = 'table table-bordered table-hover'>
               <thead>
-                <th class = 'text-center'>
-                  Name
-                  <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrderActions("name", "descendant")'></span></a>
-                  <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrderActions("name", "ascendant")'></span></a>
-                </th>
-                <th class = 'text-center' ng-repeat = 'criterion in criteria'>
-                  {{criterion.name}}
-                  <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrderActions(criterion.name, "descendant")'></span></a>
-                  <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrderActions(criterion.name, "ascendant")'></span></a>
-                </th>
-                <th class = 'col-md-2'></th>
+                <tr>
+                  <th class = 'text-center'>Question</th>
+                  <th class = 'col-md-2'></th>
+                </tr>
               </thead>
+              <!-- Added Questions -->
               <tbody>
-                <tr ng-repeat = 'action in actions' ng-class = '{danger: action.action_id == deleteIdAction}'>
-                  <td>
-                    <input class = 'form-control' type = 'text' ng-model = 'action.name'>
-                  </td>
-                  <td ng-repeat = 'criterion in criteria'>
-                    <input class = 'form-control' ng-model = 'action[criterion.name]'>
-                  </td>
-                  <td ng-if = 'action.action_id != deleteIdAction'>
-                    <button type = 'button' class = 'btn btn-danger btn-action-remove' ng-click = 'deleteAction(action)' data-toggle = 'tooltip' title = 'Delete Action'>
+                <tr ng-repeat = 'question in questions' ng-class = '{danger: question.id == delete_question}'>
+                  <td>{{question.content}}</td>
+                  <td ng-if = 'question.id != delete_question'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteQuestion(question)' title = 'Delete Question'>
                       <span class = 'glyphicon glyphicon-minus'></span>
                     </button>
                   </td>
-                  <td ng-if = 'action.action_id == deleteIdAction'>
-                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAction(action)' title = 'Confirm Delete Action'>
+                  <td ng-if = 'question.id == delete_question'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteQuestion(question)' title = 'Confirm Delete Question'>
                       <span class = 'glyphicon glyphicon-ok'></span>
                     </button>
-                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAction()' title = 'Cancel Delete Action'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteQuestion()' title = 'Cancel Delete Question'>
                       <span class = 'glyphicon glyphicon-remove'></span>
                     </button>
                   </td>
                 </tr>
-                <!-- Form to add action -->
+                <!-- Form to add new question -->
                 <tr class = 'active'>
                   <td>
-                    <input class = 'form-control' type = 'text' ng-model = 'new_action.name'>
-                  </td>
-                  <td ng-repeat = 'criterion in criteria'>
-                    <input class = 'form-control' ng-model = 'new_action[criterion.name]'>
+                    <input class = 'form-control' type = 'text' ng-model = 'new_question.content'>
                   </td>
                   <td>
-                    <button type = 'button' class = 'btn btn-success btn-action-add' ng-click = 'addAction()' data-toggle = 'tooltip' title = 'Add Action'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'addQuestion()' title = 'Add Question'>
                       <span class = 'glyphicon glyphicon-plus'></span>
                     </button>
                   </td>
                 </tr>
               </tbody>
             </table>
-          </div>
-
-          <div class = 'alert alert-danger' role = 'alert' ng-if = 'showActionFieldsError' ng-cloak>
-            <strong>Not</strong> all of the fields of the action have been filled.
-          </div>
-
-          <div class = 'alert alert-danger' role = 'alert' ng-if = 'showActionNameError' ng-cloak>
-            An action with the <strong>same name</strong> has already been added.
           </div>
         </div>
 
