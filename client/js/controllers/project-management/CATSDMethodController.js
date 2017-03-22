@@ -602,6 +602,9 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
             var cells = rows[i].split(";");
             var element = {};
 
+            //add the unique id
+            element['id'] = i;
+
             for(var j = 0; j < cells.length; j++)
               if(cells[j].trim() != '' && columns[j].trim() != '')
                 element[columns[j]] = cells[j];
@@ -617,9 +620,11 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
         return function(e) {
           var rows = e.target.result.split("\n");
 
-          var data = [];
-          for(row in rows)
-            data.push(JSON.parse(rows[row]));
+          for(row in rows) {
+            var element = JSON.parse(rows[row]);
+            element['id'] = Number(row) + 1;
+            data.push(element);
+          }
 
           $scope.$apply(fileConverter(input_id,data));
         }

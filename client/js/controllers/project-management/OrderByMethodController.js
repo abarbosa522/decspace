@@ -169,9 +169,9 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
       }
 
       if($scope.criteria.length == 0)
-        $scope.new_criterion.criterion_id = 1;
+        $scope.new_criterion.id = 1;
       else
-        $scope.new_criterion.criterion_id = $scope.criteria[$scope.criteria.length - 1]['criterion_id'] + 1;
+        $scope.new_criterion.id = $scope.criteria[$scope.criteria.length - 1]['id'] + 1;
 
       $scope.new_criterion.selected = 'false';
 
@@ -185,7 +185,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
 
   //delete a certain criterion
   $scope.deleteCriterion = function(criterion) {
-    $scope.deleteIdCriterion = criterion.criterion_id;
+    $scope.deleteIdCriterion = criterion.id;
   }
 
   $scope.confirmDeleteCriterion = function(criterion) {
@@ -249,9 +249,9 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
       }
 
       if($scope.actions.length == 0)
-        $scope.new_action.action_id = 1;
+        $scope.new_action.id = 1;
       else
-        $scope.new_action.action_id = $scope.actions[$scope.actions.length - 1]['action_id'] + 1;
+        $scope.new_action.id = $scope.actions[$scope.actions.length - 1]['id'] + 1;
 
       $scope.actions.push(angular.copy($scope.new_action));
 
@@ -265,7 +265,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
 
   //delete a certain criterion
   $scope.deleteAction = function(action) {
-    $scope.deleteIdAction = action.action_id;
+    $scope.deleteIdAction = action.id;
   }
 
   $scope.confirmDeleteAction = function(action) {
@@ -461,9 +461,12 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
           for(column in columns)
             columns[column] = columns[column].trim();
 
-          for(var i = 1; i < rows.length; i++) {
+          for(i = 1; i < rows.length; i++) {
             var cells = rows[i].split(";");
             var element = {};
+
+            //add the unique id
+            element['id'] = i;
 
             for(var j = 0; j < cells.length; j++)
               if(cells[j].trim() != '' && columns[j].trim() != '')
@@ -472,6 +475,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
             if(!angular.equals(element, {}))
               data.push(element);
           }
+
           $scope.$apply(fileConverter(input_id, data));
         };
       }
@@ -480,9 +484,11 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
         return function(e) {
           var rows = e.target.result.split("\n");
 
-          var data = [];
-          for(row in rows)
-            data.push(JSON.parse(rows[row]));
+          for(row in rows) {
+            var element = JSON.parse(rows[row]);
+            element['id'] = Number(row) + 1;
+            data.push(element);
+          }
 
           $scope.$apply(fileConverter(input_id,data));
         }
@@ -503,8 +509,8 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
         for(action in data)
           for(field in data[action])
             if(field != 'name')
-              data[action][field] = data[action][field];
-
+              data[action][field] = Number(data[action][field]);
+  
         $scope.actions = data;
         break;
     }
@@ -517,7 +523,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
 
       for(criterion in $scope.criteria) {
         for(field in $scope.criteria[criterion])
-          if(field != 'criterion_id' && field != '$$hashKey')
+          if(field != 'id' && field != '$$hashKey')
             csv_str += field + ';';
 
         csv_str = csv_str.substring(0, csv_str.length - 1);
@@ -527,7 +533,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
 
       for(criterion in $scope.criteria) {
         for(field in $scope.criteria[criterion])
-          if(field != 'criterion_id' && field != '$$hashKey')
+          if(field != 'id' && field != '$$hashKey')
             csv_str += $scope.criteria[criterion][field] + ';';
 
         csv_str = csv_str.substring(0, csv_str.length - 1);
@@ -546,7 +552,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
       for(criterion in $scope.criteria) {
         var json_element = {};
         for(field in $scope.criteria[criterion]) {
-          if(field != 'criterion_id' && field != '$$hashKey')
+          if(field != 'id' && field != '$$hashKey')
             json_element[field] = $scope.criteria[criterion][field];
         }
 
@@ -713,7 +719,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
   $scope.showCompareExecution = function(execution) {
     $scope.compareExecution = execution;
   }
-  
+
   requestLogIn();
   rewriteLastUpdate();
 });

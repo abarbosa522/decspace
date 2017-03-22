@@ -303,5 +303,31 @@ app.delete('/projects/:id', function(req, res) {
   });
 });
 
+//delphi responses
+var db3 = mongojs('mongodb://' + username + ':' + password + '@ds157247.mlab.com:57247/decspace_users', ['projects']);
+
+//db3 functions - delphi responses
+//get all delphi survey responses from db
+app.get('/delphi_responses', function(req, res) {
+  db3.delphi_responses.find(function (err, doc) {
+    res.json(doc);
+  });
+});
+
+//insert new delphi response
+app.post('/delphi_responses', function(req, res) {
+  db3.delphi_responses.insert(req.body, function(err, doc) {
+    res.json(doc);
+  });
+});
+
+//delete project
+app.delete('/delphi_responses/:id', function(req, res) {
+  var id = req.params.id;
+  db3.delphi_responses.remove({_id: mongojs.ObjectId(id)}, function(err, doc) {
+    res.json(doc);
+  });
+});
+
 app.listen(8082);
 console.log("Server running on port 8082");

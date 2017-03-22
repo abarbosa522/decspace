@@ -7,7 +7,7 @@
 
     <!-- CSS Stylesheet -->
     <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css'/>
-    <link rel = 'stylesheet' type = 'text/css' href = '../../css/sort.css' />
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/sort.css'/>
 
     <!-- jQuery -->
     <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
@@ -241,10 +241,10 @@
                   </button>
                 </td>
                 <td ng-if = 'deleteIdExecution == execution.execution_id'>
-                  <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAllExecutions()' title = 'Confirm Delete'>
+                  <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteExecution(execution)' title = 'Confirm Delete'>
                     <span class = 'glyphicon glyphicon-ok'></span>
                   </button>
-                  <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAllExecutions()' title = 'Cancel Delete'>
+                  <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteExecution()' title = 'Cancel Delete'>
                     <span class = 'glyphicon glyphicon-remove'></span>
                   </button>
                 </td>

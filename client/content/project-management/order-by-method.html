@@ -306,7 +306,7 @@
               </thead>
               <!-- Added Criteria -->
               <tbody>
-                <tr ng-repeat = 'criterion in criteria' ng-class = '{danger: criterion.criterion_id == deleteIdCriterion}'>
+                <tr ng-repeat = 'criterion in criteria' ng-class = '{danger: criterion.id == deleteIdCriterion}'>
                   <td>
                     <input type = 'radio' ng-checked = 'criterion.selected == "true"' ng-click = 'selectCriterion(criterion)' >
                   </td>
@@ -327,12 +327,12 @@
                       <option>Descendant</option>
                     </select>
                   </td>
-                  <td ng-if = 'criterion.criterion_id != deleteIdCriterion'>
+                  <td ng-if = 'criterion.id != deleteIdCriterion'>
                     <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteCriterion(criterion)' title = 'Delete Criterion'>
                       <span class = 'glyphicon glyphicon-minus'></span>
                     </button>
                   </td>
-                  <td ng-if = 'criterion.criterion_id == deleteIdCriterion'>
+                  <td ng-if = 'criterion.id == deleteIdCriterion'>
                     <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteCriterion(criterion)' title = 'Confirm Delete Criterion'>
                       <span class = 'glyphicon glyphicon-ok'></span>
                     </button>
@@ -403,19 +403,19 @@
                 <th class = 'col-md-2'></th>
               </thead>
               <tbody>
-                <tr ng-repeat = 'action in actions' ng-class = '{danger: action.action_id == deleteIdAction}'>
+                <tr ng-repeat = 'action in actions' ng-class = '{danger: action.id == deleteIdAction}'>
                   <td>
                     <input class = 'form-control' type = 'text' ng-model = 'action.name'>
                   </td>
                   <td ng-repeat = 'criterion in criteria'>
                     <input class = 'form-control' ng-model = 'action[criterion.name]'>
                   </td>
-                  <td ng-if = 'action.action_id != deleteIdAction'>
+                  <td ng-if = 'action.id != deleteIdAction'>
                     <button type = 'button' class = 'btn btn-danger btn-action-remove' ng-click = 'deleteAction(action)' data-toggle = 'tooltip' title = 'Delete Action'>
                       <span class = 'glyphicon glyphicon-minus'></span>
                     </button>
                   </td>
-                  <td ng-if = 'action.action_id == deleteIdAction'>
+                  <td ng-if = 'action.id == deleteIdAction'>
                     <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAction(action)' title = 'Confirm Delete Action'>
                       <span class = 'glyphicon glyphicon-ok'></span>
                     </button>
@@ -478,10 +478,10 @@
                   </button>
                 </td>
                 <td ng-if = 'deleteIdExecution == execution.execution_id'>
-                  <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAllExecutions()' title = 'Confirm Delete'>
+                  <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteExecution(execution)' title = 'Confirm Delete'>
                     <span class = 'glyphicon glyphicon-ok'></span>
                   </button>
-                  <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAllExecutions()' title = 'Cancel Delete'>
+                  <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteExecution()' title = 'Cancel Delete'>
                     <span class = 'glyphicon glyphicon-remove'></span>
                   </button>
                 </td>
