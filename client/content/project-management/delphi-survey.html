@@ -62,42 +62,42 @@
     <div id = 'main-content' class = 'container'>
 
       <!-- Button Bar -->
-      <div class = 'btn-toolbar' role = 'toolbar' style = 'position:fixed'>
-        <div class = 'btn-group' role = 'group'>
-          <!-- Save Button -->
-          <button type = 'button' class = 'btn btn-primary' ng-click = 'saveData()' title = 'Save Data'>
-            <span class = 'glyphicon glyphicon-floppy-save icon-large'></span>
-          </button>
+        <div class = 'btn-toolbar col-md-4' role = 'toolbar' style = 'position:fixed'>
+          <div class = 'btn-group' role = 'group'>
+            <!-- Save Button -->
+            <button type = 'button' class = 'btn btn-primary' ng-click = 'saveData()' title = 'Save Data'>
+              <span class = 'glyphicon glyphicon-floppy-save icon-large'></span>
+            </button>
 
-          <!-- Reload Data Button -->
-          <button type = 'button' class = 'btn btn-info' ng-click = 'reloadData()' title = 'Reload Data'>
-            <span class = 'glyphicon glyphicon-refresh'></span>
-          </button>
+            <!-- Reload Data Button -->
+            <button type = 'button' class = 'btn btn-info' ng-click = 'reloadData()' title = 'Reload Data'>
+              <span class = 'glyphicon glyphicon-refresh'></span>
+            </button>
 
-          <!-- Reset Data Button -->
-          <button type = 'button' class = 'btn btn-danger' ng-click = 'resetData()' title = 'Reset Data' ng-if = '!showResetData'>
-            <span class = 'glyphicon glyphicon-trash'></span>
-          </button>
+            <!-- Reset Data Button -->
+            <button type = 'button' class = 'btn btn-danger' ng-click = 'resetData()' title = 'Reset Data' ng-if = '!showResetData'>
+              <span class = 'glyphicon glyphicon-trash'></span>
+            </button>
 
-          <!-- Confirm Reset Data -->
-          <button type = 'button' class = 'btn btn-success' ng-click = 'confirmResetData()' title = 'Confirm Data Reset' ng-if = 'showResetData'>
-            <span class = 'glyphicon glyphicon-ok'></span>
-          </button>
+            <!-- Confirm Reset Data -->
+            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmResetData()' title = 'Confirm Data Reset' ng-if = 'showResetData'>
+              <span class = 'glyphicon glyphicon-ok'></span>
+            </button>
 
-          <!-- Cancel Reset Data -->
-          <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelResetData()' title = 'Cancel Data Reset' ng-if = 'showResetData'>
-            <span class = 'glyphicon glyphicon-remove'></span>
-          </button>
+            <!-- Cancel Reset Data -->
+            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelResetData()' title = 'Cancel Data Reset' ng-if = 'showResetData'>
+              <span class = 'glyphicon glyphicon-remove'></span>
+            </button>
+          </div>
         </div>
-      </div>
 
-      <!-- Data Saved Alert -->
-      <div class = 'alert alert-success alert-dismissible' role = 'alert' ng-if = 'showSaveSuccess' ng-cloak>
-        <button type = 'button' class = 'close' data-dismiss = 'alert' aria-label = 'Close' ng-click = 'changeSaveSuccess()'>
-          <span aria-hidden = 'true'>&times;</span>
-        </button>
-        Data <strong>successfully</strong> saved.
-      </div>
+        <!-- Data Saved Alert -->
+        <div class = 'alert alert-success alert-dismissible col-md-8' role = 'alert' ng-if = 'showSaveSuccess'  ng-cloak>
+          <button type = 'button' class = 'close' data-dismiss = 'alert' aria-label = 'Close' ng-click = 'changeSaveSuccess()'>
+            <span aria-hidden = 'true'>&times;</span>
+          </button>
+          Data <strong>successfully</strong> saved.
+        </div>
 
       <br><br>
 

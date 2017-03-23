@@ -21,6 +21,9 @@
     <!-- AngularJS Controllers -->
     <script src = '../../js/controllers/project-management/DelphiMethodController.js'></script>
 
+    <!-- AngularJS Services -->
+    <script src = '../../js/services/DelphiService.js'></script>
+
     <!-- Bootstrap -->
     <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
     <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.js'></script>
@@ -76,7 +79,7 @@
       <ul class = 'nav nav-tabs nav-justified'>
         <li role = 'presentation' class = 'active'><a data-toggle = 'tab' href= '#description'>Method Description</a></li>
         <li role = 'presentation'><a data-toggle = 'tab' href= '#data-input'>Round Configuration</a></li>
-        <li role = 'presentation'><a data-toggle = 'tab' href= '#results'>Results and Execution</a></li>
+        <li role = 'presentation'><a data-toggle = 'tab' href= '#results'>Results and Executions</a></li>
       </ul>
 
       <div class = 'tab-content'>
@@ -379,7 +382,7 @@
           </div>
         </div>
 
-        <!-- Results and Execution -->
+        <!-- Results and Executions -->
         <div id = 'results' class = 'tab-pane fade'>
 
           <br>
@@ -394,7 +397,7 @@
             <tbody>
               <!-- Previous Executions -->
               <tr ng-repeat = 'execution in executions' ng-class = '{"danger":  execution.id == deleteIdExecution || deleteIdExecution == "all"}'>
-                <td>{{execution.id}}</td>
+                <td>{{$index + 1}}</td>
                 <td>{{execution.execution_date}}</td>
                 <td>{{execution.comment}}</td>
                 <td ng-if = 'deleteIdExecution != execution.id'>
@@ -468,14 +471,12 @@
                       </ul>
                     </div>
 
-                    <h1>Round Configurations</h1>
-
                     <!-- Input Emails -->
                     <div class = 'row'>
                       <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#emails-exec-table' style = 'float:right' ng-click = 'emails_exec_eye = (emails_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Emails'>
                         <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : emails_exec_eye == 0, "glyphicon-eye-close" : emails_exec_eye == 1}'></span>
                       </button>
-                      <h2>Specialists' Emails List</h2>
+                      <h1>Specialists' Emails List</h1>
                     </div>
 
                     <div id = 'emails-exec-table' class = 'row collapse in'>
@@ -484,14 +485,21 @@
                           <thead>
                             <tr>
                               <th class = 'text-center'>Email Address</th>
+                              <th class = 'text-center'>Answered</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr ng-repeat = 'email in currentExecution.emails'>
                               <td>{{email.address}}</td>
+                              <td>
+                                <span class = 'glyphicon glyphicon-ok' style = 'color:green' ng-if = 'currentExecution.emails_answers.includes(email.address)'></span>
+                                <span class = 'glyphicon glyphicon-remove' style = 'color:red' ng-if = '!currentExecution.emails_answers.includes(email.address)'></span>
+                              </td>
                             </tr>
                           </tbody>
                         </table>
+
+                        <strong>Total Answers:</strong> {{currentExecution.emails_answers.length}}
                       </div>
 
                       <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
@@ -499,14 +507,21 @@
                           <thead>
                             <tr>
                               <th class = 'text-center'>Email Address</th>
+                              <th class = 'text-center'>Answered</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr ng-repeat = 'email in compareExecution.emails'>
                               <td>{{email.address}}</td>
+                              <td>
+                                <span class = 'glyphicon glyphicon-ok' style = 'color:green' ng-if = 'compareExecution.emails_answers.includes(email.address)'></span>
+                                <span class = 'glyphicon glyphicon-remove' style = 'color:red' ng-if = '!compareExecution.emails_answers.includes(email.address)'></span>
+                              </td>
                             </tr>
                           </tbody>
                         </table>
+
+                        <strong>Total Answers:</strong> {{compareExecution.emails_answers.length}}
                       </div>
                     </div>
 
@@ -515,7 +530,7 @@
                       <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#questions-exec-table' style = 'float:right' ng-click = 'questions_exec_eye = (questions_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Questions'>
                         <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : questions_exec_eye == 0, "glyphicon-eye-close" : questions_exec_eye == 1}'></span>
                       </button>
-                      <h2>Questions</h2>
+                      <h1>Questions</h1>
                     </div>
 
                     <div id = 'questions-exec-table' class = 'row collapse in'>
@@ -524,11 +539,15 @@
                           <thead>
                             <tr>
                               <th class = 'text-center'>Question</th>
+                              <th class = 'text-center'>Total Score</th>
+                              <th class = 'text-center'>Average</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr ng-repeat = 'question in currentExecution.questions'>
                               <td>{{question.content}}</td>
+                              <td>{{question.total_score}}</td>
+                              <td>{{question.average}}</td>
                             </tr>
                           </tbody>
                         </table>
@@ -539,21 +558,20 @@
                           <thead>
                             <tr>
                               <th class = 'text-center'>Question</th>
+                              <th class = 'text-center'>Total Score</th>
+                              <th class = 'text-center'>Average</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr ng-repeat = 'question in compareExecution.questions'>
                               <td>{{question.content}}</td>
+                              <td>{{question.total_score}}</td>
+                              <td>{{question.average}}</td>
                             </tr>
                           </tbody>
                         </table>
                       </div>
                     </div>
-
-                    <h1>Round Results</h1>
-
-                    
-
                   </div>
                 </div>
               </div>

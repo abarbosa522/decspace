@@ -1,4 +1,4 @@
-app.controller('DelphiMethodController', function($scope, $window, $http) {
+app.controller('DelphiMethodController', function($scope, $window, $http, DelphiService) {
   /*** SETUP FUNCTIONS ***/
 
   //get the id of the open project
@@ -106,6 +106,11 @@ app.controller('DelphiMethodController', function($scope, $window, $http) {
         });
       });
     });
+  }
+
+  //hide successful save message after being dismissed
+  $scope.changeSaveSuccess = function() {
+    $scope.showSaveSuccess = false;
   }
 
   //reload the stored data on the database
@@ -419,14 +424,15 @@ app.controller('DelphiMethodController', function($scope, $window, $http) {
   $scope.emails_exec_eye = 1;
   $scope.questions_exec_eye = 1;
 
-  //retrieve the executions stored in the database
+  //retrieve the rounds stored in the database
   function getExecutions() {
-    $http.get('/projects').success(function(response) {
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          //get the actions previously added
-          $scope.executions = response[proj]['executions'];
-          break;
+    //reset list of executions
+    $scope.executions = [];
+
+    $http.get('/delphi_rounds').success(function(response) {
+      for(round in response) {
+        if(response[round]['username'] == $scope.username && response[round]['project_id'] == proj_id) {
+          $scope.executions.push(response[round]);
         }
       }
     });
@@ -440,10 +446,7 @@ app.controller('DelphiMethodController', function($scope, $window, $http) {
     //show loading button
     $scope.isLoading = true;
 
-    var results = '';
-    //var results = OrderByService.getResults($scope.criteria, $scope.actions);
-
-    $http.get('/projects').success(function(response) {
+    $http.get('/delphi_rounds').success(function(response) {
       //get current date
       var current_date = new Date();
       var execution_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear() + ' ' + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
@@ -455,40 +458,81 @@ app.controller('DelphiMethodController', function($scope, $window, $http) {
       else
         comment = $scope.new_execution.comment;
 
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          var id;
-          //get the largest execution_id
-          if(response[proj]['executions'].length == 0)
-            id = 1;
-          else
-            id = response[proj]['executions'][response[proj]['executions'].length - 1]['id'] + 1;
+      //get the largest round id
+      var id = 0;
 
-          //insert execution into database
-          response[proj]['executions'].push({'id':id,'emails':$scope.emails,'questions':$scope.questions,'results':results,'comment':comment,'execution_date':execution_date});
-          //get the id of the document, so that it can be removed from the db
-          id_doc = response[proj]['_id'];
-          //project to store in the db
-          proj_res = response[proj];
-          delete proj_res['_id'];
-          break;
-        }
-      }
+      for(round in response)
+        if(response[round]['id'] > id)
+          id = response[round]['id'];
 
-      //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function() {
-        //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
-          getExecutions();
+      id++;
 
-          //reset the comment input field, if it was filled
-          if(typeof $scope.new_execution != 'undefined')
-            $scope.new_execution.comment = '';
+      //create the new round
+      var new_round = {};
+      //define the id of the round
+      new_round['id'] = id;
+      //project this round belongs to
+      new_round['project_id'] = proj_id;
+      //who created the round
+      new_round['username'] = $scope.username;
+      //list of emails
+      new_round['emails'] = $scope.emails;
+      //list of questions
+      new_round['questions'] = $scope.questions
+      //round comment
+      new_round['comment'] = comment;
+      //date round was created
+      new_round['execution_date'] = execution_date;
 
-          $scope.isLoading = false;
-        });
+      //add the new list of projects
+      $http.post('/delphi_rounds', new_round).success(function() {
+        //update list of rounds
+        getExecutions();
+
+        //create the answer documents
+        createAnswerDocs(new_round);
+
+        //reset the comment input field, if it was filled
+        if(typeof $scope.new_execution != 'undefined')
+          $scope.new_execution.comment = '';
+
+        //hide loading button
+        $scope.isLoading = false;
       });
     });
+  }
+
+  function createAnswerDocs(new_round) {
+    for(email in new_round['emails']) {
+      //create a new answer document
+      var new_answer = {};
+      //define the corresponding round id
+      new_answer['round_id'] = new_round['id'];
+      //define the user that created the round
+      new_answer['user_creator'] = new_round['username'];
+      //define the user that will answer the survey
+      new_answer['user'] = new_round['emails'][email]['address'];
+      //define the empty set of answers
+      new_answer['questions_answered'] = [];
+
+      //define the set of unanswered question
+      new_answer['questions_unanswered'] = [];
+
+      //add the position to the questions - corresponding to the drop box they are in
+      //-1 means that the question has not been assigned a drop box
+      for(question in $scope.questions) {
+        var new_question = {};
+        new_question['content'] = $scope.questions[question]['content'];
+        new_question['id'] = $scope.questions[question]['id'];
+        new_question['position'] = -1;
+        new_question['score'] = 'null';
+        new_answer['questions_unanswered'].push(new_question);
+      }
+
+      //add the new list of projects
+      $http.post('/delphi_responses', new_answer).success(function() {
+      });
+    }
   }
 
   //variable that controls the execution to show
@@ -499,13 +543,32 @@ app.controller('DelphiMethodController', function($scope, $window, $http) {
 
   //show modal with execution details
   $scope.showExecution = function(execution) {
-    $scope.currentExecution = execution;
-    $scope.compareExecution = '';
+    var results = DelphiService.aggregateResults(execution.id);
+
+    results.then(function(resolve) {
+
+      $scope.currentExecution = execution;
+
+      $scope.currentExecution.questions = resolve[0];
+
+      $scope.currentExecution.emails_answers = resolve[1];
+
+      $scope.compareExecution = '';
+    });
   }
 
   //show the execution to compare with
   $scope.showCompareExecution = function(execution) {
-    $scope.compareExecution = execution;
+    var results = DelphiService.aggregateResults(execution.id);
+
+    results.then(function(resolve) {
+
+      $scope.compareExecution = execution;
+
+      $scope.compareExecution.questions = resolve[0];
+
+      $scope.compareExecution.emails_answers = resolve[1];
+    });
   }
 
   //variable that controls the selected execution to be deleted
@@ -518,35 +581,23 @@ app.controller('DelphiMethodController', function($scope, $window, $http) {
 
   //confirm execution deletion
   $scope.confirmDeleteExecution = function(execution) {
-    $http.get('/projects').success(function(response) {
-      var id_doc, proj_res;
+    $http.get('/delphi_rounds').success(function(response) {
+      var id_doc;
 
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          for(exec in response[proj]['executions']) {
-            if(response[proj]['executions'][exec]['id'] == execution.id) {
-              response[proj]['executions'].splice(exec, 1);
-              //get the id of the document, so that it can be removed from the db
-              id_doc = response[proj]['_id'];
-              //project to store in the db
-              proj_res = response[proj];
-              delete proj_res['_id'];
-              break;
-            }
-          }
+      for(round in response) {
+        if(response[round]['username'] == $scope.username && response[round]['project_id'] == proj_id && response[round]['id'] == execution.id) {
+          //get the id of the document, so that it can be removed from the db
+          id_doc = response[round]['_id'];
           break;
         }
       }
 
-      //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function() {
-        //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
-          //refresh the list of projects
-          getExecutions();
-          //reset id execution variable
-          $scope.deleteIdExecution = '';
-        });
+      //delete the delphi round
+      $http.delete('/delphi_rounds/' + id_doc).success(function() {
+        //refresh the list of rounds
+        getExecutions();
+        //reset id execution variable
+        $scope.deleteIdExecution = '';
       });
     });
   }
@@ -561,33 +612,23 @@ app.controller('DelphiMethodController', function($scope, $window, $http) {
     $scope.deleteIdExecution = 'all';
   }
 
-  //confirm the deletion of all executions
+  //confirm the deletion of all executions of the current project
   $scope.confirmDeleteAllExecutions = function() {
-    $http.get('/projects').success(function(response) {
-      var id_doc, proj_res;
-
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          response[proj]['executions'] = [];
+    $http.get('/delphi_rounds').success(function(response) {
+      for(round in response) {
+        if(response[round]['username'] == $scope.username && response[round]['project_id'] == proj_id) {
           //get the id of the document, so that it can be removed from the db
-          id_doc = response[proj]['_id'];
-          //project to store in the db
-          proj_res = response[proj];
-          delete proj_res['_id'];
-          break;
+          var id_doc = response[round]['_id'];
+
+          //delete the delphi round
+          $http.delete('/delphi_rounds/' + id_doc).success(function() {
+            //refresh the list of rounds
+            getExecutions();
+            //reset id execution variable
+            $scope.deleteIdExecution = '';
+          });
         }
       }
-
-      //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function(){
-        //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
-          //refresh the list of executions
-          getExecutions();
-          //reset delete variable
-          $scope.deleteIdExecution = '';
-        });
-      });
     });
   }
 

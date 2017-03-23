@@ -3,10 +3,8 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
 
   //get the current url
   var url = window.location.href;
-  //get the delphi project id
-  var proj_id = url.slice(url.indexOf('project=') + 'project='.length, url.indexOf('&exec='));
   //get the delphi round (execution) id
-  var exec_id = Number(url.slice(url.indexOf('&exec=') + '&exec='.length, url.indexOf('&user=')));
+  var round_id = Number(url.slice(url.indexOf('round=') + 'round='.length, url.indexOf('&user=')));
   //get the user's email address
   $scope.user_id = url.substr(url.indexOf('&user=') + '&user='.length);
 
@@ -21,21 +19,21 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
 
   //get delphi project questions
   function getQuestions() {
-    $http.get('/projects').success(function(response) {
-      //get the delphi project
-      for(proj in response)
-        if(response[proj]['_id'] == proj_id)
-          for(exec in response[proj]['executions'])
-            if(response[proj]['executions'][exec]['id'] == exec_id)
-              $scope.questions_unanswered = response[proj]['executions'][exec]['questions'];
+    //get the stored answers
+    $http.get('/delphi_responses').success(function(response) {
+      //get the current answer
+      for(answer in response) {
+        if(response[answer]['user'] == $scope.user_id && response[answer]['round_id'] == round_id) {
+          //get the stored answered questions
+          $scope.questions_answered = response[answer]['questions_answered'];
+          //get the stores unanswered questions
+          $scope.questions_unanswered = response[answer]['questions_unanswered'];
 
-      //add the position to the questions - corresponding to the drop box they are in
-      //-1 means that the question has not been assigned a drop box
-      for(question in $scope.questions_unanswered) {
-        $scope.questions_unanswered[question]['position'] = -1;
-        $scope.questions_unanswered[question]['score'] = 'null';
+          break;
+        }
       }
 
+      //build the q-sort matrix
       buildMatrix();
     });
   }
@@ -46,7 +44,7 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
     //represents the q-sort matrix
     var rows = [];
     //determines when to stop, i.e. when reaches 0
-    var total_rows = $scope.questions_unanswered.length;
+    var total_rows = $scope.questions_answered.length + $scope.questions_unanswered.length;
 
     //calculate the number of rows and the number of parcels in each row
     while(total_rows > 0) {
@@ -90,47 +88,51 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
 
   //save the current data on the database
   $scope.saveData = function() {
-    $http.get('/projects').success(function(response) {
-      var id_doc, proj_res;
+    $http.get('/delphi_responses').success(function(response) {
+      var id_doc, answer_res;
 
-      //get the current project
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          //store emails
-          response[proj]['emails'] = $scope.emails;
-          //store questions
-          response[proj]['questions'] = $scope.questions;
+      //get the current answer
+      for(answer in response) {
+        if(response[answer]['user'] == $scope.user_id && response[answer]['round_id'] == round_id) {
+          //store answered questions
+          response[answer]['questions_answered'] = $scope.questions_answered;
+          //store unanswered questions
+          response[answer]['questions_unanswered'] = $scope.questions_unanswered;
 
           //get the id of the document
-          id_doc = response[proj]['_id'];
-          //project to store in the db
-          proj_res = response[proj];
-          delete proj_res['_id'];
+          id_doc = response[answer]['_id'];
+          //answer to store in the database
+          answer_res = response[answer];
+          delete answer_res['_id'];
           break;
         }
       }
 
-      //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function() {
-        //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+      //delete the previous document
+      $http.delete('/delphi_responses/' + id_doc).success(function() {
+        //add the new answers
+        $http.post('/delphi_responses', answer_res).success(function() {
           $scope.showSaveSuccess = true;
         });
       });
     });
   }
 
+  //hide successful save message after being dismissed
+  $scope.changeSaveSuccess = function() {
+    $scope.showSaveSuccess = false;
+  }
+  
   //reload the stored data on the database
   $scope.reloadData = function() {
-    $http.get('/projects').success(function(response) {
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          //retrieve the list of emails from the database
-          if(response[proj]['emails'] != undefined)
-            $scope.emails = response[proj]['emails'];
-          //retrieve the list of questions from the database
-          if(response[proj]['questions'] != undefined)
-            $scope.questions = response[proj]['questions'];
+    $http.get('/delphi_responses').success(function(response) {
+      //get the current answer
+      for(answer in response) {
+        if(response[answer]['user'] == $scope.user_id && response[answer]['round_id'] == round_id) {
+          //get the stored answered questions
+          $scope.questions_answered = response[answer]['questions_answered'];
+          //get the stores unanswered questions
+          $scope.questions_unanswered = response[answer]['questions_unanswered'];
 
           break;
         }
@@ -145,9 +147,17 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
 
   //confirm reset of the current data
   $scope.confirmResetData = function() {
-    //reset the input data
-    $scope.emails = [];
-    $scope.questions = [];
+    for(question in $scope.questions_answered) {
+      //reset the position and score of the answered question
+      $scope.questions_answered[question]['position'] = -1;
+      $scope.questions_answered[question]['score'] = 'null';
+      //add the question to the unanswered set of questions
+      $scope.questions_unanswered.push($scope.questions_answered[question]);
+    }
+    $scope.questions_answered = [];
+    //sort the questions by id
+    $scope.questions_unanswered.sort(sortById);
+
     //hide the reset confirmation and cancelation buttons
     $scope.showResetData = false;
   }
