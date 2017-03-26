@@ -1,4 +1,4 @@
-app.controller('DelphiMethodController', function($scope, $window, $http, DelphiService) {
+app.controller('SRFMethodController', function($scope, $window, $http) {
   /*** SETUP FUNCTIONS ***/
 
   //get the id of the open project
@@ -77,7 +77,7 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
   $scope.showResetData = false;
 
   //save the current data on the database
-  $scope.saveData = function() {
+  /*$scope.saveData = function() {
     $http.get('/projects').success(function(response) {
       var id_doc, proj_res;
 
@@ -106,7 +106,7 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
         });
       });
     });
-  }
+  }*/
 
   //hide successful save message after being dismissed
   $scope.changeSaveSuccess = function() {
@@ -118,12 +118,7 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
     $http.get('/projects').success(function(response) {
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          //retrieve the list of emails from the database
-          if(response[proj]['emails'] != undefined)
-            $scope.emails = response[proj]['emails'];
-          //retrieve the list of questions from the database
-          if(response[proj]['questions'] != undefined)
-            $scope.questions = response[proj]['questions'];
+          //retrieve the criteria from the database
 
           break;
         }
@@ -137,13 +132,13 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
   }
 
   //confirm reset of the current data
-  $scope.confirmResetData = function() {
+  /*$scope.confirmResetData = function() {
     //reset the input data
     $scope.emails = [];
     $scope.questions = [];
     //hide the reset confirmation and cancelation buttons
     $scope.showResetData = false;
-  }
+  }*/
 
   //cancel the data reset
   $scope.cancelResetData = function() {
@@ -154,17 +149,17 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
   /*** IMPORT AND EXPORT FUNCTIONS ***/
 
   //import the files of the checked boxes
-  $scope.importData = function() {
+  /*$scope.importData = function() {
     if(angular.element(document.querySelector('#import-emails-check')).prop('checked')) {
       importFile('import-emails-file');
     }
     if(angular.element(document.querySelector('#import-questions-check')).prop('checked')) {
       importFile('import-questions-file');
     }
-  }
+  }*/
 
   //import file according to its extension
-  function importFile(input_id) {
+  /*function importFile(input_id) {
     var file_input = document.getElementById(input_id);
 
     var reader = new FileReader();
@@ -224,10 +219,10 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
 
     //get the data from the file
     reader.readAsText(file_input.files[0]);
-  }
+  }*/
 
   //get the converted data as the current data
-  function fileConverter(input_id, data) {
+  /*function fileConverter(input_id, data) {
     switch(input_id) {
       case 'import-emails-file':
         $scope.emails = data;
@@ -237,22 +232,22 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
         $scope.questions = data;
         break;
     }
-  }
+  }*/
 
   //select emails and questions import checkboxes
-  $scope.selectAllImport = function() {
+  /*$scope.selectAllImport = function() {
     document.getElementById('import-emails-check').checked = true;
     document.getElementById('import-questions-check').checked = true;
-  }
+  }*/
 
   //deselect emails and questions import checkboxes
-  $scope.selectNoneImport = function() {
+  /*$scope.selectNoneImport = function() {
     document.getElementById('import-emails-check').checked = false;
     document.getElementById('import-questions-check').checked = false;
-  }
+  }*/
 
   //export the selected data
-  $scope.exportData = function() {
+  /*$scope.exportData = function() {
     //export emails to csv
     if(angular.element(document.querySelector('#export-emails-check')).prop('checked') && angular.element(document.querySelector('#csv-radio')).prop('checked')) {
       var csv_str = 'address\n';
@@ -326,96 +321,146 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
       hidden_element.download = 'questions.json';
       hidden_element.click();
     }
-  }
+  }*/
 
   //select emails and questions export checkboxes
-  $scope.selectAllExport = function() {
+  /*$scope.selectAllExport = function() {
     document.getElementById('export-emails-check').checked = true;
     document.getElementById('export-questions-check').checked = true;
-  }
+  }*/
 
   //deselect emails and questions export checkboxes
-  $scope.selectNoneExport = function() {
+  /*$scope.selectNoneExport = function() {
     document.getElementById('export-emails-check').checked = false;
     document.getElementById('export-questions-check').checked = false;
-  }
+  }*/
 
-  /*** INPUT DATA - EMAILS ***/
+  /*** INPUT DATA - CRITERIA ***/
 
-  //variable that stores all the current email addresses
-  $scope.emails = [];
+  //variable that stores all the current criteria
+  $scope.criteria = [];
 
-  //variable that holds the email that is selected to be deleted
-  $scope.delete_email = '';
+  //variable that holds the criterion that is selected to be deleted
+  $scope.delete_criterion = '';
 
-  //variable that controls the showing/hiding of the emails
-  $scope.emails_eye = 1;
+  //variable that controls the showing/hiding of the criteria
+  $scope.criteria_eye = 1;
 
-  //add a new email
-  $scope.addEmail = function() {
-    if($scope.emails.length == 0)
-      $scope.new_email.id = 1;
+  //add a new criterion
+  $scope.addCriterion = function() {
+    if($scope.criteria.length == 0)
+      $scope.new_criterion.id = 1;
     else
-      $scope.new_email.id = $scope.emails[$scope.emails.length - 1]['id'] + 1;
+      $scope.new_criterion.id = $scope.criteria[$scope.criteria.length - 1]['id'] + 1;
 
-    $scope.emails.push(angular.copy($scope.new_email));
+    //criterion starts unassigned to any rank
+    $scope.new_criterion.position = -1;
 
-    $scope.new_email.address = '';
+    $scope.criteria.push(angular.copy($scope.new_criterion));
+
+    $scope.new_criterion.name = '';
   }
 
-  //delete a certain email
-  $scope.deleteEmail = function(email) {
-    $scope.delete_email = email.id;
+  //delete a certain criterion
+  $scope.deleteCriterion = function(criterion) {
+    $scope.delete_criterion = criterion.id;
   }
 
-  //confirm the email deletion
-  $scope.confirmDeleteEmail = function(email) {
-    $scope.emails.splice($scope.emails.indexOf(email), 1);
-    $scope.delete_email = '';
+  //confirm the criterion deletion
+  $scope.confirmDeleteCriterion = function(criterion) {
+    $scope.criteria.splice($scope.criteria.indexOf(criterion), 1);
+    $scope.delete_criterion = '';
   }
 
-  //cancel the email deletion
-  $scope.cancelDeleteEmail = function() {
-    $scope.delete_email = '';
+  //cancel the criterion deletion
+  $scope.cancelDeleteCriterion = function() {
+    $scope.delete_criterion = '';
   }
 
-  /*** INPUT DATA - QUESTIONS ***/
+  /*** INPUT DATA - WHITE CARDS ***/
 
-  //variable that stores all the current questions
-  $scope.questions = [];
+  //white card available to be dragged
+  $scope.white_card = {
+    'white_card' : true,
+    'id' : 0
+  };
 
-  //variable that holds the question that is selected to be deleted
-  $scope.delete_question = '';
+  //dragged white cards
+  $scope.white_cards = [];
 
-  //variable that controls the showing/hiding of the questions
-  $scope.questions_eye = 1;
+  /*** INPUT DATA - RANKING ***/
 
-  //add a new question
-  $scope.addQuestion = function() {
-    if($scope.questions.length == 0)
-      $scope.new_question.id = 1;
+  //variable that stores all the current ranking
+  $scope.ranking = 2;
+
+  //variable that controls the showing/hiding of the ranking
+  $scope.ranking_eye = 1;
+
+  //create an array the size of $scope.ranking so that it can be used by ng-repeat
+  $scope.rangeRepeater = function(count) {
+    return new Array(count);
+  };
+
+  //new row is always the new least important
+  $scope.addRanking = function() {
+    $scope.ranking++;
+  }
+
+  $scope.removeRanking = function() {
+    //don't allow less than 2 rankings
+    if($scope.ranking > 2)
+      $scope.ranking--;
+
+    //check if there were any criteria cards dragged into the deleted ranking
+    //if there were, then reset their position
+    for(criterion in $scope.criteria)
+      if($scope.criteria[criterion]['position'] >= $scope.ranking)
+        $scope.criteria[criterion]['position'] = -1;
+
+    //check if there were any white cards dragged into the deleted ranking
+    //if there were, then reset their position
+    for(white_card in $scope.white_cards)
+      if($scope.white_cards[white_card]['position'] >= $scope.ranking)
+        $scope.white_cards[white_card]['position'] = -1;
+  }
+
+  /*** INPUT DATA - OTHER PARAMETERS ***/
+
+  $scope.ratio_z = '';
+
+  $scope.decimal_places = '';
+  
+  /*** DRAG AND DROP FUNCTIONS ***/
+
+  //change a card's ranking position
+  $scope.rankingDrop = function(data, index) {
+    //if the white card on the original drop was dragged
+    if(data['white_card'] && data['id'] == 0) {
+      var new_white_card = {
+        'position' : index,
+        'id' : $scope.white_cards.length + 1,
+        'white_card' : true
+      };
+
+      $scope.$apply($scope.white_cards.push(new_white_card));
+    }
+    //if a criteria card was dragged
     else
-      $scope.new_question.id = $scope.questions[$scope.questions.length - 1]['id'] + 1;
-
-    $scope.questions.push(angular.copy($scope.new_question));
-
-    $scope.new_question.content = '';
+      data['position'] = index;
   }
 
-  //delete a certain question
-  $scope.deleteQuestion = function(question) {
-    $scope.delete_question = question.id;
+  //put a criteria card back into the original drop
+  $scope.originalCriteriaDrop = function(data) {
+    if(data['white_card'] == undefined)
+      data['position'] = -1;
   }
 
-  //confirm the question deletion
-  $scope.confirmDeleteQuestion = function(question) {
-    $scope.questions.splice($scope.questions.indexOf(question), 1);
-    $scope.delete_question = '';
-  }
-
-  //cancel the question deletion
-  $scope.cancelDeleteQuestion = function() {
-    $scope.delete_question = '';
+  //put a white card back into the original drop
+  $scope.originalWhiteDrop = function(data) {
+    if(data['white_card'] && data['id'] != 0) {
+      data['position'] = -1;
+      $scope.$apply($scope.white_cards);
+    }
   }
 
   /*** EXECUTIONS AND RESULTS FUNCTIONS ***/

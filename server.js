@@ -5,7 +5,7 @@ var bodyParser = require('body-parser');
 app.use(express.static(__dirname + "/client"));
 app.use(bodyParser.json());
 
-//SESSION MANAGEMENT
+/***SESSION MANAGEMENT***/
 var session = require('client-sessions');
 
 //session handler
@@ -53,7 +53,7 @@ app.get('/logout', function(req, res) {
   res.send(req.session);
 });
 
-//EMAIL HANDLING
+/***EMAIL HANDLING***/
 var nodemailer = require('nodemailer');
 
 //email transporter
@@ -84,13 +84,32 @@ app.post('/contactus', function(req, res) {
   });
 });
 
-//send password to user
+//send forgotten password to user
 app.post('/password', function(req, res) {
   var mailOptions = {
     from: 'decspace2017@gmail.com', // sender address
     to: req.body.email, // list of receivers
     subject: 'Password Recovery', // Subject line
     text: 'Your password is ' + req.body.password
+  };
+
+  transporter.sendMail(mailOptions, function(error, info) {
+    if(error) {
+      res.json(error);
+    }
+    else {
+      res.json('Message sent!');
+    }
+  });
+});
+
+//send Delphi survey links to user
+app.post('/delphi_survey', function(req, res) {
+  var mailOptions = {
+    from: 'decspace2017@gmail.com', //sender address
+    to: req.body.email,             //receiver
+    subject: 'Survey Link',          //Subject Title
+    text: 'The link to your survey is ' + req.body.link
   };
 
   transporter.sendMail(mailOptions, function(error, info) {

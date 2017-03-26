@@ -18,7 +18,7 @@
   color: black;
   cursor: move;
   overflow: hidden;
-  border: solid 3px black;
+  border: solid 1px black;
 }
 
 ul.draggable-objects:after {

@@ -1,0 +1,70 @@
+* {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+[ng-drag] {
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+[ng-drag] {
+  width: 120px;
+  height: 60px;
+  cursor: move;
+  overflow: hidden;
+  border: solid 1px black;
+}
+
+.white-card {
+  background: white;
+  color: black;
+}
+
+.criteria-card {
+  background: black;
+  color: white;
+}
+
+ul.draggable-objects:after {
+  display: block;
+  content: "";
+  clear: both;
+}
+
+.draggable-objects li {
+  display: inline-block;
+  width: 120px;
+  height: 60px;
+  margin-left: 1%;
+}
+
+[ng-drag].drag-over {
+  border: solid 1px black;
+}
+
+[ng-drag].dragging {
+  opacity: 0.5;
+}
+
+[ng-drop] {
+  background: rgba(208, 208, 208, 0.5);
+  text-align: center;
+  width: 100%;
+  height: 60px;
+  display: block;
+  position: relative;
+}
+
+[ng-drop].drag-enter {
+  border: solid 1px black;
+}
+
+[ng-drop] div {
+  position: relative;
+  z-index: 2;
+}

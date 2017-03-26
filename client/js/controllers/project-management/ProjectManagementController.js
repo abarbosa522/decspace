@@ -44,6 +44,9 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
       case 'Sort':
         $window.location.href = 'sort.html?id=' + project['project_id'];
         break;
+      case 'SRF':
+        $window.location.href = 'srf.html?id=' + project['project_id'];
+        break;
     }
   }
 

@@ -7,6 +7,7 @@
 
     <!-- CSS Stylesheet -->
     <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css'/>
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/srf.css'/>
 
     <!-- jQuery -->
     <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
@@ -19,10 +20,10 @@
     <script src = '../../js/app.js'></script>
 
     <!-- AngularJS Controllers -->
-    <script src = '../../js/controllers/project-management/DelphiMethodController.js'></script>
+    <script src = '../../js/controllers/project-management/SRFMethodController.js'></script>
 
     <!-- AngularJS Services -->
-    <script src = '../../js/services/DelphiService.js'></script>
+    <!--<script src = '../../js/services/SRFService.js'></script>-->
 
     <!-- Bootstrap -->
     <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
@@ -35,7 +36,7 @@
     <script src = '../../js/shared/ng-draggable/ngDraggable.js'></script>
   </head>
 
-  <body ng-app = 'decspace' ng-controller = 'DelphiMethodController'>
+  <body ng-app = 'decspace' ng-controller = 'SRFMethodController'>
 
     <!-- Navigation Bar -->
     <nav class = 'navbar navbar-custom navbar-fixed-top'>
@@ -78,7 +79,7 @@
       <!-- Main tabs - Method Description, Data Input and Results and Execution -->
       <ul class = 'nav nav-tabs nav-justified'>
         <li role = 'presentation' class = 'active'><a data-toggle = 'tab' href= '#description'>Method Description</a></li>
-        <li role = 'presentation'><a data-toggle = 'tab' href= '#data-input'>Round Configuration</a></li>
+        <li role = 'presentation'><a data-toggle = 'tab' href= '#data-input'>Data Input</a></li>
         <li role = 'presentation'><a data-toggle = 'tab' href= '#results'>Results and Executions</a></li>
       </ul>
 
@@ -87,13 +88,12 @@
         <div id = 'description' class = 'tab-pane fade in active' style = 'text-align:left'>
           <br>
 
-          <p class = 'header-1'>Delphi</p>
+          <p class = 'header-1'>SRF</p>
 
           <br>
 
-          <p>Mostly used for obtaining an opinion, judgment or choice consensus.</p>
-          <p>It is divided in various rounds. In each round, a survey is sent to the specialists.</p>
-          <p>The Q-Sort technique is used to answer the surveys.</p>
+          <p>Mainly used for determining the weights of a certain criteria set with a revised Simos' procedure.</p>
+          <p>It is available as a standalone method, but it is also integrated with other methods that can make use of it.</p>
         </div>
 
         <!-- Data Input -->
@@ -161,30 +161,6 @@
                 </div>
                 <div class = 'modal-body'>
 
-                  <form class = 'form-inline row'>
-                    <div class = 'form-group col-md-6'>
-                      <input id = 'import-emails-check' type = 'checkbox'/>
-                      <label for = 'import-emails-check'>Specialists' Emails</label>
-                    </div>
-                    <div class = 'form-group col-md-4'>
-                      <input id = 'import-emails-file' type = 'file'/>
-                    </div>
-                  </form>
-
-                  <br>
-
-                  <form class = 'form-inline row'>
-                    <div class = 'form-group col-md-6'>
-                      <input id = 'import-questions-check' type = 'checkbox'/>
-                      <label for = 'import-questions-check'>Questions</label>
-                    </div>
-                    <div class = 'form-group col-md-4'>
-                      <input id = 'import-questions-file' type = 'file'/>
-                    </div>
-                  </form>
-
-                  <br>
-
                   <div class = 'row'>
                     <div class = 'col-md-1'>
                     </div>
@@ -233,24 +209,6 @@
 
                   <br><br>
 
-                  <form class = 'form-inline row'>
-                    <div class = 'form-group'>
-                      <input id = 'export-emails-check' type = 'checkbox'/>
-                      <label for = 'export-emails-check'>Specialists' Emails</label>
-                    </div>
-                  </form>
-
-                  <br>
-
-                  <form class = 'form-inline row'>
-                    <div class = 'form-group'>
-                      <input id = 'export-questions-check' type = 'checkbox'/>
-                      <label for = 'export-questions-check'>Questions</label>
-                    </div>
-                  </form>
-
-                  <br>
-
                   <div class = 'row'>
                     <div class = 'col-md-1'>
                     </div>
@@ -273,53 +231,49 @@
             </div>
           </div>
 
-          <p class = 'header-1'>Round {{executions.length + 1}}</p>
-
-          <br>
-
-          <!-- Emails -->
+          <!-- Criteria -->
           <div class = 'row'>
-            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#emails-table' style = 'float:right' ng-click = 'emails_eye = (emails_eye == 0 ? 1 : 0)' title = "Hide/Show Specialists' Emails">
-              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : emails_eye == 0, "glyphicon-eye-close" : emails_eye == 1}'></span>
+            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#criteria-table' style = 'float:right' ng-click = 'criteria_eye = (criteria_eye == 0 ? 1 : 0)' title = 'Hide/Show Criteria'>
+              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : criteria_eye == 0, "glyphicon-eye-close" : criteria_eye == 1}'></span>
             </button>
-            <p class = 'header-2'>Specialists' Emails</p>
+            <p class = 'header-2'>Criteria</p>
           </div>
 
-          <div id = 'emails-table' class = 'collapse in'>
+          <div id = 'criteria-table' class = 'collapse in'>
             <table class = 'table table-bordered table-hover'>
               <thead>
                 <tr>
-                  <th class = 'text-center'>Email Address</th>
+                  <th class = 'text-center'>Criterion</th>
                   <th class = 'col-md-2'></th>
                 </tr>
               </thead>
-              <!-- Added Emails -->
+              <!-- Added Criteria -->
               <tbody>
-                <tr ng-repeat = 'email in emails' ng-class = '{danger: email.id == delete_email}'>
+                <tr ng-repeat = 'criterion in criteria' ng-class = '{danger: criterion.id == delete_criterion}'>
                   <td>
-                    <input type = 'text' class = 'form-control' ng-model = 'email.address'>
+                    <input type = 'text' class = 'form-control' ng-model = 'criterion.name'>
                   </td>
-                  <td ng-if = 'email.id != delete_email'>
-                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteEmail(email)' title = 'Delete Email'>
+                  <td ng-if = 'criterion.id != delete_criterion'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteCriterion(criterion)' title = 'Delete Criterion'>
                       <span class = 'glyphicon glyphicon-minus'></span>
                     </button>
                   </td>
-                  <td ng-if = 'email.id == delete_email'>
-                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteEmail(email)' title = 'Confirm Delete Email'>
+                  <td ng-if = 'criterion.id == delete_criterion'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteCriterion(criterion)' title = 'Confirm Delete Criterion'>
                       <span class = 'glyphicon glyphicon-ok'></span>
                     </button>
-                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteEmail()' title = 'Cancel Delete Email'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteCriterion()' title = 'Cancel Delete Criterion'>
                       <span class = 'glyphicon glyphicon-remove'></span>
                     </button>
                   </td>
                 </tr>
-                <!-- Form to add new email -->
+                <!-- Form to add new criterion -->
                 <tr class = 'active'>
                   <td>
-                    <input class = 'form-control' type = 'text' ng-model = 'new_email.address'>
+                    <input class = 'form-control' type = 'text' ng-model = 'new_criterion.name'>
                   </td>
                   <td>
-                    <button type = 'button' class = 'btn btn-success' ng-click = 'addEmail()' title = 'Add Email'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'addCriterion()' title = 'Add Criterion'>
                       <span class = 'glyphicon glyphicon-plus'></span>
                     </button>
                   </td>
@@ -330,56 +284,101 @@
 
           <br>
 
-          <!-- Questions -->
+          <!-- Ranking -->
           <div class = 'row'>
-            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#questions-table' style = 'float:right' ng-click = 'questions_eye = (questions_eye == 0 ? 1 : 0)' title = "Hide/Show Questions">
-              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : questions_eye == 0, "glyphicon-eye-close" : questions_eye == 1}'></span>
+            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#ranking-div' style = 'float:right' ng-click = 'ranking_eye = (ranking_eye == 0 ? 1 : 0)' title = 'Hide/Show Ranking'>
+              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : ranking_eye == 0, "glyphicon-eye-close" : ranking_eye == 1}'></span>
             </button>
-            <p class = 'header-2'>Questions</p>
+            <p class = 'header-2'>Ranking</p>
           </div>
 
-          <div id = 'questions-table' class = 'collapse in'>
-            <table class = 'table table-bordered table-hover'>
-              <thead>
-                <tr>
-                  <th class = 'text-center'>Question</th>
-                  <th class = 'col-md-2'></th>
-                </tr>
-              </thead>
-              <!-- Added Questions -->
-              <tbody>
-                <tr ng-repeat = 'question in questions' ng-class = '{danger: question.id == delete_question}'>
-                  <td>
-                    <input type = 'text' class = 'form-control' ng-model = 'question.content'>
-                  </td>
-                  <td ng-if = 'question.id != delete_question'>
-                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteQuestion(question)' title = 'Delete Question'>
-                      <span class = 'glyphicon glyphicon-minus'></span>
-                    </button>
-                  </td>
-                  <td ng-if = 'question.id == delete_question'>
-                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteQuestion(question)' title = 'Confirm Delete Question'>
-                      <span class = 'glyphicon glyphicon-ok'></span>
-                    </button>
-                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteQuestion()' title = 'Cancel Delete Question'>
-                      <span class = 'glyphicon glyphicon-remove'></span>
-                    </button>
-                  </td>
-                </tr>
-                <!-- Form to add new question -->
-                <tr class = 'active'>
-                  <td>
-                    <input class = 'form-control' type = 'text' ng-model = 'new_question.content'>
-                  </td>
-                  <td>
-                    <button type = 'button' class = 'btn btn-success' ng-click = 'addQuestion()' title = 'Add Question'>
-                      <span class = 'glyphicon glyphicon-plus'></span>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div id = 'ranking-div' class = 'collapse in'>
+
+            <!-- Criteria Cards -->
+            <p>Criteria Cards</p>
+            <div ng-drop = 'true' ng-drop-success = 'originalCriteriaDrop($data)'>
+              <ul class = 'draggable-objects'>
+                <li ng-repeat = 'criterion in criteria'>
+                  <div class = 'criteria-card' ng-drag = 'true' ng-drag-data = 'criterion' data-allow-transform = 'true' title = '{{criterion.name}}' ng-if = 'criterion.position == -1'>
+                    {{criterion.name}}
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <br>
+
+            <!-- White Cards -->
+            <p>White Cards</p>
+            <div ng-drop = 'true' ng-drop-success = 'originalWhiteDrop($data)'>
+              <ul class = 'draggable-objects'>
+                <li>
+                  <div class = 'white-card' ng-drag = 'true' ng-drag-data = 'white_card' data-allow-transform = 'true'></div>
+                </li>
+              </ul>
+            </div>
+
+            <br>
+
+            <div class = 'row'>
+              <div class = 'col-md-2'>
+                Add Ranking
+                <button type = 'button' class = 'btn btn-success' ng-click = 'addRanking()' title = 'Add Ranking'>
+                  <span class = 'glyphicon glyphicon-plus'></span>
+                </button>
+              </div>
+
+              <div class = 'col-md-3'>
+                Remove Ranking
+                <button type = 'button' class = 'btn btn-danger' ng-click = 'removeRanking()' title = 'Remove Ranking'>
+                  <span class = 'glyphicon glyphicon-minus'></span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Drop Divs -->
+            <div class = 'row' ng-repeat = 'rank in rangeRepeater(ranking) track by $index' style = 'margin-top: 1%'>
+              <div class = 'col-md-2'>
+                <p ng-if = '$index == 0'>Most Important</p>
+                <p ng-if = '$index == ranking - 1'>Least Important</p>
+              </div>
+
+              <div class = 'col-md-10' ng-drop = 'true' ng-drop-success = 'rankingDrop($data, $index)'>
+                <div class = 'row'>
+                  <!-- Dragged Criteria -->
+                  <div class = 'criteria-card' ng-repeat = 'criterion in criteria' ng-drag = 'true' ng-drag-data = 'criterion' ng-if = 'criterion.position == $parent.$index' title = '{{criterion.name}}'>
+                    {{criterion.name}}
+                  </div>
+                  <!-- Dragged White Cards -->
+                  <div class = 'white-card' ng-repeat = 'white_card in white_cards' ng-drag = 'true' ng-drag-data = 'white_card' ng-if = 'white_card.position == $parent.$index'>
+                  </div>
+                </div>
+              </div>
+
+            </div>
           </div>
+
+          <!-- Other Parameters -->
+          <div class = 'row'>
+            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#param-div' style = 'float:right' ng-click = 'param_eye = (param_eye == 0 ? 1 : 0)' title = 'Hide/Show Other Parameters'>
+              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : param_eye == 0, "glyphicon-eye-close" : param_eye == 1}'></span>
+            </button>
+            <p class = 'header-2'>Other Parameters</p>
+          </div>
+
+          <div id = 'param-div' class = 'collapse in'>
+
+            <div class = 'row'>
+              <form class = 'form-inline'>
+                <div class = 'form-group'>
+                  <label>Ratio Z</label>
+                  <input type = 'text' class = 'form-control'>
+                </div>
+              </form>
+            </div>
+
+          </div>
+
         </div>
 
         <!-- Results and Executions -->
@@ -446,11 +445,11 @@
                   <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
 
                   <h4 class = 'modal-title' ng-if = 'compareExecution == ""'>
-                    Round {{currentExecution.id}}
+                    Execution {{currentExecution.id}}
                   </h4>
 
                   <h4 class = 'modal-title' ng-if = 'compareExecution != ""'>
-                    Round {{currentExecution.id}} - Round {{compareExecution.id}}
+                    Execution {{currentExecution.id}} - Execution {{compareExecution.id}}
                   </h4>
                 </div>
 
@@ -464,118 +463,13 @@
 
                       <ul class = 'dropdown-menu' aria-labelledby = 'dropdownbtn'>
                         <li ng-repeat = 'execution in executions' ng-if = 'execution != currentExecution'>
-                          <a href = '' ng-click = 'showCompareExecution(execution)'>Round {{execution.id}}</a>
+                          <a href = '' ng-click = 'showCompareExecution(execution)'>Execution {{execution.id}}</a>
                         </li>
                         <li role = 'separator' class = 'divider'></li>
                         <li><a href = '' ng-click = 'showCompareExecution("")'>None</a></li>
                       </ul>
                     </div>
 
-                    <!-- Input Emails -->
-                    <div class = 'row'>
-                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#emails-exec-table' style = 'float:right' ng-click = 'emails_exec_eye = (emails_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Emails'>
-                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : emails_exec_eye == 0, "glyphicon-eye-close" : emails_exec_eye == 1}'></span>
-                      </button>
-                      <h1>Specialists' Emails List</h1>
-                    </div>
-
-                    <div id = 'emails-exec-table' class = 'row collapse in'>
-                      <div ng-class = '{"col-md-6": compareExecution != ""}'>
-                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
-                          <thead>
-                            <tr>
-                              <th class = 'text-center'>Email Address</th>
-                              <th class = 'text-center'>Answered?</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr ng-repeat = 'email in currentExecution.emails'>
-                              <td>{{email.address}}</td>
-                              <td>
-                                <span class = 'glyphicon glyphicon-ok' style = 'color:green' ng-if = 'currentExecution.emails_answers.includes(email.address)'></span>
-                                <span class = 'glyphicon glyphicon-remove' style = 'color:red' ng-if = '!currentExecution.emails_answers.includes(email.address)'></span>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-
-                        <strong>Number Of Answers:</strong> {{currentExecution.emails_answers.length}}
-                      </div>
-
-                      <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
-                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
-                          <thead>
-                            <tr>
-                              <th class = 'text-center'>Email Address</th>
-                              <th class = 'text-center'>Answered?</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr ng-repeat = 'email in compareExecution.emails'>
-                              <td>{{email.address}}</td>
-                              <td>
-                                <span class = 'glyphicon glyphicon-ok' style = 'color:green' ng-if = 'compareExecution.emails_answers.includes(email.address)'></span>
-                                <span class = 'glyphicon glyphicon-remove' style = 'color:red' ng-if = '!compareExecution.emails_answers.includes(email.address)'></span>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-
-                        <strong>Number Of Answers:</strong> {{compareExecution.emails_answers.length}}
-                      </div>
-                    </div>
-
-                    <!-- Input Questions -->
-                    <div class = 'row'>
-                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#questions-exec-table' style = 'float:right' ng-click = 'questions_exec_eye = (questions_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Questions'>
-                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : questions_exec_eye == 0, "glyphicon-eye-close" : questions_exec_eye == 1}'></span>
-                      </button>
-                      <h1>Questions</h1>
-                    </div>
-
-                    <div id = 'questions-exec-table' class = 'row collapse in'>
-                      <div ng-class = '{"col-md-6": compareExecution != ""}'>
-                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
-                          <thead>
-                            <tr>
-                              <th class = 'text-center'>Question</th>
-                              <th class = 'text-center'>Total Score</th>
-                              <th class = 'text-center'>Average Score</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr ng-repeat = 'question in currentExecution.questions'>
-                              <td>{{question.content}}</td>
-                              <td>{{question.total_score}}</td>
-                              <td>{{question.average}}</td>
-                            </tr>
-                          </tbody>
-                        </table>
-
-                        <strong>Number Of Questions:</strong> {{currentExecution.questions.length}}
-                      </div>
-
-                      <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
-                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
-                          <thead>
-                            <tr>
-                              <th class = 'text-center'>Question</th>
-                              <th class = 'text-center'>Total Score</th>
-                              <th class = 'text-center'>Average Score</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr ng-repeat = 'question in compareExecution.questions'>
-                              <td>{{question.content}}</td>
-                              <td>{{question.total_score}}</td>
-                              <td>{{question.average}}</td>
-                            </tr>
-                          </tbody>
-                        </table>
-
-                        <strong>Number Of Questions:</strong> {{compareExecution.questions.length}}
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
