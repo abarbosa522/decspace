@@ -23,7 +23,7 @@
     <script src = '../../js/controllers/project-management/SRFMethodController.js'></script>
 
     <!-- AngularJS Services -->
-    <!--<script src = '../../js/services/SRFService.js'></script>-->
+    <script src = '../../js/services/SRFService.js'></script>
 
     <!-- Bootstrap -->
     <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
@@ -161,6 +161,78 @@
                 </div>
                 <div class = 'modal-body'>
 
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group col-md-6'>
+                      <input id = 'import-criteria-check' type = 'checkbox'/>
+                      <label for = 'import-criteria-check'>Criteria</label>
+                    </div>
+                    <div class = 'form-group col-md-4'>
+                      <input id = 'import-criteria-file' type = 'file'/>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group col-md-6'>
+                      <input id = 'import-white-cards-check' type = 'checkbox'/>
+                      <label for = 'import-white-cards-check'>White Cards</label>
+                    </div>
+                    <div class = 'form-group col-md-4'>
+                      <input id = 'import-white-cards-file' type = 'file'/>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group col-md-6'>
+                      <input id = 'import-ranking-check' type = 'checkbox'/>
+                      <label for = 'import-ranking-check'>Rankings</label>
+                    </div>
+                    <div class = 'form-group col-md-4'>
+                      <input id = 'import-ranking-file' type = 'file'/>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group col-md-6'>
+                      <input id = 'import-ratio-z-check' type = 'checkbox'/>
+                      <label for = 'import-ratio-z-check'>Ratio Z</label>
+                    </div>
+                    <div class = 'form-group col-md-4'>
+                      <input id = 'import-ratio-z-file' type = 'file'/>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group col-md-6'>
+                      <input id = 'import-decimal-places-check' type = 'checkbox'/>
+                      <label for = 'import-decimal-places-check'>Decimal Places</label>
+                    </div>
+                    <div class = 'form-group col-md-4'>
+                      <input id = 'import-decimal-places-file' type = 'file'/>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group col-md-6'>
+                      <input id = 'import-weight-type-check' type = 'checkbox'/>
+                      <label for = 'import-weight-type-check'>Weight Type</label>
+                    </div>
+                    <div class = 'form-group col-md-4'>
+                      <input id = 'import-weight-type-file' type = 'file'/>
+                    </div>
+                  </form>
+
+                  <br>
+
                   <div class = 'row'>
                     <div class = 'col-md-1'>
                     </div>
@@ -208,6 +280,60 @@
                   </form>
 
                   <br><br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group'>
+                      <input id = 'export-criteria-check' type = 'checkbox'/>
+                      <label for = 'export-criteria-check'>Criteria</label>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group'>
+                      <input id = 'export-white-cards-check' type = 'checkbox'/>
+                      <label for = 'export-white-cards-check'>White Cards</label>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group'>
+                      <input id = 'export-ranking-check' type = 'checkbox'/>
+                      <label for = 'export-ranking-check'>Ranking</label>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group'>
+                      <input id = 'export-ratio-z-check' type = 'checkbox'/>
+                      <label for = 'export-ratio-z-check'>Ratio Z</label>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group'>
+                      <input id = 'export-decimal-places-check' type = 'checkbox'/>
+                      <label for = 'export-decimal-places-check'>Number of Decimal Places</label>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group'>
+                      <input id = 'export-weight-type-check' type = 'checkbox'/>
+                      <label for = 'export-weight-type-check'>Weight Type</label>
+                    </div>
+                  </form>
+
+                  <br>
 
                   <div class = 'row'>
                     <div class = 'col-md-1'>
@@ -320,22 +446,6 @@
 
             <br>
 
-            <div class = 'row'>
-              <div class = 'col-md-2'>
-                Add Ranking
-                <button type = 'button' class = 'btn btn-success' ng-click = 'addRanking()' title = 'Add Ranking'>
-                  <span class = 'glyphicon glyphicon-plus'></span>
-                </button>
-              </div>
-
-              <div class = 'col-md-3'>
-                Remove Ranking
-                <button type = 'button' class = 'btn btn-danger' ng-click = 'removeRanking()' title = 'Remove Ranking'>
-                  <span class = 'glyphicon glyphicon-minus'></span>
-                </button>
-              </div>
-            </div>
-
             <!-- Drop Divs -->
             <div class = 'row' ng-repeat = 'rank in rangeRepeater(ranking) track by $index' style = 'margin-top: 1%'>
               <div class = 'col-md-2'>
@@ -354,9 +464,23 @@
                   </div>
                 </div>
               </div>
-
             </div>
+
+            <br>
+
+            <div class = 'row'>
+              <button type = 'button' class = 'btn btn-success' ng-click = 'addRanking()' title = 'Add Ranking'>
+                <span class = 'glyphicon glyphicon-plus'></span>
+              </button>
+
+              <button type = 'button' class = 'btn btn-danger' ng-click = 'removeRanking()' title = 'Remove Ranking'>
+                <span class = 'glyphicon glyphicon-minus'></span>
+              </button>
+            </div>
+
           </div>
+
+          <br>
 
           <!-- Other Parameters -->
           <div class = 'row'>
@@ -368,11 +492,45 @@
 
           <div id = 'param-div' class = 'collapse in'>
 
+            <!-- Ratio Z -->
             <div class = 'row'>
               <form class = 'form-inline'>
                 <div class = 'form-group'>
                   <label>Ratio Z</label>
-                  <input type = 'text' class = 'form-control'>
+                  <input type = 'number' class = 'form-control' ng-model = 'ratio_z'>
+                </div>
+              </form>
+            </div>
+
+            <br>
+
+            <!-- Decimal Places -->
+            <div class = 'row'>
+              <form class = 'form-inline'>
+                <div class = 'form-group'>
+                  <label>Number of Decimal Places</label>
+                  <select ng-model = 'decimal_places'>
+                    <option value = '' selected disabled>--- Please Select ---</option>
+                    <option>0</option>
+                    <option>1</option>
+                    <option>2</option>
+                  </select>
+                </div>
+              </form>
+            </div>
+
+            <br>
+
+            <!-- Output - Normalized or Non-Normalized Weights -->
+            <div class = 'row'>
+              <form class = 'form-inline'>
+                <div class = 'form-group'>
+                  <label>Weight Type</label>
+                  <select ng-model = 'weight_type'>
+                    <option value = '' selected disabled>--- Please Select ---</option>
+                    <option>Non-Normalized</option>
+                    <option>Normalized</option>
+                  </select>
                 </div>
               </form>
             </div>
@@ -468,6 +626,153 @@
                         <li role = 'separator' class = 'divider'></li>
                         <li><a href = '' ng-click = 'showCompareExecution("")'>None</a></li>
                       </ul>
+                    </div>
+
+                    <p class = 'header-2'>Input Data</p>
+
+                    <!-- Input Criteria -->
+                    <div class = 'row'>
+                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#criteria-exec-table' style = 'float:right' ng-click = 'criteria_exec_eye = (criteria_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Criteria'>
+                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : criteria_exec_eye == 0, "glyphicon-eye-close" : criteria_exec_eye == 1}'></span>
+                      </button>
+                      <p class = 'header-3'>Criteria</p>
+                    </div>
+
+                    <div id = 'criteria-exec-table' class = 'row collapse in'>
+                      <div ng-class = '{"col-md-6": compareExecution != ""}'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Criterion</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'criterion in currentExecution.criteria'>
+                              <td>{{criterion.name}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Criterion</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'criterion in compareExecution.criteria'>
+                              <td>{{criterion.name}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <br>
+
+                    <!-- Input Ranking -->
+                    <div class = 'row'>
+                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#ranking-exec-table' style = 'float:right' ng-click = 'ranking_exec_eye = (ranking_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Ranking'>
+                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : ranking_exec_eye == 0, "glyphicon-eye-close" : ranking_exec_eye == 1}'></span>
+                      </button>
+                      <p class = 'header-3'>Ranking</p>
+                    </div>
+
+                    <div id = 'ranking-exec-table' class = 'row collapse in'>
+                      <div ng-class = '{"col-md-6": compareExecution != ""}'>
+                        <div class = 'row' ng-repeat = 'rank in rangeRepeater(currentExecution.ranking) track by $index' style = 'margin-top: 1%'>
+                          <div class = 'col-md-2'>
+                            <p ng-if = '$index == 0'>Most Important</p>
+                            <p ng-if = '$index == ranking - 1'>Least Important</p>
+                          </div>
+
+                          <div class = 'col-md-10' ng-drop = 'true'>
+                            <div class = 'row'>
+                              <!-- Dragged Criteria -->
+                              <div class = 'criteria-card' ng-repeat = 'criterion in currentExecution.criteria' ng-drag = 'true' ng-if = 'criterion.position == $parent.$index' title = '{{criterion.name}}'>
+                                {{criterion.name}}
+                              </div>
+                              <!-- Dragged White Cards -->
+                              <div class = 'white-card' ng-repeat = 'white_card in currentExecution.white_cards' ng-drag = 'true' ng-if = 'white_card.position == $parent.$index'>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
+                        <div class = 'row' ng-repeat = 'rank in rangeRepeater(compareExecution.ranking) track by $index' style = 'margin-top: 1%'>
+                          <div class = 'col-md-2'>
+                            <p ng-if = '$index == 0'>Most Important</p>
+                            <p ng-if = '$index == ranking - 1'>Least Important</p>
+                          </div>
+
+                          <div class = 'col-md-10' ng-drop = 'true'>
+                            <div class = 'row'>
+                              <!-- Dragged Criteria -->
+                              <div class = 'criteria-card' ng-repeat = 'criterion in compareExecution.criteria' ng-drag = 'true' ng-if = 'criterion.position == $parent.$index' title = '{{criterion.name}}'>
+                                {{criterion.name}}
+                              </div>
+                              <!-- Dragged White Cards -->
+                              <div class = 'white-card' ng-repeat = 'white_card in compareExecution.white_cards' ng-drag = 'true' ng-if = 'white_card.position == $parent.$index'>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <br>
+
+                    <!-- Input Parameters -->
+                    <div class = 'row'>
+                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#parameters-exec-table' style = 'float:right' ng-click = 'parameters_exec_eye = (parameters_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Other Parameters'>
+                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : parameters_exec_eye == 0, "glyphicon-eye-close" : parameters_exec_eye == 1}'></span>
+                      </button>
+                      <p class = 'header-3'>Other Parameters</p>
+                    </div>
+
+                    <div id = 'parameters-exec-table' class = 'row collapse in'>
+                      <!-- Ratio Z -->
+                      <div class = 'row'>
+                        <div ng-class = '{"col-md-6": compareExecution != ""}'>
+                          <label>Ratio Z</label>
+                          {{currentExecution.ratio_z}}
+                        </div>
+
+                        <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
+                          <label>Ratio Z</label>
+                          {{compareExecution.ratio_z}}
+                        </div>
+                      </div>
+
+                      <!-- Number of Decimal Places -->
+                      <div class = 'row'>
+                        <div ng-class = '{"col-md-6": compareExecution != ""}'>
+                          <label>Number Of Decimal Places</label>
+                          {{currentExecution.decimal_places}}
+                        </div>
+
+                        <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
+                          <label>Number of Decimal Places</label>
+                          {{compareExecution.decimal_places}}
+                        </div>
+                      </div>
+
+                      <!-- Weight Type -->
+                      <div class = 'row'>
+                        <div ng-class = '{"col-md-6": compareExecution != ""}'>
+                          <label>Weight Type</label>
+                          {{currentExecution.weight_type}}
+                        </div>
+
+                        <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
+                          <label>Weight Type</label>
+                          {{compareExecution.weight_type}}
+                        </div>
+                      </div>
                     </div>
 
                   </div>

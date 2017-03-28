@@ -1,4 +1,4 @@
-app.controller('SRFMethodController', function($scope, $window, $http) {
+app.controller('SRFMethodController', function($scope, $window, $http, SRFService) {
   /*** SETUP FUNCTIONS ***/
 
   //get the id of the open project
@@ -62,6 +62,7 @@ app.controller('SRFMethodController', function($scope, $window, $http) {
         $http.post('/projects', proj_res).success(function() {
           //retrieve the data stored in the database
           $scope.reloadData();
+          //update the list of executions
           getExecutions();
         });
       });
@@ -77,17 +78,25 @@ app.controller('SRFMethodController', function($scope, $window, $http) {
   $scope.showResetData = false;
 
   //save the current data on the database
-  /*$scope.saveData = function() {
+  $scope.saveData = function() {
     $http.get('/projects').success(function(response) {
       var id_doc, proj_res;
 
       //get the current project
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          //store emails
-          response[proj]['emails'] = $scope.emails;
-          //store questions
-          response[proj]['questions'] = $scope.questions;
+          //store criteria
+          response[proj]['criteria'] = $scope.criteria;
+          //store white cards
+          response[proj]['white_cards'] = $scope.white_cards;
+          //store number of rankings
+          response[proj]['ranking'] = $scope.ranking;
+          //store ratio z
+          response[proj]['ratio_z'] = $scope.ratio_z;
+          //store number of decimal places
+          response[proj]['decimal_places'] = $scope.decimal_places;
+          //store the weight type
+          response[proj]['weight_type'] = $scope.weight_type;
 
           //get the id of the document
           id_doc = response[proj]['_id'];
@@ -106,7 +115,7 @@ app.controller('SRFMethodController', function($scope, $window, $http) {
         });
       });
     });
-  }*/
+  }
 
   //hide successful save message after being dismissed
   $scope.changeSaveSuccess = function() {
@@ -118,7 +127,18 @@ app.controller('SRFMethodController', function($scope, $window, $http) {
     $http.get('/projects').success(function(response) {
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          //retrieve the criteria from the database
+          //retrieve criteria
+          $scope.criteria = response[proj]['criteria'];
+          //retrieve white cards
+          $scope.white_cards = response[proj]['white_cards'];
+          //retrieve number of rankings
+          $scope.ranking = response[proj]['ranking'];
+          //retrieve ratio z
+          $scope.ratio_z = response[proj]['ratio_z'];
+          //retrieve number of decimal places
+          $scope.decimal_places = response[proj]['decimal_places'];
+          //retrieve weight type
+          $scope.weight_type = response[proj]['weight_type'];
 
           break;
         }
@@ -132,13 +152,18 @@ app.controller('SRFMethodController', function($scope, $window, $http) {
   }
 
   //confirm reset of the current data
-  /*$scope.confirmResetData = function() {
+  $scope.confirmResetData = function() {
     //reset the input data
-    $scope.emails = [];
-    $scope.questions = [];
+    $scope.criteria = [];
+    $scope.white_cards = [];
+    $scope.ranking = 2;
+    $scope.ratio_z = null;
+    $scope.decimal_places = null;
+    $scope.weight_type = null;
+
     //hide the reset confirmation and cancelation buttons
     $scope.showResetData = false;
-  }*/
+  }
 
   //cancel the data reset
   $scope.cancelResetData = function() {
@@ -149,17 +174,29 @@ app.controller('SRFMethodController', function($scope, $window, $http) {
   /*** IMPORT AND EXPORT FUNCTIONS ***/
 
   //import the files of the checked boxes
-  /*$scope.importData = function() {
-    if(angular.element(document.querySelector('#import-emails-check')).prop('checked')) {
-      importFile('import-emails-file');
+  $scope.importData = function() {
+    if(angular.element(document.querySelector('#import-criteria-check')).prop('checked')) {
+      importFile('import-criteria-file');
     }
-    if(angular.element(document.querySelector('#import-questions-check')).prop('checked')) {
-      importFile('import-questions-file');
+    if(angular.element(document.querySelector('#import-white-cards-check')).prop('checked')) {
+      importFile('import-white-cards-file');
     }
-  }*/
+    if(angular.element(document.querySelector('#import-ranking-check')).prop('checked')) {
+      importFile('import-ranking-file');
+    }
+    if(angular.element(document.querySelector('#import-ratio-z-check')).prop('checked')) {
+      importFile('import-ratio-z-file');
+    }
+    if(angular.element(document.querySelector('#import-decimal-places-check')).prop('checked')) {
+      importFile('import-decimal-places-file');
+    }
+    if(angular.element(document.querySelector('#import-weight-type-check')).prop('checked')) {
+      importFile('import-weight-type-file');
+    }
+  }
 
   //import file according to its extension
-  /*function importFile(input_id) {
+  function importFile(input_id) {
     var file_input = document.getElementById(input_id);
 
     var reader = new FileReader();
@@ -219,61 +256,81 @@ app.controller('SRFMethodController', function($scope, $window, $http) {
 
     //get the data from the file
     reader.readAsText(file_input.files[0]);
-  }*/
+  }
 
   //get the converted data as the current data
-  /*function fileConverter(input_id, data) {
+  function fileConverter(input_id, data) {
     switch(input_id) {
-      case 'import-emails-file':
-        $scope.emails = data;
+      case 'import-criteria-file':
+        $scope.criteria = data;
         break;
 
-      case 'import-questions-file':
-        $scope.questions = data;
+      case 'import-white-cards-file':
+        $scope.white_cards = data;
+        break;
+
+      case 'import-ranking-file':
+        $scope.ranking = Number(data[0]['ranking']);
+        break;
+
+      case 'import-ratio-z-file':
+        $scope.ratio_z = Number(data[0]['ratio-z']);
+        break;
+
+      case 'import-decimal-places-file':
+        $scope.decimal_places = String(data[0]['decimal-places']);
+        break;
+
+      case 'import-weight-type-file':
+        $scope.weight_type = String(data[0]['weight-type']);
         break;
     }
-  }*/
+  }
 
-  //select emails and questions import checkboxes
-  /*$scope.selectAllImport = function() {
-    document.getElementById('import-emails-check').checked = true;
-    document.getElementById('import-questions-check').checked = true;
-  }*/
+  //select all import checkboxes
+  $scope.selectAllImport = function() {
+    document.getElementById('import-criteria-check').checked = true;
+    document.getElementById('import-white-cards-check').checked = true;
+    document.getElementById('import-ranking-check').checked = true;
+    document.getElementById('import-ratio-z-check').checked = true;
+    document.getElementById('import-decimal-places-check').checked = true;
+    document.getElementById('import-weight-type-check').checked = true;
+  }
 
-  //deselect emails and questions import checkboxes
-  /*$scope.selectNoneImport = function() {
-    document.getElementById('import-emails-check').checked = false;
-    document.getElementById('import-questions-check').checked = false;
-  }*/
+  //deselect all import checkboxes
+  $scope.selectNoneImport = function() {
+    document.getElementById('import-criteria-check').checked = false;
+    document.getElementById('import-white-cards-check').checked = false;
+    document.getElementById('import-ranking-check').checked = false;
+    document.getElementById('import-ratio-z-check').checked = false;
+    document.getElementById('import-decimal-places-check').checked = false;
+    document.getElementById('import-weight-type-check').checked = false;
+  }
 
   //export the selected data
-  /*$scope.exportData = function() {
+  $scope.exportData = function() {
     //export emails to csv
-    if(angular.element(document.querySelector('#export-emails-check')).prop('checked') && angular.element(document.querySelector('#csv-radio')).prop('checked')) {
-      var csv_str = 'address\n';
+    if(angular.element(document.querySelector('#export-criteria-check')).prop('checked') && angular.element(document.querySelector('#csv-radio')).prop('checked')) {
+      var csv_str = 'name;position\n';
 
-      for(email in $scope.emails) {
-        csv_str += $scope.emails[email]['address'] + ';';
-
-        csv_str = csv_str.substring(0, csv_str.length - 1);
-        csv_str += '\n';
-      }
+      for(criterion in $scope.criteria)
+        csv_str += $scope.criteria[criterion]['name'] + ';' + $scope.criteria[criterion]['position'] + '\n';
 
       var hidden_element = document.createElement('a');
       hidden_element.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_str);
       hidden_element.target = '_blank';
-      hidden_element.download = 'emails.csv';
+      hidden_element.download = 'criteria.csv';
       hidden_element.click();
     }
-    if(angular.element(document.querySelector('#export-emails-check')).prop('checked') && angular.element(document.querySelector('#json-radio')).prop('checked')) {
+    if(angular.element(document.querySelector('#export-criteria-check')).prop('checked') && angular.element(document.querySelector('#json-radio')).prop('checked')) {
       var json_str = '';
 
-      for(email in $scope.emails) {
+      for(criterion in $scope.criteria) {
         var json_element = {};
 
-        for(field in $scope.emails[email]) {
+        for(field in $scope.criteria[criterion]) {
           if(field != 'id' && field != '$$hashKey')
-            json_element[field] = $scope.emails[email][field];
+            json_element[field] = $scope.criteria[criterion][field];
         }
 
         json_str += JSON.stringify(json_element) + '\n';
@@ -282,34 +339,30 @@ app.controller('SRFMethodController', function($scope, $window, $http) {
       var hidden_element = document.createElement('a');
       hidden_element.href = 'data:text/json;charset=utf-8,' + encodeURI(json_str);
       hidden_element.target = '_blank';
-      hidden_element.download = 'emails.json';
+      hidden_element.download = 'criteria.json';
       hidden_element.click();
     }
-    if(angular.element(document.querySelector('#export-questions-check')).prop('checked') && angular.element(document.querySelector('#csv-radio')).prop('checked')) {
-      var csv_str = 'content\n';
+    if(angular.element(document.querySelector('#export-white-cards-check')).prop('checked') && angular.element(document.querySelector('#csv-radio')).prop('checked')) {
+      var csv_str = 'position\n';
 
-      for(question in $scope.questions) {
-        csv_str += $scope.questions[question]['content'] + ';';
-
-        csv_str = csv_str.substring(0, csv_str.length - 1);
-        csv_str += '\n';
-      }
+      for(white_card in $scope.white_cards)
+        csv_str += $scope.white_cards[white_card]['position'] + '\n';
 
       var hidden_element = document.createElement('a');
       hidden_element.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_str);
       hidden_element.target = '_blank';
-      hidden_element.download = 'questions.csv';
+      hidden_element.download = 'white_cards.csv';
       hidden_element.click();
     }
-    if(angular.element(document.querySelector('#export-questions-check')).prop('checked') && angular.element(document.querySelector('#json-radio')).prop('checked')) {
+    if(angular.element(document.querySelector('#export-white-cards-check')).prop('checked') && angular.element(document.querySelector('#json-radio')).prop('checked')) {
       var json_str = '';
 
-      for(question in $scope.questions) {
+      for(white_card in $scope.white_cards) {
         var json_element = {};
 
-        for(field in $scope.questions[question]) {
-          if(field != 'id' && field != '$$hashKey')
-            json_element[field] = $scope.questions[question][field];
+        for(field in $scope.white_cards[white_card]) {
+          if(field != 'id' && field != '$$hashKey' && field != 'white_card')
+            json_element[field] = $scope.white_cards[white_card][field];
         }
 
         json_str += JSON.stringify(json_element) + '\n';
@@ -318,22 +371,134 @@ app.controller('SRFMethodController', function($scope, $window, $http) {
       var hidden_element = document.createElement('a');
       hidden_element.href = 'data:text/json;charset=utf-8,' + encodeURI(json_str);
       hidden_element.target = '_blank';
-      hidden_element.download = 'questions.json';
+      hidden_element.download = 'white_cards.json';
       hidden_element.click();
     }
-  }*/
+    if(angular.element(document.querySelector('#export-ranking-check')).prop('checked') && angular.element(document.querySelector('#csv-radio')).prop('checked')) {
+      var csv_str = 'ranking\n';
 
-  //select emails and questions export checkboxes
-  /*$scope.selectAllExport = function() {
-    document.getElementById('export-emails-check').checked = true;
-    document.getElementById('export-questions-check').checked = true;
-  }*/
+      csv_str += $scope.ranking + '\n';
 
-  //deselect emails and questions export checkboxes
-  /*$scope.selectNoneExport = function() {
-    document.getElementById('export-emails-check').checked = false;
-    document.getElementById('export-questions-check').checked = false;
-  }*/
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'ranking.csv';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-ranking-check')).prop('checked') && angular.element(document.querySelector('#json-radio')).prop('checked')) {
+      var json_str = '';
+
+      var json_element = {};
+
+      json_element['ranking'] = $scope.ranking;
+
+      json_str += JSON.stringify(json_element) + '\n';
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/json;charset=utf-8,' + encodeURI(json_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'ranking.json';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-ratio-z-check')).prop('checked') && angular.element(document.querySelector('#csv-radio')).prop('checked')) {
+      var csv_str = 'ratio-z\n';
+
+      csv_str += $scope.ratio_z + '\n';
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'ratio_z.csv';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-ratio-z-check')).prop('checked') && angular.element(document.querySelector('#json-radio')).prop('checked')) {
+      var json_str = '';
+
+      var json_element = {};
+
+      json_element['ratio-z'] = $scope.ratio_z;
+
+      json_str += JSON.stringify(json_element) + '\n';
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/json;charset=utf-8,' + encodeURI(json_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'ratio_z.json';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-decimal-places-check')).prop('checked') && angular.element(document.querySelector('#csv-radio')).prop('checked')) {
+      var csv_str = 'decimal-places\n';
+
+      csv_str += $scope.decimal_places + '\n';
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'decimal_places.csv';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-decimal-places-check')).prop('checked') && angular.element(document.querySelector('#json-radio')).prop('checked')) {
+      var json_str = '';
+
+      var json_element = {};
+
+      json_element['decimal-places'] = $scope.decimal_places;
+
+      json_str += JSON.stringify(json_element) + '\n';
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/json;charset=utf-8,' + encodeURI(json_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'decimal_places.json';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-weight-type-check')).prop('checked') && angular.element(document.querySelector('#csv-radio')).prop('checked')) {
+      var csv_str = 'weight-type\n';
+
+      csv_str += $scope.weight_type + '\n';
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'weight_type.csv';
+      hidden_element.click();
+    }
+    if(angular.element(document.querySelector('#export-weight-type-check')).prop('checked') && angular.element(document.querySelector('#json-radio')).prop('checked')) {
+      var json_str = '';
+
+      var json_element = {};
+
+      json_element['weight-type'] = $scope.weight_type;
+
+      json_str += JSON.stringify(json_element) + '\n';
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/json;charset=utf-8,' + encodeURI(json_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'weight_type.json';
+      hidden_element.click();
+    }
+  }
+
+  //select all export checkboxes
+  $scope.selectAllExport = function() {
+    document.getElementById('export-criteria-check').checked = true;
+    document.getElementById('export-white-cards-check').checked = true;
+    document.getElementById('export-ranking-check').checked = true;
+    document.getElementById('export-ratio-z-check').checked = true;
+    document.getElementById('export-decimal-places-check').checked = true;
+    document.getElementById('export-weight-type-check').checked = true;
+  }
+
+  //deselect all export checkboxes
+  $scope.selectNoneExport = function() {
+    document.getElementById('export-criteria-check').checked = false;
+    document.getElementById('export-white-cards-check').checked = false;
+    document.getElementById('export-ranking-check').checked = false;
+    document.getElementById('export-ratio-z-check').checked = false;
+    document.getElementById('export-decimal-places-check').checked = false;
+    document.getElementById('export-weight-type-check').checked = false;
+  }
 
   /*** INPUT DATA - CRITERIA ***/
 
@@ -390,7 +555,7 @@ app.controller('SRFMethodController', function($scope, $window, $http) {
 
   /*** INPUT DATA - RANKING ***/
 
-  //variable that stores all the current ranking
+  //variable that stores all the current ranking positions
   $scope.ranking = 2;
 
   //variable that controls the showing/hiding of the ranking
@@ -426,10 +591,18 @@ app.controller('SRFMethodController', function($scope, $window, $http) {
 
   /*** INPUT DATA - OTHER PARAMETERS ***/
 
-  $scope.ratio_z = '';
+  //stores the value of the ratio z
+  $scope.ratio_z = null;
 
-  $scope.decimal_places = '';
-  
+  //stores the value of the number of decimal places
+  $scope.decimal_places = null;
+
+  //stores the type of the result weights
+  $scope.weight_type = null;
+
+  //controls the showing/hiding of the other parameters
+  $scope.param_eye = 1;
+
   /*** DRAG AND DROP FUNCTIONS ***/
 
   //change a card's ranking position
@@ -466,18 +639,18 @@ app.controller('SRFMethodController', function($scope, $window, $http) {
   /*** EXECUTIONS AND RESULTS FUNCTIONS ***/
 
   //variables that control the showing/hiding of the results tables
-  $scope.emails_exec_eye = 1;
-  $scope.questions_exec_eye = 1;
+  $scope.criteria_exec_eye = 1;
+  $scope.ranking_exec_eye = 1;
+  $scope.parameters_exec_eye = 1;
 
-  //retrieve the rounds stored in the database
+  //retrieve the executions stored in the database
   function getExecutions() {
-    //reset list of executions
-    $scope.executions = [];
-
-    $http.get('/delphi_rounds').success(function(response) {
-      for(round in response) {
-        if(response[round]['username'] == $scope.username && response[round]['project_id'] == proj_id) {
-          $scope.executions.push(response[round]);
+    $http.get('/projects').success(function(response) {
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+          //get the actions previously added
+          $scope.executions = response[proj]['executions'];
+          break;
         }
       }
     });
@@ -486,113 +659,63 @@ app.controller('SRFMethodController', function($scope, $window, $http) {
   //variable that shows/hides the loading button
   $scope.isLoading = false;
 
-  //execute the method and return the corresponding results
+  //execute the SRF method and return the corresponding results
   $scope.getResults = function() {
     //show loading button
     $scope.isLoading = true;
 
-    $http.get('/delphi_rounds').success(function(response) {
+    var results = SRFService.getResults($scope.criteria, $scope.white_cards, $scope.ranking, $scope.ratio_z, $scope.decimal_places, $scope.weight_type);
+
+    /*$http.get('/projects').success(function(response) {
       //get current date
       var current_date = new Date();
       var execution_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear() + ' ' + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
 
-      var comment;
-      //if a comment has not been added, then define it as an empty string
+      //if a comment has not been added
       if(typeof $scope.new_execution == 'undefined')
-        comment = '';
+        var comment = '';
       else
-        comment = $scope.new_execution.comment;
+        var comment = $scope.new_execution.comment;
 
-      //get the largest round id
-      var id = 0;
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+          //get the largest execution_id
+          var execution_id;
+          if(response[proj]['executions'].length == 0)
+            execution_id = 1;
+          else
+            execution_id = response[proj]['executions'][response[proj]['executions'].length - 1]['execution_id'] + 1;
 
-      for(round in response)
-        if(response[round]['id'] > id)
-          id = response[round]['id'];
+          //insert execution into database
+          response[proj]['executions'].push({'execution_id':execution_id,'results':results,'comment':comment,
+            'criteria':$scope.criteria,'white_cards':$scope.white_cards,'ranking':$scope.ranking,
+            'ratio_z':$scope.ratio_z,'decimal_places':$scope.decimal_places,'weight_type':$scope.weight_type,
+            'execution_date':execution_date});
 
-      id++;
-
-      //create the new round
-      var new_round = {};
-      //define the id of the round
-      new_round['id'] = id;
-      //project this round belongs to
-      new_round['project_id'] = proj_id;
-      //who created the round
-      new_round['username'] = $scope.username;
-      //list of emails
-      new_round['emails'] = $scope.emails;
-      //list of questions
-      new_round['questions'] = $scope.questions
-      //round comment
-      new_round['comment'] = comment;
-      //date round was created
-      new_round['execution_date'] = execution_date;
-
-      //add the new list of projects
-      $http.post('/delphi_rounds', new_round).success(function() {
-        //update list of rounds
-        getExecutions();
-
-        //create the answer documents
-        createAnswerDocs(new_round);
-
-        //send the emails with links to the surveys
-        //sendSurveyLinks(new_round);
-
-        //reset the comment input field, if it was filled
-        if(typeof $scope.new_execution != 'undefined')
-          $scope.new_execution.comment = '';
-
-        //hide loading button
-        $scope.isLoading = false;
-      });
-    });
-  }
-
-  function createAnswerDocs(new_round) {
-    for(email in new_round['emails']) {
-      //create a new answer document
-      var new_answer = {};
-      //define the corresponding round id
-      new_answer['round_id'] = new_round['id'];
-      //define the user that created the round
-      new_answer['user_creator'] = new_round['username'];
-      //define the user that will answer the survey
-      new_answer['user'] = new_round['emails'][email]['address'];
-      //define the empty set of answers
-      new_answer['questions_answered'] = [];
-
-      //define the set of unanswered question
-      new_answer['questions_unanswered'] = [];
-
-      //add the position to the questions - corresponding to the drop box they are in
-      //-1 means that the question has not been assigned a drop box
-      for(question in $scope.questions) {
-        var new_question = {};
-        new_question['content'] = $scope.questions[question]['content'];
-        new_question['id'] = $scope.questions[question]['id'];
-        new_question['position'] = -1;
-        new_question['score'] = 'null';
-        new_answer['questions_unanswered'].push(new_question);
+          //get the id of the document, so that it can be removed from the db
+          id_doc = response[proj]['_id'];
+          //project to store in the db
+          proj_res = response[proj];
+          delete proj_res['_id'];
+          break;
+        }
       }
 
-      //add the new list of projects
-      $http.post('/delphi_responses', new_answer).success(function() {
-      });
-    }
-  }
+      //delete the previous document with the list of projects
+      $http.delete('/projects/' + id_doc).success(function() {
+        //add the new list of projects
+        $http.post('/projects', proj_res).success(function() {
+          getExecutions();
 
-  function sendSurveyLinks(new_round) {
-    for(email in new_round['emails']) {
-      $scope.send_email = {};
-      $scope.send_email.email = new_round['emails'][email]['address'];
-      $scope.send_email.link = 'http://vps288667.ovh.net:8082/content/project-management/delphi-survey.html?round=' + new_round['id'] + '&user=' + new_round['emails'][email]['address'];
+          //reset the comment input field, if it was filled
+          if(typeof $scope.new_execution != 'undefined')
+            $scope.new_execution.comment = '';
 
-      $http.post('/delphi_survey', $scope.send_email).success(function(response) {
-        console.log(response);
+          //hide loading button
+          $scope.isLoading = false;
+        });
       });
-    }
+    });*/
   }
 
   //variable that controls the execution to show
