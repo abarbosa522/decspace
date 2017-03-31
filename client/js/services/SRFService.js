@@ -28,6 +28,8 @@ app.service('SRFService', function() {
 
   var m = [];
 
+  var fPlus = [], fMinus = [];
+
   this.getResults = function(crtr, wht_crds, rnkng, rt_z, dcml_plcs, wght_tp) {
     //initialize input data variables
     criteria = angular.copy(crtr);
@@ -39,64 +41,41 @@ app.service('SRFService', function() {
 
     buildRanking();
 
-    console.log(ranking_order);
-
     calculateER();
-
-    console.log(order_criteria);
 
     calculateE();
 
-    console.log(e);
-
     calculateU();
-
-    console.log(u);
 
     calculateNonNormalizedWeight();
 
-    console.log(order_criteria);
-
     calculateSumK();
-
-    console.log(sum_k);
 
     calculateKI1();
 
-    console.log(order_criteria);
-
     calculateK2();
-
-    console.log(order_criteria);
 
     calculateSumK2();
 
-    console.log(sum_k2);
-
     calculateV();
-
-    console.log('v');
-    console.log(v);
 
     calculateRatioDI1();
 
-    console.log(order_criteria);
-
     calculateRatioDI2();
-
-    console.log(order_criteria);
 
     buildListL1();
 
-    console.log(listL1);
-
     buildListL2();
-
-    console.log(listL2);
 
     buildListM();
 
-    console.log(m);
+    buildListsF();
+
+    roundNormalizedWeights();
+
+    formatResults();
+
+    return criteria;
   }
 
   function buildRanking() {
@@ -197,7 +176,7 @@ app.service('SRFService', function() {
   function calculateV() {
     var var_e = 100 - sum_k2;
 
-    v = Math.pow(10, decimal_places) * var_e;
+    v = Math.round(Math.pow(10, decimal_places) * var_e);
   }
 
   function calculateRatioDI1() {
@@ -297,18 +276,86 @@ app.service('SRFService', function() {
         }
       }
 
-      if(index / di1 > di2)
+      if(di1 > di2)
         m.push(index);
     }
   }
 
-  function buildListF() {
+  function buildListsF() {
     if(m.length + v <= criteria.length) {
+      //list F-
+      //the m criteria of M
+      for(criterion in m)
+        fMinus.push(m[criterion]);
 
+      //the n-v-m last criteria of listL2 not belonging to M
+      var crt_count = criteria.length - v - m.length;
+
+      for(i = listL2.length - 1; i >= 0; i--) {
+        if(!m.includes(listL2[i]['index']) && crt_count > 0) {
+          fMinus.push(listL2[i]['index']);
+          crt_count--;
+        }
+      }
+
+      //list F+
+      //the first v criteria of L not belonging to M
+      crt_count = v;
+
+      for(criterion in listL2) {
+        if(!m.includes(listL2[criterion]['index']) && crt_count > 0) {
+          fPlus.push(listL2[criterion]['index']);
+          crt_count--;
+        }
+      }
     }
     else if(m.length + v > criteria.length) {
-      
+      //list F-
+      //last n-v criteria of L not belonging to M
+      var crt_count = criteria.length - v;
+
+      for(i = listL1.length - 1; i >= 0; i--) {
+        if(!m.includes(listL2[i]['index']) && crt_count > 0) {
+          fMinus.push(listL2[i]['index']);
+          crt_count--;
+        }
+      }
+
+      //list F+
+      for(criterion in criteria)
+        if(!fMinus.includes(Number(criterion) + 1))
+          fPlus.push(Number(criterion) + 1)
     }
   }
 
+  function roundNormalizedWeights() {
+    for(rank in order_criteria) {
+      for(card in order_criteria[rank]['cards']) {
+        var crt_index;
+
+        for(criterion in criteria)
+          if(criteria[criterion]['name'] == order_criteria[rank]['cards'][card])
+            crt_index = Number(criterion) + 1;
+
+
+        if(fPlus.includes(crt_index))
+          order_criteria[rank]['normalized weight'] = order_criteria[rank]['ki2'] + Math.pow(10, -decimal_places);
+        else
+          order_criteria[rank]['normalized weight'] = order_criteria[rank]['ki2'];
+        break;
+      }
+    }
+  }
+
+
+  function formatResults() {
+    for(criterion in criteria) {
+      for(rank in order_criteria) {
+        if(order_criteria[rank]['cards'].includes(criteria[criterion]['name'])) {
+          criteria[criterion]['non-normalized weight'] = order_criteria[rank]['non-normalized weight'];
+          criteria[criterion]['normalized weight'] = order_criteria[rank]['normalized weight'];
+        }
+      }
+    }
+  }
 });

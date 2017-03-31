@@ -1,9 +1,20 @@
-app.controller('SRFMethodController', function($scope, $window, $http, SRFService) {
+app.controller('SRFMethodController', function($scope, $window, $http, SRFService, IntegratedSRFService) {
   /*** SETUP FUNCTIONS ***/
 
   //get the id of the open project
   var url = window.location.href;
   var proj_id = Number(url.substr(url.indexOf('?id=') + 4));
+
+  var integrated;
+
+  function defineIntegrated() {
+    if(url.includes('srf.html'))
+      integrated = false;
+    else {
+      integrated = true;
+      $scope.integratedSRFService = IntegratedSRFService;
+    }
+  }
 
   function requestLogIn() {
     $http.get('/requestlogin').success(function(res) {
@@ -69,6 +80,15 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
     });
   }
 
+  function startup() {
+    defineIntegrated();
+
+    if(!integrated) {
+      requestLogIn();
+      rewriteLastUpdate();
+    }
+  }
+
   /*** BUTTON BAR FUNCTIONS ***/
 
   //variable to show or hide the save success message
@@ -128,17 +148,28 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
           //retrieve criteria
-          $scope.criteria = response[proj]['criteria'];
+          if(response[proj]['criteria'] != undefined)
+            $scope.criteria = response[proj]['criteria'];
+
           //retrieve white cards
-          $scope.white_cards = response[proj]['white_cards'];
+          if(response[proj]['white_cards'] != undefined)
+            $scope.white_cards = response[proj]['white_cards'];
+
           //retrieve number of rankings
-          $scope.ranking = response[proj]['ranking'];
+          if(response[proj]['ranking'] != undefined)
+            $scope.ranking = response[proj]['ranking'];
+
           //retrieve ratio z
-          $scope.ratio_z = response[proj]['ratio_z'];
+          if(response[proj]['ratio_z'] != undefined)
+            $scope.ratio_z = response[proj]['ratio_z'];
+
           //retrieve number of decimal places
-          $scope.decimal_places = response[proj]['decimal_places'];
+          if(response[proj]['decimal_places'] != undefined)
+            $scope.decimal_places = response[proj]['decimal_places'];
+
           //retrieve weight type
-          $scope.weight_type = response[proj]['weight_type'];
+          if(response[proj]['weight_type'] != undefined)
+            $scope.weight_type = response[proj]['weight_type'];
 
           break;
         }
@@ -642,6 +673,7 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
   $scope.criteria_exec_eye = 1;
   $scope.ranking_exec_eye = 1;
   $scope.parameters_exec_eye = 1;
+  $scope.results_exec_eye = 1;
 
   //retrieve the executions stored in the database
   function getExecutions() {
@@ -666,7 +698,7 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
 
     var results = SRFService.getResults($scope.criteria, $scope.white_cards, $scope.ranking, $scope.ratio_z, $scope.decimal_places, $scope.weight_type);
 
-    /*$http.get('/projects').success(function(response) {
+    $http.get('/projects').success(function(response) {
       //get current date
       var current_date = new Date();
       var execution_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear() + ' ' + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
@@ -684,10 +716,10 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
           if(response[proj]['executions'].length == 0)
             execution_id = 1;
           else
-            execution_id = response[proj]['executions'][response[proj]['executions'].length - 1]['execution_id'] + 1;
+            execution_id = response[proj]['executions'][response[proj]['executions'].length - 1]['id'] + 1;
 
           //insert execution into database
-          response[proj]['executions'].push({'execution_id':execution_id,'results':results,'comment':comment,
+          response[proj]['executions'].push({'id':execution_id,'results':results,'comment':comment,
             'criteria':$scope.criteria,'white_cards':$scope.white_cards,'ranking':$scope.ranking,
             'ratio_z':$scope.ratio_z,'decimal_places':$scope.decimal_places,'weight_type':$scope.weight_type,
             'execution_date':execution_date});
@@ -715,7 +747,26 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
           $scope.isLoading = false;
         });
       });
-    });*/
+    });
+  }
+
+  //execute the SRF method and return the corresponding results
+  $scope.getIntegratedResults = function() {
+
+    console.log($scope.selected_category)
+    var results = SRFService.getResults($scope.integratedSRFService.integrated_criteria, $scope.white_cards, $scope.ranking, $scope.ratio_z, $scope.decimal_places, $scope.weight_type);
+    console.log($scope.integratedSRFService)
+
+    var new_results = [];
+
+    for(result in results) {
+      if($scope.weight_type == 'Non-Normalized')
+        new_results[results[result]['name']] = results[result]['non-normalized weight'];
+      else
+        new_results[results[result]['name']] = results[result]['normalized weight'];
+    }
+    
+    $scope.integratedSRFService.integrated_results = new_results;
   }
 
   //variable that controls the execution to show
@@ -726,32 +777,13 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
 
   //show modal with execution details
   $scope.showExecution = function(execution) {
-    var results = DelphiService.aggregateResults(execution.id);
-
-    results.then(function(resolve) {
-
-      $scope.currentExecution = execution;
-
-      $scope.currentExecution.questions = resolve[0];
-
-      $scope.currentExecution.emails_answers = resolve[1];
-
-      $scope.compareExecution = '';
-    });
+    $scope.currentExecution = execution;
+    $scope.compareExecution = '';
   }
 
   //show the execution to compare with
   $scope.showCompareExecution = function(execution) {
-    var results = DelphiService.aggregateResults(execution.id);
-
-    results.then(function(resolve) {
-
-      $scope.compareExecution = execution;
-
-      $scope.compareExecution.questions = resolve[0];
-
-      $scope.compareExecution.emails_answers = resolve[1];
-    });
+    $scope.compareExecution = execution;
   }
 
   //variable that controls the selected execution to be deleted
@@ -764,36 +796,32 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
 
   //confirm execution deletion
   $scope.confirmDeleteExecution = function(execution) {
-    $http.get('/delphi_rounds').success(function(response) {
-      var id_doc;
+    $http.get('/projects').success(function(response) {
+      var id_doc, proj_res;
 
-      for(round in response) {
-        if(response[round]['username'] == $scope.username && response[round]['project_id'] == proj_id && response[round]['id'] == execution.id) {
-          //get the id of the document, so that it can be removed from the db
-          id_doc = response[round]['_id'];
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+          for(exec in response[proj]['executions']) {
+            if(response[proj]['executions'][exec]['execution_id'] == execution.execution_id) {
+              response[proj]['executions'].splice(exec, 1);
+              //get the id of the document, so that it can be removed from the db
+              id_doc = response[proj]['_id'];
+              //project to store in the db
+              proj_res = response[proj];
+              delete proj_res['_id'];
+              break;
+            }
+          }
           break;
         }
       }
 
-      //delete the delphi round
-      $http.delete('/delphi_rounds/' + id_doc).success(function() {
-        //refresh the list of rounds
-        getExecutions();
-        //reset id execution variable
-        $scope.deleteIdExecution = '';
-
-        //delete the response to this round
-        $http.get('/delphi_responses').success(function(response2) {
-          var id_res;
-
-          for(res in response2) {
-            if(response2[res]['round_id'] == execution.id) {
-              id_res = response2[res]['_id'];
-
-              $http.delete('/delphi_responses/' + id_res).success(function() {
-              });
-            }
-          }
+      //delete the previous document with the list of projects
+      $http.delete('/projects/' + id_doc).success(function() {
+        //add the new list of projects
+        $http.post('/projects', proj_res).success(function() {
+          //refresh the list of projects
+          getExecutions();
         });
       });
     });
@@ -811,39 +839,30 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
 
   //confirm the deletion of all executions of the current project
   $scope.confirmDeleteAllExecutions = function() {
-    var list_rounds = [];
+    $http.get('/projects').success(function(response) {
+      var id_doc, proj_res;
 
-    $http.get('/delphi_rounds').success(function(response) {
-      for(round in response) {
-        if(response[round]['username'] == $scope.username && response[round]['project_id'] == proj_id) {
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+          response[proj]['executions'] = [];
           //get the id of the document, so that it can be removed from the db
-          var id_doc = response[round]['_id'];
-
-          //store id of the current round
-          list_rounds.push(response[round]['id']);
-
-          //delete the delphi round
-          $http.delete('/delphi_rounds/' + id_doc).success(function() {
-            //refresh the list of rounds
-            getExecutions();
-            //reset id execution variable
-            $scope.deleteIdExecution = '';
-          });
+          id_doc = response[proj]['_id'];
+          //project to store in the db
+          proj_res = response[proj];
+          delete proj_res['_id'];
+          break;
         }
       }
 
-      //delete the response to the deleted rounds
-      $http.get('/delphi_responses').success(function(response2) {
-        var id_res;
-
-        for(res in response2) {
-          if(list_rounds.includes(response2[res]['round_id'])) {
-            id_res = response2[res]['_id'];
-
-            $http.delete('/delphi_responses/' + id_res).success(function() {
-            });
-          }
-        }
+      //delete the previous document with the list of projects
+      $http.delete('/projects/' + id_doc).success(function(){
+        //add the new list of projects
+        $http.post('/projects', proj_res).success(function() {
+          //refresh the list of executions
+          getExecutions();
+          //reset delete variable
+          $scope.deleteIdExecution = '';
+        });
       });
     });
   }
@@ -854,6 +873,5 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
   }
 
   /*** STARTUP FUNCTIONS ***/
-  requestLogIn();
-  rewriteLastUpdate();
+  startup();
 });

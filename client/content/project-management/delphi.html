@@ -277,6 +277,20 @@
 
           <br>
 
+          <!-- Survey Subject -->
+          <div class = 'row'>
+            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#subject-table' style = 'float: right' ng-click = 'subject_eye = (subject_eye == 0 ? 1 : 0)' title = "Hide/Show Survey Subject">
+              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : subject_eye == 0, "glyphicon-eye-close" : subject_eye == 1}'></span>
+            </button>
+            <p class = 'header-2'>Survey Subject</p>
+          </div>
+
+          <div id = 'subject-table' class = 'collapse in'>
+            <input type = 'text' class = 'form-control' ng-model = 'subject'>
+          </div>
+
+          <br>
+
           <!-- Emails -->
           <div class = 'row'>
             <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#emails-table' style = 'float:right' ng-click = 'emails_eye = (emails_eye == 0 ? 1 : 0)' title = "Hide/Show Specialists' Emails">
@@ -471,12 +485,30 @@
                       </ul>
                     </div>
 
+                    <!-- Input Subject Survey -->
+                    <div class = 'row'>
+                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#subject-exec-table' style = 'float: right' ng-click = 'subject_exec_eye = (emails_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Survey Subject'>
+                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : subject_exec_eye == 0, "glyphicon-eye-close" : subject_exec_eye == 1}'></span>
+                      </button>
+                      <h1>Survey Subject</h1>
+                    </div>
+
+                    <div id = 'subject-exec-table' class = 'row collapse in'>
+                      <div ng-class = '{"col-md-6": compareExecution != ""}'>
+                        {{currentExecution.subject}}
+                      </div>
+
+                      <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
+                        {{compareExecution.subject}}
+                      </div>
+                    </div>
+
                     <!-- Input Emails -->
                     <div class = 'row'>
-                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#emails-exec-table' style = 'float:right' ng-click = 'emails_exec_eye = (emails_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Emails'>
+                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#emails-exec-table' style = 'float: right' ng-click = 'emails_exec_eye = (emails_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Emails'>
                         <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : emails_exec_eye == 0, "glyphicon-eye-close" : emails_exec_eye == 1}'></span>
                       </button>
-                      <h1>Specialists' Emails List</h1>
+                      <h1>Specialists' Emails</h1>
                     </div>
 
                     <div id = 'emails-exec-table' class = 'row collapse in'>

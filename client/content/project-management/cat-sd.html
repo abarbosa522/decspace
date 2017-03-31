@@ -7,6 +7,7 @@
 
     <!-- CSS Stylesheet -->
     <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css' />
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/srf.css'/>
 
     <!-- jQuery -->
     <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
@@ -20,9 +21,12 @@
 
     <!-- AngularJS Controllers -->
     <script src = '../../js/controllers/project-management/CATSDMethodController.js'></script>
+    <script src = '../../js/controllers/project-management/SRFMethodController.js'></script>
 
     <!-- AngularJS Services -->
     <script src = '../../js/services/CATSDService.js'></script>
+    <script src = '../../js/services/SRFService.js'></script>
+    <script src = '../../js/services/IntegratedSRFService.js'></script>
 
     <!-- Bootstrap -->
     <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
@@ -44,6 +48,13 @@
 
     <!-- ng-draggable module -->
     <script src = '../../js/shared/ng-draggable/ngDraggable.js'></script>
+
+    <!-- Load Integrated SRF -->
+    <!--<script>
+      $(function() {
+        $('#srf-modal').load('srf-modal.html');
+      });
+    </script>-->
   </head>
 
   <body ng-app = 'decspace' ng-controller = 'CATSDMethodController'>
@@ -784,10 +795,19 @@
           <div id = 'categories-table' class = 'collapse in'>
             <table class = 'table table-bordered table-hover'>
               <thead>
-                <th class = 'text-center'>Category</th>
-                <th class = 'text-center'>Membership Degree</th>
-                <th class = 'text-center' ng-repeat = 'criterion in criteria'>{{criterion.name}}</th>
-                <th class = 'col-md-2'></th>
+                <tr>
+                  <th class = 'text-center' rowspan = '2'>Category</th>
+                  <th class = 'text-center' rowspan = '2'>Membership Degree</th>
+                  <th class = 'text-center' colspan = '{{criteria.length + 1}}'>
+                    <a ng-href = '#' data-toggle = 'modal' data-target = '#srf-modal' ng-click = 'updateIntegratedSRF()'>
+                      Criteria Weights
+                    </a>
+                  </th>
+                </tr>
+                <tr>
+                  <th class = 'text-center' ng-repeat = 'criterion in criteria'>{{criterion.name}}</th>
+                  <th class = 'col-md-2'></th>
+                </tr>
               </thead>
               <tbody>
                 <!-- Added Categories -->
@@ -834,6 +854,173 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Integrated SRF Modal -->
+          <div class = 'modal fade' id = 'srf-modal' role = 'dialog' ng-controller = 'SRFMethodController'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>SRF Method</h4>
+                </div>
+
+                <div class = 'modal-body'>
+
+                  <!-- Categories -->
+                  <div class = 'row'>
+                    <form class = 'form-inline'>
+                      <div class = 'form-group'>
+                        <label>Category</label>
+                        <select ng-model = 'integratedSRFService.integrated_category'>
+                          <option value = '' selected disabled>--- Please Select ---</option>
+                          <option ng-repeat = 'category in integratedSRFService.integrated_categories'>{{category.name}}</option>
+                        </select>
+                      </div>
+                    </form>
+                  </div>
+
+                  <br>
+
+                  <div class = 'row'>
+                    <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#ranking-div' style = 'float:right' ng-click = 'ranking_eye = (ranking_eye == 0 ? 1 : 0)' title = 'Hide/Show Ranking'>
+                      <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : ranking_eye == 0, "glyphicon-eye-close" : ranking_eye == 1}'></span>
+                    </button>
+                    <p class = 'header-2'>Ranking</p>
+                  </div>
+
+                  <div id = 'ranking-div' class = 'collapse in'>
+
+                    <!-- Criteria Cards -->
+                    <p>Criteria Cards</p>
+                    <div ng-drop = 'true' ng-drop-success = 'originalCriteriaDrop($data)'>
+                      <ul class = 'draggable-objects'>
+                        <li ng-repeat = 'integrated_criterion in integratedSRFService.integrated_criteria' ng-if = 'integrated_criterion.position == -1'>
+                          <div class = 'criteria-card' ng-drag = 'true' ng-drag-data = 'integrated_criterion' data-allow-transform = 'true' title = '{{integrated_criterion.name}}'>
+                            {{integrated_criterion.name}}
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <br>
+
+                    <!-- White Cards -->
+                    <p>White Cards</p>
+                    <div ng-drop = 'true' ng-drop-success = 'originalWhiteDrop($data)'>
+                      <ul class = 'draggable-objects'>
+                        <li>
+                          <div class = 'white-card' ng-drag = 'true' ng-drag-data = 'white_card' data-allow-transform = 'true'></div>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <br>
+
+                    <!-- Drop Divs -->
+                    <div class = 'row' ng-repeat = 'rank in rangeRepeater(ranking) track by $index' style = 'margin-top: 1%'>
+                      <div class = 'col-md-2'>
+                        <p ng-if = '$index == 0'>Most Important</p>
+                        <p ng-if = '$index == ranking - 1'>Least Important</p>
+                      </div>
+
+                      <div class = 'col-md-10' ng-drop = 'true' ng-drop-success = 'rankingDrop($data, $index)'>
+                        <ul class = 'draggable-objects'>
+                          <!-- Dragged Criteria -->
+                          <li ng-repeat = 'integrated_criterion in integratedSRFService.integrated_criteria' ng-if = 'integrated_criterion.position == $parent.$index'>
+                            <div class = 'criteria-card' ng-drag = 'true' ng-drag-data = 'integrated_criterion' data-allow-transform = 'true' title = '{{integrated_criterion.name}}'>
+                              {{integrated_criterion.name}}
+                            </div>
+                          </li>
+                          <!-- Dragged White Cards -->
+                          <li ng-repeat = 'white_card in white_cards' ng-if = 'white_card.position == $parent.$index'>
+                            <div class = 'white-card' ng-drag = 'true' ng-drag-data = 'white_card' data-allow-transform = 'true'>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <br>
+
+                    <div class = 'row'>
+                      <button type = 'button' class = 'btn btn-success' ng-click = 'addRanking()' title = 'Add Ranking'>
+                        <span class = 'glyphicon glyphicon-plus'></span>
+                      </button>
+
+                      <button type = 'button' class = 'btn btn-danger' ng-click = 'removeRanking()' title = 'Remove Ranking'>
+                        <span class = 'glyphicon glyphicon-minus'></span>
+                      </button>
+                    </div>
+
+                  </div>
+
+                  <br>
+
+                    <!-- Other Parameters -->
+                    <div class = 'row'>
+                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#param-div' style = 'float:right' ng-click = 'param_eye = (param_eye == 0 ? 1 : 0)' title = 'Hide/Show Other Parameters'>
+                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : param_eye == 0, "glyphicon-eye-close" : param_eye == 1}'></span>
+                      </button>
+                      <p class = 'header-2'>Other Parameters</p>
+                    </div>
+
+                    <div id = 'param-div' class = 'collapse in'>
+
+                      <!-- Ratio Z -->
+                      <div class = 'row'>
+                        <form class = 'form-inline'>
+                          <div class = 'form-group'>
+                            <label>Ratio Z</label>
+                            <input type = 'number' class = 'form-control' ng-model = 'ratio_z'>
+                          </div>
+                        </form>
+                      </div>
+
+                      <br>
+
+                      <!-- Decimal Places -->
+                      <div class = 'row'>
+                        <form class = 'form-inline'>
+                          <div class = 'form-group'>
+                            <label>Number of Decimal Places</label>
+                            <select ng-model = 'decimal_places'>
+                              <option value = '' selected disabled>--- Please Select ---</option>
+                              <option>0</option>
+                              <option>1</option>
+                              <option>2</option>
+                            </select>
+                          </div>
+                        </form>
+                      </div>
+
+                      <br>
+
+                      <!-- Output - Normalized or Non-Normalized Weights -->
+                      <div class = 'row'>
+                        <form class = 'form-inline'>
+                          <div class = 'form-group'>
+                            <label>Weight Type</label>
+                            <select ng-model = 'weight_type'>
+                              <option value = '' selected disabled>--- Please Select ---</option>
+                              <option>Non-Normalized</option>
+                              <option>Normalized</option>
+                            </select>
+                          </div>
+                        </form>
+                      </div>
+
+                      <br>
+
+                      <!-- Execute Button -->
+                      <button type = 'button' class = 'btn btn-default' ng-click = 'getIntegratedResults()'>
+                        Get Results
+                      </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <br>

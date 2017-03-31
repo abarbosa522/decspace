@@ -57,7 +57,7 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function(){
+      $http.delete('/projects/' + id_doc).success(function() {
         //add the new list of projects
         $http.post('/projects', proj_res).success(function() {
           //retrieve the data stored in the database
@@ -84,6 +84,8 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
       //get the current project
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+          //store survey subject
+          response[proj]['subject'] = $scope.subject;
           //store emails
           response[proj]['emails'] = $scope.emails;
           //store questions
@@ -118,6 +120,9 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
     $http.get('/projects').success(function(response) {
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+          //retrieve the survey subject from the database
+          if(response[proj]['subject'] != undefined)
+            $scope.subject = response[proj]['subject'];
           //retrieve the list of emails from the database
           if(response[proj]['emails'] != undefined)
             $scope.emails = response[proj]['emails'];
@@ -141,6 +146,8 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
     //reset the input data
     $scope.emails = [];
     $scope.questions = [];
+    $scope.subject = '';
+
     //hide the reset confirmation and cancelation buttons
     $scope.showResetData = false;
   }
@@ -340,6 +347,15 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
     document.getElementById('export-questions-check').checked = false;
   }
 
+  /*** INPU DATA - SURVEY SUBJECT ***/
+
+  //variable that stores all the current survey subject
+  $scope.subject = '';
+
+  //variable that controls the showing/hiding of the subject
+  $scope.subject_eye = 1;
+
+
   /*** INPUT DATA - EMAILS ***/
 
   //variable that stores all the current email addresses
@@ -423,6 +439,7 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
   //variables that control the showing/hiding of the results tables
   $scope.emails_exec_eye = 1;
   $scope.questions_exec_eye = 1;
+  $scope.subject_exec_eye = 1;
 
   //retrieve the rounds stored in the database
   function getExecutions() {
@@ -479,6 +496,8 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
       new_round['emails'] = $scope.emails;
       //list of questions
       new_round['questions'] = $scope.questions
+      //survey subject
+      new_round['subject'] = $scope.subject;
       //round comment
       new_round['comment'] = comment;
       //date round was created
@@ -493,7 +512,7 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
         createAnswerDocs(new_round);
 
         //send the emails with links to the surveys
-        //sendSurveyLinks(new_round);
+        sendSurveyLinks(new_round);
 
         //reset the comment input field, if it was filled
         if(typeof $scope.new_execution != 'undefined')
@@ -517,6 +536,8 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
       new_answer['user'] = new_round['emails'][email]['address'];
       //define the empty set of answers
       new_answer['questions_answered'] = [];
+      //define the subject survey
+      new_answer['subject'] = new_round['subject'];
 
       //define the set of unanswered question
       new_answer['questions_unanswered'] = [];
@@ -545,7 +566,6 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
       $scope.send_email.link = 'http://vps288667.ovh.net:8082/content/project-management/delphi-survey.html?round=' + new_round['id'] + '&user=' + new_round['emails'][email]['address'];
 
       $http.post('/delphi_survey', $scope.send_email).success(function(response) {
-        console.log(response);
       });
     }
   }

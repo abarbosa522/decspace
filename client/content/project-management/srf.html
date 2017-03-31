@@ -24,6 +24,7 @@
 
     <!-- AngularJS Services -->
     <script src = '../../js/services/SRFService.js'></script>
+    <script src = '../../js/services/IntegratedSRFService.js'></script>
 
     <!-- Bootstrap -->
     <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
@@ -424,8 +425,8 @@
             <p>Criteria Cards</p>
             <div ng-drop = 'true' ng-drop-success = 'originalCriteriaDrop($data)'>
               <ul class = 'draggable-objects'>
-                <li ng-repeat = 'criterion in criteria'>
-                  <div class = 'criteria-card' ng-drag = 'true' ng-drag-data = 'criterion' data-allow-transform = 'true' title = '{{criterion.name}}' ng-if = 'criterion.position == -1'>
+                <li ng-repeat = 'criterion in criteria' ng-if = 'criterion.position == -1'>
+                  <div class = 'criteria-card' ng-drag = 'true' ng-drag-data = 'criterion' data-allow-transform = 'true' title = '{{criterion.name}}'>
                     {{criterion.name}}
                   </div>
                 </li>
@@ -454,15 +455,19 @@
               </div>
 
               <div class = 'col-md-10' ng-drop = 'true' ng-drop-success = 'rankingDrop($data, $index)'>
-                <div class = 'row'>
+                <ul class = 'draggable-objects'>
                   <!-- Dragged Criteria -->
-                  <div class = 'criteria-card' ng-repeat = 'criterion in criteria' ng-drag = 'true' ng-drag-data = 'criterion' ng-if = 'criterion.position == $parent.$index' title = '{{criterion.name}}'>
-                    {{criterion.name}}
-                  </div>
+                  <li ng-repeat = 'criterion in criteria' ng-if = 'criterion.position == $parent.$index'>
+                    <div class = 'criteria-card' ng-drag = 'true' ng-drag-data = 'criterion' data-allow-transform = 'true' title = '{{criterion.name}}'>
+                      {{criterion.name}}
+                    </div>
+                  </li>
                   <!-- Dragged White Cards -->
-                  <div class = 'white-card' ng-repeat = 'white_card in white_cards' ng-drag = 'true' ng-drag-data = 'white_card' ng-if = 'white_card.position == $parent.$index'>
-                  </div>
-                </div>
+                  <li ng-repeat = 'white_card in white_cards' ng-if = 'white_card.position == $parent.$index'>
+                    <div class = 'white-card' ng-drag = 'true' ng-drag-data = 'white_card' data-allow-transform = 'true'>
+                    </div>
+                  </li>
+                </ul>
               </div>
             </div>
 
@@ -689,15 +694,19 @@
                           </div>
 
                           <div class = 'col-md-10' ng-drop = 'true'>
-                            <div class = 'row'>
+                            <ul class = 'draggable-objects'>
                               <!-- Dragged Criteria -->
-                              <div class = 'criteria-card' ng-repeat = 'criterion in currentExecution.criteria' ng-drag = 'true' ng-if = 'criterion.position == $parent.$index' title = '{{criterion.name}}'>
-                                {{criterion.name}}
-                              </div>
+                              <li ng-repeat = 'criterion in currentExecution.criteria' ng-if = 'criterion.position == $parent.$index'>
+                                <div class = 'criteria-card undraggable-card' title = '{{criterion.name}}'>
+                                  {{criterion.name}}
+                                </div>
+                              </li>
                               <!-- Dragged White Cards -->
-                              <div class = 'white-card' ng-repeat = 'white_card in currentExecution.white_cards' ng-drag = 'true' ng-if = 'white_card.position == $parent.$index'>
-                              </div>
-                            </div>
+                              <li ng-repeat = 'white_card in currentExecution.white_cards' ng-if = 'white_card.position == $parent.$index'>
+                                <div class = 'white-card undraggable-card'>
+                                </div>
+                              </li>
+                            </ul>
                           </div>
                         </div>
                       </div>
@@ -710,15 +719,19 @@
                           </div>
 
                           <div class = 'col-md-10' ng-drop = 'true'>
-                            <div class = 'row'>
+                            <ul class = 'draggable-objects'>
                               <!-- Dragged Criteria -->
-                              <div class = 'criteria-card' ng-repeat = 'criterion in compareExecution.criteria' ng-drag = 'true' ng-if = 'criterion.position == $parent.$index' title = '{{criterion.name}}'>
-                                {{criterion.name}}
-                              </div>
+                              <li ng-repeat = 'criterion in compareExecution.criteria' ng-if = 'criterion.position == $parent.$index'>
+                                <div class = 'criteria-card undraggable-card' title = '{{criterion.name}}'>
+                                  {{criterion.name}}
+                                </div>
+                              </li>
                               <!-- Dragged White Cards -->
-                              <div class = 'white-card' ng-repeat = 'white_card in compareExecution.white_cards' ng-drag = 'true' ng-if = 'white_card.position == $parent.$index'>
-                              </div>
-                            </div>
+                              <li ng-repeat = 'white_card in compareExecution.white_cards' ng-if = 'white_card.position == $parent.$index'>
+                                <div class = 'white-card undraggable-card'>
+                                </div>
+                              </li>
+                            </ul>
                           </div>
                         </div>
                       </div>
@@ -738,12 +751,12 @@
                       <!-- Ratio Z -->
                       <div class = 'row'>
                         <div ng-class = '{"col-md-6": compareExecution != ""}'>
-                          <label>Ratio Z</label>
+                          <label>Ratio Z: </label>
                           {{currentExecution.ratio_z}}
                         </div>
 
                         <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
-                          <label>Ratio Z</label>
+                          <label>Ratio Z: </label>
                           {{compareExecution.ratio_z}}
                         </div>
                       </div>
@@ -751,12 +764,12 @@
                       <!-- Number of Decimal Places -->
                       <div class = 'row'>
                         <div ng-class = '{"col-md-6": compareExecution != ""}'>
-                          <label>Number Of Decimal Places</label>
+                          <label>Number Of Decimal Places: </label>
                           {{currentExecution.decimal_places}}
                         </div>
 
                         <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
-                          <label>Number of Decimal Places</label>
+                          <label>Number of Decimal Places: </label>
                           {{compareExecution.decimal_places}}
                         </div>
                       </div>
@@ -764,14 +777,64 @@
                       <!-- Weight Type -->
                       <div class = 'row'>
                         <div ng-class = '{"col-md-6": compareExecution != ""}'>
-                          <label>Weight Type</label>
+                          <label>Weight Type: </label>
                           {{currentExecution.weight_type}}
                         </div>
 
                         <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
-                          <label>Weight Type</label>
+                          <label>Weight Type: </label>
                           {{compareExecution.weight_type}}
                         </div>
+                      </div>
+                    </div>
+
+                    <br>
+
+                    <!-- Results -->
+                    <div class = 'row'>
+                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#results-exec-table' style = 'float:right' ng-click = 'results_exec_eye = (results_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Results'>
+                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : results_exec_eye == 0, "glyphicon-eye-close" : results_exec_eye == 1}'></span>
+                      </button>
+                      <p class = 'header-2'>Results</p>
+                    </div>
+
+                    <div id = 'results-exec-table' class = 'row collapse in'>
+                      <div ng-class = '{"col-md-6": compareExecution != ""}'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Criterion</th>
+                              <th class = 'text-center' ng-if = 'currentExecution.weight_type == "Non-Normalized"'>Non-Normalized Weight</th>
+                              <th class = 'text-center' ng-if = 'currentExecution.weight_type == "Normalized"'>Normalized Weight</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'result in currentExecution.results'>
+                              <td>{{result.name}}</td>
+                              <td ng-if = 'currentExecution.weight_type == "Non-Normalized"'>{{result["non-normalized weight"]}}</td>
+                              <td ng-if = 'currentExecution.weight_type == "Normalized"'>{{result["normalized weight"]}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Criterion</th>
+                              <th class = 'text-center' ng-if = 'compareExecution.weight_type == "Non-Normalized"'>Non-Normalized Weight</th>
+                              <th class = 'text-center' ng-if = 'compareExecution.weight_type == "Normalized"'>Normalized Weight</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'result in compareExecution.results'>
+                              <td>{{result.name}}</td>
+                              <td ng-if = 'compareExecution.weight_type == "Non-Normalized"'>{{result["non-normalized weight"]}}</td>
+                              <td ng-if = 'compareExecution.weight_type == "Normalized"'>{{result["normalized weight"]}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </div>
 

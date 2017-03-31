@@ -28,7 +28,9 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
           $scope.questions_answered = response[answer]['questions_answered'];
           //get the stores unanswered questions
           $scope.questions_unanswered = response[answer]['questions_unanswered'];
-
+          //geth the survey subject
+          $scope.subject = response[answer]['subject'];
+          
           break;
         }
       }
@@ -122,7 +124,7 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
   $scope.changeSaveSuccess = function() {
     $scope.showSaveSuccess = false;
   }
-  
+
   //reload the stored data on the database
   $scope.reloadData = function() {
     $http.get('/delphi_responses').success(function(response) {

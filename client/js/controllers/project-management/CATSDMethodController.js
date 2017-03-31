@@ -1,4 +1,4 @@
-app.controller('CATSDMethodController', function($scope, $window, $http, CATSDService) {
+app.controller('CATSDMethodController', function($scope, $window, $http, CATSDService, IntegratedSRFService) {
   //get the id of the open project
   var url = window.location.href;
   var proj_id = Number(url.substr(url.indexOf('?id=') + 4));
@@ -46,6 +46,8 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
 
   $scope.currentExecution = '';
   $scope.compareExecution = '';
+
+  $scope.integratedSRFService = IntegratedSRFService;
 
   function requestLogIn() {
     $http.get('/requestlogin').success(function(res) {
@@ -1153,6 +1155,37 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
 
     return true;
   }
+
+  //update integratedSRFService variables
+  $scope.updateIntegratedSRF = function() {
+    $scope.integratedSRFService.addCriteria(angular.copy($scope.criteria));
+    $scope.integratedSRFService.addCategories(angular.copy($scope.categories));
+
+
+  }
+
+  //check when the integrated SRF results are changed
+  $scope.$watch('integratedSRFService.integrated_results', function() {
+    console.log($scope.integratedSRFService.integrated_results)
+    console.log(Object.keys($scope.integratedSRFService.integrated_results))
+
+    if(Object.keys($scope.integratedSRFService.integrated_results).length > 0) {
+      for(category in $scope.categories) {
+        if($scope.categories[category]['name'] == $scope.integratedSRFService.integrated_category) {
+          console.log('here')
+          for(field in Object.keys($scope.integratedSRFService.integrated_results)) {
+            console.log(field)
+            console.log(Object.keys($scope.integratedSRFService.integrated_results)[field])
+            $scope.categories[category][Object.keys($scope.integratedSRFService.integrated_results)[field]] = $scope.integratedSRFService.integrated_results[Object.keys($scope.integratedSRFService.integrated_results)[field]];
+          }
+
+          break;
+        }
+      }
+    }
+
+    console.log($scope.categories);
+  });
 
   requestLogIn();
   rewriteLastUpdate();
