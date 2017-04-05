@@ -750,12 +750,10 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
     });
   }
 
-  //execute the SRF method and return the corresponding results
+  //execute the SRF method and return the corresponding results to the integrated version
   $scope.getIntegratedResults = function() {
 
-    console.log($scope.selected_category)
     var results = SRFService.getResults($scope.integratedSRFService.integrated_criteria, $scope.white_cards, $scope.ranking, $scope.ratio_z, $scope.decimal_places, $scope.weight_type);
-    console.log($scope.integratedSRFService)
 
     var new_results = [];
 
@@ -765,7 +763,7 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
       else
         new_results[results[result]['name']] = results[result]['normalized weight'];
     }
-    
+
     $scope.integratedSRFService.integrated_results = new_results;
   }
 

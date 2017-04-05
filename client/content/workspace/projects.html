@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>DecSpace - Projects</title>
+    <title>DecSpace: Workspace - Projects</title>
 
     <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
 
     <!-- CSS Stylesheet -->
     <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css' />
-    <link rel = 'stylesheet' type = 'text/css' href = '../../css/project-management.css' />
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/project-management.css'/>
 
     <!-- jQuery -->
     <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
@@ -20,7 +20,7 @@
     <script src = '../../js/app.js'></script>
 
     <!-- AngularJS Controllers -->
-    <script src = '../../js/controllers/project-management/ProjectManagementController.js'></script>
+    <script src = '../../js/controllers/workspace/ProjectsController.js'></script>
 
     <!-- Bootstrap -->
     <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
@@ -31,9 +31,12 @@
 
     <!-- ng-draggable module -->
     <script src = '../../js/shared/ng-draggable/ngDraggable.js'></script>
+
+    <!-- Font Awesome -->
+    <link rel = 'stylesheet' href = '../../js/shared/font-awesome-4.7.0/css/font-awesome.css'></link>
   </head>
 
-  <body ng-app = 'decspace' ng-controller = 'ProjectManagementController'>
+  <body ng-app = 'decspace' ng-controller = 'ProjectsController'>
 
     <!-- Navigation Bar -->
     <nav class = 'navbar navbar-custom navbar-fixed-top'>
@@ -70,10 +73,10 @@
 
       <ul class = 'breadcrumb'>
         <li><a href = '../dashboard/dashboard.html'>Dashboard</a></li>
-        <li class = 'active'>Projects</li>
+        <li class = 'active'>Workspace - Projects</li>
       </ul>
 
-      <p class = 'header-1'>Projects</p>
+      <p class = 'header-1'>Workspace - Projects</p>
 
       <br>
 
@@ -82,24 +85,34 @@
           <tr>
             <th class = 'text-center'>
               Name
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrder("name", "descendant")'></span></a>
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrder("name", "ascendant")'></span></a>
+              <a href = ''>
+                <span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeCurrentOrder("name", "descendant")' title = 'Sort "Name" Downwards'></span>
+              </a>
+              <a href = ''>
+                <span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeCurrentOrder("name", "ascendant")' title = 'Sort "Name" Upwards'></span>
+              </a>
             </th>
-            <th class = 'text-center'>
-              Method
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrder("method", "descendant")'></span></a>
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrder("method", "ascendant")'></span></a>
-            </th>
+
             <th class = 'text-center'>
               Creation Date
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrder("creation_date", "descendant")'></span></a>
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrder("creation_date", "ascendant")'></span></a>
+              <a href = ''>
+                <span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeCurrentOrder("creation_date", "descendant")' title = 'Sort "Creation Date" Downwards'></span>
+              </a>
+              <a href = ''>
+                <span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeCurrentOrder("creation_date", "ascendant")' title = 'Sort "Creation Date" Upwards'></span>
+              </a>
             </th>
+
             <th class = 'text-center'>
               Last Update
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrder("last_update", "descendant")'></span></a>
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrder("last_update", "ascendant")'></span></a>
+              <a href = ''>
+                <span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeCurrentOrder("last_update", "descendant")' title = 'Sort "Last Update" Downwards'></span>
+              </a>
+              <a href = ''>
+                <span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeCurrentOrder("last_update", "ascendant")' title = 'Sort "Last Update" Upwards'></span>
+              </a>
             </th>
+
             <th></th>
           </tr>
         </thead>
@@ -107,9 +120,6 @@
           <tr ng-repeat = 'project in projects' ng-class = '{danger: delete_id_project == project.project_id || delete_id_project == "all"}'>
             <!-- Project Name -->
             <td>{{project.name}}</td>
-
-            <!-- Project Method -->
-            <td>{{project.method}}</td>
 
             <!-- Creation Date -->
             <td>{{project.creation_date}}</td>
@@ -147,25 +157,13 @@
               <input id = 'input-name' type = 'text' class = 'form-control' placeholder = 'New Project' ng-model = 'project.name'>
             </td>
 
-            <!-- Method List -->
-            <td>
-              <select id = 'input-method' ng-model = 'project.method'>
-                <option value = '' selected disabled>--- Please Select ---</option>
-                <option>CAT-SD</option>
-                <option>Delphi</option>
-                <option>OrderBy</option>
-                <option>Sort</option>
-                <option>SRF</option>
-              </select>
-            </td>
-
             <td></td>
 
             <td></td>
 
             <!-- Add Button -->
             <td>
-              <button type = 'button' class = 'btn btn-success btn-add' ng-click = 'addProject()' data-toggle = 'tooltip' title = 'Add Project'>
+              <button type = 'button' class = 'btn btn-success btn-add' ng-click = 'addProject()' title = 'Add Project'>
                 <span class = 'glyphicon glyphicon-plus'></span>
               </button>
             </td>
@@ -195,12 +193,8 @@
 
       <br><br>
 
-      <div class = 'alert alert-danger' role = 'alert' ng-if = 'showMethodErrorAlert' ng-cloak>
-        A method has <strong>not</strong> been chosen.
-      </div>
-
       <div class = 'alert alert-danger' role = 'alert' ng-if = 'showNameErrorAlert' ng-cloak>
-        A name was <strong>not</strong> been defined.
+        A name was <strong>not</strong> defined.
       </div>
 
     </div>

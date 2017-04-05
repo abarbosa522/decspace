@@ -288,18 +288,12 @@
                   <th class = 'text-center'>Order by</th>
                   <th class = 'text-center'>
                     Name
-                    <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrderCriteria("name", "descendant")'></span></a>
-                    <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrderCriteria("name", "ascendant")'></span></a>
                   </th>
                   <th class = 'text-center'>
                     Type
-                    <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrderCriteria("type", "descendant")'></span></a>
-                    <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrderCriteria("type", "ascendant")'></span></a>
                   </th>
                   <th class = 'text-center'>
                     Direction
-                    <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrderCriteria("direction", "descendant")'></span></a>
-                    <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrderCriteria("direction", "ascendant")'></span></a>
                   </th>
                   <th class = 'col-md-2'></th>
                 </tr>
@@ -392,13 +386,9 @@
               <thead>
                 <th class = 'text-center'>
                   Name
-                  <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrderActions("name", "descendant")'></span></a>
-                  <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrderActions("name", "ascendant")'></span></a>
                 </th>
                 <th class = 'text-center' ng-repeat = 'criterion in criteria'>
                   {{criterion.name}}
-                  <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrderActions(criterion.name, "descendant")'></span></a>
-                  <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrderActions(criterion.name, "ascendant")'></span></a>
                 </th>
                 <th class = 'col-md-2'></th>
               </thead>
@@ -456,7 +446,7 @@
 
           <br>
 
-          <table class = 'table table-bordered table-hover table-striped'>
+          <table class = 'table table-bordered table-hover'>
             <thead>
               <th class = 'text-center'>#</th>
               <th class = 'text-center'>Date</th>

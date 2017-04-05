@@ -1,0 +1,55 @@
+.module-orderby {
+  position: absolute;
+
+  width: 25%;
+  height: 25%;
+  margin: 10%;
+
+  background-color: #29e;
+  color: white;
+
+  border: black 1px solid;
+  border-radius: 0.75em;
+  padding: 4%;
+
+  -webkit-transform: translate(0px, 0px);
+          transform: translate(0px, 0px);
+}
+
+.module-circle {
+  border-radius: 50%;
+	width: 10px;
+	height: 10px;
+  background-color: yellow;
+  margin-left: -20%;
+  border: black 1px solid;
+}
+
+.module-circle-anchor {
+  font-size: 10px;
+  position: absolute;
+  margin-top: -2%;
+  margin-left: 3%;
+  color: black;
+}
+
+.module-circle-output {
+  border-radius: 50%;
+	width: 10px;
+	height: 10px;
+  background-color: red;
+  margin-left: 115%;
+  border: black 1px solid;
+}
+
+.module-circle-output-anchor {
+  font-size: 10px;
+  position: absolute;
+  margin-top: -2.5%;
+  margin-left: -21%;
+  color: black;
+}
+
+#criteria-modal {
+  cursor: default;
+}

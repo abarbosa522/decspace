@@ -1166,25 +1166,16 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
 
   //check when the integrated SRF results are changed
   $scope.$watch('integratedSRFService.integrated_results', function() {
-    console.log($scope.integratedSRFService.integrated_results)
-    console.log(Object.keys($scope.integratedSRFService.integrated_results))
-
     if(Object.keys($scope.integratedSRFService.integrated_results).length > 0) {
       for(category in $scope.categories) {
         if($scope.categories[category]['name'] == $scope.integratedSRFService.integrated_category) {
-          console.log('here')
           for(field in Object.keys($scope.integratedSRFService.integrated_results)) {
-            console.log(field)
-            console.log(Object.keys($scope.integratedSRFService.integrated_results)[field])
             $scope.categories[category][Object.keys($scope.integratedSRFService.integrated_results)[field]] = $scope.integratedSRFService.integrated_results[Object.keys($scope.integratedSRFService.integrated_results)[field]];
           }
-
           break;
         }
       }
     }
-
-    console.log($scope.categories);
   });
 
   requestLogIn();

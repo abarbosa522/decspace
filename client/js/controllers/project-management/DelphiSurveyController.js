@@ -30,7 +30,7 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
           $scope.questions_unanswered = response[answer]['questions_unanswered'];
           //geth the survey subject
           $scope.subject = response[answer]['subject'];
-          
+
           break;
         }
       }
@@ -80,6 +80,11 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
     }
   }
 
+  //hide the successful save alert
+  function hideAlert() {
+    angular.element(document.querySelector('#save-success')).hide();
+  }
+
   /*** BUTTON BAR FUNCTIONS ***/
 
   //variable to show or hide the save success message
@@ -115,6 +120,14 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
         //add the new answers
         $http.post('/delphi_responses', answer_res).success(function() {
           $scope.showSaveSuccess = true;
+
+          //show save success alert
+          angular.element(document.querySelector('#save-success')).alert();
+          //smoothly hide success alert
+          angular.element(document.querySelector('#save-success')).fadeTo(2000, 500).slideUp(500, function(){
+               angular.element(document.querySelector('#save-success')).slideUp(500);
+                });
+
         });
       });
     });
@@ -253,4 +266,5 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
 
   /*** STARTUP FUNCTIONS ***/
   getQuestions();
+  hideAlert();
 });

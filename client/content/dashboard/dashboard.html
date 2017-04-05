@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>DecSpace - Dashboard</title>
+    <title>DecSpace: Dashboard</title>
 
     <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
 
@@ -31,6 +31,9 @@
 
     <!-- ng-draggable module -->
     <script src = '../../js/shared/ng-draggable/ngDraggable.js'></script>
+
+    <!-- Font Awesome -->
+    <link rel = 'stylesheet' href = '../../js/shared/font-awesome-4.7.0/css/font-awesome.css'></link>
   </head>
 
   <body ng-app = 'decspace' ng-controller = 'DashboardController'>
@@ -50,7 +53,7 @@
         <ul class = 'nav navbar-nav navbar-right'>
 
           <li>
-            <p class = 'navbar-text' style = 'font-weight:600;font-style:italic'>Welcome, {{name}}!</p>
+            <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic'>Welcome, {{name}}!</p>
           </li>
 
           <li><a href = '../homepage/about.html'>About</a></li>
@@ -71,43 +74,67 @@
     </nav>
 
     <div id = 'main-content' class = 'container'>
-      <ul class = 'breadcrumb'>
-        <li class = 'active'>Dashboard</li>
-      </ul>
+
+      <br>
 
       <p class = 'header-1'>Dashboard</p>
 
       <hr/>
 
+      <!-- First Button Row -->
       <div class = 'row'>
         <div class = 'col-md-4'>
           <button type = 'button' class = 'btn btn-default btn-lg' ng-click = 'toProjectManagement()'>
             <span class = 'glyphicon glyphicon-th-list'></span>
-        </button>
-        </div>
-
-        <div class = 'col-md-4'>
-          <button type = 'button' class = 'btn btn-default btn-lg' ng-click = 'toSettings()'>
-            <span class = 'glyphicon glyphicon-cog'></span>
           </button>
         </div>
 
         <div class = 'col-md-4'>
+          <button type = 'button' class = 'btn btn-default btn-lg' ng-click = 'toWorkspaceProjects()'>
+            <i class = 'fa fa-desktop fa-lg'></i>
+          </button>
         </div>
-    </div>
 
+        <div class = 'col-md-4'>
+          <button type = 'button' class = 'btn btn-default btn-lg' ng-click = ''>
+            <i class = 'fa fa-book fa-lg'></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- First Title Row -->
       <div class = 'row'>
         <div class = 'col-md-4'>
           <span>Projects</span>
         </div>
 
         <div class = 'col-md-4'>
-          <span>Settings</span>
+          <span>Workspace</span>
         </div>
 
         <div class = 'col-md-4'>
+          <span>Method Catalog</span>
         </div>
       </div>
+
+      <br>
+
+      <!-- Second Button Row -->
+      <div class = 'row'>
+        <div class = 'col-md-4'>
+          <button type = 'button' class = 'btn btn-default btn-lg' ng-click = 'toSettings()'>
+            <span class = 'glyphicon glyphicon-cog'></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Second Title Row -->
+      <div class = 'row'>
+        <div class = 'col-md-4'>
+          <span>Settings</span>
+        </div>
+      </div>
+
     </div>
   </body>
 </html>

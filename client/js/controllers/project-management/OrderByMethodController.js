@@ -81,9 +81,6 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
         }
       }
 
-      console.log(id_doc);
-      console.log(proj_res);
-
       //delete the previous document with the list of projects
       $http.delete('/projects/' + id_doc).success(function(){
         //add the new list of projects
@@ -106,38 +103,10 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
           else
             $scope.criteria = response[proj]['criteria'];
 
-          if(currentOrderCriteria[0] != '' && currentOrderCriteria[1] != '') {
-            $scope.criteria.sort(sortData(currentOrderCriteria[0], currentOrderCriteria[1]));
-          }
-
           break;
         }
       }
     });
-  }
-
-  $scope.changeCurrentOrderCriteria = function(attr, dir) {
-    currentOrderCriteria = [attr, dir];
-    $scope.criteria.sort(sortData(currentOrderCriteria[0], currentOrderCriteria[1]));
-  }
-
-  function sortData(order, direction) {
-    return function(a, b) {
-      if(direction == 'ascendant') {
-        if(a[order] < b[order])
-          return -1;
-        if(a[order] > b[order])
-          return 1;
-        return 0;
-      }
-      else {
-        if(a[order] < b[order])
-          return 1;
-        if(a[order] > b[order])
-          return -1;
-        return 0;
-      }
-    }
   }
 
   //get the number of parameters of a scope variable
@@ -216,18 +185,10 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
           else
             $scope.actions = response[proj]['actions'];
 
-          if(currentOrderActions[0] != '' && currentOrderActions[1] != '')
-            $scope.actions.sort(sortData(currentOrderActions[0], currentOrderActions[1]));
-
           break;
         }
       }
     });
-  }
-
-  $scope.changeCurrentOrderActions = function(attr, dir) {
-    currentOrderActions = [attr, dir];
-    $scope.actions.sort(sortData(currentOrderActions[0], currentOrderActions[1]));
   }
 
   $scope.addAction = function() {
@@ -510,7 +471,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
           for(field in data[action])
             if(field != 'name')
               data[action][field] = Number(data[action][field]);
-  
+
         $scope.actions = data;
         break;
     }

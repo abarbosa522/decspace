@@ -36,7 +36,7 @@
     <link href = 'https://fonts.googleapis.com/css?family=Open+Sans:400,600i' rel = 'stylesheet'>
 
     <!-- MathJax -->
-    <script type="text/x-mathjax-config">
+    <script type = 'text/x-mathjax-config'>
       MathJax.Hub.Config({
         CommonHTML: {
           scale: 90,
@@ -798,15 +798,15 @@
                 <tr>
                   <th class = 'text-center' rowspan = '2'>Category</th>
                   <th class = 'text-center' rowspan = '2'>Membership Degree</th>
-                  <th class = 'text-center' colspan = '{{criteria.length + 1}}'>
+                  <th class = 'text-center' colspan = '{{criteria.length}}'>
                     <a ng-href = '#' data-toggle = 'modal' data-target = '#srf-modal' ng-click = 'updateIntegratedSRF()'>
                       Criteria Weights
                     </a>
                   </th>
+                  <th class = 'col-md-2' rowspan = '2'></th>
                 </tr>
                 <tr>
                   <th class = 'text-center' ng-repeat = 'criterion in criteria'>{{criterion.name}}</th>
-                  <th class = 'col-md-2'></th>
                 </tr>
               </thead>
               <tbody>
@@ -867,21 +867,6 @@
                 </div>
 
                 <div class = 'modal-body'>
-
-                  <!-- Categories -->
-                  <div class = 'row'>
-                    <form class = 'form-inline'>
-                      <div class = 'form-group'>
-                        <label>Category</label>
-                        <select ng-model = 'integratedSRFService.integrated_category'>
-                          <option value = '' selected disabled>--- Please Select ---</option>
-                          <option ng-repeat = 'category in integratedSRFService.integrated_categories'>{{category.name}}</option>
-                        </select>
-                      </div>
-                    </form>
-                  </div>
-
-                  <br>
 
                   <div class = 'row'>
                     <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#ranking-div' style = 'float:right' ng-click = 'ranking_eye = (ranking_eye == 0 ? 1 : 0)' title = 'Hide/Show Ranking'>
@@ -958,66 +943,83 @@
 
                   <br>
 
-                    <!-- Other Parameters -->
+                  <!-- Other Parameters -->
+                  <div class = 'row'>
+                    <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#param-div' style = 'float:right' ng-click = 'param_eye = (param_eye == 0 ? 1 : 0)' title = 'Hide/Show Other Parameters'>
+                      <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : param_eye == 0, "glyphicon-eye-close" : param_eye == 1}'></span>
+                    </button>
+                    <p class = 'header-2'>Other Parameters</p>
+                  </div>
+
+                  <div id = 'param-div' class = 'collapse in'>
+
+                    <!-- Categories -->
                     <div class = 'row'>
-                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#param-div' style = 'float:right' ng-click = 'param_eye = (param_eye == 0 ? 1 : 0)' title = 'Hide/Show Other Parameters'>
-                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : param_eye == 0, "glyphicon-eye-close" : param_eye == 1}'></span>
-                      </button>
-                      <p class = 'header-2'>Other Parameters</p>
+                      <form class = 'form-inline'>
+                        <div class = 'form-group'>
+                          <label>Category</label>
+                          <select ng-model = 'integratedSRFService.integrated_category'>
+                            <option value = '' selected disabled>--- Please Select ---</option>
+                            <option ng-repeat = 'category in integratedSRFService.integrated_categories'>{{category.name}}</option>
+                          </select>
+                        </div>
+                      </form>
                     </div>
 
-                    <div id = 'param-div' class = 'collapse in'>
+                    <br>
 
-                      <!-- Ratio Z -->
-                      <div class = 'row'>
-                        <form class = 'form-inline'>
-                          <div class = 'form-group'>
-                            <label>Ratio Z</label>
-                            <input type = 'number' class = 'form-control' ng-model = 'ratio_z'>
-                          </div>
-                        </form>
-                      </div>
+                    <!-- Ratio Z -->
+                    <div class = 'row'>
+                      <form class = 'form-inline'>
+                        <div class = 'form-group'>
+                          <label>Ratio Z</label>
+                          <input type = 'number' class = 'form-control' ng-model = 'ratio_z'>
+                        </div>
+                      </form>
+                    </div>
 
-                      <br>
+                    <br>
 
-                      <!-- Decimal Places -->
-                      <div class = 'row'>
-                        <form class = 'form-inline'>
-                          <div class = 'form-group'>
-                            <label>Number of Decimal Places</label>
-                            <select ng-model = 'decimal_places'>
-                              <option value = '' selected disabled>--- Please Select ---</option>
-                              <option>0</option>
-                              <option>1</option>
-                              <option>2</option>
-                            </select>
-                          </div>
-                        </form>
-                      </div>
+                    <!-- Decimal Places -->
+                    <div class = 'row'>
+                      <form class = 'form-inline'>
+                        <div class = 'form-group'>
+                          <label>Number of Decimal Places</label>
+                          <select ng-model = 'decimal_places'>
+                            <option value = '' selected disabled>--- Please Select ---</option>
+                            <option>0</option>
+                            <option>1</option>
+                            <option>2</option>
+                          </select>
+                        </div>
+                      </form>
+                    </div>
 
-                      <br>
+                    <br>
 
-                      <!-- Output - Normalized or Non-Normalized Weights -->
-                      <div class = 'row'>
-                        <form class = 'form-inline'>
-                          <div class = 'form-group'>
-                            <label>Weight Type</label>
-                            <select ng-model = 'weight_type'>
-                              <option value = '' selected disabled>--- Please Select ---</option>
-                              <option>Non-Normalized</option>
-                              <option>Normalized</option>
-                            </select>
-                          </div>
-                        </form>
-                      </div>
+                    <!-- Output - Normalized or Non-Normalized Weights -->
+                    <div class = 'row'>
+                      <form class = 'form-inline'>
+                        <div class = 'form-group'>
+                          <label>Weight Type</label>
+                          <select ng-model = 'weight_type'>
+                            <option value = '' selected disabled>--- Please Select ---</option>
+                            <option>Non-Normalized</option>
+                            <option>Normalized</option>
+                          </select>
+                        </div>
+                      </form>
+                    </div>
 
-                      <br>
+                    <br>
 
-                      <!-- Execute Button -->
-                      <button type = 'button' class = 'btn btn-default' ng-click = 'getIntegratedResults()'>
-                        Get Results
-                      </button>
                   </div>
+
+                  <!-- Execute Button -->
+                  <button type = 'button' class = 'btn btn-default' ng-click = 'getIntegratedResults()'>
+                    Get Results
+                  </button>
+
                 </div>
               </div>
             </div>

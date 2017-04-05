@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DecSpace: Workspace - Projects</title>
+
+    <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
+
+    <!-- CSS Stylesheet -->
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css'/>
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/workspace.css'/>
+
+    <!-- jQuery -->
+    <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
+    <script type = 'text/javascript' src = '../../js/shared/jquery-ui-1.12.0/jquery-ui.js'></script>
+
+    <!-- AngularJS -->
+    <script src = '../../js/shared/angular.min.js'></script>
+
+    <!-- AngularJS Modules -->
+    <script src = '../../js/app.js'></script>
+
+    <!-- AngularJS Controllers -->
+    <script src = '../../js/controllers/workspace/WorkspaceController.js'></script>
+
+    <!-- Bootstrap -->
+    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
+    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.js'></script>
+
+    <!-- Google Web Fonts -->
+    <link href = 'https://fonts.googleapis.com/css?family=Open+Sans:400,600i' rel = 'stylesheet'>
+
+    <!-- Font Awesome -->
+    <link rel = 'stylesheet' href = '../../js/shared/font-awesome-4.7.0/css/font-awesome.css'></link>
+
+    <!-- InteractJS -->
+    <script type = 'text/javascript' src = '../../js/shared/interact.js'></script>
+  </head>
+
+  <body ng-app = 'decspace' ng-controller = 'WorkspaceController'>
+
+    <!-- Navigation Bar -->
+    <nav class = 'navbar navbar-custom navbar-fixed-top'>
+      <div class = 'container'>
+        <!-- Title -->
+        <div class = 'navbar-header'>
+          <a class = 'navbar-brand' href = '../dashboard/dashboard.html'>DecSpace</a>
+        </div>
+
+        <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
+        <ul class = 'nav navbar-nav navbar-right'>
+          <li><p class = 'navbar-text' style = 'font-weight: 600; font-style: italic'>Welcome, {{name}}!</p></li>
+
+          <li><a href = '../homepage/about.html'>About</a></li>
+
+          <li><a href = '../homepage/faq.html'>FAQ</a></li>
+
+          <li><a href = '../homepage/contactus.html'>Contact Us</a></li>
+
+          <li>
+            <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'logOut()'>
+              <span class = 'glyphicon glyphicon-log-out'></span>
+              Log Out
+            </button>
+          </li>
+        </ul>
+
+      </div>
+    </nav>
+
+    <div id = 'main-content' class = 'container'>
+
+      <ul class = 'breadcrumb'>
+        <li><a href = '../dashboard/dashboard.html'>Dashboard</a></li>
+        <li><a href = 'projects.html'>Workspace - Projects</a></li>
+        <li class = 'active'>Workspace - Project {{project_name}}</li>
+      </ul>
+
+      <p class = 'header-1'>Workspace - Project {{project_name}}</p>
+
+      <br>
+
+      <div class = 'row'>
+        <div class = 'col-md-2' >
+        </div>
+
+        <!-- Workspace -->
+        <div id = 'workspace' class = 'col-md-8' style = 'height: 400px; border: black 1px solid'>
+
+          <!-- Button Bar -->
+          <div class = 'btn-toolbar' role = 'toolbar' style = 'margin-top: 1%'>
+            <div class = 'btn-group' role = 'group'>
+              <!-- Execute Button -->
+              <button type = 'button' class = 'btn btn-default' ng-click = '' title = 'Execute Project'>
+                <span class = 'glyphicon glyphicon-play'></span>
+              </button>
+            </div>
+
+            <div class = 'btn-group' role = 'group'>
+              <!-- Save Button -->
+              <button type = 'button' class = 'btn btn-primary' ng-click = 'saveData()' title = 'Save Data'>
+                <span class = 'glyphicon glyphicon-floppy-save icon-large'></span>
+              </button>
+
+              <!-- Reload Data Button -->
+              <button type = 'button' class = 'btn btn-info' ng-click = 'reloadData()' title = 'Reload Data'>
+                <span class = 'glyphicon glyphicon-refresh'></span>
+              </button>
+            </div>
+
+            <div class = 'btn-group' role = 'group'>
+              <!-- Import Button -->
+              <button type = 'button' class = 'btn btn-warning' title = 'Import Data' data-toggle = 'modal' data-target = '#import-modal'>
+                <span class = 'glyphicon glyphicon-import icon-large'></span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Module Templates -->
+
+          <!-- OrderBy Template -->
+          <template id = 'orderby-temp'>
+            <div id = 'orderby' class = 'module-orderby draggable'>
+              Order By
+
+              <div class = 'module-circle' style = 'margin-top: -30%'>
+                <a href data-toggle = 'modal' data-target = '#criteria-modal' class = 'module-circle-anchor' ng-click = 'selectCurrentModule($event)'>Criteria</a>
+              </div>
+
+              <div class = 'module-circle' style = 'margin-top: 40%'>
+                <a href = '' class = 'module-circle-anchor' ng-click = ''>Actions</a>
+              </div>
+
+              <div class = 'module-circle-output' style = 'margin-top: -30%'>
+                <a href = '' class = 'module-circle-output-anchor' ng-click = ''>Output</a>
+              </div>
+            </div>
+          </template>
+
+
+          <!-- Module Modals -->
+
+          <!-- Criteria Modal -->
+          <div id = 'criteria-modal' class = 'modal fade'  role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>Criteria</h4>
+                </div>
+
+                <div class = 'modal-body'>
+                  <table class = 'table table-bordered table-hover'>
+                    <thead>
+                      <tr>
+                        <th class = 'text-center' ng-repeat = 'arg in currentModule.criteria.args'>{{arg}}</th>
+                        <th class = 'col-md-2'></th>
+                      </tr>
+                    </thead>
+                    <!-- Added Criteria -->
+                    <tbody>
+                      <tr ng-repeat = 'criterion in currentModule.criteria.data' ng-class = '{danger: criterion.id == deleteIdCriterion}'>
+                        <td>
+                          <input type = 'radio' ng-checked = 'criterion.selected == "true"' ng-click = 'selectCriterion(criterion)' >
+                        </td>
+                        <td>
+                          <input class = 'form-control' type = 'text' ng-model = 'criterion.name'>
+                        </td>
+                        <td>
+                          <select ng-model = 'criterion.type'>
+                            <option disabled>--- Please Select ---</option>
+                            <option>Text</option>
+                            <option>Number</option>
+                          </select>
+                        </td>
+                        <td>
+                          <select ng-model = 'criterion.direction'>
+                            <option disabled>--- Please Select ---</option>
+                            <option>Ascendant</option>
+                            <option>Descendant</option>
+                          </select>
+                        </td>
+                        <td ng-if = 'criterion.id != deleteIdCriterion'>
+                          <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteCriterion(criterion)' title = 'Delete Criterion'>
+                            <span class = 'glyphicon glyphicon-minus'></span>
+                          </button>
+                        </td>
+                        <td ng-if = 'criterion.id == deleteIdCriterion'>
+                          <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteCriterion(criterion)' title = 'Confirm Delete Criterion'>
+                            <span class = 'glyphicon glyphicon-ok'></span>
+                          </button>
+                          <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteCriterion()' title = 'Cancel Delete Criterion'>
+                            <span class = 'glyphicon glyphicon-remove'></span>
+                          </button>
+                        </td>
+                      </tr>
+                      <!-- Form to add criteria -->
+                      <!--<tr class = 'active'>
+                        <td></td>
+                        <td>
+                          <input class = 'form-control' type = 'text' ng-model = 'new_criterion.name'>
+                        </td>
+                        <td>
+                          <select ng-model = 'new_criterion.type'>
+                            <option value = '' disabled>--- Please Select ---</option>
+                            <option>Text</option>
+                            <option>Number</option>
+                          </select>
+                        </td>
+                        <td>
+                          <select ng-model = 'new_criterion.direction'>
+                            <option value = '' disabled>--- Please Select ---</option>
+                            <option>Ascendant</option>
+                            <option>Descendant</option>
+                          </select>
+                        </td>
+                        <td>
+                          <button type = 'button' class = 'btn btn-success' ng-click = 'addCriterion()' data-toggle = 'tooltip' title = 'Add Criterion'>
+                            <span class = 'glyphicon glyphicon-plus'></span>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>-->
+                  </table>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Modules List -->
+        <div class = 'col-md-2'>
+          <div class = 'panel-group'>
+            <div class = 'panel panel-default'>
+              <div class = 'panel-heading'>
+                <h4 class = 'panel-title'>
+                  <a data-toggle = 'collapse' href = '#collapse1'>Methods</a>
+                </h4>
+              </div>
+
+              <div id = 'collapse1' class = 'panel-collapse collapse'>
+                <ul class = 'list-group'>
+                  <li class = 'list-group-item' ng-repeat = 'method in methods' ng-click = 'addMethodModule(method)'>
+                    <a href = ''>{{method}}</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </body>
+</html>

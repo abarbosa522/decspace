@@ -1,4 +1,4 @@
-var app = angular.module('decspace', ['ngDraggable']);
+var app = angular.module('decspace', []);
 
 //MathJax Directive
 app.directive('mathJaxBind', function() {
