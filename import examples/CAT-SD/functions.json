@@ -6,7 +6,9 @@
 {"criterion":"Mental Sharpness","function":"1","condition":"abs(x-y)<=5"}
 {"criterion":"Mental Sharpness","function":"(10-abs(x-y))/5","condition":"5<abs(x-y) and abs(x-y)<=10"}
 {"criterion":"Mental Sharpness","function":"0","condition":"(y-20<x and x<=y-10) or (y+10<x and x<=y+15)"}
+{"criterion":"Mental Sharpness","function":"(x-y+20)/5","condition":"y-25<x and x<=y-20"}
 {"criterion":"Mental Sharpness","function":"(-(x-y)+15)/5","condition":"y+15<x and x<=y+20"}
+{"criterion":"Mental Sharpness","function":"-1","condition":"x<=y-25 or x>=y+20"}
 {"criterion":"Mental Resilience","function":"1","condition":"x=y"}
 {"criterion":"Mental Resilience","function":"-1","condition":"abs(x-y)>=1"}
 {"criterion":"Intelligence","function":"1","condition":"x=y"}

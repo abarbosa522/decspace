@@ -192,7 +192,7 @@ app.get('/expr-eval', function(req, res) {
 
             var cond = parser.parse(condition);
             var result = cond.evaluate({x: Number(arg1), y: Number(arg2)});
-
+            
             if(result == true) {
               var func_branch = parser.parse(criteria[criterion]['branches'][branch]['function']);
               result = func_branch.evaluate({x: Number(arg1), y: Number(arg2)});
@@ -202,6 +202,7 @@ app.get('/expr-eval', function(req, res) {
               result_obj['action'] = actions[action]['name'];
               result_obj['reference_action'] = categories[category]['reference_actions'][reference_action]['name'];
               result_obj['result'] = result;
+
               similarityValues.push(result_obj);
               break;
             }

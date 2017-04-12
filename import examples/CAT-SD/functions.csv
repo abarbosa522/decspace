@@ -7,7 +7,9 @@ Physical Fitness;-1;abs(x-y)>200
 Mental Sharpness;1;abs(x-y)<=5
 Mental Sharpness;(10-abs(x-y))/5;5<abs(x-y) and abs(x-y)<=10
 Mental Sharpness;0;(y-20<x and x<=y-10) or (y+10<x and x<=y+15)
+Mental Sharpness;(x-y+20)/5;y-25<x and x<=y-20
 Mental Sharpness;(-(x-y)+15)/5;y+15<x and x<=y+20
+Mental Sharpness;-1;x<=y-25 or x>=y+20
 Mental Resilience;1;x=y
 Mental Resilience;-1;abs(x-y)>=1
 Intelligence;1;x=y

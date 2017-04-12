@@ -126,8 +126,7 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
           //smoothly hide success alert
           angular.element(document.querySelector('#save-success')).fadeTo(2000, 500).slideUp(500, function(){
                angular.element(document.querySelector('#save-success')).slideUp(500);
-                });
-
+          });
         });
       });
     });

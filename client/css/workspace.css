@@ -1,4 +1,4 @@
-.module-orderby {
+.module-template {
   position: absolute;
 
   width: 25%;
@@ -16,40 +16,44 @@
           transform: translate(0px, 0px);
 }
 
+.module-inputfile {
+  height: 15%;
+}
+
 .module-circle {
-  border-radius: 50%;
-	width: 10px;
-	height: 10px;
-  background-color: yellow;
-  margin-left: -20%;
+  position: absolute;
+  border-radius: 100%;
+	width: 12px;
+	height: 12px;
   border: black 1px solid;
 }
 
-.module-circle-anchor {
-  font-size: 10px;
-  position: absolute;
-  margin-top: -2%;
-  margin-left: 3%;
-  color: black;
+.module-circle-input {
+  background-color: yellow;
 }
 
 .module-circle-output {
-  border-radius: 50%;
-	width: 10px;
-	height: 10px;
   background-color: red;
-  margin-left: 115%;
-  border: black 1px solid;
 }
 
-.module-circle-output-anchor {
-  font-size: 10px;
+.module-circle-span {
   position: absolute;
-  margin-top: -2.5%;
-  margin-left: -21%;
+  font-size: 12px;
   color: black;
 }
 
-#criteria-modal {
+.module-circle-anchor {
+  color: black;
+}
+
+.custom-modal .modal-dialog {
   cursor: default;
+  width: 95%;
+}
+
+.custom-alert {
+  position: absolute;
+  width: 60%;
+  margin-top: -5%;
+  margin-left: 30%;
 }
