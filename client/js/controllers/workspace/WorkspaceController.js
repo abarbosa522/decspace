@@ -116,9 +116,12 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
     target.style.transform =
       'translate(' + x + 'px, ' + y + 'px)';
 
-    // update the posiion attributes
+    // update the position attributes
     target.setAttribute('data-x', x);
     target.setAttribute('data-y', y);
+
+    //update the position of the connecting lines of the dragged module
+    updateConnections(target.attributes.id.value);
   }
 
   /*** BUTTON BAR FUNCTIONS ***/
@@ -251,6 +254,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
     $('#save-success').hide();
     $('#invalid-connection1').hide();
     $('#invalid-connection2').hide();
+    $('#invalid-connection3').hide();
   }
 
   //show certain alert and hide it smoothly
@@ -508,40 +512,36 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
   }
 
   /*** CONNECTOR FUNCTIONS ***/
-  //created lines
-  var lines = [];
+  //created connections
+  var connections = [];
   //controls if a first point has already been clicked
   var drawing_line = false;
-  //holds the first point's coordinates
-  var line_x, line_y;
-  //holds the "type" of the first point - output, criteria, actions, etc
-  var first_type;
-  //holds the id of the module of the first point
-  var first_module_id;
+  //holds all the information of the first point
+  var first_event;
 
   //draw a line connector between two different points
   $scope.drawLine = function(event) {
     //first a first point has not been created yet
     if(!drawing_line) {
-      var new_coords = transformCoordinates($(event.target).offset().left, $(event.target).offset().top - window.scrollY);
-      //store the coordinates of the first point
-      line_x = new_coords[0];
-      line_y = new_coords[1];
-      //store the "type" of the first point
-      first_type = event.target.nextElementSibling.innerHTML;
-      //store the id of the module of the first point
-      first_module_id = event.target.parentElement.attributes.id.value;
-
+      first_event = event;
       drawing_line = true;
     }
     //if a first point has been created already
     else {
+      //"type" of the first point
+      var first_type = first_event.target.nextElementSibling.innerHTML;
       //"type" of the second point
       var second_type = event.target.nextElementSibling.innerHTML;
+      //id of the module of the first point
+      var first_module_id = first_event.target.parentElement.attributes.id.value;
       //id of the module of the second point
       var second_module_id = event.target.parentElement.attributes.id.value;
+      //id of the first point
+      var first_point_id = first_event.target.attributes.id.value;
+      //id of the second point
+      var second_point_id = event.target.attributes.id.value;
 
-      //unsuccessful connection if both points are of the same type or neither of them is of type "Output"
+      //unsuccessful connection - both points are of the same type or neither of them is of type "Output"
       if(first_type == second_type || (first_type != 'Output' && second_type != 'Output')) {
         showAlert('invalid-connection1');
       }
@@ -549,22 +549,58 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
       else if(first_module_id == second_module_id) {
         showAlert('invalid-connection2');
       }
+      //unsuccessful connection - connection already exists
+      else if(connectionExists(first_module_id, second_module_id, first_type, second_type)) {
+        showAlert('invalid-connection3');
+      }
       //successful connection
       else {
-        var new_coords = transformCoordinates($(event.target).offset().left, $(event.target).offset().top - window.scrollY);
+        //convert the coordinates of the first point to SVG coordinates
+        var first_coords = transformCoordinates($(first_event.target).offset().left, $(first_event.target).offset().top - window.scrollY);
+        //convert the coordinates of the second point to SVG coordinates
+        var second_coords = transformCoordinates($(event.target).offset().left, $(event.target).offset().top - window.scrollY);
         //create a new SVG line
         var new_line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         //set the coordinates of the line
-        new_line.setAttribute('x1', line_x);
-        new_line.setAttribute('y1', line_y);
-        new_line.setAttribute('x2', new_coords[0]);
-        new_line.setAttribute('y2', new_coords[1]);
+        new_line.setAttribute('x1', first_coords[0]);
+        new_line.setAttribute('y1', first_coords[1]);
+        new_line.setAttribute('x2', second_coords[0]);
+        new_line.setAttribute('y2', second_coords[1]);
         //set the color of the line
         new_line.setAttribute('stroke', 'rgb(255, 0, 0)');
         //set the width of the line
         new_line.setAttribute('stroke-width', '2');
+        //set the id of the line
+        new_line.setAttribute('id', 'line' + (connections.length + 1));
         //append the new line to the svg area
         $('#svg').append(new_line);
+
+        //create a new connection to be added to the connections array
+        var new_connection = {};
+        new_connection['id'] = 'line' + (connections.length + 1);
+        if(first_type == 'Output') {
+          new_connection['point_mapping'] = {
+            'output' : 'first_point',
+            'input' : 'second_point'
+          }
+          new_connection['output'] = first_module_id;
+          new_connection['output_point'] = first_point_id;
+          new_connection['input'] = second_module_id;
+          new_connection['input_point'] = second_point_id;
+          new_connection['input_type'] = second_type;
+        }
+        else {
+          new_connection['point_mapping'] = {
+            'output' : 'second_point',
+            'input' : 'first_point'
+          }
+          new_connection['output'] = second_module_id;
+          new_connection['output_point'] = second_point_id;
+          new_connection['input'] = first_module_id;
+          new_connection['input_point'] = first_point_id;
+          new_connection['input_type'] = first_type;
+        }
+        connections.push(new_connection);
       }
       //reset the drawing process
       drawing_line = false;
@@ -579,6 +615,51 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
     pt = pt.matrixTransform(svg.getScreenCTM().inverse());
 
     return [pt.x, pt.y];
+  }
+
+  //verify if a connection already exists
+  function connectionExists(first_id, second_id, first_type, second_type) {
+    for(connection in connections)
+      if((connections[connection]['input'] == first_id && connections[connection]['output'] == second_id && connections[connection]['input_type'] == first_type)
+      || (connections[connection]['input'] == second_id && connections[connection]['output'] == first_id && connections[connection]['input_type'] == second_type))
+        return true;
+
+    return false;
+  }
+
+  function updateConnections(id) {
+    for(connection in connections) {
+      if(connections[connection]['input'] == id) {
+        var x_coord = $('#' + id).find('#' + connections[connection]['input_point']).offset().left;
+        var y_coord = $('#' + id).find('#' + connections[connection]['input_point']).offset().top - window.scrollY;
+        var new_coords = transformCoordinates(x_coord, y_coord);
+        var line = $('#' + connections[connection]['id']);
+
+        if(connections[connection]['point_mapping']['input'] == 'first_point') {
+          line.attr('x1', new_coords[0]);
+          line.attr('y1', new_coords[1]);
+        }
+        else {
+          line.attr('x2', new_coords[0]);
+          line.attr('y2', new_coords[1]);
+        }
+      }
+      else if(connections[connection]['output'] == id) {
+        var x_coord = $('#' + id).find('#' + connections[connection]['output_point']).offset().left;
+        var y_coord = $('#' + id).find('#' + connections[connection]['output_point']).offset().top - window.scrollY;
+        var new_coords = transformCoordinates(x_coord, y_coord);
+        var line = $('#' + connections[connection]['id']);
+
+        if(connections[connection]['point_mapping']['output'] == 'first_point') {
+          line.attr('x1', new_coords[0]);
+          line.attr('y1', new_coords[1]);
+        }
+        else {
+          line.attr('x2', new_coords[0]);
+          line.attr('y2', new_coords[1]);
+        }
+      }
+    }
   }
 
   /*** STARTUP FUNCTIONS ***/
