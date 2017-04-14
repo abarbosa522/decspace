@@ -138,8 +138,10 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
         //get the current project
         for(proj in response) {
           if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-            //insert modules
+            //insert the created modules into the database
             response[proj]['modules'] = $scope.modules;
+            //insert the created connections into the database
+            response[proj]['connections'] = connections;
             //get the id of the document
             id_doc = response[proj]['_id'];
             //project to store in the db
@@ -166,21 +168,33 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
       //remove current modules
       for(mod in $scope.modules)
         $('#' + $scope.modules[mod]['id']).remove();
-
+      //reset the modules array
       $scope.modules = [];
+
+      //remove all existant connections
+      for(connection in connections)
+        $('#' + connections[connection]['id']).remove();
+      //reset the connections array
+      connections = [];
 
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
           if(response[proj]['modules'] != undefined)
             $scope.modules = response[proj]['modules'];
 
+          if(response[proj]['connections'] != undefined)
+            connections = response[proj]['connections'];
+
           break;
         }
       }
 
-      //add the method module to the screen
+      //add the modules previously stored in the database
       for(mod in $scope.modules)
-        addModule($scope.modules[mod]);
+        reloadModule($scope.modules[mod]);
+      //add the connections previously stored in the database
+      for(connection in connections)
+        reloadConnection(connections[connection]);
     });
   }
 
@@ -255,6 +269,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
     $('#invalid-connection1').hide();
     $('#invalid-connection2').hide();
     $('#invalid-connection3').hide();
+    $('#invalid-connection4').hide();
   }
 
   //show certain alert and hide it smoothly
@@ -278,7 +293,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
       case 'OrderBy':
         var new_mod = {};
         //generate the unique id
-        new_mod['id'] = 'orderby' + $scope.modules.length;
+        var unique_id = generateUniqueId($scope.modules);
+        new_mod['id'] = 'orderby-' + unique_id;
         //store the module type
         new_mod['type'] = 'OrderBy';
         //initialize the criteria array
@@ -295,15 +311,67 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
   function createInputFileData(name, data) {
     var new_mod = {};
     //generate the unique id
-    new_mod['id'] = 'inputfile' + $scope.modules.length;
+    var unique_id = generateUniqueId($scope.modules);
+    new_mod['id'] = 'inputfile-' + unique_id;
+
     //store the module type
     new_mod['type'] = 'InputFile';
     //store the name of the file
     new_mod['name'] = name;
     //store the imported data
-    new_mod['data'] = data;
+    new_mod['results'] = data;
     //store the new module into the modules array
     $scope.modules.push(new_mod);
+  }
+
+  //delete a certain modulee
+  $scope.deleteModule = function(event) {
+    var mod_id = event.target.parentNode.parentNode.attributes.id.value;
+
+    //remove module from the DOM
+    $('#' + mod_id).remove();
+
+    //delete the module's data
+    var mod_index;
+    for(mod in $scope.modules)
+      if($scope.modules[mod]['id'] == mod_id) {
+        mod_index = mod;
+        break;
+      }
+
+    $scope.modules.splice(mod_index, 1);
+
+    //remove all connections of the removed module
+    var connections_ids = [];
+    var input_mods = [];
+
+    for(connection in connections)
+      if(connections[connection]['output'] == mod_id || connections[connection]['input'] == mod_id) {
+        $('#' + connections[connection]['id']).remove();
+        connections_ids.push(connections[connection]['id']);
+
+        /*var module_results;
+        for(mod in $scope.modules)
+          if($scope.modules[mod]['id'] == mod_id) {
+            module_results = $scope.modules[mod]['results'];
+            break;
+          }
+
+        if(connections[connection]['output'] == mod_id && mod_results.length > 0) {
+          for(mod2 in $scope.modules)
+            if($scope.modules[mod2]['id'] == connections[connection]['input']) {
+              $scope.modules[mod2][connections[connection]['type']]
+            }
+
+        } */ 
+      }
+
+    for(id in connections_ids)
+      for(connect in connections)
+        if(connections[connect]['id'] == connections_ids[id]) {
+          connections.splice(connect, 1);
+          break;
+        }
   }
 
   //id of the currently open module
@@ -326,23 +394,15 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
     }
   }
 
-  //delete the currently selected module
-  $scope.deleteCurrentModule = function() {
-    //close the open modal
-    switch($scope.currentModule['type']) {
-      case 'InputFile':
-        $('#inputfile-modal').modal('hide');
-        break;
-      case 'OrderBy':
-        $('#orderby-modal').modal('hide');
-        break;
-    }
-    //remove module from the DOM
-    $('#' + $scope.currentModule['id']).remove();
-    //delete the module's data
-    $scope.modules.splice($scope.modules.indexOf($scope.currentModule), 1);
-    //reset the currentModule variable, since the modal was closed
-    $scope.currentModule = '';
+  //find the largest id on a data array and increment it
+  function generateUniqueId(data_array) {
+    var unique_id = 1;
+
+    for(item in data_array)
+      if(Number(data_array[item]['id'].split('-').pop()) >= unique_id)
+        unique_id = Number(data_array[item]['id'].split('-').pop()) + 1;
+
+    return unique_id;
   }
 
   /*** METHODS FUNCTIONS ***/
@@ -359,18 +419,19 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
         //clone the template
         var temp_clone = $(temp.content).clone();
         //make its id unique
-        temp_clone.find('#orderby').attr('id', 'orderby' + $scope.modules.length);
+        var unique_id = generateUniqueId($scope.modules);
+        temp_clone.find('#orderby').attr('id', 'orderby-' + unique_id);
         //cloned elements need to be manually compiled - angularJS
         var compiled_temp = $compile(temp_clone)($scope);
         //add the new instance of the template to the document
         compiled_temp.appendTo($('#workspace'));
         //define the initial posiiton of the new module
-        $('#orderby' + $scope.modules.length).offset({top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10});
+        $('#orderby-' + unique_id).offset({top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10});
         break;
     }
 
     //create the data of the new module
-    createModuleData(mod);
+    createModuleData(mod, unique_id);
   }
 
   $scope.createInputFileModule = function(name, data) {
@@ -379,21 +440,22 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
     //clone the template
     var temp_clone = $(temp.content).clone();
     //make its id unique
-    temp_clone.find('#inputfile').attr('id', 'inputfile' + $scope.modules.length);
+    var unique_id = generateUniqueId($scope.modules);
+    temp_clone.find('#inputfile').attr('id', 'inputfile-' + unique_id);
     //add the file name to the module
-    temp_clone.find('a').html(name);
+    temp_clone.find('#filename').html(name);
     //cloned elements need to be manually compiled by the angularJS
     var compiled_temp = $compile(temp_clone)($scope);
     //add the new instance of the template to the document
     compiled_temp.appendTo($('#workspace'));
     //define the initial posiiton of the new input file
-    $('#inputfile' + $scope.modules.length).offset({top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10});
+    $('#inputfile-' + unique_id).offset({top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10});
 
-    createInputFileData(name, data);
+    createInputFileData(name, data, unique_id);
   }
 
   //add the module mod to the workspace
-  function addModule(mod) {
+  function reloadModule(mod) {
     switch(mod['type']) {
       case 'OrderBy':
         //get the method's template
@@ -418,7 +480,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
         //make its id unique
         temp_clone.find('#inputfile').attr('id', mod['id']);
         //add the file name to the module
-        temp_clone.find('a').html(mod['name']);
+        temp_clone.find('#filename').html(mod['name']);
         //cloned elements need to be manually compiled by the angularJS
         var compiled_temp = $compile(temp_clone)($scope);
         //add the new instance of the template to the document
@@ -512,6 +574,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
   }
 
   /*** CONNECTOR FUNCTIONS ***/
+
   //created connections
   var connections = [];
   //controls if a first point has already been clicked
@@ -553,6 +616,10 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
       else if(connectionExists(first_module_id, second_module_id, first_type, second_type)) {
         showAlert('invalid-connection3');
       }
+      //unsuccessful connection - input point is already connected
+      else if(inputConnected(first_module_id, second_module_id, first_type, second_type)) {
+        showAlert('invalid-connection4');
+      }
       //successful connection
       else {
         //convert the coordinates of the first point to SVG coordinates
@@ -561,46 +628,75 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
         var second_coords = transformCoordinates($(event.target).offset().left, $(event.target).offset().top - window.scrollY);
         //create a new SVG line
         var new_line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        //set the coordinates of the line
+        //set the coordinates of the connector
         new_line.setAttribute('x1', first_coords[0]);
         new_line.setAttribute('y1', first_coords[1]);
         new_line.setAttribute('x2', second_coords[0]);
         new_line.setAttribute('y2', second_coords[1]);
-        //set the color of the line
+        //set the color of the connector
         new_line.setAttribute('stroke', 'rgb(255, 0, 0)');
-        //set the width of the line
-        new_line.setAttribute('stroke-width', '2');
-        //set the id of the line
-        new_line.setAttribute('id', 'line' + (connections.length + 1));
-        //append the new line to the svg area
-        $('#svg').append(new_line);
+        //set the width of the connector
+        new_line.setAttribute('stroke-width', '3');
+
+        //get the id of the connector
+        var unique_id = generateUniqueId(connections);
+
+        //set the id of the connector
+        new_line.setAttribute('id', 'line-' + unique_id);
+
+        //set a click event
+        new_line.setAttribute('ng-click', 'deleteLine($event)')
+        //compile the new line
+        var compiled_line = $compile(new_line)($scope);
+        //append the compile line to the svg area
+        $('#svg').append(compiled_line);
 
         //create a new connection to be added to the connections array
         var new_connection = {};
-        new_connection['id'] = 'line' + (connections.length + 1);
+        new_connection['id'] = 'line-' + unique_id;
+
+        var input, input_point, input_type, output, output_type;
+
         if(first_type == 'Output') {
+          input = second_module_id;
+          input_point = second_point_id;
+          input_type = second_type;
+          output = first_module_id;
+          output_point = first_point_id;
           new_connection['point_mapping'] = {
             'output' : 'first_point',
             'input' : 'second_point'
           }
-          new_connection['output'] = first_module_id;
-          new_connection['output_point'] = first_point_id;
-          new_connection['input'] = second_module_id;
-          new_connection['input_point'] = second_point_id;
-          new_connection['input_type'] = second_type;
         }
         else {
+          input = first_module_id;
+          input_point = first_point_id;
+          input_type = first_type;
+          output = second_module_id;
+          output_point = second_point_id;
           new_connection['point_mapping'] = {
             'output' : 'second_point',
             'input' : 'first_point'
           }
-          new_connection['output'] = second_module_id;
-          new_connection['output_point'] = second_point_id;
-          new_connection['input'] = first_module_id;
-          new_connection['input_point'] = first_point_id;
-          new_connection['input_type'] = first_type;
         }
+
+        new_connection['input'] = input;
+        new_connection['input_point'] = input_point;
+        new_connection['input_type'] = input_type;
+        new_connection['output'] = output;
+        new_connection['output_point'] = output_point;
+
         connections.push(new_connection);
+
+        //transfer data between output and input
+        for(mod in $scope.modules)
+          //verify if the output module already contains the results
+          if($scope.modules[mod]['id'] == output && $scope.modules[mod]['results'].length > 0) {
+            for(modl in $scope.modules)
+              if($scope.modules[modl]['id'] == input)
+                $scope.modules[modl][input_type.toLowerCase()] = angular.copy($scope.modules[mod]['results']);
+            break;
+          }
       }
       //reset the drawing process
       drawing_line = false;
@@ -627,6 +723,26 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
     return false;
   }
 
+  //verify if input point is already connected
+  function inputConnected(first_id, second_id, first_type, second_type) {
+    var input_point, input_type;
+    if(first_type != 'Output') {
+      input_point = first_id;
+      input_type = first_type;
+    }
+    else {
+      input_point = second_id;
+      input_type = second_type;
+    }
+
+    for(connection in connections)
+      if(connections[connection]['input'] == input_point && connections[connection]['input_type'] == input_type)
+        return true;
+
+    return false;
+  }
+
+  //update the position of a certain point
   function updateConnections(id) {
     for(connection in connections) {
       if(connections[connection]['input'] == id) {
@@ -660,6 +776,63 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
         }
       }
     }
+  }
+
+  //add a previosuly created module mod to the workspace
+  function reloadConnection(connection) {
+    var input_x = $('#' + connection['input']).find('#' + connection['input_point']).offset().left;
+    var input_y = $('#' + connection['input']).find('#' + connection['input_point']).offset().top - window.scrollY;
+    var trans_input = transformCoordinates(input_x, input_y);
+
+    var output_x = $('#' + connection['output']).find('#' + connection['output_point']).offset().left;
+    var output_y = $('#' + connection['output']).find('#' + connection['output_point']).offset().top - window.scrollY;
+    var trans_output = transformCoordinates(output_x, output_y);
+
+    //create a new SVG line
+    var new_line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+
+    //set the coordinates of the line
+    if(connection['point_mapping']['output'] == 'first_point') {
+      new_line.setAttribute('x1', trans_output[0]);
+      new_line.setAttribute('y1', trans_output[1]);
+      new_line.setAttribute('x2', trans_input[0]);
+      new_line.setAttribute('y2', trans_input[1]);
+    }
+    else {
+      new_line.setAttribute('x1', trans_input[0]);
+      new_line.setAttribute('y1', trans_input[1]);
+      new_line.setAttribute('x2', trans_output[0]);
+      new_line.setAttribute('y2', trans_output[1]);
+    }
+    //set the color of the line
+    new_line.setAttribute('stroke', 'rgb(255, 0, 0)');
+    //set the width of the line
+    new_line.setAttribute('stroke-width', '3');
+    //set the id of the line
+    new_line.setAttribute('id', connection['id']);
+    //set a click event
+    new_line.setAttribute('ng-click', 'deleteLine($event)')
+    //compile the new line
+    var compiled_line = $compile(new_line)($scope);
+    //append the compile line to the svg area
+    $('#svg').append(compiled_line);
+  }
+
+  $scope.deleteLine = function(event) {
+    var connection_id;
+
+    //find the index of the clicked connector
+    for(connection in connections)
+      if(connections[connection]['id'] == event.target.attributes.id.value) {
+        connection_id = connection
+        break;
+      }
+
+    //remove the connector from the connections array
+    connections.splice(connection_id, 1);
+
+    //remove the connection from the screen
+    $(event.target).remove();
   }
 
   /*** STARTUP FUNCTIONS ***/

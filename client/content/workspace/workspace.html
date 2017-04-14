@@ -123,7 +123,7 @@
           </div>
 
           <div class = 'alert alert-danger custom-alert' id = 'invalid-connection1' ng-cloak>
-            <strong>Invalid connection</strong> - Input Points should be connected to Output Points.
+            <strong>Invalid connection</strong> - Input points should be connected to Output points.
           </div>
 
           <div class = 'alert alert-danger custom-alert' id = 'invalid-connection2' ng-cloak>
@@ -132,6 +132,10 @@
 
           <div class = 'alert alert-danger custom-alert' id = 'invalid-connection3' ng-cloak>
             <strong>Invalid connection</strong> - That connection already exists.
+          </div>
+
+          <div class = 'alert alert-danger custom-alert' id = 'invalid-connection4' ng-cloak>
+            <strong>Invalid connection</strong> - Input points can only be connected once.
           </div>
 
           <!-- SVG Area -->
@@ -181,11 +185,6 @@
                   </div>
 
                   <div class = 'modal-body'>
-                    <div class = 'row'>
-                      <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteCurrentModule()' title = 'Delete Module' style = 'margin-left: -94%'>
-                        <span class = 'glyphicon glyphicon-trash'></span>
-                      </button>
-                    </div>
 
                     <p class = 'header-1'>Data</p>
 
@@ -196,7 +195,7 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr ng-repeat = 'item in currentModule.data'>
+                        <tr ng-repeat = 'item in currentModule.results'>
                           <td ng-repeat = '(key, value) in item'>{{value}}</td>
                         </tr>
                       </tbody>
@@ -218,11 +217,6 @@
                   </div>
 
                   <div class = 'modal-body'>
-                    <div class = 'row'>
-                      <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteCurrentModule()' title = 'Delete Module' style = 'margin-left: -94%'>
-                        <span class = 'glyphicon glyphicon-trash'></span>
-                      </button>
-                    </div>
 
                     <!-- Criteria -->
                     <p class = 'header-1'>Criteria</p>
@@ -361,10 +355,14 @@
             <!-- Input File Template -->
             <template id = 'inputfile-temp'>
               <div id = 'inputfile' class = 'module-template module-inputfile draggable' style = 'position:absolute; margin-top: 100%'>
-                <a href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#inputfile-modal' ng-click = 'selectCurrentModule($event)' style = 'position: absolute; margin-top: -5%; margin-left: -20%'></a>
+                <a id = 'filename' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#inputfile-modal' ng-click = 'selectCurrentModule($event)' style = 'position: absolute; margin-top: -5%; margin-left: -20%'></a>
 
-                <button id = 'inputfile-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawLine($event)' style = 'margin-top: 7%; margin-left: 42%'></button>
-                <span class = 'module-circle-span' style = 'margin-left: 20%; margin-top: 5%'>Output</span>
+                <a href ng-click = 'deleteModule($event)' style = 'display: block; margin-top: -22%; margin-left: 108%'>
+                  <span class = 'glyphicon glyphicon-remove'></span>
+                </a>
+
+                <button id = 'inputfile-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawLine($event)' style = 'margin-top: 12%; margin-left: 40%'></button>
+                <span class = 'module-circle-span' style = 'margin-top: 10%; margin-left: 18%'>Output</span>
               </div>
             </template>
 
@@ -373,14 +371,18 @@
               <div id = 'orderby' class = 'module-template draggable'>
                 <a href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#orderby-modal' ng-click = 'selectCurrentModule($event)'>OrderBy</a>
 
-                <button id = 'orderby-criteria' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawLine($event)' style = 'margin-top: -10%; margin-left: -65%'></button>
-                <span class = 'module-circle-span' style = 'margin-top: -11%; margin-left: -57%'>Criteria</span>
+                <a href ng-click = 'deleteModule($event)' style = 'display: block; margin-top: -40%; margin-left: 108%'>
+                  <span class = 'glyphicon glyphicon-remove'></span>
+                </a>
 
-                <button id = 'orderby-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawLine($event)' style = 'margin-top: 20%; margin-left: -65%'></button>
-                <span class = 'module-circle-span' style = 'margin-top: 19%; margin-left: -57%'>Actions</span>
+                <button id = 'orderby-criteria' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawLine($event)' style = 'margin-top: -3%; margin-left: -48%'></button>
+                <span class = 'module-circle-span' style = 'margin-top: -4%; margin-left: -40%'>Criteria</span>
 
-                <button id = 'orderby-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawLine($event)' style = 'margin-top: 25%; margin-left: 25%'></button>
-                <span class = 'module-circle-span' style = 'margin-left: 3%; margin-top: 23%'>Output</span>
+                <button id = 'orderby-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawLine($event)' style = 'margin-top: 20%; margin-left: -48%'></button>
+                <span class = 'module-circle-span' style = 'margin-top: 19%; margin-left: -40%'>Actions</span>
+
+                <button id = 'orderby-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawLine($event)' style = 'margin-top: 30%; margin-left: 40%'></button>
+                <span class = 'module-circle-span' style = 'margin-top: 28%; margin-left: 18%'>Output</span>
               </div>
             </template>
 
