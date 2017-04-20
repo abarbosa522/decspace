@@ -53,23 +53,7 @@
   color: #ecf0f1;
 }
 
-@media (max-width: 767px) {
-  .navbar-custom .navbar-nav .open .dropdown-menu > li > a {
-    color: #ecf0f1;
-  }
-  .navbar-custom .navbar-nav .open .dropdown-menu > li > a:hover,
-  .navbar-custom .navbar-nav .open .dropdown-menu > li > a:focus {
-    color: #ecf0f1;
-  }
-  .navbar-custom .navbar-nav .open .dropdown-menu > .active > a,
-  .navbar-custom .navbar-nav .open .dropdown-menu > .active > a:hover,
-  .navbar-custom .navbar-nav .open .dropdown-menu > .active > a:focus {
-    color: #ecf0f1;
-    background-color: #191461;
-  }
-}
-
-nav > div > ul > li {
+nav > div > div > ul > li {
   font-family: 'Open Sans', sans-serif;
 }
 
@@ -110,10 +94,6 @@ nav > div > ul > li {
   font-size: 15px;
 }
 
-.no-display {
-  display: none;
-}
-
 .icon-custom {
   font-size: 100px;
   color: #191461;
@@ -135,11 +115,6 @@ nav > div > ul > li {
   to { transform: scale(1) rotate(360deg);}
 }
 
-/*Save, Import and Export Buttons' Icons Size*/
-.icon-large {
-  font-size: 16px;
-}
-
 /*Execution Modal*/
 #execution-modal .modal-dialog {
   width: 95%;
@@ -151,4 +126,8 @@ nav > div > ul > li {
 
 #srf-modal .modal-dialog {
   width: 95%;
+}
+
+.btn-exec {
+  margin-top: 2%;
 }

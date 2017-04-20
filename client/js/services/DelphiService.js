@@ -7,16 +7,19 @@ app.service('DelphiService', function($http, $q) {
     var questions = [];
     //emails of the users that answered
     var answer_emails = [];
+    //aggregation of all suggestions
+    var suggestions = [];
 
     $http.get('/delphi_rounds').success(function(response) {
       for(round in response) {
         if(response[round]['id'] == round_id) {
           for(question in response[round]['questions']) {
             var new_question = {};
+            new_question['id'] = response[round]['questions'][question]['id'];
+            new_question['content'] = response[round]['questions'][question]['content'];
+            new_question['description'] = response[round]['questions'][question]['description'];
             new_question['total_score'] = 0;
             new_question['average'] = 0;
-            new_question['content'] = response[round]['questions'][question]['content'];
-            new_question['id'] = response[round]['questions'][question]['id'];
             questions.push(new_question);
           }
 
@@ -29,6 +32,9 @@ app.service('DelphiService', function($http, $q) {
         for(answer in response2)
           if(response2[answer]['round_id'] == round_id && response2[answer]['questions_answered'].length == questions.length) {
             answer_emails.push(response2[answer]['user']);
+
+            for(suggestion in response2[answer]['suggestions'])
+              suggestions.push(response2[answer]['suggestions'][suggestion]);
 
             for(question in response2[answer]['questions_answered'])
               for(question2 in questions)
@@ -46,7 +52,7 @@ app.service('DelphiService', function($http, $q) {
             questions[question]['average'] = 0;
         }
 
-        deferred.resolve([questions, answer_emails]);
+        deferred.resolve([questions, answer_emails, suggestions]);
       });
     });
 

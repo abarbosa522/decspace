@@ -347,14 +347,13 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
     document.getElementById('export-questions-check').checked = false;
   }
 
-  /*** INPU DATA - SURVEY SUBJECT ***/
+  /*** INPUT DATA - SURVEY SUBJECT ***/
 
   //variable that stores all the current survey subject
   $scope.subject = '';
 
   //variable that controls the showing/hiding of the subject
   $scope.subject_eye = 1;
-
 
   /*** INPUT DATA - EMAILS ***/
 
@@ -416,6 +415,7 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
     $scope.questions.push(angular.copy($scope.new_question));
 
     $scope.new_question.content = '';
+    $scope.new_question.description = '';
   }
 
   //delete a certain question
@@ -436,10 +436,15 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
 
   /*** EXECUTIONS AND RESULTS FUNCTIONS ***/
 
+  //stores the last id of the executions of the current project
+  $scope.current_execution_project_id = 0;
+
   //variables that control the showing/hiding of the results tables
   $scope.emails_exec_eye = 1;
   $scope.questions_exec_eye = 1;
   $scope.subject_exec_eye = 1;
+  $scope.link_exec_eye = 1;
+  $scope.suggestions_exec_eye = 1;
 
   //retrieve the rounds stored in the database
   function getExecutions() {
@@ -452,6 +457,14 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
           $scope.executions.push(response[round]);
         }
       }
+
+      $scope.current_execution_project_id = 0;
+      
+      for(execution in $scope.executions)
+        if($scope.executions[execution]['execution_project_id'] > $scope.current_execution_project_id)
+          $scope.current_execution_project_id = $scope.executions[execution]['execution_project_id'];
+
+      $scope.current_execution_project_id++;
     });
   }
 
@@ -484,12 +497,23 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
 
       id++;
 
+      //get the largest execution id in the project context
+      var execution_project_id = 0;
+
+      for(execution in $scope.executions)
+        if($scope.executions[execution]['execution_project_id'] > execution_project_id)
+          execution_project_id = $scope.executions[execution]['execution_project_id'];
+
+      execution_project_id++;
+
       //create the new round
       var new_round = {};
       //define the id of the round
       new_round['id'] = id;
       //project this round belongs to
       new_round['project_id'] = proj_id;
+      //id in the project context
+      new_round['execution_project_id'] = execution_project_id;
       //who created the round
       new_round['username'] = $scope.username;
       //list of emails
@@ -502,6 +526,8 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
       new_round['comment'] = comment;
       //date round was created
       new_round['execution_date'] = execution_date;
+      //generate survey link
+      new_round['link'] = 'http://vps288667.ovh.net:8082/content/project-management/delphi-survey.html?round=' + new_round['id'];
 
       //add the new list of projects
       $http.post('/delphi_rounds', new_round).success(function() {
@@ -588,6 +614,8 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
 
       $scope.currentExecution.emails_answers = resolve[1];
 
+      $scope.currentExecution.suggestions = resolve[2];
+
       $scope.compareExecution = '';
     });
   }
@@ -603,6 +631,8 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
       $scope.compareExecution.questions = resolve[0];
 
       $scope.compareExecution.emails_answers = resolve[1];
+
+      $scope.compareExecution.suggestions = resolve[2];
     });
   }
 

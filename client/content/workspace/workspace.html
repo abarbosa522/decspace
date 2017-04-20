@@ -191,7 +191,7 @@
                     <table class = 'table table-bordered table-hover'>
                       <thead>
                         <tr>
-                          <th class = 'text-center' ng-repeat = '(key, value) in currentModule.data[0]'>{{key}}</th>
+                          <th class = 'text-center' ng-repeat = '(key, value) in currentModule.results[0]'>{{key}}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -235,7 +235,7 @@
                       <tbody>
                         <tr ng-repeat = 'criterion in currentModule.criteria' ng-class = '{danger: criterion.id == deleteIdOrderByCriterion}'>
                           <td>
-                            <input type = 'radio' ng-checked = 'criterion.selected == true' ng-click = 'selectOrderByCriterion(criterion)'>
+                            <input type = 'radio' ng-checked = 'criterion.selected == "true"' ng-click = 'selectOrderByCriterion(criterion)'>
                           </td>
                           <td>
                             <input class = 'form-control' type = 'text' ng-model = 'criterion.name'>

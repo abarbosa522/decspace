@@ -42,33 +42,42 @@
       <div class = 'container'>
         <!-- Title -->
         <div class = 'navbar-header'>
+          <button type = 'button' class = 'navbar-toggle collapsed' data-toggle = 'collapse' data-target = '#navbar-collapsed' aria-expanded = 'false'>
+            <span class = 'sr-only'>Toggle navigation</span>
+            <span class = 'icon-bar'></span>
+            <span class = 'icon-bar'></span>
+            <span class = 'icon-bar'></span>
+          </button>
           <a class = 'navbar-brand' href = '../dashboard/dashboard.html'>DecSpace</a>
         </div>
 
         <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
-        <ul class = 'nav navbar-nav navbar-right'>
-          <li>
-            <p class = 'navbar-text' style = 'font-weight:600;font-style:italic'>Welcome, {{name}}!</p>
-          </li>
+        <div class = 'collapse navbar-collapse' id = 'navbar-collapsed'>
+          <ul class = 'nav navbar-nav navbar-right'>
+            <li>
+              <p class = 'navbar-text' style = 'font-weight:600;font-style:italic'>Welcome, {{name}}!</p>
+            </li>
 
-          <li><a href = '../homepage/about.html'>About</a></li>
+            <li><a href = '../homepage/about.html'>About</a></li>
 
-          <li><a href = '../homepage/faq.html'>FAQ</a></li>
+            <li><a href = '../homepage/faq.html'>FAQ</a></li>
 
-          <li><a href = '../homepage/contactus.html'>Contact Us</a></li>
+            <li><a href = '../homepage/contactus.html'>Contact Us</a></li>
 
-          <li>
-            <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'logOut()'>
-              <span class = 'glyphicon glyphicon-log-out'></span>
-              Log Out
-            </button>
-          </li>
-        </ul>
+            <li>
+              <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'logOut()'>
+                <span class = 'glyphicon glyphicon-log-out'></span>
+                Log Out
+              </button>
+            </li>
+          </ul>
+        </div>
 
       </div>
     </nav>
 
     <div id = 'main-content' class = 'container'>
+
       <ul class = 'breadcrumb'>
         <li><a href = '../dashboard/dashboard.html'>Dashboard</a></li>
         <li><a href = 'project-management.html'>Projects</a></li>
@@ -106,7 +115,7 @@
             <div class = 'btn-group' role = 'group'>
               <!-- Save Button -->
               <button type = 'button' class = 'btn btn-primary' ng-click = 'saveData()' title = 'Save Data'>
-                <span class = 'glyphicon glyphicon-floppy-save icon-large'></span>
+                <span class = 'glyphicon glyphicon-floppy-save'></span>
               </button>
 
               <!-- Reload Data Button -->
@@ -133,12 +142,12 @@
             <div class = 'btn-group' role = 'group'>
               <!-- Import Button -->
               <button type = 'button' class = 'btn btn-warning' title = 'Import Data' data-toggle = 'modal' data-target = '#import-modal'>
-                <span class = 'glyphicon glyphicon-import icon-large'></span>
+                <span class = 'glyphicon glyphicon-import'></span>
               </button>
 
               <!-- Export Button -->
               <button type = 'button' class = 'btn btn-warning' title = 'Export Data' data-toggle = 'modal' data-target = '#export-modal'>
-                <span class = 'glyphicon glyphicon-export icon-large'></span>
+                <span class = 'glyphicon glyphicon-export'></span>
               </button>
             </div>
           </div>
@@ -273,7 +282,7 @@
             </div>
           </div>
 
-          <p class = 'header-1'>Round {{executions.length + 1}}</p>
+          <p class = 'header-1'>Round {{current_execution_project_id}}</p>
 
           <br>
 
@@ -356,7 +365,8 @@
             <table class = 'table table-bordered table-hover'>
               <thead>
                 <tr>
-                  <th class = 'text-center'>Question</th>
+                  <th class = 'text-center'>Question Title</th>
+                  <th class = 'text-center'>Question Description</th>
                   <th class = 'col-md-2'></th>
                 </tr>
               </thead>
@@ -365,6 +375,9 @@
                 <tr ng-repeat = 'question in questions' ng-class = '{danger: question.id == delete_question}'>
                   <td>
                     <input type = 'text' class = 'form-control' ng-model = 'question.content'>
+                  </td>
+                  <td>
+                    <input type = 'text' class = 'form-control' ng-model = 'question.description'>
                   </td>
                   <td ng-if = 'question.id != delete_question'>
                     <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteQuestion(question)' title = 'Delete Question'>
@@ -384,6 +397,9 @@
                 <tr class = 'active'>
                   <td>
                     <input class = 'form-control' type = 'text' ng-model = 'new_question.content'>
+                  </td>
+                  <td>
+                    <input class = 'form-control' type = 'text' ng-model = 'new_question.description'>
                   </td>
                   <td>
                     <button type = 'button' class = 'btn btn-success' ng-click = 'addQuestion()' title = 'Add Question'>
@@ -411,7 +427,7 @@
             <tbody>
               <!-- Previous Executions -->
               <tr ng-repeat = 'execution in executions' ng-class = '{"danger":  execution.id == deleteIdExecution || deleteIdExecution == "all"}'>
-                <td>{{$index + 1}}</td>
+                <td>{{execution.execution_project_id}}</td>
                 <td>{{execution.execution_date}}</td>
                 <td>{{execution.comment}}</td>
                 <td ng-if = 'deleteIdExecution != execution.id'>
@@ -460,11 +476,11 @@
                   <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
 
                   <h4 class = 'modal-title' ng-if = 'compareExecution == ""'>
-                    Round {{currentExecution.id}}
+                    Round {{currentExecution.execution_project_id}}
                   </h4>
 
                   <h4 class = 'modal-title' ng-if = 'compareExecution != ""'>
-                    Round {{currentExecution.id}} - Round {{compareExecution.id}}
+                    Round {{currentExecution.execution_project_id}} - Round {{compareExecution.execution_project_id}}
                   </h4>
                 </div>
 
@@ -478,16 +494,34 @@
 
                       <ul class = 'dropdown-menu' aria-labelledby = 'dropdownbtn'>
                         <li ng-repeat = 'execution in executions' ng-if = 'execution != currentExecution'>
-                          <a href = '' ng-click = 'showCompareExecution(execution)'>Round {{execution.id}}</a>
+                          <a href = '' ng-click = 'showCompareExecution(execution)'>{{execution}}</a>
                         </li>
                         <li role = 'separator' class = 'divider'></li>
                         <li><a href = '' ng-click = 'showCompareExecution("")'>None</a></li>
                       </ul>
                     </div>
 
+                    <!-- Survey Link -->
+                    <div class = 'row'>
+                      <button class = 'btn btn-default btn-exec' data-toggle = 'collapse' data-target = '#link-exec-table' style = 'float: right' ng-click = 'link_exec_eye = (link_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Survey Link'>
+                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : link_exec_eye == 0, "glyphicon-eye-close" : link_exec_eye == 1}'></span>
+                      </button>
+                      <h1>Survey Link</h1>
+                    </div>
+
+                    <div id = 'link-exec-table' class = 'row collapse in'>
+                      <div ng-class = '{"col-md-6": compareExecution != ""}'>
+                        {{currentExecution.link}}
+                      </div>
+
+                      <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
+                        {{compareExecution.link}}
+                      </div>
+                    </div>
+
                     <!-- Input Subject Survey -->
                     <div class = 'row'>
-                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#subject-exec-table' style = 'float: right' ng-click = 'subject_exec_eye = (emails_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Survey Subject'>
+                      <button class = 'btn btn-default btn-exec' data-toggle = 'collapse' data-target = '#subject-exec-table' style = 'float: right' ng-click = 'subject_exec_eye = (subject_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Survey Subject'>
                         <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : subject_exec_eye == 0, "glyphicon-eye-close" : subject_exec_eye == 1}'></span>
                       </button>
                       <h1>Survey Subject</h1>
@@ -505,10 +539,10 @@
 
                     <!-- Input Emails -->
                     <div class = 'row'>
-                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#emails-exec-table' style = 'float: right' ng-click = 'emails_exec_eye = (emails_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Emails'>
+                      <button class = 'btn btn-default btn-exec' data-toggle = 'collapse' data-target = '#emails-exec-table' style = 'float: right' ng-click = 'emails_exec_eye = (emails_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Emails'>
                         <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : emails_exec_eye == 0, "glyphicon-eye-close" : emails_exec_eye == 1}'></span>
                       </button>
-                      <h1>Specialists' Emails</h1>
+                      <h1>Users that answered</h1>
                     </div>
 
                     <div id = 'emails-exec-table' class = 'row collapse in'>
@@ -517,16 +551,11 @@
                           <thead>
                             <tr>
                               <th class = 'text-center'>Email Address</th>
-                              <th class = 'text-center'>Answered?</th>
                             </tr>
                           </thead>
                           <tbody>
-                            <tr ng-repeat = 'email in currentExecution.emails'>
-                              <td>{{email.address}}</td>
-                              <td>
-                                <span class = 'glyphicon glyphicon-ok' style = 'color:green' ng-if = 'currentExecution.emails_answers.includes(email.address)'></span>
-                                <span class = 'glyphicon glyphicon-remove' style = 'color:red' ng-if = '!currentExecution.emails_answers.includes(email.address)'></span>
-                              </td>
+                            <tr ng-repeat = 'email in currentExecution.emails_answers'>
+                              <td>{{email}}</td>
                             </tr>
                           </tbody>
                         </table>
@@ -539,16 +568,11 @@
                           <thead>
                             <tr>
                               <th class = 'text-center'>Email Address</th>
-                              <th class = 'text-center'>Answered?</th>
                             </tr>
                           </thead>
                           <tbody>
-                            <tr ng-repeat = 'email in compareExecution.emails'>
-                              <td>{{email.address}}</td>
-                              <td>
-                                <span class = 'glyphicon glyphicon-ok' style = 'color:green' ng-if = 'compareExecution.emails_answers.includes(email.address)'></span>
-                                <span class = 'glyphicon glyphicon-remove' style = 'color:red' ng-if = '!compareExecution.emails_answers.includes(email.address)'></span>
-                              </td>
+                            <tr ng-repeat = 'email in compareExecution.emails_answers'>
+                              <td>{{email}}</td>
                             </tr>
                           </tbody>
                         </table>
@@ -559,7 +583,7 @@
 
                     <!-- Input Questions -->
                     <div class = 'row'>
-                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#questions-exec-table' style = 'float:right' ng-click = 'questions_exec_eye = (questions_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Questions'>
+                      <button class = 'btn btn-default btn-exec' data-toggle = 'collapse' data-target = '#questions-exec-table' style = 'float:right' ng-click = 'questions_exec_eye = (questions_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Questions'>
                         <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : questions_exec_eye == 0, "glyphicon-eye-close" : questions_exec_eye == 1}'></span>
                       </button>
                       <h1>Questions</h1>
@@ -570,7 +594,8 @@
                         <table class = 'table table-bordered table-condensed table-striped table-hover'>
                           <thead>
                             <tr>
-                              <th class = 'text-center'>Question</th>
+                              <th class = 'text-center'>Question Title</th>
+                              <th class = 'text-center'>Question Description</th>
                               <th class = 'text-center'>Total Score</th>
                               <th class = 'text-center'>Average Score</th>
                             </tr>
@@ -578,6 +603,7 @@
                           <tbody>
                             <tr ng-repeat = 'question in currentExecution.questions'>
                               <td>{{question.content}}</td>
+                              <td>{{question.description}}</td>
                               <td>{{question.total_score}}</td>
                               <td>{{question.average}}</td>
                             </tr>
@@ -591,7 +617,8 @@
                         <table class = 'table table-bordered table-condensed table-striped table-hover'>
                           <thead>
                             <tr>
-                              <th class = 'text-center'>Question</th>
+                              <th class = 'text-center'>Question Title</th>
+                              <th class = 'text-center'>Question Description</th>
                               <th class = 'text-center'>Total Score</th>
                               <th class = 'text-center'>Average Score</th>
                             </tr>
@@ -599,6 +626,7 @@
                           <tbody>
                             <tr ng-repeat = 'question in compareExecution.questions'>
                               <td>{{question.content}}</td>
+                              <td>{{question.description}}</td>
                               <td>{{question.total_score}}</td>
                               <td>{{question.average}}</td>
                             </tr>
@@ -608,6 +636,55 @@
                         <strong>Number Of Questions:</strong> {{compareExecution.questions.length}}
                       </div>
                     </div>
+
+                    <!-- Input Questions -->
+                    <div class = 'row'>
+                      <button class = 'btn btn-default btn-exec' data-toggle = 'collapse' data-target = '#suggestions-exec-table' style = 'float:right' ng-click = 'suggestions_exec_eye = (suggestions_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Suggestions'>
+                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : suggestions_exec_eye == 0, "glyphicon-eye-close" : suggestions_exec_eye == 1}'></span>
+                      </button>
+                      <h1>Suggestions</h1>
+                    </div>
+
+                    <div id = 'suggestions-exec-table' class = 'row collapse in'>
+                      <div ng-class = '{"col-md-6": compareExecution != ""}'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Suggestion Title</th>
+                              <th class = 'text-center'>Suggestion Description</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'suggestion in currentExecution.suggestions'>
+                              <td>{{suggestion.title}}</td>
+                              <td>{{suggestion.description}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+
+                        <strong>Number Of Suggestions:</strong> {{currentExecution.suggestions.length}}
+                      </div>
+
+                      <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Suggestion Title</th>
+                              <th class = 'text-center'>Suggestion Description</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'suggestion in compareExecution.suggestions'>
+                              <td>{{suggestion.title}}</td>
+                              <td>{{suggestion.description}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+
+                        <strong>Number Of Suggestions:</strong> {{compareExecution.suggestions.length}}
+                      </div>
+                    </div>
+
                   </div>
                 </div>
               </div>

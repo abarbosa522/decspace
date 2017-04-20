@@ -14,11 +14,14 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
   //questions answered
   $scope.questions_answered = [];
 
+  //survey subject
+  $scope.subject = '';
+
   //matrix with the weights
   $scope.matrix = [];
 
   //get delphi project questions
-  function getQuestions() {
+  function getData() {
     //get the stored answers
     $http.get('/delphi_responses').success(function(response) {
       //get the current answer
@@ -26,13 +29,48 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
         if(response[answer]['user'] == $scope.user_id && response[answer]['round_id'] == round_id) {
           //get the stored answered questions
           $scope.questions_answered = response[answer]['questions_answered'];
-          //get the stores unanswered questions
+          //get the stored unanswered questions
           $scope.questions_unanswered = response[answer]['questions_unanswered'];
-          //geth the survey subject
+          //get the survey subject
           $scope.subject = response[answer]['subject'];
+          //get the stored suggestions
+          $scope.suggestions = response[answer]['suggestions'];
 
           break;
         }
+      }
+
+      //if answer was not found, i.e. user has not answered before
+      if($scope.questions_answered.length == 0 && $scope.questions_unanswered.length == 0 && $scope.subject == '') {
+        $http.get('/delphi_rounds').success(function(response) {
+          for(round in response) {
+            if(response[round]['id'] == round_id) {
+              $scope.questions_unanswered = angular.copy(response[round]['questions']);
+
+              for(question in $scope.questions_unanswered) {
+                $scope.questions_unanswered[question]['position'] = -1;
+                $scope.questions_unanswered[question]['score'] = 'null';
+              }
+
+              $scope.subject = response[round]['subject']
+
+              //create new document
+              var new_answer = {};
+              new_answer['round_id'] = round_id;
+              new_answer['user'] = $scope.user_id;
+              new_answer['subject'] = $scope.subject;
+              new_answer['questions_answered'] = $scope.questions_answered;
+              new_answer['questions_unanswered'] = $scope.questions_unanswered;
+              new_answer['suggestions'] = [];
+
+              //insert the initial document without any answers, so that it can be modified later
+              $http.post('/delphi_responses', new_answer).success(function() {
+                buildMatrix();
+              });
+
+            }
+          }
+        });
       }
 
       //build the q-sort matrix
@@ -105,6 +143,8 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
           response[answer]['questions_answered'] = $scope.questions_answered;
           //store unanswered questions
           response[answer]['questions_unanswered'] = $scope.questions_unanswered;
+          //store suggestions
+          response[answer]['suggestions'] = $scope.suggestions;
 
           //get the id of the document
           id_doc = response[answer]['_id'];
@@ -263,7 +303,44 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
       return false;
   }
 
+  /*** INPUT DATA - SUGGESTIONS ***/
+
+  //variable that stores all the current suggestions
+  $scope.suggestions = [];
+
+  //variable that holds the suggestion that is selected to be deleted
+  $scope.delete_suggestion = '';
+
+  //add a new suggestion
+  $scope.addSuggestion = function() {
+    if($scope.suggestions.length == 0)
+      $scope.new_suggestion.id = 1;
+    else
+      $scope.new_suggestion.id = $scope.suggestions[$scope.suggestions.length - 1]['id'] + 1;
+
+    $scope.suggestions.push(angular.copy($scope.new_suggestion));
+
+    $scope.new_suggestion.title = '';
+    $scope.new_suggestion.description = '';
+  }
+
+  //delete a certain suggestion
+  $scope.deleteSuggestion = function(suggestion) {
+    $scope.delete_suggestion = suggestion.id;
+  }
+
+  //confirm the suggestion deletion
+  $scope.confirmDeleteSuggestion = function(suggestion) {
+    $scope.suggestions.splice($scope.suggestions.indexOf(suggestion), 1);
+    $scope.delete_suggestion = '';
+  }
+
+  //cancel the suggestion deletion
+  $scope.cancelDeleteSuggestion = function() {
+    $scope.delete_suggestion = '';
+  }
+
   /*** STARTUP FUNCTIONS ***/
-  getQuestions();
+  getData();
   hideAlert();
 });

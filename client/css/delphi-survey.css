@@ -27,13 +27,6 @@ ul.draggable-objects:after {
   clear: both;
 }
 
-.draggable-objects li {
-  display: block;
-  width: 130px;
-  height: 60px;
-  margin-left: 95%;
-}
-
 [ng-drag].dragging {
   opacity: 0.5;
 }
@@ -52,7 +45,6 @@ ul.draggable-objects:after {
 
 [ng-drop] div {
   z-index: 2;
-  position: fixed;
 }
 
 .div_pos {
@@ -72,16 +64,4 @@ ul.draggable-objects:after {
 
 .grey_drop {
   background: rgba(208, 208, 208, 0.5);
-}
-
-.green_drag {
-  background: rgb(0, 255, 0);
-}
-
-.red_drag {
-  background: rgb(255, 0, 0);
-}
-
-.grey_drag {
-  background: rgb(208, 208, 208);
 }
