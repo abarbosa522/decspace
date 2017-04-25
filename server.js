@@ -5,7 +5,7 @@ var bodyParser = require('body-parser');
 app.use(express.static(__dirname + "/client"));
 app.use(bodyParser.json());
 
-/***SESSION MANAGEMENT***/
+/*** SESSION MANAGEMENT ***/
 var session = require('client-sessions');
 
 //session handler
@@ -53,7 +53,7 @@ app.get('/logout', function(req, res) {
   res.send(req.session);
 });
 
-/***EMAIL HANDLING***/
+/*** EMAIL HANDLING ***/
 var nodemailer = require('nodemailer');
 
 //email transporter
@@ -192,7 +192,7 @@ app.get('/expr-eval', function(req, res) {
 
             var cond = parser.parse(condition);
             var result = cond.evaluate({x: Number(arg1), y: Number(arg2)});
-            
+
             if(result == true) {
               var func_branch = parser.parse(criteria[criterion]['branches'][branch]['function']);
               result = func_branch.evaluate({x: Number(arg1), y: Number(arg2)});
@@ -259,7 +259,7 @@ app.get('/expr-eval', function(req, res) {
   res.json(similarityValues);
 });
 
-//DATABASE CONNECTIONS
+/*** DATABASE CONNECTIONS ***/
 var mongojs = require('mongojs');
 var username = 'abarbosa';
 var password = 'andrebarbosa';

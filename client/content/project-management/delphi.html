@@ -172,6 +172,18 @@
 
                   <form class = 'form-inline row'>
                     <div class = 'form-group col-md-6'>
+                      <input id = 'import-subject-check' type = 'checkbox'/>
+                      <label for = 'import-subject-check'>Survey Subject</label>
+                    </div>
+                    <div class = 'form-group col-md-4'>
+                      <input id = 'import-subject-file' type = 'file'/>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group col-md-6'>
                       <input id = 'import-emails-check' type = 'checkbox'/>
                       <label for = 'import-emails-check'>Specialists' Emails</label>
                     </div>
@@ -241,6 +253,15 @@
                   </form>
 
                   <br><br>
+
+                  <form class = 'form-inline row'>
+                    <div class = 'form-group'>
+                      <input id = 'export-subject-check' type = 'checkbox'/>
+                      <label for = 'export-subject-check'>Subject</label>
+                    </div>
+                  </form>
+
+                  <br>
 
                   <form class = 'form-inline row'>
                     <div class = 'form-group'>
@@ -494,7 +515,7 @@
 
                       <ul class = 'dropdown-menu' aria-labelledby = 'dropdownbtn'>
                         <li ng-repeat = 'execution in executions' ng-if = 'execution != currentExecution'>
-                          <a href = '' ng-click = 'showCompareExecution(execution)'>{{execution}}</a>
+                          <a href = '' ng-click = 'showCompareExecution(execution)'>Round {{execution.execution_project_id}}</a>
                         </li>
                         <li role = 'separator' class = 'divider'></li>
                         <li><a href = '' ng-click = 'showCompareExecution("")'>None</a></li>
@@ -594,10 +615,26 @@
                         <table class = 'table table-bordered table-condensed table-striped table-hover'>
                           <thead>
                             <tr>
-                              <th class = 'text-center'>Question Title</th>
-                              <th class = 'text-center'>Question Description</th>
-                              <th class = 'text-center'>Total Score</th>
-                              <th class = 'text-center'>Average Score</th>
+                              <th class = 'text-center'>
+                                Question Title
+                                <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeQuestionsOrder("content", "descendant", "currentExecution")'></span></a>
+                                <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeQuestionsOrder("content", "ascendant", "currentExecution")'></span></a>
+                              </th>
+                              <th class = 'text-center'>
+                                Question Description
+                                <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeQuestionsOrder("description", "descendant", "currentExecution")'></span></a>
+                                <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeQuestionsOrder("description", "ascendant", "currentExecution")'></span></a>
+                              </th>
+                              <th class = 'text-center'>
+                                Total Score
+                                <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeQuestionsOrder("total_score", "descendant", "currentExecution")'></span></a>
+                                <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeQuestionsOrder("total_score", "ascendant", "currentExecution")'></span></a>
+                              </th>
+                              <th class = 'text-center'>
+                                Average Score
+                                <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeQuestionsOrder("average", "descendant", "currentExecution")'></span></a>
+                                <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeQuestionsOrder("average", "ascendant", "currentExecution")'></span></a>
+                              </th>
                             </tr>
                           </thead>
                           <tbody>
@@ -617,10 +654,26 @@
                         <table class = 'table table-bordered table-condensed table-striped table-hover'>
                           <thead>
                             <tr>
-                              <th class = 'text-center'>Question Title</th>
-                              <th class = 'text-center'>Question Description</th>
-                              <th class = 'text-center'>Total Score</th>
-                              <th class = 'text-center'>Average Score</th>
+                              <th class = 'text-center'>
+                                Question Title
+                                <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeQuestionsOrder("content", "descendant", "compareExecution")'></span></a>
+                                <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeQuestionsOrder("content", "ascendant", "compareExecution")'></span></a>
+                              </th>
+                              <th class = 'text-center'>
+                                Question Description
+                                <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeQuestionsOrder("description", "descendant", "compareExecution")'></span></a>
+                                <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeQuestionsOrder("description", "ascendant", "compareExecution")'></span></a>
+                              </th>
+                              <th class = 'text-center'>
+                                Total Score
+                                <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeQuestionsOrder("total_score", "descendant", "compareExecution")'></span></a>
+                                <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeQuestionsOrder("total_score", "ascendant", "compareExecution")'></span></a>
+                              </th>
+                              <th class = 'text-center'>
+                                Average Score
+                                <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeQuestionsOrder("average", "descendant", "compareExecution")'></span></a>
+                                <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeQuestionsOrder("average", "ascendant", "compareExecution")'></span></a>
+                              </th>
                             </tr>
                           </thead>
                           <tbody>

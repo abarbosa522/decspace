@@ -1,4 +1,4 @@
-content
-What is your name?
-How old are you?
-What is your favorite color?
+content;description
+What is your name?;Name of the user
+How old are you?;Age of the user
+What is your favorite color?;Favorite color of the user

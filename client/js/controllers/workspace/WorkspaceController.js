@@ -1,4 +1,4 @@
-app.controller('WorkspaceController', function($scope, $window, $http, $compile) {
+app.controller('WorkspaceController', function($scope, $window, $http, $compile, OrderByService) {
   /*** SETUP FUNCTIONS ***/
 
   //get the id of the open project
@@ -64,13 +64,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
         $http.post('/projects', proj_res).success(function() {
           //retrieve the data stored in the database
           $scope.reloadData();
-
           //update the list of executions
-          /*
-                              UNCOMMENT
           getExecutions();
-          */
-
         });
       });
     });
@@ -130,8 +125,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
   $scope.saveData = function() {
     $http.get('/projects').success(function(response) {
       //save the position of all modules
-      for(mod in $scope.modules)
-        $scope.modules[mod]['position'] = $('#' + $scope.modules[mod]['id']).offset();
+      for(mod in modules)
+        modules[mod]['position'] = $('#' + modules[mod]['id']).offset();
 
         var id_doc, proj_res;
 
@@ -139,7 +134,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
         for(proj in response) {
           if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
             //insert the created modules into the database
-            response[proj]['modules'] = $scope.modules;
+            response[proj]['modules'] = modules;
             //insert the created connections into the database
             response[proj]['connections'] = connections;
             //get the id of the document
@@ -166,10 +161,10 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
   $scope.reloadData = function() {
     $http.get('/projects').success(function(response) {
       //remove current modules
-      for(mod in $scope.modules)
-        $('#' + $scope.modules[mod]['id']).remove();
+      for(mod in modules)
+        $('#' + modules[mod]['id']).remove();
       //reset the modules array
-      $scope.modules = [];
+      modules = [];
 
       //remove all existant connections
       for(connection in connections)
@@ -180,7 +175,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
           if(response[proj]['modules'] != undefined)
-            $scope.modules = response[proj]['modules'];
+            modules = response[proj]['modules'];
 
           if(response[proj]['connections'] != undefined)
             connections = response[proj]['connections'];
@@ -190,8 +185,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
       }
 
       //add the modules previously stored in the database
-      for(mod in $scope.modules)
-        reloadModule($scope.modules[mod]);
+      for(mod in modules)
+        reloadModule(modules[mod]);
       //add the connections previously stored in the database
       for(connection in connections)
         reloadConnection(connections[connection]);
@@ -270,6 +265,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
     $('#invalid-connection2').hide();
     $('#invalid-connection3').hide();
     $('#invalid-connection4').hide();
+    $('#execution-success').hide();
+    $('#execution-error').hide();
   }
 
   //show certain alert and hide it smoothly
@@ -285,7 +282,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
   /*** MODULES FUNCTIONS ***/
 
   //created modules
-  $scope.modules = [];
+  var modules = [];
 
   //add a new module to "modules" and the corresponding data
   function createModuleData(mod) {
@@ -293,16 +290,20 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
       case 'OrderBy':
         var new_mod = {};
         //generate the unique id
-        var unique_id = generateUniqueId($scope.modules);
+        var unique_id = generateUniqueId(modules);
+        //store the module id
         new_mod['id'] = 'orderby-' + unique_id;
         //store the module type
         new_mod['type'] = 'OrderBy';
-        //initialize the criteria array
-        new_mod['criteria'] = [];
-        //initialize the actions array
-        new_mod['actions'] = [];
+        //initialize the input data array
+        new_mod['input'] = {
+          'criteria' : [],
+          'actions' : []
+        };
+        //initialize the output data array
+        new_mod['output'] = [];
         //store the new module into the modules array
-        $scope.modules.push(new_mod);
+        modules.push(new_mod);
         break;
     }
   }
@@ -311,7 +312,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
   function createInputFileData(name, data) {
     var new_mod = {};
     //generate the unique id
-    var unique_id = generateUniqueId($scope.modules);
+    var unique_id = generateUniqueId(modules);
     new_mod['id'] = 'inputfile-' + unique_id;
 
     //store the module type
@@ -319,12 +320,12 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
     //store the name of the file
     new_mod['name'] = name;
     //store the imported data
-    new_mod['results'] = data;
+    new_mod['output'] = data;
     //store the new module into the modules array
-    $scope.modules.push(new_mod);
+    modules.push(new_mod);
   }
 
-  //delete a certain modulee
+  //delete a certain module
   $scope.deleteModule = function(event) {
     var mod_id = event.target.parentNode.parentNode.attributes.id.value;
 
@@ -333,43 +334,30 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
 
     //delete the module's data
     var mod_index;
-    for(mod in $scope.modules)
-      if($scope.modules[mod]['id'] == mod_id) {
+    for(mod in modules)
+      if(modules[mod]['id'] == mod_id) {
         mod_index = mod;
         break;
       }
 
-    $scope.modules.splice(mod_index, 1);
+    modules.splice(mod_index, 1);
 
     //remove all connections of the removed module
     var connections_ids = [];
     var input_mods = [];
 
+    //identify the connections attached to the deleted module
     for(connection in connections)
       if(connections[connection]['output'] == mod_id || connections[connection]['input'] == mod_id) {
         $('#' + connections[connection]['id']).remove();
         connections_ids.push(connections[connection]['id']);
-
-        /*var module_results;
-        for(mod in $scope.modules)
-          if($scope.modules[mod]['id'] == mod_id) {
-            module_results = $scope.modules[mod]['results'];
-            break;
-          }
-
-        if(connections[connection]['output'] == mod_id && mod_results.length > 0) {
-          for(mod2 in $scope.modules)
-            if($scope.modules[mod2]['id'] == connections[connection]['input']) {
-              $scope.modules[mod2][connections[connection]['type']]
-            }
-
-        } */ 
       }
 
+    //delete the identified connections
     for(id in connections_ids)
       for(connect in connections)
         if(connections[connect]['id'] == connections_ids[id]) {
-          connections.splice(connect, 1);
+          deleteConnection(connect);
           break;
         }
   }
@@ -381,9 +369,9 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
   $scope.selectCurrentModule = function(event) {
     var parent_id = event.target.parentNode.id;
 
-    for(mod in $scope.modules)
-      if($scope.modules[mod]['id'] == parent_id)
-        $scope.currentModule = $scope.modules[mod];
+    for(mod in modules)
+      if(modules[mod]['id'] == parent_id)
+        $scope.currentModule = modules[mod];
 
     //reset the select deletion variables
     switch($scope.currentModule['type']) {
@@ -419,7 +407,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
         //clone the template
         var temp_clone = $(temp.content).clone();
         //make its id unique
-        var unique_id = generateUniqueId($scope.modules);
+        var unique_id = generateUniqueId(modules);
         temp_clone.find('#orderby').attr('id', 'orderby-' + unique_id);
         //cloned elements need to be manually compiled - angularJS
         var compiled_temp = $compile(temp_clone)($scope);
@@ -440,7 +428,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
     //clone the template
     var temp_clone = $(temp.content).clone();
     //make its id unique
-    var unique_id = generateUniqueId($scope.modules);
+    var unique_id = generateUniqueId(modules);
     temp_clone.find('#inputfile').attr('id', 'inputfile-' + unique_id);
     //add the file name to the module
     temp_clone.find('#filename').html(name);
@@ -498,16 +486,16 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
   //add a new criterion
   $scope.addOrderByCriterion = function() {
     //assign an unique id to the new criterion
-    if($scope.currentModule.criteria.length == 0)
+    if($scope.currentModule.input.criteria.length == 0)
       $scope.new_criterion.id = 1;
     else
-      $scope.new_criterion.id = $scope.currentModule.criteria[$scope.currentModule.criteria.length - 1]['id'] + 1;
+      $scope.new_criterion.id = $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.length - 1]['id'] + 1;
 
     //the criterion is not selected by default
     $scope.new_criterion.selected = false;
 
     //add the new criterion to the
-    $scope.currentModule.criteria.push(angular.copy($scope.new_criterion));
+    $scope.currentModule.input.criteria.push(angular.copy($scope.new_criterion));
 
     //reset the criterion input fields
     $scope.new_criterion.name = '';
@@ -525,7 +513,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
 
   //delete the selected criterion
   $scope.confirmDeleteOrderByCriterion = function(criterion) {
-    $scope.currentModule.criteria.splice($scope.currentModule.criteria.indexOf(criterion), 1);
+    $scope.currentModule.input.criteria.splice($scope.currentModule.input.criteria.indexOf(criterion), 1);
     $scope.deleteIdOrderByCriterion = '';
   }
 
@@ -536,22 +524,22 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
 
   //select the criterion that defines the order
   $scope.selectOrderByCriterion = function(criterion) {
-    $scope.currentModule.criteria[$scope.currentModule.criteria.indexOf(criterion)]['selected'] = true;
+    $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.indexOf(criterion)]['selected'] = true;
   }
 
   //add a new action
   $scope.addOrderByAction = function() {
-    if($scope.currentModule.actions.length == 0)
+    if($scope.currentModule.input.actions.length == 0)
       $scope.new_action.id = 1;
     else
-      $scope.new_action.id = $scope.currentModule.actions[$scope.currentModule.actions.length - 1]['id'] + 1;
+      $scope.new_action.id = $scope.currentModule.input.actions[$scope.currentModule.input.actions.length - 1]['id'] + 1;
 
-    $scope.currentModule.actions.push(angular.copy($scope.new_action));
+    $scope.currentModule.input.actions.push(angular.copy($scope.new_action));
 
     $scope.new_action.name = '';
 
-    for(criterion in $scope.currentModule.criteria)
-      $scope.new_action[$scope.currentModule.criteria[criterion]['name']] = '';
+    for(criterion in $scope.currentModule.input.criteria)
+      $scope.new_action[$scope.currentModule.input.criteria[criterion]['name']] = '';
   }
 
   //selected action to be deleted
@@ -564,7 +552,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
 
   //delete the selected action
   $scope.confirmDeleteOrderByAction = function(action) {
-    $scope.currentModule.actions.splice($scope.currentModule.actions.indexOf(action), 1);
+    $scope.currentModule.input.actions.splice($scope.currentModule.input.actions.indexOf(action), 1);
     $scope.deleteIdOrderByAction = '';
   }
 
@@ -583,7 +571,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
   var first_event;
 
   //draw a line connector between two different points
-  $scope.drawLine = function(event) {
+  $scope.drawConnection = function(event) {
     //first a first point has not been created yet
     if(!drawing_line) {
       first_event = event;
@@ -592,9 +580,9 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
     //if a first point has been created already
     else {
       //"type" of the first point
-      var first_type = first_event.target.nextElementSibling.innerHTML;
+      var first_type = first_event.target.nextElementSibling.innerHTML.toLowerCase();
       //"type" of the second point
-      var second_type = event.target.nextElementSibling.innerHTML;
+      var second_type = event.target.nextElementSibling.innerHTML.toLowerCase();
       //id of the module of the first point
       var first_module_id = first_event.target.parentElement.attributes.id.value;
       //id of the module of the second point
@@ -604,8 +592,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
       //id of the second point
       var second_point_id = event.target.attributes.id.value;
 
-      //unsuccessful connection - both points are of the same type or neither of them is of type "Output"
-      if(first_type == second_type || (first_type != 'Output' && second_type != 'Output')) {
+      //unsuccessful connection - both points are of the same type or neither of them is of type "output"
+      if(first_type == second_type || (first_type != 'output' && second_type != 'output')) {
         showAlert('invalid-connection1');
       }
       //unsuccessful connection -  both points belong to the same module
@@ -645,7 +633,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
         new_line.setAttribute('id', 'line-' + unique_id);
 
         //set a click event
-        new_line.setAttribute('ng-click', 'deleteLine($event)')
+        new_line.setAttribute('ng-click', 'deleteConnection($event)')
         //compile the new line
         var compiled_line = $compile(new_line)($scope);
         //append the compile line to the svg area
@@ -657,7 +645,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
 
         var input, input_point, input_type, output, output_type;
 
-        if(first_type == 'Output') {
+        if(first_type == 'output') {
           input = second_module_id;
           input_point = second_point_id;
           input_type = second_type;
@@ -689,12 +677,12 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
         connections.push(new_connection);
 
         //transfer data between output and input
-        for(mod in $scope.modules)
+        for(mod in modules)
           //verify if the output module already contains the results
-          if($scope.modules[mod]['id'] == output && $scope.modules[mod]['results'].length > 0) {
-            for(modl in $scope.modules)
-              if($scope.modules[modl]['id'] == input)
-                $scope.modules[modl][input_type.toLowerCase()] = angular.copy($scope.modules[mod]['results']);
+          if(modules[mod]['id'] == output && modules[mod]['output'] != undefined) {
+            for(modl in modules)
+              if(modules[modl]['id'] == input)
+                modules[modl]['input'][input_type.toLowerCase()] = angular.copy(modules[mod]['output']);
             break;
           }
       }
@@ -726,7 +714,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
   //verify if input point is already connected
   function inputConnected(first_id, second_id, first_type, second_type) {
     var input_point, input_type;
-    if(first_type != 'Output') {
+    if(first_type != 'output') {
       input_point = first_id;
       input_type = first_type;
     }
@@ -811,14 +799,15 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
     //set the id of the line
     new_line.setAttribute('id', connection['id']);
     //set a click event
-    new_line.setAttribute('ng-click', 'deleteLine($event)')
+    new_line.setAttribute('ng-click', 'deleteConnection($event)')
     //compile the new line
     var compiled_line = $compile(new_line)($scope);
     //append the compile line to the svg area
     $('#svg').append(compiled_line);
   }
 
-  $scope.deleteLine = function(event) {
+  //deletes a connection - triggered by clicking it
+  $scope.deleteConnection = function(event) {
     var connection_id;
 
     //find the index of the clicked connector
@@ -828,11 +817,199 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile)
         break;
       }
 
+    //reset the data transfered from one module to another
+    for(mod in modules)
+      if(modules[mod]['id'] == connections[connection_id]['input']) {
+        modules[mod]['input'][connections[connection_id]['input_type'].toLowerCase()] = [];
+        break;
+      }
+
     //remove the connector from the connections array
     connections.splice(connection_id, 1);
 
     //remove the connection from the screen
     $(event.target).remove();
+  }
+
+  //deletes a certain connection
+  function deleteConnection(connection) {
+    //reset the data transfered from one module to another
+    for(mod in modules)
+      if(modules[mod]['id'] == connections[connection]['input']) {
+        modules[mod]['input'][connections[connection]['input_type'].toLowerCase()] = [];
+        break;
+      }
+
+    //remove the connector from the connections array
+    connections.splice(connection, 1);
+
+    //remove the connection from the screen
+    //does not need to be performed??
+  }
+
+  /*** EXECUTION AND RESULTS ***/
+
+  //execute the workflow
+  $scope.executeWorkflow = function() {
+    //show loading sign
+    $scope.isLoading = true;
+
+    var total_results = 0;
+
+    //verify if every module is eligible to receive data
+    if(checkModulesData()) {
+      //count the number of executed modules
+      var mod_exec = 0;
+
+      while(mod_exec < modules.length) {
+        mod_exec = 0;
+
+        for(mod in modules) {
+          if(modules[mod]['output'].length > 0)
+            mod_exec++;
+
+          else {
+            //transfer data between the connections of the current module
+            transferData(modules[mod]);
+
+            //try to execute method
+            if(executeMethod(modules[mod]))
+              mod_exec++;
+          }
+        }
+      }
+      //create new execution
+      newExecution();
+      //show the successful execution alert
+      showAlert('execution-success');
+    }
+    else
+      showAlert('execution-error');
+
+    //hide loading sign
+    $scope.isLoading = false;
+  }
+
+  //verify if all modules have manually input data or a connection
+  function checkModulesData() {
+    //keep the number of modules that have data, for each input point of each module
+    var modules_data = 0;
+
+    for(mod in modules) {
+      //input files do not have input points, therefore they do not need to be checked
+      if(modules[mod]['type'] != 'InputFile') {
+        var input_data = 0;
+        //check connections for each input point of the current module
+        for(input in modules[mod]['input'])
+          for(connection in connections)
+            if((connections[connection]['input'] == modules[mod]['id'] && connections[connection]['input_type'] == input) || modules[mod]['input'][input].length > 0) {
+              input_data++;
+              break;
+            }
+
+        //check if all input points of the current module have a connection or already have input data
+        if(input_data == Object.keys(modules[mod]['input']).length)
+          modules_data++;
+      }
+      else
+        modules_data++;
+    }
+
+    return modules_data == modules.length;
+  }
+
+  //transfer the data to a certain module, according to its connections
+  function transferData(mod) {
+    for(input in mod['input'])
+      //if no input is defined in the module, then a connection must have been created to this point
+      if(mod['input'][input].length == 0)
+        for(connection in connections)
+          if(connections[connection]['input'] == mod['id'] && connections[connection]['input_type'] == input)
+            //find the module connected to the input point and get its output data
+            for(modl in modules)
+              if(modules[modl]['id'] == connections[connection]['output'] && modules[modl]['output'].length > 0)
+                mod['input'][input] = modules[modl]['output'];
+  }
+
+  //execute the method correspondent to the mod module
+  function executeMethod(mod) {
+    switch(mod['type']) {
+      case 'OrderBy':
+        mod['output'] = OrderByService.getResults(mod['input']['criteria'], mod['input']['actions']);
+        break;
+    }
+  }
+
+  //create new execution
+  function newExecution() {
+    //get created projects
+    $http.get('/projects').success(function(response) {
+      //create the new execution object
+      var new_exec = {};
+
+      //proj_res - new project document; id_doc - id of the old project document
+      var proj_res, id_doc;
+
+      for(proj in response) {
+        if(response[proj]['username'] == $scope.username && response[proj]['project_id'] == proj_id) {
+          //get the largest execution_id
+          var exec_id;
+
+          if(response[proj]['executions'].length == 0)
+            exec_id = 1;
+          else
+            exec_id = response[proj]['executions'][response[proj]['executions'].length - 1]['exec_id'] + 1;
+
+          //define the date of the execution
+          var current_date = new Date();
+          var exec_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear() + ' ' + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
+
+          new_exec['exec_id'] = exec_id;
+          new_exec['date'] = exec_date;
+          new_exec['modules'] = modules;
+          new_exec['connections'] = connections;
+
+          //insert execution into database
+          response[proj]['executions'].push(new_exec);
+          //get the id of the document, so that it can be removed from the db
+          id_doc = response[proj]['_id'];
+          //project to store in the db
+          proj_res = response[proj];
+          delete proj_res['_id'];
+          break;
+        }
+      }
+
+      //delete the previous document with the list of projects
+      $http.delete('/projects/' + id_doc).success(function() {
+        //add the new list of projects
+        $http.post('/projects', proj_res).success(function() {
+          //reload executions
+          getExecutions();
+        });
+      });
+    });
+  }
+
+  //get the executions of the current project
+  function getExecutions() {
+    $http.get('/projects').success(function(response) {
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+          //get the actions previously added
+          $scope.executions = response[proj]['executions'];
+          break;
+        }
+      }
+    });
+  }
+
+  //currently selected execution
+  $scope.current_exec = '';
+
+  //define exec as the currently selected execution
+  $scope.selectExecution = function(exec) {
+    $scope.current_exec = exec;
   }
 
   /*** STARTUP FUNCTIONS ***/

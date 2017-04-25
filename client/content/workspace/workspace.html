@@ -22,6 +22,9 @@
     <!-- AngularJS Controllers -->
     <script src = '../../js/controllers/workspace/WorkspaceController.js'></script>
 
+    <!-- AngularJS Services -->
+    <script src = '../../js/services/OrderByService.js'></script>
+
     <!-- Bootstrap -->
     <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
     <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.js'></script>
@@ -83,7 +86,22 @@
       <br>
 
       <div class = 'row'>
-        <div class = 'col-md-2' ></div>
+
+        <!-- Modules List -->
+        <div class = 'col-md-2'>
+          <div class = 'panel panel-default'>
+            <div class = 'panel-heading'>
+              <!-- Title - Modules -->
+              <h4 class = 'panel-title'>Modules</h4>
+            </div>
+            <!-- List of Modules -->
+            <ul class = 'list-group'>
+              <li class = 'list-group-item' ng-repeat = 'method in methods' ng-click = 'createModule(method)'>
+                <a href = ''>{{method}}</a>
+              </li>
+            </ul>
+          </div>
+        </div>
 
         <!-- Workspace -->
         <div id = 'workspace' class = 'col-md-8' style = 'height: 400px; border: black 1px solid'>
@@ -92,8 +110,12 @@
           <div class = 'btn-toolbar' role = 'toolbar' style = 'margin-top: 1%'>
             <div class = 'btn-group' role = 'group'>
               <!-- Execute Button -->
-              <button type = 'button' class = 'btn btn-default' ng-click = '' title = 'Execute Project'>
+              <button type = 'button' class = 'btn btn-default' ng-if = '!isLoading' ng-click = 'executeWorkflow()' title = 'Execute Workflow'>
                 <span class = 'glyphicon glyphicon-play'></span>
+              </button>
+              <!-- Loading Button -->
+              <button class = 'btn btn-default active' ng-if = 'isLoading' title = 'Working...' ng-cloak>
+                <span class = 'glyphicon glyphicon-refresh glyphicon-refresh-animate'></span>
               </button>
             </div>
 
@@ -136,6 +158,14 @@
 
           <div class = 'alert alert-danger custom-alert' id = 'invalid-connection4' ng-cloak>
             <strong>Invalid connection</strong> - Input points can only be connected once.
+          </div>
+
+          <div class = 'alert alert-success custom-alert' id = 'execution-success' ng-cloak>
+            Workflow <strong>successfully</strong> executed.
+          </div>
+
+          <div class = 'alert alert-danger custom-alert' id = 'execution-error' ng-cloak>
+            <strong>Execution error</strong> - One or more modules do not have input data or any connection.
           </div>
 
           <!-- SVG Area -->
@@ -191,12 +221,12 @@
                     <table class = 'table table-bordered table-hover'>
                       <thead>
                         <tr>
-                          <th class = 'text-center' ng-repeat = '(key, value) in currentModule.results[0]'>{{key}}</th>
+                          <th class = 'text-center' ng-repeat = '(key, value) in currentModule.output[0]' ng-if = 'key != "id"'>{{key}}</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr ng-repeat = 'item in currentModule.results'>
-                          <td ng-repeat = '(key, value) in item'>{{value}}</td>
+                        <tr ng-repeat = 'item in currentModule.output'>
+                          <td ng-repeat = '(key, value) in item' ng-if = 'key != "id"'>{{value}}</td>
                         </tr>
                       </tbody>
                     </table>
@@ -233,7 +263,7 @@
                       </thead>
                       <!-- Added Criteria -->
                       <tbody>
-                        <tr ng-repeat = 'criterion in currentModule.criteria' ng-class = '{danger: criterion.id == deleteIdOrderByCriterion}'>
+                        <tr ng-repeat = 'criterion in currentModule.input.criteria' ng-class = '{danger: criterion.id == deleteIdOrderByCriterion}'>
                           <td>
                             <input type = 'radio' ng-checked = 'criterion.selected == "true"' ng-click = 'selectOrderByCriterion(criterion)'>
                           </td>
@@ -303,15 +333,15 @@
                     <table class = 'table table-bordered table-hover'>
                       <thead>
                         <th class = 'text-center'>Action Name</th>
-                        <th class = 'text-center' ng-repeat = 'criterion in currentModule.criteria'>{{criterion.name}}</th>
+                        <th class = 'text-center' ng-repeat = 'criterion in currentModule.input.criteria'>{{criterion.name}}</th>
                         <th class = 'col-md-2'></th>
                       </thead>
                       <tbody>
-                        <tr ng-repeat = 'action in currentModule.actions' ng-class = '{danger: action.id == deleteIdOrderByAction}'>
+                        <tr ng-repeat = 'action in currentModule.input.actions' ng-class = '{danger: action.id == deleteIdOrderByAction}'>
                           <td>
                             <input class = 'form-control' type = 'text' ng-model = 'action.name'>
                           </td>
-                          <td ng-repeat = 'criterion in currentModule.criteria'>
+                          <td ng-repeat = 'criterion in currentModule.input.criteria'>
                             <input class = 'form-control' ng-model = 'action[criterion.name]'>
                           </td>
                           <td ng-if = 'action.id != deleteIdOrderByAction'>
@@ -333,7 +363,7 @@
                           <td>
                             <input class = 'form-control' type = 'text' ng-model = 'new_action.name'>
                           </td>
-                          <td ng-repeat = 'criterion in currentModule.criteria'>
+                          <td ng-repeat = 'criterion in currentModule.input.criteria'>
                             <input class = 'form-control' ng-model = 'new_action[criterion.name]'>
                           </td>
                           <td>
@@ -361,7 +391,7 @@
                   <span class = 'glyphicon glyphicon-remove'></span>
                 </a>
 
-                <button id = 'inputfile-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawLine($event)' style = 'margin-top: 12%; margin-left: 40%'></button>
+                <button id = 'inputfile-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 12%; margin-left: 40%'></button>
                 <span class = 'module-circle-span' style = 'margin-top: 10%; margin-left: 18%'>Output</span>
               </div>
             </template>
@@ -375,13 +405,13 @@
                   <span class = 'glyphicon glyphicon-remove'></span>
                 </a>
 
-                <button id = 'orderby-criteria' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawLine($event)' style = 'margin-top: -3%; margin-left: -48%'></button>
+                <button id = 'orderby-criteria' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: -3%; margin-left: -48%'></button>
                 <span class = 'module-circle-span' style = 'margin-top: -4%; margin-left: -40%'>Criteria</span>
 
-                <button id = 'orderby-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawLine($event)' style = 'margin-top: 20%; margin-left: -48%'></button>
+                <button id = 'orderby-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 20%; margin-left: -48%'></button>
                 <span class = 'module-circle-span' style = 'margin-top: 19%; margin-left: -40%'>Actions</span>
 
-                <button id = 'orderby-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawLine($event)' style = 'margin-top: 30%; margin-left: 40%'></button>
+                <button id = 'orderby-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 30%; margin-left: 40%'></button>
                 <span class = 'module-circle-span' style = 'margin-top: 28%; margin-left: 18%'>Output</span>
               </div>
             </template>
@@ -389,25 +419,106 @@
           </svg>
         </div>
 
-        <!-- Modules List -->
+        <!-- Executions and Results List -->
         <div class = 'col-md-2'>
-          <div class = 'panel-group'>
-            <div class = 'panel panel-default'>
-              <div class = 'panel-heading'>
-                <h4 class = 'panel-title'>
-                  <a data-toggle = 'collapse' href = '#collapse1'>Methods</a>
-                </h4>
-              </div>
+          <div class = 'panel panel-default'>
+            <div class = 'panel-heading'>
+              <!-- Title - Executions -->
+              <h4 class = 'panel-title'>Executions</h4>
+            </div>
+            <!-- List of executions -->
+            <ul class = 'list-group'>
+              <li class = 'list-group-item' ng-repeat = 'execution in executions' ng-click = 'selectExecution(execution)'>
+                <a href = '' data-toggle = 'modal' data-target = '#exec-modal'>{{execution.date}}</a>
+              </li>
+            </ul>
+          </div>
 
-              <div id = 'collapse1' class = 'panel-collapse collapse'>
-                <ul class = 'list-group'>
-                  <li class = 'list-group-item' ng-repeat = 'method in methods' ng-click = 'createModule(method)'>
-                    <a href = ''>{{method}}</a>
-                  </li>
-                </ul>
+          <!-- Execution Modal -->
+          <div class = 'modal fade custom-modal' id = 'exec-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>Execution {{current_exec.exec_id}}</h4>
+                </div>
+                <div class = 'modal-body'>
+                  <!-- Show input and output data of all modules -->
+                  <div ng-repeat = 'mod in current_exec.modules'>
+                    <h2>{{mod.id}}</h2>
+
+                    <!-- Input Files -->
+                    <div ng-if = 'mod.type == "InputFile"'>
+                      <!-- Output -->
+                      <h3>Output</h3>
+
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center' ng-repeat = '(key, value) in mod.output[0]' ng-if = 'key != "id"'>{{key}}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat = 'item in mod.output'>
+                            <td ng-repeat = '(key, value) in item' ng-if = 'key != "id"'>{{value}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <!-- OrderBy Module -->
+                    <div ng-if = 'mod.type == "OrderBy"'>
+                      <!-- Criteria -->
+                      <h3>Criteria</h3>
+
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>Order By</th>
+                            <th class = 'text-center'>Criterion Name</th>
+                            <th class = 'text-center'>Type</th>
+                            <th class = 'text-center'>Direction</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat = 'criterion in mod.input.criteria'>
+                            <td>
+                              <span class = 'glyphicon glyphicon-ok' ng-if = 'criterion.selected == "true"' style = 'color: green'></span>
+                              <span class = 'glyphicon glyphicon-remove' ng-if = 'criterion.selected == "false"' style = 'color: red'></span>
+                            </td>
+                            <td>{{criterion.name}}</td>
+                            <td>{{criterion.type}}</td>
+                            <td>{{criterion.direction}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <!-- Actions -->
+                      <h3>Actions</h3>
+                      
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <th class = 'text-center'>Action Name</th>
+                          <th class = 'text-center' ng-repeat = 'criterion in mod.input.criteria'>{{criterion.name}}</th>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat = 'action in mod.input.actions'>
+                            <td>{{action.name}}</td>
+                            <td ng-repeat = 'criterion in mod.input.criteria'>{{action[criterion.name]}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <!-- Output -->
+                      {{mod.output}}
+                    </div>
+
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+
         </div>
 
       </div>

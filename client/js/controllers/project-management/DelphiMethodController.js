@@ -162,6 +162,9 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
 
   //import the files of the checked boxes
   $scope.importData = function() {
+    if(angular.element(document.querySelector('#import-subject-check')).prop('checked')) {
+      importFile('import-subject-file');
+    }
     if(angular.element(document.querySelector('#import-emails-check')).prop('checked')) {
       importFile('import-emails-file');
     }
@@ -236,10 +239,12 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
   //get the converted data as the current data
   function fileConverter(input_id, data) {
     switch(input_id) {
+      case 'import-subject-file':
+        $scope.subject = data[0]['subject'];
+        break;
       case 'import-emails-file':
         $scope.emails = data;
         break;
-
       case 'import-questions-file':
         $scope.questions = data;
         break;
@@ -248,18 +253,46 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
 
   //select emails and questions import checkboxes
   $scope.selectAllImport = function() {
+    document.getElementById('import-subject-check').checked = true;
     document.getElementById('import-emails-check').checked = true;
     document.getElementById('import-questions-check').checked = true;
   }
 
   //deselect emails and questions import checkboxes
   $scope.selectNoneImport = function() {
+    document.getElementById('import-subject-check').checked = false;
     document.getElementById('import-emails-check').checked = false;
     document.getElementById('import-questions-check').checked = false;
   }
 
   //export the selected data
   $scope.exportData = function() {
+    //export subject to csv
+    if(angular.element(document.querySelector('#export-subject-check')).prop('checked') && angular.element(document.querySelector('#csv-radio')).prop('checked')) {
+      var csv_str = 'subject\n' + $scope.subject;
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'subject.csv';
+      hidden_element.click();
+    }
+    //export subject to json
+    if(angular.element(document.querySelector('#export-subject-check')).prop('checked') && angular.element(document.querySelector('#json-radio')).prop('checked')) {
+      var json_str = '';
+
+      var json_element = {};
+
+      json_element['subject'] = $scope.subject;
+
+      json_str += JSON.stringify(json_element) + '\n';
+
+      var hidden_element = document.createElement('a');
+      hidden_element.href = 'data:text/json;charset=utf-8,' + encodeURI(json_str);
+      hidden_element.target = '_blank';
+      hidden_element.download = 'subject.json';
+      hidden_element.click();
+    }
     //export emails to csv
     if(angular.element(document.querySelector('#export-emails-check')).prop('checked') && angular.element(document.querySelector('#csv-radio')).prop('checked')) {
       var csv_str = 'address\n';
@@ -277,6 +310,7 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
       hidden_element.download = 'emails.csv';
       hidden_element.click();
     }
+    //export emails to json
     if(angular.element(document.querySelector('#export-emails-check')).prop('checked') && angular.element(document.querySelector('#json-radio')).prop('checked')) {
       var json_str = '';
 
@@ -297,6 +331,7 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
       hidden_element.download = 'emails.json';
       hidden_element.click();
     }
+    //export questions to csv
     if(angular.element(document.querySelector('#export-questions-check')).prop('checked') && angular.element(document.querySelector('#csv-radio')).prop('checked')) {
       var csv_str = 'content\n';
 
@@ -313,6 +348,7 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
       hidden_element.download = 'questions.csv';
       hidden_element.click();
     }
+    //export questions to json
     if(angular.element(document.querySelector('#export-questions-check')).prop('checked') && angular.element(document.querySelector('#json-radio')).prop('checked')) {
       var json_str = '';
 
@@ -337,12 +373,14 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
 
   //select emails and questions export checkboxes
   $scope.selectAllExport = function() {
+    document.getElementById('export-subject-check').checked = true;
     document.getElementById('export-emails-check').checked = true;
     document.getElementById('export-questions-check').checked = true;
   }
 
   //deselect emails and questions export checkboxes
   $scope.selectNoneExport = function() {
+    document.getElementById('export-subject-check').checked = false;
     document.getElementById('export-emails-check').checked = false;
     document.getElementById('export-questions-check').checked = false;
   }
@@ -459,7 +497,7 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
       }
 
       $scope.current_execution_project_id = 0;
-      
+
       for(execution in $scope.executions)
         if($scope.executions[execution]['execution_project_id'] > $scope.current_execution_project_id)
           $scope.current_execution_project_id = $scope.executions[execution]['execution_project_id'];
@@ -733,6 +771,34 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
   //cancel the deletion of all executions
   $scope.cancelDeleteAllExecutions = function() {
     $scope.deleteIdExecution = '';
+  }
+
+  //order the questions results by a certain attribute in a certain direction
+  $scope.changeQuestionsOrder = function(attr, dir, data) {
+    if(data == 'currentExecution')
+      $scope.currentExecution.questions.sort(sortData(attr, dir));
+    else if(data == 'compareExecution')
+      $scope.compareExecution.questions.sort(sortData(attr, dir));
+  }
+
+  //sort an array by order and direction
+  function sortData(attribute, direction) {
+    return function(a, b) {
+      if(direction == 'ascendant') {
+        if(a[attribute] < b[attribute])
+          return -1;
+        if(a[attribute] > b[attribute])
+          return 1;
+        return 0;
+      }
+      else {
+        if(a[attribute] < b[attribute])
+          return 1;
+        if(a[attribute] > b[attribute])
+          return -1;
+        return 0;
+      }
+    }
   }
 
   /*** STARTUP FUNCTIONS ***/

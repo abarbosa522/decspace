@@ -1,3 +1,3 @@
-{"content":"What is your name?"}
-{"content":"How old are you?"}
-{"content":"What is your favorite color?"}
+{"content":"What is your name?","description":"Name of the user"}
+{"content":"How old are you?","description":"Age of the user"}
+{"content":"What is your favorite color?","description":"Favorite color of the user"}

@@ -192,8 +192,8 @@
         </thead>
         <tbody>
           <tr ng-repeat = 'suggestion in suggestions' ng-class = '{danger: suggestion.id == delete_suggestion}'>
-            <td>{{suggestion.title}}</td>
-            <td>{{suggestion.description}}</td>
+            <td><input class = 'form-control' type = 'text' ng-model = 'suggestion.title'></td>
+            <td><input class = 'form-control' type = 'text' ng-model = 'suggestion.description'></td>
             <td ng-if = 'suggestion.id != delete_suggestion'>
               <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteSuggestion(suggestion)' title = 'Delete Suggestion'>
                 <span class = 'glyphicon glyphicon-minus'></span>
