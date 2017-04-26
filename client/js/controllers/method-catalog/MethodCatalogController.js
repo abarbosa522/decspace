@@ -1,4 +1,4 @@
-app.controller('DashboardController', function($scope, $window, $http) {
+app.controller('MethodCatalogController', function($scope, $window, $http) {
   /*** SETUP FUNCTIONS ***/
 
   //check if there is a user logged in
@@ -21,33 +21,21 @@ app.controller('DashboardController', function($scope, $window, $http) {
     });
   }
 
-  //user log out
+  //log out current user
   $scope.logOut = function() {
     $http.get('/logout').success(function(res) {
       $window.location.href = '../../index.html';
     });
   }
 
-  /*** REDIRECTING FUNCTIONS ***/
+  /*** METHODS ***/
 
-  //redirect to the Project Management page
-  $scope.toProjectManagement = function() {
-    $window.location.href = '../project-management/project-management.html';
-  }
+  //list of methods currently available
+  $scope.methods = ['CAT-SD', 'Delphi', 'OrderBy', 'Sort', 'SRF'];
 
-  //redirect to the Workspace Projects page
-  $scope.toWorkspaceProjects = function() {
-    $window.location.href = '../workspace/projects.html';
-  }
-
-  //redirect to the Method Catalog page
-  $scope.toMethodCatalog = function() {
-    $window.location.href = '../method-catalog/method-catalog.html';
-  }
-
-  //redirect to the Settings page
-  $scope.toSettings = function() {
-    $window.location.href = '../settings/settings.html';
+  //redirect to the method page
+  $scope.toMethod = function(method) {
+    $window.location.href = method + '.html';
   }
 
   /*** STARTUP FUNCTIONS ***/

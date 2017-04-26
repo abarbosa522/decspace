@@ -293,6 +293,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         var unique_id = generateUniqueId(modules);
         //store the module id
         new_mod['id'] = 'orderby-' + unique_id;
+        //generate and store module name
+        new_mod['name_id'] = generateUniqueNameId('OrderBy');
         //store the module type
         new_mod['type'] = 'OrderBy';
         //initialize the input data array
@@ -308,7 +310,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     }
   }
 
-  //add a new input file module and correspondign data
+  //add a new input file module and corresponding data
   function createInputFileData(name, data) {
     var new_mod = {};
     //generate the unique id
@@ -393,6 +395,16 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     return unique_id;
   }
 
+  function generateUniqueNameId(method_type) {
+    var mod_num = 0;
+
+    for(mod in modules)
+      if(modules[mod]['type'] == method_type && modules[mod]['name_id'] > mod_num)
+        mod_num = modules[mod]['name_id'];
+
+    return ++mod_num;
+  }
+
   /*** METHODS FUNCTIONS ***/
 
   //available methods
@@ -409,6 +421,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         //make its id unique
         var unique_id = generateUniqueId(modules);
         temp_clone.find('#orderby').attr('id', 'orderby-' + unique_id);
+        //add the file name to the module
+        temp_clone.find('#mod-name').html('OrderBy' + generateUniqueNameId('OrderBy'));
         //cloned elements need to be manually compiled - angularJS
         var compiled_temp = $compile(temp_clone)($scope);
         //add the new instance of the template to the document
@@ -452,6 +466,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         var temp_clone = $(temp.content).clone();
         //make its id unique
         temp_clone.find('#orderby').attr('id', mod['id']);
+        //add the module name to the module
+        temp_clone.find('#mod-name').html('OrderBy' + mod['name_id']);
         //cloned elements need to be manually compiled - angularJS
         var compiled_temp = $compile(temp_clone)($scope);
         //add the new instance of the template to the document
@@ -524,7 +540,15 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   //select the criterion that defines the order
   $scope.selectOrderByCriterion = function(criterion) {
-    $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.indexOf(criterion)]['selected'] = true;
+    if($scope.currentModule.input.criteria[$scope.currentModule.input.criteria.indexOf(criterion)]['selected'] == 'true')
+      $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.indexOf(criterion)]['selected'] = 'false';
+    else {
+      //make sure no other criterion is selected
+      for(crit in $scope.currentModule.input.criteria)
+        $scope.currentModule.input.criteria[crit]['selected'] = 'false';
+      //select the clicked criterion
+      $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.indexOf(criterion)]['selected'] = 'true';
+    }
   }
 
   //add a new action
@@ -847,7 +871,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     //does not need to be performed??
   }
 
-  /*** EXECUTION AND RESULTS ***/
+  /*** WORKFLOW EXECUTION ***/
 
   //execute the workflow
   $scope.executeWorkflow = function() {
@@ -867,11 +891,9 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         for(mod in modules) {
           if(modules[mod]['output'].length > 0)
             mod_exec++;
-
           else {
             //transfer data between the connections of the current module
             transferData(modules[mod]);
-
             //try to execute method
             if(executeMethod(modules[mod]))
               mod_exec++;
@@ -933,11 +955,38 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   //execute the method correspondent to the mod module
   function executeMethod(mod) {
+    var method_executed = false;
+
     switch(mod['type']) {
       case 'OrderBy':
         mod['output'] = OrderByService.getResults(mod['input']['criteria'], mod['input']['actions']);
+        method_executed = true;
         break;
     }
+
+    return method_executed;
+  }
+
+  function resetOutputFields() {
+    for(mod in modules)
+      if(modules[mod]['type'] != 'InputFile')
+        modules[mod]['output'] = [];
+  }
+  /*** EXECUTIONS AND RESULTS ***/
+
+  $scope.executions = [];
+
+  //get the executions of the current project
+  function getExecutions() {
+    $http.get('/projects').success(function(response) {
+      for(proj in response) {
+        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+          //get the actions previously added
+          $scope.executions = response[proj]['executions'];
+          break;
+        }
+      }
+    });
   }
 
   //create new execution
@@ -962,10 +1011,12 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
           //define the date of the execution
           var current_date = new Date();
-          var exec_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear() + ' ' + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
+          var exec_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
+          var exec_time = + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
 
           new_exec['exec_id'] = exec_id;
           new_exec['date'] = exec_date;
+          new_exec['time'] = exec_time;
           new_exec['modules'] = modules;
           new_exec['connections'] = connections;
 
@@ -986,21 +1037,90 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         $http.post('/projects', proj_res).success(function() {
           //reload executions
           getExecutions();
+          //reset output fields
+          resetOutputFields();
         });
       });
     });
   }
 
-  //get the executions of the current project
-  function getExecutions() {
+  //execution selected to be deleted
+  $scope.exec_delete = '';
+
+  $scope.deleteExecution = function(exec) {
+    $scope.exec_delete = exec;
+    $('#delete-execution-modal').modal();
+  }
+
+  //delete a certain execution
+  $scope.confirmDeleteExecution = function() {
+    //get all created projects
     $http.get('/projects').success(function(response) {
+      //proj_res - new project document; id_doc - id of the old project document
+      var proj_res, id_doc;
+
+      //find the current project
       for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          //get the actions previously added
-          $scope.executions = response[proj]['executions'];
+        if(response[proj]['username'] == $scope.username && response[proj]['project_id'] == proj_id) {
+          //remove execution from the executions array
+          response[proj]['executions'].splice($scope.executions.indexOf($scope.exec_delete), 1);
+          //get the id of the document, so that it can be removed from the db
+          id_doc = response[proj]['_id'];
+          //project to store in the db
+          proj_res = response[proj];
+          delete proj_res['_id'];
           break;
         }
       }
+
+      //delete the previous document with the list of projects
+      $http.delete('/projects/' + id_doc).success(function() {
+        //add the new list of projects
+        $http.post('/projects', proj_res).success(function() {
+          //reload executions
+          getExecutions();
+          //reset selected execution to be deleted
+          $scope.exec_delete = '';
+        });
+      });
+    });
+  }
+
+  //open modal to confirm the deletion of all executions of the current project
+  $scope.deleteAllExecutions = function() {
+    if($scope.executions.length > 0)
+      $('#delete-all-executions-modal').modal();
+  }
+
+  //confirm the deletion of all executions of the current project
+  $scope.confirmDeleteAllExecutions = function() {
+    //get all created projects
+    $http.get('/projects').success(function(response) {
+      //proj_res - new project document; id_doc - id of the old project document
+      var proj_res, id_doc;
+
+      //find the current project
+      for(proj in response) {
+        if(response[proj]['username'] == $scope.username && response[proj]['project_id'] == proj_id) {
+          //remove execution from the executions array
+          response[proj]['executions'] = [];
+          //get the id of the document, so that it can be removed from the db
+          id_doc = response[proj]['_id'];
+          //project to store in the db
+          proj_res = response[proj];
+          delete proj_res['_id'];
+          break;
+        }
+      }
+
+      //delete the previous document with the list of projects
+      $http.delete('/projects/' + id_doc).success(function() {
+        //add the new list of projects
+        $http.post('/projects', proj_res).success(function() {
+          //reload executions
+          getExecutions();
+        });
+      });
     });
   }
 
@@ -1010,6 +1130,32 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   //define exec as the currently selected execution
   $scope.selectExecution = function(exec) {
     $scope.current_exec = exec;
+  }
+
+  $scope.current_exec_page = 0;
+
+  var exec_limit = 4;
+
+  $scope.incrementExecutionPage = function() {
+    if($scope.showIncrementPage())
+      $scope.current_exec_page = $scope.current_exec_page + exec_limit;
+  }
+
+  $scope.showIncrementPage = function() {
+    return $scope.current_exec_page + exec_limit < $scope.executions.length;
+  }
+
+  $scope.decrementExecutionPage = function() {
+    if($scope.showDecrementPage())
+      $scope.current_exec_page = $scope.current_exec_page - exec_limit;
+  }
+
+  $scope.showDecrementPage = function() {
+    return $scope.current_exec_page > 0;
+  }
+
+  $scope.checkPage = function(index) {
+    return $scope.current_exec_page <= index && index < exec_limit + $scope.current_exec_page;
   }
 
   /*** STARTUP FUNCTIONS ***/

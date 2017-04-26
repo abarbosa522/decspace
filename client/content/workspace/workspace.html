@@ -211,7 +211,7 @@
 
                   <div class = 'modal-header'>
                     <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-                    <h4 class = 'modal-title'>Input File</h4>
+                    <h4 class = 'modal-title'>Input File - {{currentModule.name}}</h4>
                   </div>
 
                   <div class = 'modal-body'>
@@ -243,7 +243,7 @@
 
                   <div class = 'modal-header'>
                     <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-                    <h4 class = 'modal-title'>OrderBy Method</h4>
+                    <h4 class = 'modal-title'>Module - OrderBy{{currentModule.name_id}}</h4>
                   </div>
 
                   <div class = 'modal-body'>
@@ -399,7 +399,7 @@
             <!-- OrderBy Template -->
             <template id = 'orderby-temp'>
               <div id = 'orderby' class = 'module-template draggable'>
-                <a href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#orderby-modal' ng-click = 'selectCurrentModule($event)'>OrderBy</a>
+                <a id = 'mod-name' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#orderby-modal' ng-click = 'selectCurrentModule($event)'></a>
 
                 <a href ng-click = 'deleteModule($event)' style = 'display: block; margin-top: -40%; margin-left: 108%'>
                   <span class = 'glyphicon glyphicon-remove'></span>
@@ -426,13 +426,35 @@
               <!-- Title - Executions -->
               <h4 class = 'panel-title'>Executions</h4>
             </div>
+
+            <!-- Up button -->
+            <button type = 'button' class = 'btn btn-default btn-block' ng-click = 'decrementExecutionPage()' ng-class = '{"disabled": !showDecrementPage()}' title = 'Previous Executions'>
+              <span class = 'glyphicon glyphicon-menu-up' ng-class = '{"blue_arrow" : showDecrementPage(), "black_arrow" : !showDecrementPage()}'></span>
+            </button>
+
             <!-- List of executions -->
             <ul class = 'list-group'>
-              <li class = 'list-group-item' ng-repeat = 'execution in executions' ng-click = 'selectExecution(execution)'>
-                <a href = '' data-toggle = 'modal' data-target = '#exec-modal'>{{execution.date}}</a>
+              <li class = 'list-group-item' ng-repeat = 'execution in executions' ng-click = 'selectExecution(execution)' ng-if = 'checkPage($index)'>
+                <!-- delete button -->
+                <a href ng-click = 'deleteExecution(execution)' style = 'position: absolute; margin-left: 60%; color: red'>
+                  <span class = 'glyphicon glyphicon-remove'></span>
+                </a>
+                <!-- modal open -->
+                <a href data-toggle = 'modal' data-target = '#exec-modal'>{{execution.date}}<br>{{execution.time}}</a>
               </li>
             </ul>
+
+            <!-- Down button -->
+            <button type = 'button' class = 'btn btn-default btn-block' ng-click = 'incrementExecutionPage()' ng-class = '{"disabled": !showIncrementPage()}' title = 'Next Executions'>
+              <span class = 'glyphicon glyphicon-menu-down' ng-class = '{"blue_arrow" : showIncrementPage(), "black_arrow" : !showIncrementPage()}'></span>
+            </button>
           </div>
+
+          <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteAllExecutions()' ng-class = '{"disabled" : executions.length == 0}' title = 'Delete All Executions'>
+            Delete All Executions
+          </button>
+
+          <!-- Executions Modals -->
 
           <!-- Execution Modal -->
           <div class = 'modal fade custom-modal' id = 'exec-modal' role = 'dialog'>
@@ -445,10 +467,10 @@
                 <div class = 'modal-body'>
                   <!-- Show input and output data of all modules -->
                   <div ng-repeat = 'mod in current_exec.modules'>
-                    <h2>{{mod.id}}</h2>
-
                     <!-- Input Files -->
                     <div ng-if = 'mod.type == "InputFile"'>
+                      <!-- Module Name -->
+                      <h2>{{mod.name}}</h2>
                       <!-- Output -->
                       <h3>Output</h3>
 
@@ -468,6 +490,8 @@
 
                     <!-- OrderBy Module -->
                     <div ng-if = 'mod.type == "OrderBy"'>
+                      <!-- Module Name -->
+                      <h2>OrderBy{{mod.name_id}}</h2>
                       <!-- Criteria -->
                       <h3>Criteria</h3>
 
@@ -495,7 +519,7 @@
 
                       <!-- Actions -->
                       <h3>Actions</h3>
-                      
+
                       <table class = 'table table-bordered table-hover'>
                         <thead>
                           <th class = 'text-center'>Action Name</th>
@@ -510,9 +534,87 @@
                       </table>
 
                       <!-- Output -->
-                      {{mod.output}}
+                      <h3>Output</h3>
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <th class = 'text-center'>Action Name</th>
+                          <th class = 'text-center' ng-repeat = 'criterion in mod.input.criteria'>{{criterion.name}}</th>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat = 'action in mod.output'>
+                            <td>{{action.name}}</td>
+                            <td ng-repeat = 'criterion in mod.input.criteria'>{{action[criterion.name]}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
 
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delete Execution Modal -->
+          <div class = 'modal fade' id = 'delete-execution-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>Are you sure you want to delete the execution created on {{exec_delete.date}} {{exec_delete.time}}?</h4>
+                </div>
+                <div class = 'modal-body'>
+                  <div class = 'row'>
+                    <div class = 'col-md-2'>
+                    </div>
+
+                    <div class = 'col-md-4'>
+                      <button type = 'button' class = 'btn btn-primary' ng-click = 'confirmDeleteExecution()' data-dismiss = 'modal' title = 'Confirm Execution Deletion'>
+                        Yes
+                      </button>
+                    </div>
+
+                    <div class = 'col-md-4'>
+                      <button type = 'button' class = 'btn btn-primary' data-dismiss = 'modal' title = 'Cancel Execution Deletion'>
+                        No
+                      </button>
+                    </div>
+
+                    <div class = 'col-md-2'>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delete All Executions Modal -->
+          <div class = 'modal fade' id = 'delete-all-executions-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>Are you sure you want to delete all executions?</h4>
+                </div>
+                <div class = 'modal-body'>
+                  <div class = 'row'>
+                    <div class = 'col-md-2'>
+                    </div>
+
+                    <div class = 'col-md-4'>
+                      <button type = 'button' class = 'btn btn-primary' ng-click = 'confirmDeleteAllExecutions()' data-dismiss = 'modal' title = 'Confirm Deletion Of All Executions'>
+                        Yes
+                      </button>
+                    </div>
+
+                    <div class = 'col-md-4'>
+                      <button type = 'button' class = 'btn btn-primary' data-dismiss = 'modal' title = 'Cancel Deletion Of All Executions'>
+                        No
+                      </button>
+                    </div>
+
+                    <div class = 'col-md-2'>
+                    </div>
                   </div>
                 </div>
               </div>
