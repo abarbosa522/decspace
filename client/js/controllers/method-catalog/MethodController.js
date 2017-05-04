@@ -28,10 +28,22 @@ app.controller('MethodController', function($scope, $window, $http) {
     });
   }
 
+  /*** EXPORT FUNCTION ***/
+  $scope.exportExampleData = function(method_name) {
+    var zip_file_path = '../../../content/method-catalog/examples/' + method_name + '/' + method_name + '.rar';
+    var zip_file_name = method_name + '.rar';
+    var a = document.createElement('a');
+    document.body.appendChild(a);
+    a.href = zip_file_path;
+    a.download = zip_file_name;
+    a.click();
+    document.body.removeChild(a);
+  }
+
   /*** SORT METHOD ***/
   $scope.sort_objects = [
-    {'name' : 'Object 1'},
     {'name' : 'Object 2'},
+    {'name' : 'Object 1'},
     {'name' : 'Object 3'}
   ];
 

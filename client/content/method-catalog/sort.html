@@ -98,8 +98,16 @@
 
           <br>
 
+          <!-- Export Button -->
+          <button type = 'button' class = 'btn btn-primary' title = 'Download Sort Example' ng-click = 'exportExampleData("Sort")' style = 'float: left'>
+            <span class = 'glyphicon glyphicon-download-alt icon-large'></span>
+          </button>
+
+          <br><br>
+
+          <!-- Example of Order -->
           <p class = 'header-5'>Order</p>
-          
+
           <ul class = 'draglist'>
             <li class = 'drop-obj' ng-repeat = 'obj in sort_objects'>
               <div class = 'drag-obj'>
@@ -109,6 +117,23 @@
               <p ng-if = '$index == sort_objects.length - 1'>Least Important</p>
             </li>
           </ul>
+
+          <br><br><br>
+
+          <!-- Example of Results -->
+          <p class = 'header-5'>Results</p>
+
+          <ul class = 'draglist'>
+            <li class = 'drop-obj' ng-repeat = 'obj in sort_objects'>
+              <div class = 'drag-obj'>
+                {{obj.name}}
+              </div>
+              <p ng-if = '$index == 0'>Most Important</p>
+              <p ng-if = '$index == sort_objects.length - 1'>Least Important</p>
+            </li>
+          </ul>
+
+          <br>
 
         </div>
       </div>
