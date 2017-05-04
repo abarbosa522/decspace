@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DecSpace - Method Catalog - Sort</title>
+
+    <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
+
+    <!-- CSS Stylesheet -->
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css'/>
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/sort.css' />
+
+    <!-- jQuery -->
+    <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
+    <script type = 'text/javascript' src = '../../js/shared/jquery-ui-1.12.0/jquery-ui.js'></script>
+
+    <!-- AngularJS -->
+    <script src = '../../js/shared/angular.min.js'></script>
+
+    <!-- AngularJS Modules -->
+    <script src = '../../js/app.js'></script>
+
+    <!-- AngularJS Controllers -->
+    <script src = '../../js/controllers/method-catalog/MethodController.js'></script>
+
+    <!-- Bootstrap -->
+    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
+    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.js'></script>
+
+    <!-- Google Web Fonts -->
+    <link href = 'https://fonts.googleapis.com/css?family=Open+Sans:400,600i' rel = 'stylesheet'>
+
+    <!-- ng-draggable module -->
+    <script src = '../../js/shared/ng-draggable/ngDraggable.js'></script>
+  </head>
+
+  <body ng-app = 'decspace' ng-controller = 'MethodController'>
+
+    <!-- Navigation Bar -->
+    <nav class = 'navbar navbar-custom navbar-fixed-top'>
+      <div class = 'container'>
+        <!-- Title -->
+        <div class = 'navbar-header'>
+          <a class = 'navbar-brand' href = '../dashboard/dashboard.html'>DecSpace</a>
+        </div>
+
+        <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
+        <ul class = 'nav navbar-nav navbar-right'>
+          <li>
+            <p class = 'navbar-text' style = 'font-weight:600;font-style:italic'>Welcome, {{name}}!</p>
+          </li>
+
+          <li><a href = '../homepage/about.html'>About</a></li>
+
+          <li><a href = '../homepage/faq.html'>FAQ</a></li>
+
+          <li><a href = '../homepage/contactus.html'>Contact Us</a></li>
+
+          <li>
+            <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'logOut()'>
+              <span class = 'glyphicon glyphicon-log-out'></span>
+              Log Out
+            </button>
+          </li>
+        </ul>
+
+      </div>
+    </nav>
+
+    <div id = 'main-content' class = 'container'>
+      <ul class = 'breadcrumb'>
+        <li><a href = '../dashboard/dashboard.html'>Dashboard</a></li>
+        <li><a href = 'method-catalog.html'>Method Catalog</a></li>
+        <li class = 'active'>Sort</li>
+      </ul>
+
+      <p class = 'header-1'>Method Catalog - Sort</p>
+
+      <br>
+
+      <!-- Main tabs - Method Description and Example -->
+      <ul class = 'nav nav-tabs nav-justified'>
+        <li role = 'presentation' class = 'active'><a data-toggle = 'tab' href= '#description'>Method Description</a></li>
+        <li role = 'presentation'><a data-toggle = 'tab' href= '#example'>Example</a></li>
+      </ul>
+
+      <div class = 'tab-content'>
+        <!-- Method Description -->
+        <div id = 'description' class = 'tab-pane fade in active' style = 'text-align: left'>
+
+          <br>
+
+          <p>Given 3 different objects, reorder them by their importance. The object on the left should be the most important and the object on the right should be the least important.</p>
+
+        </div>
+
+        <!-- Example -->
+        <div id = 'example' class = 'tab-pane fade'>
+
+          <br>
+
+          <p class = 'header-5'>Order</p>
+          
+          <ul class = 'draglist'>
+            <li class = 'drop-obj' ng-repeat = 'obj in sort_objects'>
+              <div class = 'drag-obj'>
+                {{obj.name}}
+              </div>
+              <p ng-if = '$index == 0'>Most Important</p>
+              <p ng-if = '$index == sort_objects.length - 1'>Least Important</p>
+            </li>
+          </ul>
+
+        </div>
+      </div>
+
+    </div>
+
+  </body>
+</html>

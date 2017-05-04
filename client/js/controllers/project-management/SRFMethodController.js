@@ -597,27 +597,39 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
     return new Array(count);
   };
 
-  //new row is always the new least important
-  $scope.addRanking = function() {
+  //increment the number of rankings
+  $scope.addRanking = function(index) {
+    for(criterion in $scope.criteria)
+      if($scope.criteria[criterion]['position'] > index)
+        $scope.criteria[criterion]['position']++;
+
+    for(white_card in $scope.white_cards)
+      if($scope.white_cards[white_card]['position'] > index)
+        $scope.white_cards[white_card]['position']++;
+
     $scope.ranking++;
   }
 
-  $scope.removeRanking = function() {
+  $scope.removeRanking = function(index) {
     //don't allow less than 2 rankings
-    if($scope.ranking > 2)
+    if($scope.ranking > 2) {
+
+      for(criterion in $scope.criteria) {
+        if($scope.criteria[criterion]['position'] > index)
+          $scope.criteria[criterion]['position']--;
+        else if($scope.criteria[criterion]['position'] == index)
+          $scope.criteria[criterion]['position'] = -1;
+      }
+
+      for(white_card in $scope.white_cards) {
+        if($scope.white_cards[white_card]['position'] > index)
+          $scope.white_cards[white_card]['position']--;
+        else if($scope.white_cards[white_card]['position'] == index)
+          $scope.white_cards[white_card]['position'] = -1;
+      }
+
       $scope.ranking--;
-
-    //check if there were any criteria cards dragged into the deleted ranking
-    //if there were, then reset their position
-    for(criterion in $scope.criteria)
-      if($scope.criteria[criterion]['position'] >= $scope.ranking)
-        $scope.criteria[criterion]['position'] = -1;
-
-    //check if there were any white cards dragged into the deleted ranking
-    //if there were, then reset their position
-    for(white_card in $scope.white_cards)
-      if($scope.white_cards[white_card]['position'] >= $scope.ranking)
-        $scope.white_cards[white_card]['position'] = -1;
+    }
   }
 
   /*** INPUT DATA - OTHER PARAMETERS ***/
@@ -639,7 +651,7 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
   //change a card's ranking position
   $scope.rankingDrop = function(data, index) {
     //if the white card on the original drop was dragged
-    if(data['white_card'] && data['id'] == 0) {
+    if(data['white_card'] && data['id'] == 0 && noCriteriaCards(index)) {
       var new_white_card = {
         'position' : index,
         'id' : $scope.white_cards.length + 1,
@@ -649,7 +661,7 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
       $scope.$apply($scope.white_cards.push(new_white_card));
     }
     //if a criteria card was dragged
-    else
+    else if(noWhiteCards(index))
       data['position'] = index;
   }
 
@@ -665,6 +677,24 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
       data['position'] = -1;
       $scope.$apply($scope.white_cards);
     }
+  }
+
+  //check if there are any white cards in the index ranking
+  function noCriteriaCards(index) {
+    for(criterion in $scope.criteria)
+      if($scope.criteria[criterion]['position'] == index)
+        return false;
+
+    return true;
+  }
+
+  //check if there are any criteria cards in the index ranking
+  function noWhiteCards(index) {
+    for(white in $scope.white_cards)
+      if($scope.white_cards[white]['position'] == index)
+        return false;
+
+    return true;
   }
 
   /*** EXECUTIONS AND RESULTS FUNCTIONS ***/

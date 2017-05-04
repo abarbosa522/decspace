@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DecSpace - Method Catalog - CAT-SD</title>
+
+    <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
+
+    <!-- CSS Stylesheet -->
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css' />
+
+    <!-- jQuery -->
+    <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
+    <script type = 'text/javascript' src = '../../js/shared/jquery-ui-1.12.0/jquery-ui.js'></script>
+
+    <!-- AngularJS -->
+    <script src = '../../js/shared/angular.min.js'></script>
+
+    <!-- AngularJS Modules -->
+    <script src = '../../js/app.js'></script>
+
+    <!-- AngularJS Controllers -->
+    <script src = '../../js/controllers/method-catalog/MethodController.js'></script>
+
+    <!-- Bootstrap -->
+    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
+    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.js'></script>
+
+    <!-- Google Web Fonts -->
+    <link href = 'https://fonts.googleapis.com/css?family=Open+Sans:400,600i' rel = 'stylesheet'>
+
+    <!-- ng-draggable module -->
+    <script src = '../../js/shared/ng-draggable/ngDraggable.js'></script>
+
+    <!-- MathJax -->
+    <script type = 'text/x-mathjax-config'>
+      MathJax.Hub.Config({
+        CommonHTML: {
+          scale: 90,
+          linebreaks: { automatic: true }
+        }
+      });
+    </script>
+    <script type = 'text/javascript' async src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=AM_CHTML'></script>
+  </head>
+
+  <body ng-app = 'decspace' ng-controller = 'MethodController'>
+
+    <!-- Navigation Bar -->
+    <nav class = 'navbar navbar-custom navbar-fixed-top'>
+      <div class = 'container'>
+        <!-- Title -->
+        <div class = 'navbar-header'>
+          <a class = 'navbar-brand' href = '../dashboard/dashboard.html'>DecSpace</a>
+        </div>
+
+        <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
+        <ul class = 'nav navbar-nav navbar-right'>
+          <li>
+            <p class = 'navbar-text' style = 'font-weight:600;font-style:italic'>Welcome, {{name}}!</p>
+          </li>
+
+          <li><a href = '../homepage/about.html'>About</a></li>
+
+          <li><a href = '../homepage/faq.html'>FAQ</a></li>
+
+          <li><a href = '../homepage/contactus.html'>Contact Us</a></li>
+
+          <li>
+            <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'logOut()'>
+              <span class = 'glyphicon glyphicon-log-out'></span>
+              Log Out
+            </button>
+          </li>
+        </ul>
+
+      </div>
+    </nav>
+
+    <div id = 'main-content' class = 'container'>
+      <ul class = 'breadcrumb'>
+        <li><a href = '../dashboard/dashboard.html'>Dashboard</a></li>
+        <li><a href = 'method-catalog.html'>Method Catalog</a></li>
+        <li class = 'active'>CAT-SD</li>
+      </ul>
+
+      <p class = 'header-1'>Method Catalog - CAT-SD</p>
+
+      <br>
+
+      <!-- Main tabs - Method Description and Example -->
+      <ul class = 'nav nav-tabs nav-justified'>
+        <li role = 'presentation' class = 'active'><a data-toggle = 'tab' href= '#description'>Method Description</a></li>
+        <li role = 'presentation'><a data-toggle = 'tab' href= '#example'>Example</a></li>
+      </ul>
+
+      <div class = 'tab-content'>
+        <!-- Method Description -->
+        <div id = 'description' class = 'tab-pane fade in active' style = 'text-align: left'>
+
+          <br>
+
+          <p>A new multiple criteria decision-aiding method for nominal classification problems where the categories are pre-defined and no order exists among them.</p>
+          <p>It consists of assigning each action, assessed according to multiple criteria, to at least one category.</p>
+
+        </div>
+
+        <!-- Example -->
+        <div id = 'example' class = 'tab-pane fade'>
+
+          <br>
+
+          <!-- Example of Criteria -->
+          <p class = 'header-5'>Criteria</p>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center'>Name</th>
+                <th class = 'text-center'>Direction</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Physical Fitness</td>
+                <td>Minimize</td>
+              </tr>
+              <tr>
+                <td>Mental Sharpness</td>
+                <td>Maximize</td>
+              </tr>
+              <tr>
+                <td>Mental Resilience</td>
+                <td>Maximize</td>
+              </tr>
+              <tr>
+                <td>Intelligence</td>
+                <td>Maximize</td>
+              </tr>
+              <tr>
+                <td>Teamwork Skills</td>
+                <td>Maximize</td>
+              </tr>
+              <tr>
+                <td>Motivation</td>
+                <td>Maximize</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Example of Interaction Effects -->
+          <p class = 'header-5'>Interaction Effects</p>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center'>Type Of Effect</th>
+                <th class = 'text-center'>Criterion 1</th>
+                <th class = 'text-center'>Criterion 2</th>
+                <th class = 'text-center'>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Mutual-Strengthening Effects</td>
+                <td>Mental Sharpness</td>
+                <td>Mental Resilience</td>
+                <td>10</td>
+              </tr>
+              <tr>
+                <td>Mutual-Weakening Effects</td>
+                <td>Physical Fitness</td>
+                <td>Teamwork Skills</td>
+                <td>-4</td>
+              </tr>
+              <tr>
+                <td>Antagonistic Effect</td>
+                <td>Physical Fitness</td>
+                <td>Intelligence</td>
+                <td>-3</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Example of Scales and Functions -->
+          <p class = 'header-5'>Scales and Functions</p>
+
+          <!-- Criterion: Physical Fitness -->
+          <p class = 'header-6'>Physical Fitness</p>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center'>Type</th>
+                <th class = 'text-center'>Minimum Value</th>
+                <th class = 'text-center'>Maximum Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Numerical</td>
+                <td>370</td>
+                <td>1281</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center col-md-6'>Function</th>
+                <th class = 'text-center col-md-6'>Condition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><p math-jax-bind = '"1"'></p></td>
+                <td><p math-jax-bind = '"abs(x-y)<=50"'></p></td>
+              </tr>
+              <tr>
+                <td><p math-jax-bind = '"(100-abs(x-y))/50"'></p></td>
+                <td><p math-jax-bind = '"50<abs(x-y) and abs(x-y)<=100"'></p></td>
+              </tr>
+              <tr>
+                <td><p math-jax-bind = '"0"'></p></td>
+                <td><p math-jax-bind = '"100<abs(x-y) and abs(x-y)<=150"'></p></td>
+              </tr>
+              <tr>
+                <td><p math-jax-bind = '"(150-abs(x-y))/50"'></p></td>
+                <td><p math-jax-bind = '"150<abs(x-y) and abs(x-y)<=200"'></p></td>
+              </tr>
+              <tr>
+                <td><p math-jax-bind = '"-1"'></p></td>
+                <td><p math-jax-bind = '"abs(x-y)>200"'></p></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Criterion: Mental Sharpness -->
+          <p class = 'header-6'>Mental Sharpness</p>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center'>Type</th>
+                <th class = 'text-center'>Minimum Value</th>
+                <th class = 'text-center'>Maximum Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Numerical</td>
+                <td>35</td>
+                <td>99</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center col-md-6'>Function</th>
+                <th class = 'text-center col-md-6'>Condition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><p math-jax-bind = '"1"'></p></td>
+                <td><p math-jax-bind = '"abs(x-y)<=5"'></p></td>
+              </tr>
+              <tr>
+                <td><p math-jax-bind = '"(10-abs(x-y))/5"'></p></td>
+                <td><p math-jax-bind = '"5<abs(x-y) and abs(x-y)<=10"'></p></td>
+              </tr>
+              <tr>
+                <td><p math-jax-bind = '"0"'></p></td>
+                <td><p math-jax-bind = '"(y-20<x and x<=y-10) or (y+10<x and x<=y+15)"'></p></td>
+              </tr>
+              <tr>
+                <td><p math-jax-bind = '"(x-y+20)/5"'></p></td>
+                <td><p math-jax-bind = '"y-25<x and x<=y-20"'></p></td>
+              </tr>
+              <tr>
+                <td><p math-jax-bind = '"(-(x-y)+15)/5"'></p></td>
+                <td><p math-jax-bind = '"y+15<x and x<=y+20"'></p></td>
+              </tr>
+              <tr>
+                <td><p math-jax-bind = '"-1"'></p></td>
+                <td><p math-jax-bind = '"x<=y-25 or x>=y+20"'></p></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Criterion: Mental Resilience -->
+          <p class = 'header-6'>Mental Resilience</p>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center'>Type</th>
+                <th class = 'text-center'>Number of Categories</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Categorical</td>
+                <td>4</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center col-md-6'>Function</th>
+                <th class = 'text-center col-md-6'>Condition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><p math-jax-bind = '"1"'></p></td>
+                <td><p math-jax-bind = '"x=y"'></p></td>
+              </tr>
+              <tr>
+                <td><p math-jax-bind = '"-1"'></p></td>
+                <td><p math-jax-bind = '"abs(x-y)>=1"'></p></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Criterion: Intelligence -->
+          <p class = 'header-6'>Intelligence</p>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center'>Type</th>
+                <th class = 'text-center'>Number of Categories</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Categorical</td>
+                <td>7</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center col-md-6'>Function</th>
+                <th class = 'text-center col-md-6'>Condition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><p math-jax-bind = '"1"'></p></td>
+                <td><p math-jax-bind = '"x=y"'></p></td>
+              </tr>
+              <tr>
+                <td><p math-jax-bind = '"0"'></p></td>
+                <td><p math-jax-bind = '"abs(x-y)=1"'></p></td>
+              </tr>
+              <tr>
+                <td><p math-jax-bind = '"-1"'></p></td>
+                <td><p math-jax-bind = '"abs(x-y)>=2"'></p></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Criterion: Teamwork Skills -->
+          <p class = 'header-6'>Teamwork Skills</p>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center'>Type</th>
+                <th class = 'text-center'>Number of Categories</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Categorical</td>
+                <td>7</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center col-md-6'>Function</th>
+                <th class = 'text-center col-md-6'>Condition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><p math-jax-bind = '"1"'></p></td>
+                <td><p math-jax-bind = '"x=y"'></p></td>
+              </tr>
+              <tr>
+                <td><p math-jax-bind = '"0"'></p></td>
+                <td><p math-jax-bind = '"abs(x-y)=1"'></p></td>
+              </tr>
+              <tr>
+                <td><p math-jax-bind = '"-1"'></p></td>
+                <td><p math-jax-bind = '"abs(x-y)>=2"'></p></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Criterion: Motivation -->
+          <p class = 'header-6'>Motivation</p>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center'>Type</th>
+                <th class = 'text-center'>Number of Categories</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Categorical</td>
+                <td>7</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center col-md-6'>Function</th>
+                <th class = 'text-center col-md-6'>Condition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><p math-jax-bind = '"1"'></p></td>
+                <td><p math-jax-bind = '"x=y"'></p></td>
+              </tr>
+              <tr>
+                <td><p math-jax-bind = '"0"'></p></td>
+                <td><p math-jax-bind = '"abs(x-y)=1"'></p></td>
+              </tr>
+              <tr>
+                <td><p math-jax-bind = '"-1"'></p></td>
+                <td><p math-jax-bind = '"abs(x-y)>=2"'></p></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Example of Actions -->
+          <p class = 'header-5'>Actions</p>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center'>Action Name</th>
+                <th class = 'text-center'>Physical Fitness</th>
+                <th class = 'text-center'>Mental Sharpness</th>
+                <th class = 'text-center'>Mental Resilience</th>
+                <th class = 'text-center'>Intelligence</th>
+                <th class = 'text-center'>Teamwork Skills</th>
+                <th class = 'text-center'>Motivation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>a1</td>
+                <td>740</td>
+                <td>74</td>
+                <td>4</td>
+                <td>7</td>
+                <td>4</td>
+                <td>6</td>
+              </tr>
+              <tr>
+                <td>a2</td>
+                <td>950</td>
+                <td>82</td>
+                <td>2</td>
+                <td>4</td>
+                <td>4</td>
+                <td>4</td>
+              </tr>
+              <tr>
+                <td>a3</td>
+                <td>720</td>
+                <td>58</td>
+                <td>3</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+              </tr>
+              <tr>
+                <td>a4</td>
+                <td>920</td>
+                <td>78</td>
+                <td>2</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+              </tr>
+              <tr>
+                <td>a5</td>
+                <td>850</td>
+                <td>66</td>
+                <td>3</td>
+                <td>5</td>
+                <td>6</td>
+                <td>5</td>
+              </tr>
+              <tr>
+                <td>a6</td>
+                <td>1100</td>
+                <td>70</td>
+                <td>4</td>
+                <td>5</td>
+                <td>5</td>
+                <td>6</td>
+              </tr>
+              <tr>
+                <td>a7</td>
+                <td>710</td>
+                <td>73</td>
+                <td>3</td>
+                <td>6</td>
+                <td>5</td>
+                <td>6</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Example of Categories -->
+          <p class = 'header-5'>Categories</p>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center' rowspan = '2'>Category Name</th>
+                <th class = 'text-center' rowspan = '2'>Membership Degree</th>
+                <th class = 'text-center' colspan = '6'>Criteria Weights</th>
+              </tr>
+              <tr>
+                <th class = 'text-center'>Physical Fitness</th>
+                <th class = 'text-center'>Mental Sharpness</th>
+                <th class = 'text-center'>Mental Resilience</th>
+                <th class = 'text-center'>Intelligence</th>
+                <th class = 'text-center'>Teamwork Skills</th>
+                <th class = 'text-center'>Motivation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Snipers</td>
+                <td>0.75</td>
+                <td>10</td>
+                <td>15</td>
+                <td>20</td>
+                <td>20</td>
+                <td>5</td>
+                <td>15</td>
+              </tr>
+              <tr>
+                <td>Breachers</td>
+                <td>0.60</td>
+                <td>25</td>
+                <td>15</td>
+                <td>20</td>
+                <td>5</td>
+                <td>10</td>
+                <td>5</td>
+              </tr>
+              <tr>
+                <td>Communications Operators</td>
+                <td>0.65</td>
+                <td>10</td>
+                <td>20</td>
+                <td>15</td>
+                <td>20</td>
+                <td>15</td>
+                <td>10</td>
+              </tr>
+              <tr>
+                <td>Heavy Weapons Operators</td>
+                <td>0.60</td>
+                <td>25</td>
+                <td>5</td>
+                <td>15</td>
+                <td>5</td>
+                <td>20</td>
+                <td>10</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Example of Reference Actions -->
+          <p class = 'header-5'>Reference Actions</p>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <th class = 'text-center'>Category</th>
+              <th class = 'text-center'>Physical Fitness</th>
+              <th class = 'text-center'>Mental Sharpness</th>
+              <th class = 'text-center'>Mental Resilience</th>
+              <th class = 'text-center'>Intelligence</th>
+              <th class = 'text-center'>Teamwork Skills</th>
+              <th class = 'text-center'>Motivation</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td rowspan = '2'>Snipers</td>
+                <td>700</td>
+                <td>80</td>
+                <td>4</td>
+                <td>6</td>
+                <td>4</td>
+                <td>6</td>
+              </tr>
+              <tr>
+                <td>750</td>
+                <td>75</td>
+                <td>4</td>
+                <td>7</td>
+                <td>4</td>
+                <td>7</td>
+              </tr>
+              <tr>
+                <td>Breachers</td>
+                <td>800</td>
+                <td>70</td>
+                <td>3</td>
+                <td>6</td>
+                <td>6</td>
+                <td>6</td>
+              </tr>
+              <tr>
+                <td rowspan = '2'>Communications Operators</td>
+                <td>1000</td>
+                <td>85</td>
+                <td>2</td>
+                <td>5</td>
+                <td>4</td>
+                <td>4</td>
+              </tr>
+              <tr>
+                <td>950</td>
+                <td>80</td>
+                <td>2</td>
+                <td>5</td>
+                <td>4</td>
+                <td>5</td>
+              </tr>
+              <tr>
+                <td>Heavy Weapons Operators</td>
+                <td>700</td>
+                <td>60</td>
+                <td>3</td>
+                <td>5</td>
+                <td>6</td>
+                <td>5</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Example of Output -->
+          <p class = 'header-5'>Output</p>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center'>Action Name</th>
+                <th class = 'text-center'>Snipers</th>
+                <th class = 'text-center'>Breachers</th>
+                <th class = 'text-center'>Communications Operators</th>
+                <th class = 'text-center'>Heavy Weapons Operators</th>
+                <th class = 'text-center'>Not Assigned</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>a1</td>
+                <td><span class = 'glyphicon glyphicon-ok' style = 'color: green'></span></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>a2</td>
+                <td></td>
+                <td></td>
+                <td><span class = 'glyphicon glyphicon-ok' style = 'color: green'></span></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>a3</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><span class = 'glyphicon glyphicon-ok' style = 'color: green'></span></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>a4</td>
+                <td></td>
+                <td></td>
+                <td><span class = 'glyphicon glyphicon-ok' style = 'color: green'></span></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>a5</td>
+                <td></td>
+                <td><span class = 'glyphicon glyphicon-ok' style = 'color: green'></span></td>
+                <td></td>
+                <td><span class = 'glyphicon glyphicon-ok' style = 'color: green'></span></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>a6</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><span class = 'glyphicon glyphicon-ok' style = 'color: green'></span></td>
+              </tr>
+              <tr>
+                <td>a7</td>
+                <td></td>
+                <td><span class = 'glyphicon glyphicon-ok' style = 'color: green'></span></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </body>
+</html>

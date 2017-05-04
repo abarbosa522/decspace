@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DecSpace - Method Catalog - OrderBy</title>
+
+    <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
+
+    <!-- CSS Stylesheet -->
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css' />
+
+    <!-- jQuery -->
+    <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
+    <script type = 'text/javascript' src = '../../js/shared/jquery-ui-1.12.0/jquery-ui.js'></script>
+
+    <!-- AngularJS -->
+    <script src = '../../js/shared/angular.min.js'></script>
+
+    <!-- AngularJS Modules -->
+    <script src = '../../js/app.js'></script>
+
+    <!-- AngularJS Controllers -->
+    <script src = '../../js/controllers/method-catalog/MethodController.js'></script>
+
+    <!-- Bootstrap -->
+    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
+    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.js'></script>
+
+    <!-- Google Web Fonts -->
+    <link href = 'https://fonts.googleapis.com/css?family=Open+Sans:400,600i' rel = 'stylesheet'>
+
+    <!-- ng-draggable module -->
+    <script src = '../../js/shared/ng-draggable/ngDraggable.js'></script>
+  </head>
+
+  <body ng-app = 'decspace' ng-controller = 'MethodController'>
+
+    <!-- Navigation Bar -->
+    <nav class = 'navbar navbar-custom navbar-fixed-top'>
+      <div class = 'container'>
+        <!-- Title -->
+        <div class = 'navbar-header'>
+          <a class = 'navbar-brand' href = '../dashboard/dashboard.html'>DecSpace</a>
+        </div>
+
+        <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
+        <ul class = 'nav navbar-nav navbar-right'>
+          <li>
+            <p class = 'navbar-text' style = 'font-weight:600;font-style:italic'>Welcome, {{name}}!</p>
+          </li>
+
+          <li><a href = '../homepage/about.html'>About</a></li>
+
+          <li><a href = '../homepage/faq.html'>FAQ</a></li>
+
+          <li><a href = '../homepage/contactus.html'>Contact Us</a></li>
+
+          <li>
+            <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'logOut()'>
+              <span class = 'glyphicon glyphicon-log-out'></span>
+              Log Out
+            </button>
+          </li>
+        </ul>
+
+      </div>
+    </nav>
+
+    <div id = 'main-content' class = 'container'>
+      <ul class = 'breadcrumb'>
+        <li><a href = '../dashboard/dashboard.html'>Dashboard</a></li>
+        <li><a href = 'method-catalog.html'>Method Catalog</a></li>
+        <li class = 'active'>OrderBy</li>
+      </ul>
+
+      <p class = 'header-1'>Method Catalog - OrderBy</p>
+
+      <br>
+
+      <!-- Main tabs - Method Description and Example -->
+      <ul class = 'nav nav-tabs nav-justified'>
+        <li role = 'presentation' class = 'active'><a data-toggle = 'tab' href= '#description'>Method Description</a></li>
+        <li role = 'presentation'><a data-toggle = 'tab' href= '#example'>Example</a></li>
+      </ul>
+
+      <div class = 'tab-content'>
+        <!-- Method Description -->
+        <div id = 'description' class = 'tab-pane fade in active' style = 'text-align: left'>
+
+          <br>
+
+          <p>Orders a given group of actions by a certain criterion in a specific direction (ascendant and descendant).</p>
+
+        </div>
+
+        <!-- Example -->
+        <div id = 'example' class = 'tab-pane fade'>
+
+          <br>
+
+          <!-- Example of Criteria -->
+          <p class = 'header-5'>Criteria</p>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center'>Order By</th>
+                <th class = 'text-center'>Criterion Name</th>
+                <th class = 'text-center'>Type</th>
+                <th class = 'text-center'>Direction</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class = 'glyphicon glyphicon-remove' style = 'color: red'></span></td>
+                <td>Age</td>
+                <td>Number</td>
+                <td>Descendant</td>
+              </tr>
+              <tr>
+                <td><span class = 'glyphicon glyphicon-ok' style = 'color: green'></span></td>
+                <td>Favorite Color</td>
+                <td>Text</td>
+                <td>Ascendant</td>
+              </tr>
+              <tr>
+                <td><span class = 'glyphicon glyphicon-remove' style = 'color: red'></span></td>
+                <td>Favorite Song</td>
+                <td>Text</td>
+                <td>Descendant</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Example of Actions -->
+          <p class = 'header-5'>Actions</p>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center'>Action Name</th>
+                <th class = 'text-center'>Age</th>
+                <th class = 'text-center'>Favorite Color</th>
+                <th class = 'text-center'>Favorite Song</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>John</td>
+                <td>15</td>
+                <td>Red</td>
+                <td>Round4Round</td>
+              </tr>
+              <tr>
+                <td>Richard</td>
+                <td>22</td>
+                <td>Blue</td>
+                <td>Where It's At</td>
+              </tr>
+              <tr>
+                <td>Jackie</td>
+                <td>21</td>
+                <td>Green</td>
+                <td>Out On The Tiles</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Example of Output -->
+          <p class = 'header-5'>Output</p>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center'>Action Name</th>
+                <th class = 'text-center'>Age</th>
+                <th class = 'text-center'>Favorite Color</th>
+                <th class = 'text-center'>Favorite Song</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Richard</td>
+                <td>22</td>
+                <td>Blue</td>
+                <td>Where It's At</td>
+              </tr>
+              <tr>
+                <td>Jackie</td>
+                <td>21</td>
+                <td>Green</td>
+                <td>Out On The Tiles</td>
+              </tr>
+              <tr>
+                <td>John</td>
+                <td>15</td>
+                <td>Red</td>
+                <td>Round4Round</td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+
+    </div>
+
+  </body>
+</html>

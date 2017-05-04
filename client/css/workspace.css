@@ -58,10 +58,23 @@
   margin-left: 30%;
 }
 
+/*** EXECUTION MENU ARROWS ***/
+
 .blue_arrow {
   color: blue;
 }
 
 .black_arrow {
   color: black;
+}
+
+/*** CONNECTOR LINES ***/
+
+line {
+  stroke: green;
+  stroke-width: 3;
+}
+
+line:hover {
+  stroke-width: 5;
 }

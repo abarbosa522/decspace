@@ -454,35 +454,35 @@
                 <p ng-if = '$index == ranking - 1'>Least Important</p>
               </div>
 
-              <div class = 'col-md-10' ng-drop = 'true' ng-drop-success = 'rankingDrop($data, $index)'>
-                <ul class = 'draggable-objects'>
-                  <!-- Dragged Criteria -->
-                  <li ng-repeat = 'criterion in criteria' ng-if = 'criterion.position == $parent.$index'>
-                    <div class = 'criteria-card' ng-drag = 'true' ng-drag-data = 'criterion' data-allow-transform = 'true' title = '{{criterion.name}}'>
-                      {{criterion.name}}
-                    </div>
-                  </li>
-                  <!-- Dragged White Cards -->
-                  <li ng-repeat = 'white_card in white_cards' ng-if = 'white_card.position == $parent.$index'>
-                    <div class = 'white-card' ng-drag = 'true' ng-drag-data = 'white_card' data-allow-transform = 'true'>
-                    </div>
-                  </li>
-                </ul>
+              <div class = 'col-md-9'>
+                <div ng-drop = 'true' ng-drop-success = 'rankingDrop($data, $index)'>
+                  <ul class = 'draggable-objects'>
+                    <!-- Dragged Criteria -->
+                    <li ng-repeat = 'criterion in criteria' ng-if = 'criterion.position == $parent.$index'>
+                      <div class = 'criteria-card' ng-drag = 'true' ng-drag-data = 'criterion' data-allow-transform = 'true' title = '{{criterion.name}}'>
+                        {{criterion.name}}
+                      </div>
+                    </li>
+                    <!-- Dragged White Cards -->
+                    <li ng-repeat = 'white_card in white_cards' ng-if = 'white_card.position == $parent.$index'>
+                      <div class = 'white-card' ng-drag = 'true' ng-drag-data = 'white_card' data-allow-transform = 'true'></div>
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Add Drop Div Button -->
+                <button type = 'button' class = 'btn btn-success' ng-click = 'addRanking($index)' title = 'Add Ranking' ng-if = '$index != ranking - 1' style = 'margin-top: 1%; margin-left: 7%'>
+                  <span class = 'glyphicon glyphicon-plus'></span>
+                </button>
+              </div>
+
+              <div class = 'col-md-1'>
+                <!-- Delete Drop Div Button -->
+                <button type = 'button' class = 'btn btn-danger' ng-click = 'removeRanking($index)' title = 'Remove Ranking' ng-if = '$index != 0 && $index != ranking - 1'>
+                  <span class = 'glyphicon glyphicon-minus'></span>
+                </button>
               </div>
             </div>
-
-            <br>
-
-            <div class = 'row'>
-              <button type = 'button' class = 'btn btn-success' ng-click = 'addRanking()' title = 'Add Ranking'>
-                <span class = 'glyphicon glyphicon-plus'></span>
-              </button>
-
-              <button type = 'button' class = 'btn btn-danger' ng-click = 'removeRanking()' title = 'Remove Ranking'>
-                <span class = 'glyphicon glyphicon-minus'></span>
-              </button>
-            </div>
-
           </div>
 
           <br>
@@ -541,6 +541,8 @@
             </div>
 
           </div>
+
+          <br>
 
         </div>
 

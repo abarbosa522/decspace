@@ -461,94 +461,126 @@
             <div class = 'modal-dialog'>
               <div class = 'modal-content'>
                 <div class = 'modal-header'>
+                  <!-- Dropdown Button -->
+                  <div class = 'dropdown row' style = 'float: left; margin-left: 1%'>
+                    <button class = 'btn btn-primary dropdown-toggle' type = 'button' data-toggle = 'dropdown' aria-haspopup = 'true' aria-expanded = 'true' title = 'Compare Executions'>
+                      <span class = 'glyphicon glyphicon-transfer'></span>
+                    </button>
+
+                    <ul class = 'dropdown-menu' aria-labelledby = 'dropdownbtn'>
+                      <li ng-repeat = 'execution in executions' ng-if = 'execution != current_exec'>
+                        <a href ng-click = 'selectCompareExecution(execution)'>Execution {{execution.exec_id}}</a>
+                      </li>
+                      <li role = 'separator' class = 'divider'></li>
+                      <li><a href ng-click = 'selectCompareExecution("")'>None</a></li>
+                    </ul>
+                  </div>
+
+                  <!-- Close Button -->
                   <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-                  <h4 class = 'modal-title'>Execution {{current_exec.exec_id}}</h4>
+
+                  <!-- Execution Title -->
+                  <p class = 'header-1' ng-if = 'compare_exec == ""'>Execution {{current_exec.exec_id}}</p>
+                  <p class = 'header-1' ng-if = 'compare_exec != ""'>Execution {{current_exec.exec_id}} - Execution {{compare_exec.exec_id}}</p>
                 </div>
+
                 <div class = 'modal-body'>
-                  <!-- Show input and output data of all modules -->
-                  <div ng-repeat = 'mod in current_exec.modules'>
-                    <!-- Input Files -->
-                    <div ng-if = 'mod.type == "InputFile"'>
-                      <!-- Module Name -->
-                      <h2>{{mod.name}}</h2>
-                      <!-- Output -->
-                      <h3>Output</h3>
+                  <div class = 'container'>
+                    <div ng-repeat = 'exec in checkCompareExecution()'>
+                      <div ng-class = '{"col-md-6": compare_exec != ""}'>
+                        <!-- Show input and output data of all modules -->
+                        <div ng-repeat = 'mod in exec.modules'>
+                          <!-- Input Files -->
+                          <div ng-if = 'mod.type == "InputFile"'>
+                            <!-- Module Name -->
+                            <p class = 'header-7'>{{mod.name}}</p>
+                            <!-- Output -->
+                            <p class = 'header-8'>Output</p>
 
-                      <table class = 'table table-bordered table-hover'>
-                        <thead>
-                          <tr>
-                            <th class = 'text-center' ng-repeat = '(key, value) in mod.output[0]' ng-if = 'key != "id"'>{{key}}</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr ng-repeat = 'item in mod.output'>
-                            <td ng-repeat = '(key, value) in item' ng-if = 'key != "id"'>{{value}}</td>
-                          </tr>
-                        </tbody>
-                      </table>
+                            <table class = 'table table-bordered table-hover'>
+                              <thead>
+                                <tr>
+                                  <th class = 'text-center' ng-repeat = '(key, value) in mod.output[0]' ng-if = 'key != "id"'>{{key}}</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr ng-repeat = 'item in mod.output'>
+                                  <td ng-repeat = '(key, value) in item' ng-if = 'key != "id"'>{{value}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+
+                            <!-- Horizontal Divider -->
+                            <br><hr class = 'custom-hr'><br>
+                          </div>
+
+                          <!-- OrderBy Module -->
+                          <div ng-if = 'mod.type == "OrderBy"'>
+                            <!-- Module Name -->
+                            <p class = 'header-7'>OrderBy{{mod.name_id}}</p>
+                            <!-- Criteria -->
+                            <p class = 'header-8'>Criteria</p>
+
+                            <table class = 'table table-bordered table-hover'>
+                              <thead>
+                                <tr>
+                                  <th class = 'text-center'>Order By</th>
+                                  <th class = 'text-center'>Criterion Name</th>
+                                  <th class = 'text-center'>Type</th>
+                                  <th class = 'text-center'>Direction</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr ng-repeat = 'criterion in mod.input.criteria'>
+                                  <td>
+                                    <span class = 'glyphicon glyphicon-ok' ng-if = 'criterion.selected == "true"' style = 'color: green'></span>
+                                    <span class = 'glyphicon glyphicon-remove' ng-if = 'criterion.selected == "false"' style = 'color: red'></span>
+                                  </td>
+                                  <td>{{criterion.name}}</td>
+                                  <td>{{criterion.type}}</td>
+                                  <td>{{criterion.direction}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+
+                            <!-- Actions -->
+                            <p class = 'header-8'>Actions</p>
+
+                            <table class = 'table table-bordered table-hover'>
+                              <thead>
+                                <th class = 'text-center'>Action Name</th>
+                                <th class = 'text-center' ng-repeat = 'criterion in mod.input.criteria'>{{criterion.name}}</th>
+                              </thead>
+                              <tbody>
+                                <tr ng-repeat = 'action in mod.input.actions'>
+                                  <td>{{action.name}}</td>
+                                  <td ng-repeat = 'criterion in mod.input.criteria'>{{action[criterion.name]}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+
+                            <!-- Output -->
+                            <p class = 'header-8'>Output</p>
+
+                            <table class = 'table table-bordered table-hover'>
+                              <thead>
+                                <th class = 'text-center'>Action Name</th>
+                                <th class = 'text-center' ng-repeat = 'criterion in mod.input.criteria'>{{criterion.name}}</th>
+                              </thead>
+                              <tbody>
+                                <tr ng-repeat = 'action in mod.output'>
+                                  <td>{{action.name}}</td>
+                                  <td ng-repeat = 'criterion in mod.input.criteria'>{{action[criterion.name]}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+
+                            <!-- Horizontal Divider -->
+                            <br><hr class = 'custom-hr'><br>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-
-                    <!-- OrderBy Module -->
-                    <div ng-if = 'mod.type == "OrderBy"'>
-                      <!-- Module Name -->
-                      <h2>OrderBy{{mod.name_id}}</h2>
-                      <!-- Criteria -->
-                      <h3>Criteria</h3>
-
-                      <table class = 'table table-bordered table-hover'>
-                        <thead>
-                          <tr>
-                            <th class = 'text-center'>Order By</th>
-                            <th class = 'text-center'>Criterion Name</th>
-                            <th class = 'text-center'>Type</th>
-                            <th class = 'text-center'>Direction</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr ng-repeat = 'criterion in mod.input.criteria'>
-                            <td>
-                              <span class = 'glyphicon glyphicon-ok' ng-if = 'criterion.selected == "true"' style = 'color: green'></span>
-                              <span class = 'glyphicon glyphicon-remove' ng-if = 'criterion.selected == "false"' style = 'color: red'></span>
-                            </td>
-                            <td>{{criterion.name}}</td>
-                            <td>{{criterion.type}}</td>
-                            <td>{{criterion.direction}}</td>
-                          </tr>
-                        </tbody>
-                      </table>
-
-                      <!-- Actions -->
-                      <h3>Actions</h3>
-
-                      <table class = 'table table-bordered table-hover'>
-                        <thead>
-                          <th class = 'text-center'>Action Name</th>
-                          <th class = 'text-center' ng-repeat = 'criterion in mod.input.criteria'>{{criterion.name}}</th>
-                        </thead>
-                        <tbody>
-                          <tr ng-repeat = 'action in mod.input.actions'>
-                            <td>{{action.name}}</td>
-                            <td ng-repeat = 'criterion in mod.input.criteria'>{{action[criterion.name]}}</td>
-                          </tr>
-                        </tbody>
-                      </table>
-
-                      <!-- Output -->
-                      <h3>Output</h3>
-                      <table class = 'table table-bordered table-hover'>
-                        <thead>
-                          <th class = 'text-center'>Action Name</th>
-                          <th class = 'text-center' ng-repeat = 'criterion in mod.input.criteria'>{{criterion.name}}</th>
-                        </thead>
-                        <tbody>
-                          <tr ng-repeat = 'action in mod.output'>
-                            <td>{{action.name}}</td>
-                            <td ng-repeat = 'criterion in mod.input.criteria'>{{action[criterion.name]}}</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-
                   </div>
                 </div>
               </div>

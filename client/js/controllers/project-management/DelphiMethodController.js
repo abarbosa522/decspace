@@ -565,7 +565,7 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
       //date round was created
       new_round['execution_date'] = execution_date;
       //generate survey link
-      new_round['link'] = 'http://vps288667.ovh.net:8082/content/project-management/delphi-survey.html?round=' + new_round['id'];
+      new_round['link'] = 'http://vps288667.ovh.net:8082/content/project-management/delphi-login.html?round=' + new_round['id'];
 
       //add the new list of projects
       $http.post('/delphi_rounds', new_round).success(function() {
@@ -602,7 +602,8 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
       new_answer['questions_answered'] = [];
       //define the subject survey
       new_answer['subject'] = new_round['subject'];
-
+      //define the suggestions
+      new_answer['suggestions'] = [];
       //define the set of unanswered question
       new_answer['questions_unanswered'] = [];
 
@@ -616,6 +617,22 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
         new_question['score'] = 'null';
         new_answer['questions_unanswered'].push(new_question);
       }
+
+      //usability metrics
+      new_answer['usability_metrics'] = {};
+      new_answer['usability_metrics']['log_ins'] = 0;
+      new_answer['usability_metrics']['task_duration'] = '';
+      new_answer['usability_metrics']['drag_and_drops'] = 0;
+      new_answer['usability_metrics']['added_suggestions'] = 0;
+      new_answer['usability_metrics']['confirmed_deletion_suggestion'] = 0;
+      new_answer['usability_metrics']['canceled_deletion_suggestion'] = 0;
+      new_answer['usability_metrics']['data_saves'] = 0;
+      new_answer['usability_metrics']['confirmed_data_resets'] = 0;
+      new_answer['usability_metrics']['canceled_data_resets'] = 0;
+      new_answer['usability_metrics']['data_reloads'] = 0;
+      new_answer['usability_metrics']['help_modal_open'] = 0;
+      new_answer['usability_metrics']['task_complete'] = '';
+      new_answer['usability_metrics']['incomplete_saves'] = 0;
 
       //add the new list of projects
       $http.post('/delphi_responses', new_answer).success(function() {

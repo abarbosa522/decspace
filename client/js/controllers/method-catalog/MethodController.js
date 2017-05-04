@@ -1,4 +1,4 @@
-app.controller('MethodCatalogController', function($scope, $window, $http) {
+app.controller('MethodController', function($scope, $window, $http) {
   /*** SETUP FUNCTIONS ***/
 
   //check if there is a user logged in
@@ -28,15 +28,12 @@ app.controller('MethodCatalogController', function($scope, $window, $http) {
     });
   }
 
-  /*** METHODS ***/
-
-  //list of methods currently available
-  $scope.methods = ['CAT-SD', 'Delphi', 'OrderBy', 'Sort', 'SRF'];
-
-  //redirect to the method page
-  $scope.toMethod = function(method) {
-    $window.location.href = method.toLowerCase() + '.html';
-  }
+  /*** SORT METHOD ***/
+  $scope.sort_objects = [
+    {'name' : 'Object 1'},
+    {'name' : 'Object 2'},
+    {'name' : 'Object 3'}
+  ];
 
   /*** STARTUP FUNCTIONS ***/
   requestLogIn();

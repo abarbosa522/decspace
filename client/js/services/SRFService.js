@@ -3,32 +3,27 @@ app.service('SRFService', function() {
   var criteria, white_cards, ranking, ratio_z, decimal_places, weight_type;
 
   //0 = least important, ranking - 1 = most important
-  var ranking_order = [];
-
+  var ranking_order;
   //ranking_order without white cards and other values calculated
-  var order_criteria = [];
-
+  var order_criteria;
   //sum of all e'r values
-  var e = 0;
-
+  var e;
   //
-  var u = 0;
-
+  var u;
   //K - sum of all non-normalized weights
-  var sum_k = 0;
-
+  var sum_k;
   //K2 - sum of all ki'' (ki2)
-  var sum_k2 = 0;
-
+  var sum_k2;
+  //
   var v;
-
-  var listL1 = [];
-
-  var listL2 = [];
-
-  var m = [];
-
-  var fPlus = [], fMinus = [];
+  //
+  var listL1;
+  //
+  var listL2;
+  //
+  var m ;
+  //
+  var fPlus, fMinus;
 
   this.getResults = function(crtr, wht_crds, rnkng, rt_z, dcml_plcs, wght_tp) {
     //initialize input data variables
@@ -39,6 +34,10 @@ app.service('SRFService', function() {
     decimal_places = angular.copy(dcml_plcs);
     weight_type = angular.copy(wght_tp);
 
+    //reset service variables
+    ranking_order = [], order_criteria = [], listL1 = [], listL2 = [], m = [], fPlus = [], fMinus = [];
+    e = 0, u = 0, sum_k = 0, sum_k2 = 0, v = 0;
+
     buildRanking();
 
     calculateER();
@@ -48,6 +47,8 @@ app.service('SRFService', function() {
     calculateU();
 
     calculateNonNormalizedWeight();
+
+    transferNonNormalizedData();
 
     calculateSumK();
 
@@ -72,8 +73,6 @@ app.service('SRFService', function() {
     buildListsF();
 
     roundNormalizedWeights();
-
-    formatResults();
 
     return criteria;
   }
@@ -111,7 +110,7 @@ app.service('SRFService', function() {
           var rank_aux = angular.copy(Number(rank));
           //increment e_r if there are any white cards in the between the ranks r and r+1
           while(ranking_order[Number(rank_aux) + 1]['cards'].includes('white_card')) {
-            e_r++;
+            e_r += ranking_order[Number(rank_aux) + 1]['cards'].length;
             rank_aux++;
           }
 
@@ -140,7 +139,6 @@ app.service('SRFService', function() {
 
   function calculateNonNormalizedWeight() {
     for(criterion in order_criteria) {
-
       //sum of e'r before rank r
       var sum_er = 0;
 
@@ -151,26 +149,36 @@ app.service('SRFService', function() {
     }
   }
 
+  //normalized weigths must be calculated by criterion, not by rank
+  function transferNonNormalizedData() {
+    for(criterion in criteria)
+      for(rank in order_criteria)
+        if(order_criteria[rank]['cards'].includes(criteria[criterion]['name'])) {
+          criteria[criterion]['ki'] = order_criteria[rank]['non-normalized weight'];
+          criteria[criterion]['non-normalized weight'] = order_criteria[rank]['non-normalized weight'];
+        }
+  }
+
   function calculateSumK() {
-    for(rank in order_criteria)
-      sum_k += order_criteria[rank]['non-normalized weight'] * order_criteria[rank]['cards'].length;
+    for(criterion in criteria)
+      sum_k += criteria[criterion]['ki'];
   }
 
   //KI1 = ki*
   function calculateKI1() {
-    for(rank in order_criteria)
-      order_criteria[rank]['ki1'] = (100 / sum_k) * order_criteria[rank]['non-normalized weight'];
+    for(criterion in criteria)
+      criteria[criterion]['ki1'] = (100 / sum_k) * criteria[criterion]['ki'];
   }
 
   //K2 = ki''
   function calculateK2() {
-    for(rank in order_criteria)
-      order_criteria[rank]['ki2'] = Math.floor(order_criteria[rank]['ki1'] * Math.pow(10, Number(decimal_places))) / Math.pow(10, Number(decimal_places));
+    for(criterion in criteria)
+      criteria[criterion]['ki2'] = Math.floor(criteria[criterion]['ki1'] * Math.pow(10, Number(decimal_places))) / Math.pow(10, Number(decimal_places));
   }
 
   function calculateSumK2() {
-    for(rank in order_criteria)
-      sum_k2 += order_criteria[rank]['ki2'] * order_criteria[rank]['cards'].length;
+    for(criterion in criteria)
+      sum_k2 += criteria[criterion]['ki2'];
   }
 
   function calculateV() {
@@ -180,13 +188,13 @@ app.service('SRFService', function() {
   }
 
   function calculateRatioDI1() {
-    for(rank in order_criteria)
-      order_criteria[rank]['di1'] = (Math.pow(10, -Number(decimal_places)) - (order_criteria[rank]['ki1'] - order_criteria[rank]['ki2'])) / order_criteria[rank]['ki1'];
+    for(criterion in criteria)
+      criteria[criterion]['di1'] = (Math.pow(10, -Number(decimal_places)) - (criteria[criterion]['ki1'] - criteria[criterion]['ki2'])) / criteria[criterion]['ki1'];
   }
 
   function calculateRatioDI2() {
-    for(rank in order_criteria)
-      order_criteria[rank]['di2'] = (order_criteria[rank]['ki1'] - order_criteria[rank]['ki2']) / order_criteria[rank]['ki1'];
+    for(criterion in criteria)
+      criteria[criterion]['di2'] = (criteria[criterion]['ki1'] - criteria[criterion]['ki2']) / criteria[criterion]['ki1'];
   }
 
   function compareDI1(a, b) {
@@ -209,13 +217,7 @@ app.service('SRFService', function() {
       var new_pair = {};
 
       new_pair['index'] = Number(criterion) + 1;
-
-      for(rank in order_criteria) {
-        if(order_criteria[rank]['cards'].includes(criteria[criterion]['name'])) {
-          new_pair['di1'] = order_criteria[rank]['di1'];
-          break;
-        }
-      }
+      new_pair['di1'] = criteria[criterion]['di1'];
 
       listL1.push(new_pair);
     }
@@ -243,13 +245,7 @@ app.service('SRFService', function() {
       var new_pair = {};
 
       new_pair['index'] = Number(criterion) + 1;
-
-      for(rank in order_criteria) {
-        if(order_criteria[rank]['cards'].includes(criteria[criterion]['name'])) {
-          new_pair['di2'] = order_criteria[rank]['di2'];
-          break;
-        }
-      }
+      new_pair['di2'] = criteria[criterion]['di2'];
 
       listL2.push(new_pair);
     }
@@ -260,23 +256,8 @@ app.service('SRFService', function() {
   function buildListM() {
     for(criterion in criteria) {
       var index = Number(criterion) + 1;
-      var di1, di2;
 
-      for(item1 in listL1) {
-        if(listL1[item1]['index'] == index) {
-          di1 = listL1[item1]['di1'];
-          break;
-        }
-      }
-
-      for(item2 in listL2) {
-        if(listL2[item2]['index'] == index) {
-          di2 = listL2[item2]['di2'];
-          break;
-        }
-      }
-
-      if(di1 > di2)
+      if(criteria[criterion]['di1'] > criteria[criterion]['di2'])
         m.push(index);
     }
   }
@@ -315,47 +296,39 @@ app.service('SRFService', function() {
       var crt_count = criteria.length - v;
 
       for(i = listL1.length - 1; i >= 0; i--) {
-        if(!m.includes(listL2[i]['index']) && crt_count > 0) {
-          fMinus.push(listL2[i]['index']);
+        if(m.includes(listL1[i]['index']) && crt_count > 0) {
+
+          fMinus.push(listL1[i]['index']);
           crt_count--;
         }
       }
 
-      //list F+
+      //add the remaining criteria - ENGLISH PAPER IS NOT EXPLICIT AND CONTRADICTORY WITH THE FRENCH VERSION
       for(criterion in criteria)
         if(!fMinus.includes(Number(criterion) + 1))
-          fPlus.push(Number(criterion) + 1)
+          fPlus.push(Number(criterion) + 1);
+
+      //POSSIBLE SOLUTION FOR CONTRADICTORY PAPERS
+      //list F+
+      //n-m criteria of L1 not belonging to M
+      /*for(i = 0; i < criteria.length - m.length; i++)
+        if(!m.includes(listL1[i]['index']))
+          fPlus.push(listL1[i]['index']);
+
+      //v + m - n first criteria of L1 belonging to M
+      for(i = 0; i < v + m.length - criteria.length; i++)
+        if(m.includes(listL1[i]['index']))
+          fPlus.push(listL1[i]['index']);*/
     }
   }
 
   function roundNormalizedWeights() {
-    for(rank in order_criteria) {
-      for(card in order_criteria[rank]['cards']) {
-        var crt_index;
-
-        for(criterion in criteria)
-          if(criteria[criterion]['name'] == order_criteria[rank]['cards'][card])
-            crt_index = Number(criterion) + 1;
-
-
-        if(fPlus.includes(crt_index))
-          order_criteria[rank]['normalized weight'] = order_criteria[rank]['ki2'] + Math.pow(10, -decimal_places);
-        else
-          order_criteria[rank]['normalized weight'] = order_criteria[rank]['ki2'];
-        break;
-      }
-    }
-  }
-
-
-  function formatResults() {
     for(criterion in criteria) {
-      for(rank in order_criteria) {
-        if(order_criteria[rank]['cards'].includes(criteria[criterion]['name'])) {
-          criteria[criterion]['non-normalized weight'] = order_criteria[rank]['non-normalized weight'];
-          criteria[criterion]['normalized weight'] = order_criteria[rank]['normalized weight'];
-        }
-      }
+      if(fPlus.includes(Number(criterion) + 1))
+        criteria[criterion]['normalized weight'] = Number((criteria[criterion]['ki2'] + Math.pow(10, -decimal_places)).toFixed(decimal_places));
+      else
+        criteria[criterion]['normalized weight'] = Number(criteria[criterion]['ki2'].toFixed(decimal_places));
     }
   }
+
 });

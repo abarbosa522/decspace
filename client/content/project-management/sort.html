@@ -46,7 +46,7 @@
         <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
         <ul class = 'nav navbar-nav navbar-right'>
           <li>
-            <p class = 'navbar-text' style = 'font-weight:600;font-style:italic'>Welcome, {{name}}!</p>
+            <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic'>Welcome, {{name}}!</p>
           </li>
 
           <li><a href = '../homepage/about.html'>About</a></li>
@@ -206,8 +206,8 @@
                 <div ng-drag = 'true' ng-drag-data = 'obj' ng-class = 'obj.name'>
                   {{obj.name}}
                 </div>
-                <p ng-if = '$index == 0' style = 'margin-top:20%'>Most Important</p>
-                <p ng-if = '$index == draggableObjects.length - 1' style = 'margin-top:20%'>Least Important</p>
+                <p ng-if = '$index == 0' style = 'margin-top: 20%'>Most Important</p>
+                <p ng-if = '$index == draggableObjects.length - 1' style = 'margin-top: 20%'>Least Important</p>
               </li>
             </ul>
           </div>

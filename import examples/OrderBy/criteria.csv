@@ -1,4 +1,4 @@
 name;type;direction;selected
-Color;Text;Ascendant;true
-Last Grade;Number;Descendant;false
+Age;Number;Descendant;false
+Favorite Color;Text;Ascendant;true
 Favorite Song;Text;Descendant;false

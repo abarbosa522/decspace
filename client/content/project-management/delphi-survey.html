@@ -65,41 +65,29 @@
       <div class = 'btn-toolbar col-md-4' role = 'toolbar'>
         <div class = 'btn-group' role = 'group'>
           <!-- Save Button -->
-          <button type = 'button' class = 'btn btn-primary' ng-click = 'saveData()' title = 'Save Data'>
+          <button type = 'button' class = 'btn btn-primary' ng-click = 'saveData()' title = 'Save Answer'>
             <span class = 'glyphicon glyphicon-floppy-save icon-large'></span>
           </button>
 
           <!-- Reload Data Button -->
-          <button type = 'button' class = 'btn btn-info' ng-click = 'reloadData()' title = 'Reload Data'>
+          <button type = 'button' class = 'btn btn-info' ng-click = 'reloadData()' title = 'Reload Answer'>
             <span class = 'glyphicon glyphicon-refresh'></span>
           </button>
 
           <!-- Reset Data Button -->
-          <button type = 'button' class = 'btn btn-danger' ng-click = 'resetData()' title = 'Reset Data' ng-if = '!showResetData'>
+          <button type = 'button' class = 'btn btn-danger' ng-click = 'resetData()' title = 'Reset Answer' ng-if = '!showResetData'>
             <span class = 'glyphicon glyphicon-trash'></span>
-          </button>
-
-          <!-- Confirm Reset Data -->
-          <button type = 'button' class = 'btn btn-success' ng-click = 'confirmResetData()' title = 'Confirm Data Reset' ng-if = 'showResetData'>
-            <span class = 'glyphicon glyphicon-ok'></span>
-          </button>
-
-          <!-- Cancel Reset Data -->
-          <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelResetData()' title = 'Cancel Data Reset' ng-if = 'showResetData'>
-            <span class = 'glyphicon glyphicon-remove'></span>
           </button>
         </div>
       </div>
 
-      <!-- Help Anchor -->
-      <a href = '#' data-toggle = 'modal' data-target = '#help-modal' style = 'margin-left: 50%'>
-        <span class = 'glyphicon glyphicon-question-sign' style = 'font-size:25px'></span>
-      </a>
-
       <!-- Data Saved Alert -->
-      <div class = 'alert alert-success' id = 'save-success' style = 'position: fixed; margin-left: 62%' ng-cloak>
-        Data <strong>successfully</strong> saved.
+      <div class = 'alert alert-success' id = 'save-success' style = 'position: fixed; margin-left: 55%' ng-cloak>
+        Answer <strong>successfully</strong> saved.
       </div>
+
+      <!-- Help Anchor - All in one line of code, so that a little space does not appear -->
+      <a href data-toggle = 'modal' data-target = '#help-modal' style = 'margin-left: 50%' ng-click = 'registerHelpModalOpen()'><span class = 'glyphicon glyphicon-question-sign' style = 'font-size:25px'></span></a>
 
       <!-- Help Modal -->
       <div class = 'modal fade' id = 'help-modal' role = 'dialog'>
@@ -112,29 +100,63 @@
             </div>
 
             <div class = 'modal-body'>
-              <p>To answer this survey, just drag the concepts/questions on the right to the boxes on the middle of screen, so that they are assigned a certain score.</p>
+              <p>To answer this survey, just drag the concepts/questions on the top of the screen to the boxes on the middle of screen, so that they are assigned the score displayed over the column of the box.</p>
               <p>The concepts/questions you find most relevant should be assigned a higher score than the ones that you do not consider relevant.</p>
-              <p>To read the description of a certain question, just hover it with the mouse.</p>
+              <p>To read the description of a certain question, just hover it with the cursor.</p>
               <p>
-                <button type = 'button' class = 'btn btn-primary' title = 'Save Data'>
+                <button type = 'button' class = 'btn btn-primary' title = 'Save Answer'>
                   <span class = 'glyphicon glyphicon-floppy-save icon-large'></span>
                 </button>
                 - Saves the current answer. Answers will only be considered if all concepts/questions are dragged to a box.
               </p>
 
               <p>
-                <button type = 'button' class = 'btn btn-info' title = 'Reload Data'>
+                <button type = 'button' class = 'btn btn-info' title = 'Reload Answer'>
                   <span class = 'glyphicon glyphicon-refresh'></span>
                 </button>
-                - Reload your previous answer.
+                - Reloads the last saved answer.
               </p>
 
               <p>
-                <button type = 'button' class = 'btn btn-danger' title = 'Reset Data'>
+                <button type = 'button' class = 'btn btn-danger' title = 'Reset Answer'>
                   <span class = 'glyphicon glyphicon-trash'></span>
                 </button>
-                - Reset current answer, i.e. unassign all concepts/questions.
+                - Reset current answer, i.e. unassign all concepts/questions and delete all suggestions.
               </p>
+
+              <p>After that, you can add any suggestions of questions/concepts that you think that makes sense in this survey's context.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Reset Modal -->
+      <div class = 'modal fade' id = 'data-reset-modal' role = 'dialog'>
+        <div class = 'modal-dialog'>
+          <div class = 'modal-content'>
+            <div class = 'modal-header'>
+              <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+              <h4 class = 'modal-title'>Are you sure you want to reset the current answer?</h4>
+            </div>
+            <div class = 'modal-body'>
+              <div class = 'row'>
+                <div class = 'col-md-2'>
+                </div>
+
+                <!-- Confirm Data Reset Button -->
+                <div class = 'col-md-4'>
+                  <button type = 'button' class = 'btn btn-primary' ng-click = 'confirmResetData()' data-dismiss = 'modal' title = 'Confirm Answer Reset'>
+                    Yes
+                  </button>
+                </div>
+
+                <!-- Cancel Data Reset Button -->
+                <div class = 'col-md-4'>
+                  <button type = 'button' class = 'btn btn-primary' ng-click = 'cancelResetData()' data-dismiss = 'modal' title = 'Cancel Answer Reset'>
+                    No
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -143,7 +165,7 @@
       <br>
 
       <!-- Survey Subject -->
-      <h2>{{subject}}</h2>
+      <h1 class = 'header-7'>{{subject}}</h1>
 
       <br>
 
@@ -160,15 +182,9 @@
       <div id = 'drop-areas'>
         <div ng-repeat = 'row in matrix'>
           <div class = 'div_pos' ng-if = '$parent.$index == 0' ng-repeat = 'pos in row track by $index'>
-            <div ng-if = '$index == 0'>
-              Least Important
-            </div>
-            <div ng-if = 'pos == 0'>
-              Neutral
-            </div>
-            <div ng-if = '$index == row.length - 1'>
-              Most Important
-            </div>
+            <div ng-if = '$index == 0'>Least Important</div>
+            <div ng-if = 'pos == 0'>Neutral</div>
+            <div ng-if = '$index == row.length - 1'>Most Important</div>
             {{pos}}
           </div>
         </div>
@@ -182,7 +198,9 @@
         </div>
       </div>
 
-      <h2>Any suggestions for other questions?</h2>
+      <br>
+
+      <h2 class = 'header-8'>Any suggestions for other questions?</h2>
 
       <table class = 'table table-bordered table-hover'>
         <thead>

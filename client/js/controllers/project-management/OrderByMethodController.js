@@ -469,8 +469,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
       case 'import-actions-file':
         for(action in data)
           for(field in data[action])
-            if(field != 'name')
-              data[action][field] = Number(data[action][field]);
+            data[action][field] = data[action][field];
 
         $scope.actions = data;
         break;

@@ -645,14 +645,9 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         new_line.setAttribute('y1', first_coords[1]);
         new_line.setAttribute('x2', second_coords[0]);
         new_line.setAttribute('y2', second_coords[1]);
-        //set the color of the connector
-        new_line.setAttribute('stroke', 'rgb(255, 0, 0)');
-        //set the width of the connector
-        new_line.setAttribute('stroke-width', '3');
 
         //get the id of the connector
         var unique_id = generateUniqueId(connections);
-
         //set the id of the connector
         new_line.setAttribute('id', 'line-' + unique_id);
 
@@ -816,10 +811,6 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       new_line.setAttribute('x2', trans_output[0]);
       new_line.setAttribute('y2', trans_output[1]);
     }
-    //set the color of the line
-    new_line.setAttribute('stroke', 'rgb(255, 0, 0)');
-    //set the width of the line
-    new_line.setAttribute('stroke-width', '3');
     //set the id of the line
     new_line.setAttribute('id', connection['id']);
     //set a click event
@@ -1126,10 +1117,24 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   //currently selected execution
   $scope.current_exec = '';
+  //execution selected to be compared
+  $scope.compare_exec = '';
+
+  $scope.checkCompareExecution = function() {
+    if($scope.compare_exec == '')
+      return [$scope.current_exec];
+    else
+      return [$scope.current_exec, $scope.compare_exec];
+  }
 
   //define exec as the currently selected execution
   $scope.selectExecution = function(exec) {
     $scope.current_exec = exec;
+    $scope.compare_exec = '';
+  }
+
+  $scope.selectCompareExecution = function(exec) {
+    $scope.compare_exec = exec;
   }
 
   $scope.current_exec_page = 0;

@@ -90,8 +90,18 @@ nav > div > div > ul > li {
 }
 
 .header-6 {
-  font-weight: 600;
   font-size: 15px;
+  font-weight: 600;
+}
+
+.header-7 {
+  font-size: 25px;
+  font-weight: 600;
+}
+
+.header-8 {
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .icon-custom {
@@ -130,4 +140,17 @@ nav > div > div > ul > li {
 
 .btn-exec {
   margin-top: 2%;
+}
+
+.custom-hr {
+  border-top: 1px solid #8c8b8b;
+	border-bottom: 1px solid #fff;
+}
+
+.custom-hr:after {
+	content: '';
+	display: block;
+	margin-top: 2px;
+	border-top: 1px solid #8c8b8b;
+	border-bottom: 1px solid #fff;
 }

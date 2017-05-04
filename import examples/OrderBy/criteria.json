@@ -1,3 +1,3 @@
-{"name":"Color","type":"Text","direction":"Ascendant","selected":"true"}
-{"name":"Last Grade","type":"Number","direction":"Descendant","selected":"false"}
+{"name":"Age","type":"Number","direction":"Descendant","selected":"false"}
+{"name":"Favorite Color","type":"Text","direction":"Ascendant","selected":"true"}
 {"name":"Favorite Song","type":"Text","direction":"Descendant","selected":"false"}
