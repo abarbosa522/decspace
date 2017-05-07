@@ -307,6 +307,52 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         //store the new module into the modules array
         modules.push(new_mod);
         break;
+
+      case 'Sort':
+        var new_mod = {};
+        //generate the unique id
+        var unique_id = generateUniqueId(modules);
+        //store the module id
+        new_mod['id'] = 'sort-' + unique_id;
+        //generate and store module name
+        new_mod['name_id'] = generateUniqueNameId('Sort');
+        //store the module type
+        new_mod['type'] = 'Sort';
+        //initialize the input data array
+        new_mod['input'] = {
+          'objects' : []
+        };
+        //initialize the output data array
+        new_mod['output'] = [];
+        //store the new module into the modules array
+        modules.push(new_mod);
+        break;
+
+      case 'CAT-SD':
+        var new_mod = {};
+        //generate the unique id
+        var unique_id = generateUniqueId(modules);
+        //store the module id
+        new_mod['id'] = 'cat-sd-' + unique_id;
+        //generate and store module name
+        new_mod['name_id'] = generateUniqueNameId('CAT-SD');
+        //store the module type
+        new_mod['type'] = 'CAT-SD';
+        //initialize the input data array
+        new_mod['input'] = {
+          'criteria' : [],
+          'interaction-effects' : [],
+          'scales' : [],
+          'functions' : [],
+          'actions' : [],
+          'categories' : [],
+          'reference-actions' : []
+        };
+        //initialize the output data array
+        new_mod['output'] = [];
+        //store the new module into the modules array
+        modules.push(new_mod);
+        break;
     }
   }
 
@@ -375,13 +421,22 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       if(modules[mod]['id'] == parent_id)
         $scope.currentModule = modules[mod];
 
-    //reset the select deletion variables
+    //reset the select deletion and "new" variables
     switch($scope.currentModule['type']) {
       case 'OrderBy':
+        $scope.new_criterion = {};
+        $scope.new_action = {};
         $scope.deleteIdOrderByCriterion = '';
         $scope.deleteIdOrderByAction = '';
         break;
+
+      case 'Sort':
+        $scope.new_object = {};
+        $scope.deleteIdSortObject = '';
+        break;
     }
+
+    removeErrorClasses($scope.currentModule['type']);
   }
 
   //find the largest id on a data array and increment it
@@ -403,6 +458,31 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         mod_num = modules[mod]['name_id'];
 
     return ++mod_num;
+  }
+
+  //remove error classes from the input fields
+  function removeErrorClasses(type) {
+    switch(type) {
+      case 'OrderBy':
+        //Criteria
+        $('#orderby-criteria-name').removeClass('has-error');
+        $('#orderby-criteria-type').removeClass('has-error');
+        $('#orderby-criteria-direction').removeClass('has-error');
+
+        //Actions
+        $('#orderby-actions-name').removeClass('has-error');
+
+        for(criterion in $scope.currentModule.input.criteria)
+          $('#orderby-actions-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
+
+        break;
+
+      case 'Sort':
+        //Objects
+        $('#sort-objects-name').removeClass('has-error');
+
+        break;
+    }
   }
 
   /*** METHODS FUNCTIONS ***/
@@ -429,6 +509,42 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         compiled_temp.appendTo($('#workspace'));
         //define the initial posiiton of the new module
         $('#orderby-' + unique_id).offset({top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10});
+        break;
+
+      case 'Sort':
+        //get the method's template
+        var temp = document.getElementById('sort-temp');
+        //clone the template
+        var temp_clone = $(temp.content).clone();
+        //make its id unique
+        var unique_id = generateUniqueId(modules);
+        temp_clone.find('#sort').attr('id', 'sort-' + unique_id);
+        //add the file name to the module
+        temp_clone.find('#mod-name').html('Sort' + generateUniqueNameId('Sort'));
+        //cloned elements need to be manually compiled - angularJS
+        var compiled_temp = $compile(temp_clone)($scope);
+        //add the new instance of the template to the document
+        compiled_temp.appendTo($('#workspace'));
+        //define the initial posiiton of the new module
+        $('#sort-' + unique_id).offset({top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10});
+        break;
+
+      case 'CAT-SD':
+        //get the method's template
+        var temp = document.getElementById('cat-sd-temp');
+        //clone the template
+        var temp_clone = $(temp.content).clone();
+        //make its id unique
+        var unique_id = generateUniqueId(modules);
+        temp_clone.find('#cat-sd').attr('id', 'cat-sd-' + unique_id);
+        //add the file name to the module
+        temp_clone.find('#mod-name').html('CAT-SD' + generateUniqueNameId('CAT-SD'));
+        //cloned elements need to be manually compiled - angularJS
+        var compiled_temp = $compile(temp_clone)($scope);
+        //add the new instance of the template to the document
+        compiled_temp.appendTo($('#workspace'));
+        //define the initial posiiton of the new module
+        $('#cat-sd-' + unique_id).offset({top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10});
         break;
     }
 
@@ -492,31 +608,90 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         //set position of module
         $('#' + mod['id']).offset(mod['position']);
         break;
+
+      case 'Sort':
+        //get the method's template
+        var temp = document.getElementById('sort-temp');
+        //clone the template
+        var temp_clone = $(temp.content).clone();
+        //make its id unique
+        temp_clone.find('#sort').attr('id', mod['id']);
+        //add the module name to the module
+        temp_clone.find('#mod-name').html('Sort' + mod['name_id']);
+        //cloned elements need to be manually compiled - angularJS
+        var compiled_temp = $compile(temp_clone)($scope);
+        //add the new instance of the template to the document
+        compiled_temp.appendTo($('#workspace'));
+        //set position of module
+        $('#' + mod['id']).offset(mod['position']);
+        break;
+
+      case 'CAT-SD':
+        //get the method's template
+        var temp = document.getElementById('cat-sd-temp');
+        //clone the template
+        var temp_clone = $(temp.content).clone();
+        //make its id unique
+        temp_clone.find('#cat-sd').attr('id', mod['id']);
+        //add the module name to the module
+        temp_clone.find('#mod-name').html('CAT-SD' + mod['name_id']);
+        //cloned elements need to be manually compiled - angularJS
+        var compiled_temp = $compile(temp_clone)($scope);
+        //add the new instance of the template to the document
+        compiled_temp.appendTo($('#workspace'));
+        //set position of module
+        $('#' + mod['id']).offset(mod['position']);
+        break;
     }
   }
 
-  /*** DATA INPUT FUNCTIONS ***/
-
-  //OrderBy Method
+  /*** DATA INPUT FUNCTIONS - ORDERBY METHOD ***/
 
   //add a new criterion
   $scope.addOrderByCriterion = function() {
-    //assign an unique id to the new criterion
-    if($scope.currentModule.input.criteria.length == 0)
-      $scope.new_criterion.id = 1;
-    else
-      $scope.new_criterion.id = $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.length - 1]['id'] + 1;
+    //if there is an input field not assigned
+    if($scope.new_criterion.name == undefined || $scope.new_criterion.name == '' || $scope.new_criterion.type == undefined || $scope.new_criterion.type == '' || $scope.new_criterion.direction == undefined || $scope.new_criterion.direction == '') {
+      //if a name has not been assigned - add error class
+      if($scope.new_criterion.name == undefined || $scope.new_criterion.name == '')
+        $('#orderby-criteria-name').addClass('has-error');
+      else
+        $('#orderby-criteria-name').removeClass('has-error');
 
-    //the criterion is not selected by default
-    $scope.new_criterion.selected = false;
+      //if a type has not been assigned - add error class
+      if($scope.new_criterion.type == undefined || $scope.new_criterion.type == '')
+        $('#orderby-criteria-type').addClass('has-error');
+      else
+        $('#orderby-criteria-type').removeClass('has-error');
 
-    //add the new criterion to the
-    $scope.currentModule.input.criteria.push(angular.copy($scope.new_criterion));
+      //if a direction has not been assigned - add error class
+      if($scope.new_criterion.direction == undefined || $scope.new_criterion.direction == '')
+        $('#orderby-criteria-direction').addClass('has-error');
+      else
+        $('#orderby-criteria-direction').removeClass('has-error');
+    }
+    else {
+      //assign an unique id to the new criterion
+      if($scope.currentModule.input.criteria.length == 0)
+        $scope.new_criterion.id = 1;
+      else
+        $scope.new_criterion.id = $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.length - 1]['id'] + 1;
 
-    //reset the criterion input fields
-    $scope.new_criterion.name = '';
-    $scope.new_criterion.type = '';
-    $scope.new_criterion.direction = '';
+      //the criterion is not selected by default
+      $scope.new_criterion.selected = false;
+
+      //add the new criterion to the
+      $scope.currentModule.input.criteria.push(angular.copy($scope.new_criterion));
+
+      //reset the criterion input fields
+      $scope.new_criterion.name = '';
+      $scope.new_criterion.type = '';
+      $scope.new_criterion.direction = '';
+
+      //remove all error classes - just be sure
+      $('#orderby-criteria-name').removeClass('has-error');
+      $('#orderby-criteria-type').removeClass('has-error');
+      $('#orderby-criteria-direction').removeClass('has-error');
+    }
   }
 
   //selected criterion to be deleted
@@ -553,17 +728,45 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   //add a new action
   $scope.addOrderByAction = function() {
-    if($scope.currentModule.input.actions.length == 0)
-      $scope.new_action.id = 1;
-    else
-      $scope.new_action.id = $scope.currentModule.input.actions[$scope.currentModule.input.actions.length - 1]['id'] + 1;
+    var unassigned_field = false;
 
-    $scope.currentModule.input.actions.push(angular.copy($scope.new_action));
-
-    $scope.new_action.name = '';
-
+    //check if there is an unassigned input field
     for(criterion in $scope.currentModule.input.criteria)
-      $scope.new_action[$scope.currentModule.input.criteria[criterion]['name']] = '';
+      if($scope.new_action[$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_action[$scope.currentModule.input.criteria[criterion]['name']] == "")
+        unassigned_field = true;
+
+    if($scope.new_action.name == undefined || $scope.new_action.name == '' || unassigned_field) {
+      //if a name has not been assigned - add error class
+      if($scope.new_action.name == undefined || $scope.new_action.name == '')
+        $('#orderby-actions-name').addClass('has-error');
+      else
+        $('#orderby-actions-name').removeClass('has-error');
+
+      //if the criterion field has not been assigned - add error class
+      for(criterion in $scope.currentModule.input.criteria) {
+        if($scope.new_action[$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_action[$scope.currentModule.input.criteria[criterion]['name']] == "")
+          $('#orderby-actions-' + $scope.currentModule.input.criteria[criterion]['id']).addClass('has-error');
+        else
+          $('#orderby-actions-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
+      }
+    }
+    else {
+      if($scope.currentModule.input.actions.length == 0)
+        $scope.new_action.id = 1;
+      else
+        $scope.new_action.id = $scope.currentModule.input.actions[$scope.currentModule.input.actions.length - 1]['id'] + 1;
+
+      $scope.currentModule.input.actions.push(angular.copy($scope.new_action));
+
+      //reset the new action input fields and remove the error classes - just in case
+      $scope.new_action.name = '';
+      $('#orderby-actions-name').removeClass('has-error');
+
+      for(criterion in $scope.currentModule.input.criteria) {
+        $scope.new_action[$scope.currentModule.input.criteria[criterion]['name']] = '';
+        $('#orderby-actions-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
+      }
+    }
   }
 
   //selected action to be deleted
@@ -585,21 +788,71 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     $scope.deleteIdOrderByAction = '';
   }
 
+  /*** DATA INPUT FUNCTIONS - SORT METHOD ***/
+
+  $scope.addSortObject = function() {
+    //if a name has not been assigned - add error class
+    if($scope.new_object.name == undefined || $scope.new_object.name == '')
+      $('#sort-objects-name').addClass('has-error');
+    else {
+      $('#sort-objects-name').removeClass('has-error');
+
+      if($scope.currentModule.input.objects.length == 0)
+        $scope.new_object.id = 1;
+      else
+        $scope.new_object.id = $scope.currentModule.input.objects[$scope.currentModule.input.objects.length - 1]['id'] + 1;
+
+      $scope.currentModule.input.objects.push(angular.copy($scope.new_object));
+
+      //reset the new object input field and remove the error class - just in case
+      $scope.new_object.name = '';
+      $('#sort-object-name').removeClass('has-error');
+    }
+  }
+
+  //selected object to be deleted
+  $scope.deleteIdSortObject = '';
+
+  //select a certain object to be deleted
+  $scope.deleteSortObject = function(object) {
+    $scope.deleteIdSortObject = object.id;
+  }
+
+  //delete the selected object
+  $scope.confirmDeleteSortObject = function(object) {
+    $scope.currentModule.input.objects.splice($scope.currentModule.input.objects.indexOf(object), 1);
+    $scope.deleteIdSortObject = '';
+  }
+
+  //cancel the object deletion
+  $scope.cancelDeleteSortObject = function() {
+    $scope.deleteIdSortObject = '';
+  }
+
+  $scope.onDropComplete = function(index, obj, evt) {
+    var otherObj = $scope.currentModule.input.objects[index];
+    var otherIndex = $scope.currentModule.input.objects.indexOf(obj);
+    $scope.currentModule.input.objects[index] = obj;
+    $scope.currentModule.input.objects[otherIndex] = otherObj;
+  }
+
+  /*** DATA INPUT FUNCTIONS - CAT-SD METHOD ***/
+
   /*** CONNECTOR FUNCTIONS ***/
 
   //created connections
   var connections = [];
   //controls if a first point has already been clicked
-  var drawing_line = false;
+  $scope.drawing_line = false;
   //holds all the information of the first point
   var first_event;
 
   //draw a line connector between two different points
   $scope.drawConnection = function(event) {
     //first a first point has not been created yet
-    if(!drawing_line) {
+    if(!$scope.drawing_line) {
       first_event = event;
-      drawing_line = true;
+      $scope.drawing_line = true;
     }
     //if a first point has been created already
     else {
@@ -652,7 +905,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         new_line.setAttribute('id', 'line-' + unique_id);
 
         //set a click event
-        new_line.setAttribute('ng-click', 'deleteConnection($event)')
+        new_line.setAttribute('ng-click', 'deleteConnection($event)');
+
         //compile the new line
         var compiled_line = $compile(new_line)($scope);
         //append the compile line to the svg area
@@ -706,7 +960,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
           }
       }
       //reset the drawing process
-      drawing_line = false;
+      $scope.drawing_line = false;
     }
   }
 
@@ -913,13 +1167,17 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       if(modules[mod]['type'] != 'InputFile') {
         var input_data = 0;
         //check connections for each input point of the current module
-        for(input in modules[mod]['input'])
-          for(connection in connections)
-            if((connections[connection]['input'] == modules[mod]['id'] && connections[connection]['input_type'] == input) || modules[mod]['input'][input].length > 0) {
-              input_data++;
-              break;
-            }
-
+        for(input in modules[mod]['input']) {
+          if(modules[mod]['input'][input].length > 0)
+            input_data++;
+          else {
+            for(connection in connections)
+              if(connections[connection]['input'] == modules[mod]['id'] && connections[connection]['input_type'] == input) {
+                input_data++;
+                break;
+              }
+          }
+        }
         //check if all input points of the current module have a connection or already have input data
         if(input_data == Object.keys(modules[mod]['input']).length)
           modules_data++;
@@ -953,6 +1211,11 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         mod['output'] = OrderByService.getResults(mod['input']['criteria'], mod['input']['actions']);
         method_executed = true;
         break;
+
+      case 'Sort':
+        mod['output'] = mod['order'];
+        method_executed = true;
+        break;
     }
 
     return method_executed;
@@ -963,6 +1226,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       if(modules[mod]['type'] != 'InputFile')
         modules[mod]['output'] = [];
   }
+
   /*** EXECUTIONS AND RESULTS ***/
 
   $scope.executions = [];

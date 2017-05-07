@@ -1,3 +1,5 @@
+/*** MODULE TEMPLATES ***/
+
 .module-template {
   position: absolute;
 
@@ -18,6 +20,18 @@
 
 .module-inputfile {
   height: 15%;
+}
+
+.module-orderby {
+  height: 23%;
+}
+
+.module-sort {
+  height: 16%;
+}
+
+.module-cat-sd {
+  height: 27%;
 }
 
 .module-circle {
@@ -46,16 +60,44 @@
   color: black;
 }
 
+/*** MODALS ***/
+
 .custom-modal .modal-dialog {
   cursor: default;
   width: 95%;
 }
+
+/*** ALERTS ***/
 
 .custom-alert {
   position: absolute;
   width: 60%;
   margin-top: -5%;
   margin-left: 30%;
+}
+
+#invalid-connection1 {
+  height: 15%;
+}
+
+#invalid-connection2 {
+  height: 15%;
+}
+
+#invalid-connection4 {
+  height: 15%;
+}
+
+#execution-error {
+  height: 15%;
+}
+
+/*** WORKSPACE ***/
+
+#workspace {
+  height: 350px;
+  border: black 1px solid;
+  margin-top: 4%;
 }
 
 /*** EXECUTION MENU ARROWS ***/
@@ -77,4 +119,21 @@ line {
 
 line:hover {
   stroke-width: 5;
+}
+
+/*** CONNECTION STATUS ***/
+
+.connection-circle {
+  display: inline-block;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+}
+
+.green-light {
+  background-color: #40ff00;
+}
+
+.red-light {
+  background-color: #ff3300;
 }

@@ -199,15 +199,76 @@
             </div>
           </div>
 
-          <!-- Draggable Area -->
-          <div class = 'row text-center'>
+          <!-- Objects -->
+          <div class = 'row'>
+            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#objects-table' style = 'float: right' ng-click = 'objects_eye = (objects_eye == 0 ? 1 : 0)' title = 'Hide/Show Objects'>
+              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : objects_eye == 0, "glyphicon-eye-close" : objects_eye == 1}'></span>
+            </button>
+            <p class = 'header-1'>Objects</p>
+          </div>
+
+          <div id = 'objects-table' class = 'collapse in'>
+            <table class = 'table table-bordered table-hover'>
+              <thead>
+                <tr>
+                  <th class = 'text-center'>Object Name</th>
+                  <th class = 'col-md-2'></th>
+                </tr>
+              </thead>
+              <!-- Added Objects -->
+              <tbody>
+                <tr ng-repeat = 'object in objects | orderBy: "id"' ng-class = '{danger: object.id == deleteIdObject}'>
+                  <td>
+                    <input class = 'form-control' type = 'text' ng-model = 'object.name'>
+                  </td>
+                  <td ng-if = 'object.id != deleteIdObject'>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteObject(object)' title = 'Delete Object'>
+                      <span class = 'glyphicon glyphicon-minus'></span>
+                    </button>
+                  </td>
+                  <td ng-if = 'object.id == deleteIdObject'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteObject(object)' title = 'Confirm Delete Object'>
+                      <span class = 'glyphicon glyphicon-ok'></span>
+                    </button>
+                    <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteObject()' title = 'Cancel Delete Object'>
+                      <span class = 'glyphicon glyphicon-remove'></span>
+                    </button>
+                  </td>
+                </tr>
+                <!-- Form to add object -->
+                <tr class = 'active'>
+                  <td>
+                    <div id = 'objects-name' class = 'form-group'>
+                      <input class = 'form-control' type = 'text' ng-model = 'new_object.name'>
+                    </div>
+                  </td>
+                  <td>
+                    <button type = 'button' class = 'btn btn-success btn-action-add' ng-click = 'addObject()' title = 'Add Object'>
+                      <span class = 'glyphicon glyphicon-plus'></span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Object Ordering - Draggable Area -->
+          <div class = 'row'>
+            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#order-table' style = 'float: right' ng-click = 'order_eye = (order_eye == 0 ? 1 : 0)' title = 'Hide/Show Order'>
+              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : order_eye == 0, "glyphicon-eye-close" : order_eye == 1}'></span>
+            </button>
+            <p class = 'header-1'>Order</p>
+          </div>
+
+          <div id = 'order-table' class = 'row text-center collapse in'>
             <ul class = 'draglist'>
-              <li ng-repeat = 'obj in draggableObjects' ng-drop = 'true' ng-drop-success = 'onDropComplete($index, $data, $event)'>
-                <div ng-drag = 'true' ng-drag-data = 'obj' ng-class = 'obj.name'>
-                  {{obj.name}}
+              <li ng-repeat = 'obj in objects' ng-drop = 'true' ng-drop-success = 'onDropComplete($index, $data, $event)'>
+                <div ng-drag = 'true' ng-drag-data = 'obj' ng-class = 'obj.name'>{{obj.name}}</div>
+
+                <div ng-if = 'objects.length > 1'>
+                  <p ng-if = '$index == 0' style = 'margin-top: 20%'>Most Important</p>
+                  <p ng-if = '$index == objects.length - 1' style = 'margin-top: 20%'>Least Important</p>
                 </div>
-                <p ng-if = '$index == 0' style = 'margin-top: 20%'>Most Important</p>
-                <p ng-if = '$index == draggableObjects.length - 1' style = 'margin-top: 20%'>Least Important</p>
               </li>
             </ul>
           </div>
@@ -327,30 +388,108 @@
                       </ul>
                     </div>
 
-                    <!-- Results -->
-                    <p class = 'header-2'>Results</p>
+                    <!-- Input Data -->
+                    <p class = 'header-2'>Input Data</p>
 
+                    <!-- Input Objects -->
                     <div class = 'row'>
-                      <div class = 'text-center' ng-class = '{"col-md-6": compareExecution != ""}'>
+                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#objects-exec-table' style = 'float: right' ng-click = 'objects_exec_eye = (objects_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Objects'>
+                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : objects_exec_eye == 0, "glyphicon-eye-close" : objects_exec_eye == 1}'></span>
+                      </button>
+                      <p class = 'header-3'>Objects</p>
+                    </div>
+
+                    <div id = 'objects-exec-table' class = 'row collapse in'>
+                      <div ng-class = '{"col-md-6": compareExecution != ""}'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Object Name</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'object in currentExecution.objects | orderBy: "id"'>
+                              <td>{{object.name}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
+                        <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Object Name</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'object in compareExecution.objects | orderBy: "id"'>
+                              <td>{{object.name}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <br>
+
+                    <!-- Order -->
+                    <div class = 'row'>
+                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#order-exec-table' style = 'float: right' ng-click = 'order_exec_eye = (order_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Order'>
+                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : order_exec_eye == 0, "glyphicon-eye-close" : order_exec_eye == 1}'></span>
+                      </button>
+                      <p class = 'header-3'>Order</p>
+                    </div>
+
+                    <div id = 'order-exec-table' class = 'row collapse in'>
+                      <div ng-class = '{"col-md-6": compareExecution != ""}'>
                         <ul class = 'draglist'>
-                          <li class = 'drop-obj' ng-repeat = 'obj in currentExecution.results'>
-                            <div class = 'drag-obj'>
-                              {{obj.name}}
-                            </div>
+                          <li class = 'drop-obj' ng-repeat = 'obj in currentExecution.objects'>
+                            <div class = 'drag-obj'>{{obj.name}}</div>
                             <p ng-if = '$index == 0'>Most Important</p>
-                            <p ng-if = '$index == draggableObjects.length - 1'>Least Important</p>
+                            <p ng-if = '$index == currentExecution.objects.length - 1'>Least Important</p>
                           </li>
                         </ul>
                       </div>
 
-                      <div class = 'text-center col-md-6' ng-if = 'compareExecution != ""'>
+                      <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
                         <ul class = 'draglist'>
-                          <li class = 'drop-obj' ng-repeat = 'obj in compareExecution.results'>
-                            <div class = 'drag-obj'>
-                              {{obj.name}}
-                            </div>
+                          <li class = 'drop-obj' ng-repeat = 'obj in compareExecution.objects'>
+                            <div class = 'drag-obj'>{{obj.name}}</div>
                             <p ng-if = '$index == 0'>Most Important</p>
-                            <p ng-if = '$index == draggableObjects.length - 1'>Least Important</p>
+                            <p ng-if = '$index == compareExecution.objects.length - 1'>Least Important</p>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <br><br>
+
+                    <!-- Results -->
+                    <div class = 'row'>
+                      <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#results-exec-table' style = 'float: right' ng-click = 'results_exec_eye = (results_exec_eye == 0 ? 1 : 0)' title = 'Hide/Show Results'>
+                        <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : results_exec_eye == 0, "glyphicon-eye-close" : results_exec_eye == 1}'></span>
+                      </button>
+                      <p class = 'header-2'>Results</p>
+                    </div>
+
+                    <div id = 'results-exec-table' class = 'row collapse in'>
+                      <div ng-class = '{"col-md-6": compareExecution != ""}'>
+                        <ul class = 'draglist'>
+                          <li class = 'drop-obj' ng-repeat = 'obj in currentExecution.objects'>
+                            <div class = 'drag-obj'>{{obj.name}}</div>
+                            <p ng-if = '$index == 0'>Most Important</p>
+                            <p ng-if = '$index == currentExecution.objects.length - 1'>Least Important</p>
+                          </li>
+                        </ul>
+                      </div>
+
+                      <div class = 'col-md-6' ng-if = 'compareExecution != ""'>
+                        <ul class = 'draglist'>
+                          <li class = 'drop-obj' ng-repeat = 'obj in compareExecution.objects'>
+                            <div class = 'drag-obj'>{{obj.name}}</div>
+                            <p ng-if = '$index == 0'>Most Important</p>
+                            <p ng-if = '$index == compareExecution.objects.length - 1'>Least Important</p>
                           </li>
                         </ul>
                       </div>

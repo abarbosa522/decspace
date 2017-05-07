@@ -3,9 +3,6 @@ app.controller('SortMethodController', function($scope, $http, $window) {
   var url = window.location.href;
   var proj_id = Number(url.substr(url.indexOf('?id=') + 4));
 
-  //draggable objects
-  $scope.draggableObjects = [];
-
   $scope.deleteIdExecution = '';
 
   $scope.showResetData = false;
@@ -50,7 +47,6 @@ app.controller('SortMethodController', function($scope, $http, $window) {
       //get the selected project
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-
           //get the name of the project
           $scope.project_name = response[proj]['name'];
           //change the date of the last update of the project
@@ -75,11 +71,52 @@ app.controller('SortMethodController', function($scope, $http, $window) {
     });
   }
 
+  $scope.objects = [];
+  $scope.deleteIdObject = '';
+  $scope.objects_eye = 1;
+  $scope.new_object = {};
+
+  $scope.addObject = function() {
+    console.log($scope.objects)
+    //if a name has not been assigned - add error class
+    if($scope.new_object.name == undefined || $scope.new_object.name == '')
+      $('#objects-name').addClass('has-error');
+    else {
+      $('#objects-name').removeClass('has-error');
+
+      if($scope.objects.length == 0)
+        $scope.new_object.id = 1;
+      else
+        $scope.new_object.id = $scope.objects[$scope.objects.length - 1]['id'] + 1;
+
+      $scope.objects.push(angular.copy($scope.new_object));
+
+      //reset the new object input field and remove the error class - just in case
+      $scope.new_object.name = '';
+      $('#objects-name').removeClass('has-error');
+    }
+  }
+
+  $scope.deleteObject = function(object) {
+    $scope.deleteIdObject = object.id;
+  }
+
+  $scope.confirmDeleteObject = function(object) {
+    $scope.objects.splice($scope.objects.indexOf(object), 1);
+    $scope.deleteIdObject = '';
+  }
+
+  $scope.cancelDeleteObject = function() {
+    $scope.deleteIdObject = '';
+  }
+
+  $scope.order_eye = 1;
+
   $scope.onDropComplete = function (index, obj, evt) {
-    var otherObj = $scope.draggableObjects[index];
-    var otherIndex = $scope.draggableObjects.indexOf(obj);
-    $scope.draggableObjects[index] = obj;
-    $scope.draggableObjects[otherIndex] = otherObj;
+    var otherObj = $scope.objects[index];
+    var otherIndex = $scope.objects.indexOf(obj);
+    $scope.objects[index] = obj;
+    $scope.objects[otherIndex] = otherObj;
   }
 
   $scope.saveData = function() {
@@ -90,8 +127,8 @@ app.controller('SortMethodController', function($scope, $http, $window) {
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
 
-          //insert sorted objects
-          response[proj]['sorted_objects'] = $scope.draggableObjects;
+          //insert objects
+          response[proj]['objects'] = $scope.objects;
 
           //get the id of the document
           id_doc = response[proj]['_id'];
@@ -121,20 +158,17 @@ app.controller('SortMethodController', function($scope, $http, $window) {
       //get the current project
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          //get criteria
-          if(typeof response[proj]['sorted_objects'] != 'undefined')
-            $scope.draggableObjects = response[proj]['sorted_objects'];
-          else {
-            $scope.draggableObjects = [
-              {'name' : 'Object 1'},
-              {'name' : 'Object 2'},
-              {'name' : 'Object 3'}
-            ];
-          }
+          //get objects
+          if(response[proj]['objects'] != undefined)
+            $scope.objects = response[proj]['objects'];
         }
       }
     });
   }
+
+  $scope.objects_exec_eye = 1;
+  $scope.order_exec_eye = 1;
+  $scope.results_exec_eye = 1;
 
   $scope.getResults = function() {
     //show loading button
@@ -146,25 +180,28 @@ app.controller('SortMethodController', function($scope, $http, $window) {
       var execution_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear() + ' ' + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
 
       //if a comment has not been added
-      if(typeof $scope.new_execution == 'undefined') {
+      if(typeof $scope.new_execution == 'undefined')
         var comment = '';
-      }
-      else {
+      else
         var comment = $scope.new_execution.comment;
-      }
 
       for(proj in response) {
         if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
           //get the largest execution_id
-          if(response[proj]['executions'].length == 0) {
+          if(response[proj]['executions'].length == 0)
             var execution_id = 1;
-          }
-          else {
+          else
             var execution_id = response[proj]['executions'][response[proj]['executions'].length - 1]['execution_id'] + 1;
-          }
 
           //insert execution into database
-          response[proj]['executions'].push({'execution_id':execution_id,'results':$scope.draggableObjects,'comment':comment,'execution_date':execution_date});
+          var new_exec = {};
+          new_exec['execution_id'] = execution_id;
+          new_exec['objects'] = $scope.objects;
+          new_exec['comment'] = comment;
+          new_exec['execution_date'] = execution_date;
+
+          response[proj]['executions'].push(new_exec);
+
           //get the id of the document, so that it can be removed from the db
           id_doc = response[proj]['_id'];
           //project to store in the db

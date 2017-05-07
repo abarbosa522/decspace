@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>DecSpace: Workspace - Projects</title>
+    <title>DecSpace: Workspace</title>
 
     <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
 
     <!-- CSS Stylesheet -->
     <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css'/>
     <link rel = 'stylesheet' type = 'text/css' href = '../../css/workspace.css'/>
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/sort.css'/>
 
     <!-- jQuery -->
     <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
@@ -103,9 +104,7 @@
           </div>
         </div>
 
-        <!-- Workspace -->
-        <div id = 'workspace' class = 'col-md-8' style = 'height: 400px; border: black 1px solid'>
-
+        <div class = 'col-md-8'>
           <!-- Button Bar -->
           <div class = 'btn-toolbar' role = 'toolbar' style = 'margin-top: 1%'>
             <div class = 'btn-group' role = 'group'>
@@ -121,12 +120,12 @@
 
             <div class = 'btn-group' role = 'group'>
               <!-- Save Button -->
-              <button type = 'button' class = 'btn btn-primary' ng-click = 'saveData()' title = 'Save Data'>
+              <button type = 'button' class = 'btn btn-primary' ng-click = 'saveData()' title = 'Save Workflow'>
                 <span class = 'glyphicon glyphicon-floppy-save icon-large'></span>
               </button>
 
               <!-- Reload Data Button -->
-              <button type = 'button' class = 'btn btn-info' ng-click = 'reloadData()' title = 'Reload Data'>
+              <button type = 'button' class = 'btn btn-info' ng-click = 'reloadData()' title = 'Reload Workflow'>
                 <span class = 'glyphicon glyphicon-refresh'></span>
               </button>
             </div>
@@ -139,9 +138,15 @@
             </div>
           </div>
 
+          <!-- Creating Line Status -->
+          <div style = 'float: left; margin-top: 0.5%'>
+            <span style = 'display: inline-block'>Creating Connection:</span>
+            <div class = 'connection-circle' ng-class = '{"green-light" : drawing_line, "red-light" : !drawing_line}'></div>
+          </div>
+
           <!-- Alerts -->
           <div class = 'alert alert-success custom-alert' id = 'save-success' ng-cloak>
-            Data <strong>successfully</strong> saved.
+            Workflow <strong>successfully</strong> saved.
           </div>
 
           <div class = 'alert alert-danger custom-alert' id = 'invalid-connection1' ng-cloak>
@@ -168,255 +173,401 @@
             <strong>Execution error</strong> - One or more modules do not have input data or any connection.
           </div>
 
-          <!-- SVG Area -->
-          <svg id = 'svg' width = '100%' height = '100%'>
+          <!-- Workspace -->
+          <div id = 'workspace'>
+            <!-- SVG Area -->
+            <svg id = 'svg' width = '100%' height = '100%'>
 
-            <!-- Import Modal -->
-            <div class = 'modal fade' id = 'import-modal' role = 'dialog'>
-              <div class = 'modal-dialog'>
-                <div class = 'modal-content'>
-                  <div class = 'modal-header'>
-                    <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-                    <h4 class = 'modal-title'>Import Data</h4>
-                  </div>
-                  <div class = 'modal-body'>
-
-                    <div class = 'row'>
-                      <div class = 'col-md-4'></div>
-                      <input id = 'input-files' type = 'file' multiple>
+              <!-- Import Modal -->
+              <div class = 'modal fade' id = 'import-modal' role = 'dialog'>
+                <div class = 'modal-dialog'>
+                  <div class = 'modal-content'>
+                    <div class = 'modal-header'>
+                      <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                      <h4 class = 'modal-title'>Import Data</h4>
                     </div>
+                    <div class = 'modal-body'>
 
-                    <br>
+                      <div class = 'row'>
+                        <div class = 'col-md-4'></div>
+                        <input id = 'input-files' type = 'file' multiple>
+                      </div>
 
-                    <div class = 'row'>
-                      <div class = 'col-md-5'></div>
-                      <button type = 'button' class = 'btn btn-primary col-md-2' ng-click = 'importData()' data-dismiss = 'modal'>
-                        Import
-                      </button>
+                      <br>
+
+                      <div class = 'row'>
+                        <div class = 'col-md-5'></div>
+                        <button type = 'button' class = 'btn btn-primary col-md-2' ng-click = 'importData()' data-dismiss = 'modal'>
+                          Import
+                        </button>
+                      </div>
+
+                      <p><sub>CSV and JSON formats are accepted.</sub></p>
+
                     </div>
-
-                    <p><sub>CSV and JSON formats are accepted.</sub></p>
-
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Module Modals -->
+              <!-- Module Modals -->
 
-            <!-- Input File Modal -->
-            <div id = 'inputfile-modal' class = 'modal fade custom-modal' role = 'dialog'>
-              <div class = 'modal-dialog'>
-                <div class = 'modal-content'>
+              <!-- Input File Modal -->
+              <div id = 'inputfile-modal' class = 'modal fade custom-modal' role = 'dialog'>
+                <div class = 'modal-dialog'>
+                  <div class = 'modal-content'>
 
-                  <div class = 'modal-header'>
-                    <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-                    <h4 class = 'modal-title'>Input File - {{currentModule.name}}</h4>
-                  </div>
+                    <div class = 'modal-header'>
+                      <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                      <h4 class = 'modal-title'>Input File - {{currentModule.name}}</h4>
+                    </div>
 
-                  <div class = 'modal-body'>
+                    <div class = 'modal-body'>
 
-                    <p class = 'header-1'>Data</p>
+                      <p class = 'header-1'>Data</p>
 
-                    <table class = 'table table-bordered table-hover'>
-                      <thead>
-                        <tr>
-                          <th class = 'text-center' ng-repeat = '(key, value) in currentModule.output[0]' ng-if = 'key != "id"'>{{key}}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr ng-repeat = 'item in currentModule.output'>
-                          <td ng-repeat = '(key, value) in item' ng-if = 'key != "id"'>{{value}}</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center' ng-repeat = '(key, value) in currentModule.output[0]' ng-if = 'key != "id"'>{{key}}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat = 'item in currentModule.output'>
+                            <td ng-repeat = '(key, value) in item' ng-if = 'key != "id"'>{{value}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
 
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- OrderBy Modal -->
-            <div id = 'orderby-modal' class = 'modal fade custom-modal'  role = 'dialog'>
-              <div class = 'modal-dialog'>
-                <div class = 'modal-content'>
+              <!-- OrderBy Modal -->
+              <div id = 'orderby-modal' class = 'modal fade custom-modal'  role = 'dialog'>
+                <div class = 'modal-dialog'>
+                  <div class = 'modal-content'>
 
-                  <div class = 'modal-header'>
-                    <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-                    <h4 class = 'modal-title'>Module - OrderBy{{currentModule.name_id}}</h4>
-                  </div>
+                    <div class = 'modal-header'>
+                      <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                      <h4 class = 'modal-title'>Module - OrderBy{{currentModule.name_id}}</h4>
+                    </div>
 
-                  <div class = 'modal-body'>
+                    <div class = 'modal-body'>
 
-                    <!-- Criteria -->
-                    <p class = 'header-1'>Criteria</p>
+                      <!-- Criteria -->
+                      <p class = 'header-1'>Criteria</p>
 
-                    <table class = 'table table-bordered table-hover'>
-                      <thead>
-                        <tr>
-                          <th class = 'text-center'>Order By</th>
-                          <th class = 'text-center'>Criterion Name</th>
-                          <th class = 'text-center'>Type</th>
-                          <th class = 'text-center'>Direction</th>
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>Order By</th>
+                            <th class = 'text-center'>Criterion Name</th>
+                            <th class = 'text-center'>Type</th>
+                            <th class = 'text-center'>Direction</th>
+                            <th class = 'col-md-2'></th>
+                          </tr>
+                        </thead>
+                        <!-- Added Criteria -->
+                        <tbody>
+                          <tr ng-repeat = 'criterion in currentModule.input.criteria' ng-class = '{danger: criterion.id == deleteIdOrderByCriterion}'>
+                            <td>
+                              <input type = 'radio' ng-checked = 'criterion.selected == "true"' ng-click = 'selectOrderByCriterion(criterion)'>
+                            </td>
+                            <td>
+                              <input class = 'form-control' type = 'text' ng-model = 'criterion.name'>
+                            </td>
+                            <td>
+                              <select class = 'form-control' ng-model = 'criterion.type'>
+                                <option value = '' disabled>--- Please Select ---</option>
+                                <option>Text</option>
+                                <option>Number</option>
+                              </select>
+                            </td>
+                            <td>
+                              <select class = 'form-control' ng-model = 'criterion.direction'>
+                                <option value = '' disabled>--- Please Select ---</option>
+                                <option>Ascendant</option>
+                                <option>Descendant</option>
+                              </select>
+                            </td>
+                            <td ng-if = 'criterion.id != deleteIdOrderByCriterion'>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteOrderByCriterion(criterion)' title = 'Delete Criterion'>
+                                <span class = 'glyphicon glyphicon-minus'></span>
+                              </button>
+                            </td>
+                            <td ng-if = 'criterion.id == deleteIdOrderByCriterion'>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteOrderByCriterion(criterion)' title = 'Confirm Delete Criterion'>
+                                <span class = 'glyphicon glyphicon-ok'></span>
+                              </button>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteOrderByCriterion()' title = 'Cancel Delete Criterion'>
+                                <span class = 'glyphicon glyphicon-remove'></span>
+                              </button>
+                            </td>
+                          </tr>
+                          <!-- Form to add criteria -->
+                          <tr class = 'active'>
+                            <td></td>
+                            <td>
+                              <div id = 'orderby-criteria-name' class = 'form-group'>
+                                <input class = 'form-control' type = 'text' ng-model = 'new_criterion.name'>
+                              </div>
+                            </td>
+                            <td>
+                              <div id = 'orderby-criteria-type' class = 'form-group'>
+                                <select class = 'form-control' ng-model = 'new_criterion.type'>
+                                  <option value = '' disabled>--- Please Select ---</option>
+                                  <option>Text</option>
+                                  <option>Number</option>
+                                </select>
+                              </div>
+                            </td>
+                            <td>
+                              <div id = 'orderby-criteria-direction' class = 'form-group'>
+                                <select class = 'form-control' ng-model = 'new_criterion.direction'>
+                                  <option value = '' disabled>--- Please Select ---</option>
+                                  <option>Ascendant</option>
+                                  <option>Descendant</option>
+                                </select>
+                              </div>
+                            </td>
+                            <td>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'addOrderByCriterion()' title = 'Add Criterion'>
+                                <span class = 'glyphicon glyphicon-plus'></span>
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <!-- Actions -->
+                      <p class = 'header-1'>Actions</p>
+
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <th class = 'text-center'>Action Name</th>
+                          <th class = 'text-center' ng-repeat = 'criterion in currentModule.input.criteria'>{{criterion.name}}</th>
                           <th class = 'col-md-2'></th>
-                        </tr>
-                      </thead>
-                      <!-- Added Criteria -->
-                      <tbody>
-                        <tr ng-repeat = 'criterion in currentModule.input.criteria' ng-class = '{danger: criterion.id == deleteIdOrderByCriterion}'>
-                          <td>
-                            <input type = 'radio' ng-checked = 'criterion.selected == "true"' ng-click = 'selectOrderByCriterion(criterion)'>
-                          </td>
-                          <td>
-                            <input class = 'form-control' type = 'text' ng-model = 'criterion.name'>
-                          </td>
-                          <td>
-                            <select ng-model = 'criterion.type'>
-                              <option value = '' disabled>--- Please Select ---</option>
-                              <option>Text</option>
-                              <option>Number</option>
-                            </select>
-                          </td>
-                          <td>
-                            <select ng-model = 'criterion.direction'>
-                              <option value = '' disabled>--- Please Select ---</option>
-                              <option>Ascendant</option>
-                              <option>Descendant</option>
-                            </select>
-                          </td>
-                          <td ng-if = 'criterion.id != deleteIdOrderByCriterion'>
-                            <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteOrderByCriterion(criterion)' title = 'Delete Criterion'>
-                              <span class = 'glyphicon glyphicon-minus'></span>
-                            </button>
-                          </td>
-                          <td ng-if = 'criterion.id == deleteIdOrderByCriterion'>
-                            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteOrderByCriterion(criterion)' title = 'Confirm Delete Criterion'>
-                              <span class = 'glyphicon glyphicon-ok'></span>
-                            </button>
-                            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteOrderByCriterion()' title = 'Cancel Delete Criterion'>
-                              <span class = 'glyphicon glyphicon-remove'></span>
-                            </button>
-                          </td>
-                        </tr>
-                        <!-- Form to add criteria -->
-                        <tr class = 'active'>
-                          <td></td>
-                          <td>
-                            <input class = 'form-control' type = 'text' ng-model = 'new_criterion.name'>
-                          </td>
-                          <td>
-                            <select ng-model = 'new_criterion.type'>
-                              <option value = '' disabled>--- Please Select ---</option>
-                              <option>Text</option>
-                              <option>Number</option>
-                            </select>
-                          </td>
-                          <td>
-                            <select ng-model = 'new_criterion.direction'>
-                              <option value = '' disabled>--- Please Select ---</option>
-                              <option>Ascendant</option>
-                              <option>Descendant</option>
-                            </select>
-                          </td>
-                          <td>
-                            <button type = 'button' class = 'btn btn-success' ng-click = 'addOrderByCriterion()' title = 'Add Criterion'>
-                              <span class = 'glyphicon glyphicon-plus'></span>
-                            </button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat = 'action in currentModule.input.actions' ng-class = '{danger: action.id == deleteIdOrderByAction}'>
+                            <td>
+                              <input class = 'form-control' type = 'text' ng-model = 'action.name'>
+                            </td>
+                            <td ng-repeat = 'criterion in currentModule.input.criteria'>
+                              <input class = 'form-control' ng-model = 'action[criterion.name]'>
+                            </td>
+                            <td ng-if = 'action.id != deleteIdOrderByAction'>
+                              <button type = 'button' class = 'btn btn-danger btn-action-remove' ng-click = 'deleteOrderByAction(action)' title = 'Delete Action'>
+                                <span class = 'glyphicon glyphicon-minus'></span>
+                              </button>
+                            </td>
+                            <td ng-if = 'action.id == deleteIdOrderByAction'>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteOrderByAction(action)' title = 'Confirm Delete Action'>
+                                <span class = 'glyphicon glyphicon-ok'></span>
+                              </button>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteOrderByAction()' title = 'Cancel Delete Action'>
+                                <span class = 'glyphicon glyphicon-remove'></span>
+                              </button>
+                            </td>
+                          </tr>
+                          <!-- Form to add action -->
+                          <tr class = 'active'>
+                            <td>
+                              <div id = 'orderby-actions-name' class = 'form-group'>
+                                <input class = 'form-control' type = 'text' ng-model = 'new_action.name'>
+                              </div>
+                            </td>
+                            <td ng-repeat = 'criterion in currentModule.input.criteria'>
+                              <div id = 'orderby-actions-{{criterion.id}}' class = 'form-group'>
+                                <input class = 'form-control' ng-model = 'new_action[criterion.name]'>
+                              </div>
+                            </td>
+                            <td>
+                              <button type = 'button' class = 'btn btn-success btn-action-add' ng-click = 'addOrderByAction()' title = 'Add Action'>
+                                <span class = 'glyphicon glyphicon-plus'></span>
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
 
-                    <!-- Actions -->
-                    <p class = 'header-1'>Actions</p>
-
-                    <table class = 'table table-bordered table-hover'>
-                      <thead>
-                        <th class = 'text-center'>Action Name</th>
-                        <th class = 'text-center' ng-repeat = 'criterion in currentModule.input.criteria'>{{criterion.name}}</th>
-                        <th class = 'col-md-2'></th>
-                      </thead>
-                      <tbody>
-                        <tr ng-repeat = 'action in currentModule.input.actions' ng-class = '{danger: action.id == deleteIdOrderByAction}'>
-                          <td>
-                            <input class = 'form-control' type = 'text' ng-model = 'action.name'>
-                          </td>
-                          <td ng-repeat = 'criterion in currentModule.input.criteria'>
-                            <input class = 'form-control' ng-model = 'action[criterion.name]'>
-                          </td>
-                          <td ng-if = 'action.id != deleteIdOrderByAction'>
-                            <button type = 'button' class = 'btn btn-danger btn-action-remove' ng-click = 'deleteOrderByAction(action)' title = 'Delete Action'>
-                              <span class = 'glyphicon glyphicon-minus'></span>
-                            </button>
-                          </td>
-                          <td ng-if = 'action.id == deleteIdOrderByAction'>
-                            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteOrderByAction(action)' title = 'Confirm Delete Action'>
-                              <span class = 'glyphicon glyphicon-ok'></span>
-                            </button>
-                            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteOrderByAction()' title = 'Cancel Delete Action'>
-                              <span class = 'glyphicon glyphicon-remove'></span>
-                            </button>
-                          </td>
-                        </tr>
-                        <!-- Form to add action -->
-                        <tr class = 'active'>
-                          <td>
-                            <input class = 'form-control' type = 'text' ng-model = 'new_action.name'>
-                          </td>
-                          <td ng-repeat = 'criterion in currentModule.input.criteria'>
-                            <input class = 'form-control' ng-model = 'new_action[criterion.name]'>
-                          </td>
-                          <td>
-                            <button type = 'button' class = 'btn btn-success btn-action-add' ng-click = 'addOrderByAction()' title = 'Add Action'>
-                              <span class = 'glyphicon glyphicon-plus'></span>
-                            </button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
                   </div>
-
                 </div>
               </div>
-            </div>
 
-            <!-- Module Templates -->
+              <!-- Sort Modal -->
+              <div id = 'sort-modal' class = 'modal fade custom-modal' role = 'dialog'>
+                <div class = 'modal-dialog'>
+                  <div class = 'modal-content'>
 
-            <!-- Input File Template -->
-            <template id = 'inputfile-temp'>
-              <div id = 'inputfile' class = 'module-template module-inputfile draggable' style = 'position:absolute; margin-top: 100%'>
-                <a id = 'filename' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#inputfile-modal' ng-click = 'selectCurrentModule($event)' style = 'position: absolute; margin-top: -5%; margin-left: -20%'></a>
+                    <div class = 'modal-header'>
+                      <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                      <h4 class = 'modal-title'>Module - Sort{{currentModule.name_id}}</h4>
+                    </div>
 
-                <a href ng-click = 'deleteModule($event)' style = 'display: block; margin-top: -22%; margin-left: 108%'>
-                  <span class = 'glyphicon glyphicon-remove'></span>
-                </a>
+                    <div class = 'modal-body'>
 
-                <button id = 'inputfile-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 12%; margin-left: 40%'></button>
-                <span class = 'module-circle-span' style = 'margin-top: 10%; margin-left: 18%'>Output</span>
+                      <!-- Objects -->
+                      <p class = 'header-1'>Objects</p>
+
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>Object Name</th>
+                            <th class = 'col-md-2'></th>
+                          </tr>
+                        </thead>
+                        <!-- Added Objects -->
+                        <tbody>
+                          <tr ng-repeat = 'object in currentModule.input.objects | orderBy: "id"' ng-class = '{danger: object.id == deleteIdSortObject}'>
+                            <td>
+                              <input class = 'form-control' type = 'text' ng-model = 'object.name'>
+                            </td>
+                            <td ng-if = 'object.id != deleteIdSortObject'>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteSortObject(object)' title = 'Delete Object'>
+                                <span class = 'glyphicon glyphicon-minus'></span>
+                              </button>
+                            </td>
+                            <td ng-if = 'object.id == deleteIdSortObject'>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteSortObject(object)' title = 'Confirm Delete Object'>
+                                <span class = 'glyphicon glyphicon-ok'></span>
+                              </button>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteSortObject()' title = 'Cancel Delete Object'>
+                                <span class = 'glyphicon glyphicon-remove'></span>
+                              </button>
+                            </td>
+                          </tr>
+                          <!-- Form to add object -->
+                          <tr class = 'active'>
+                            <td>
+                              <div id = 'sort-objects-name' class = 'form-group'>
+                                <input class = 'form-control' type = 'text' ng-model = 'new_object.name'>
+                              </div>
+                            </td>
+                            <td>
+                              <button type = 'button' class = 'btn btn-success btn-action-add' ng-click = 'addSortObject()' title = 'Add Object'>
+                                <span class = 'glyphicon glyphicon-plus'></span>
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <!-- Order -->
+                      <p class = 'header-1'>Order</p>
+
+                      <div class = 'row text-center'>
+                        <ul class = 'draglist'>
+                          <li ng-repeat = 'obj in currentModule.input.objects' ng-drop = 'true' ng-drop-success = 'onDropComplete($index, $data, $event)'>
+                            <div ng-drag = 'true' ng-drag-data = 'obj' ng-class = 'obj.name'>{{obj.name}}</div>
+
+                            <div ng-if = 'currentModule.input.objects.length > 1'>
+                              <p ng-if = '$index == 0' style = 'margin-top: 20%'>Most Important</p>
+                              <p ng-if = '$index == currentModule.input.objects.length - 1' style = 'margin-top: 20%'>Least Important</p>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+
+                      <br><br>
+
+                    </div>
+                  </div>
+                </div>
               </div>
-            </template>
 
-            <!-- OrderBy Template -->
-            <template id = 'orderby-temp'>
-              <div id = 'orderby' class = 'module-template draggable'>
-                <a id = 'mod-name' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#orderby-modal' ng-click = 'selectCurrentModule($event)'></a>
+              <!-- Module Templates -->
 
-                <a href ng-click = 'deleteModule($event)' style = 'display: block; margin-top: -40%; margin-left: 108%'>
-                  <span class = 'glyphicon glyphicon-remove'></span>
-                </a>
+              <!-- Input File Template -->
+              <template id = 'inputfile-temp'>
+                <div id = 'inputfile' class = 'module-template module-inputfile draggable' style = 'position:absolute; margin-top: 100%'>
+                  <a id = 'filename' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#inputfile-modal' ng-click = 'selectCurrentModule($event)' style = 'position: absolute; margin-top: -5%; margin-left: -20%'></a>
 
-                <button id = 'orderby-criteria' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: -3%; margin-left: -48%'></button>
-                <span class = 'module-circle-span' style = 'margin-top: -4%; margin-left: -40%'>Criteria</span>
+                  <a href ng-click = 'deleteModule($event)' style = 'display: block; margin-top: -23%; margin-left: 108%'>
+                    <span class = 'glyphicon glyphicon-remove'></span>
+                  </a>
 
-                <button id = 'orderby-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 20%; margin-left: -48%'></button>
-                <span class = 'module-circle-span' style = 'margin-top: 19%; margin-left: -40%'>Actions</span>
+                  <button id = 'inputfile-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 12%; margin-left: 40%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 10%; margin-left: 18%'>Output</span>
+                </div>
+              </template>
 
-                <button id = 'orderby-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 30%; margin-left: 40%'></button>
-                <span class = 'module-circle-span' style = 'margin-top: 28%; margin-left: 18%'>Output</span>
-              </div>
-            </template>
+              <!-- OrderBy Template -->
+              <template id = 'orderby-temp'>
+                <div id = 'orderby' class = 'module-template module-orderby draggable'>
+                  <a id = 'mod-name' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#orderby-modal' ng-click = 'selectCurrentModule($event)'></a>
 
-          </svg>
+                  <a href ng-click = 'deleteModule($event)' style = 'display: block; margin-top: -40%; margin-left: 108%'>
+                    <span class = 'glyphicon glyphicon-remove'></span>
+                  </a>
+
+                  <button id = 'orderby-criteria' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: -3%; margin-left: -48%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: -4%; margin-left: -40%'>Criteria</span>
+
+                  <button id = 'orderby-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 20%; margin-left: -48%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 19%; margin-left: -40%'>Actions</span>
+
+                  <button id = 'orderby-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 30%; margin-left: 40%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 28%; margin-left: 18%'>Output</span>
+                </div>
+              </template>
+
+              <!-- Sort Template -->
+              <template id = 'sort-temp'>
+                <div id = 'sort' class = 'module-template module-sort draggable'>
+                  <a id = 'mod-name' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#sort-modal' ng-click = 'selectCurrentModule($event)' style = 'display: block; margin-top: -10%'></a>
+
+                  <a href ng-click = 'deleteModule($event)' style = 'display: block; margin-top: -31%; margin-left: 109%'>
+                    <span class = 'glyphicon glyphicon-remove'></span>
+                  </a>
+
+                  <button id = 'sort-order' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 15.5%; margin-left: -47%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 14%; margin-left: -39%'>Objects</span>
+
+                  <button id = 'sort-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 15.5%; margin-left: 40%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 14%; margin-left: 18%'>Output</span>
+                </div>
+              </template>
+
+              <!-- CAT-SD Template -->
+              <template id = 'cat-sd-temp'>
+                <div id = 'cat-sd' class = 'module-template module-cat-sd draggable'>
+                  <a id = 'mod-name' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#cat-sd-modal' ng-click = 'selectCurrentModule($event)' style = 'display: block; margin-top: 5%'></a>
+
+                  <a href ng-click = 'deleteModule($event)' style = 'display: block; margin-top: -45%; margin-left: 108%'>
+                    <span class = 'glyphicon glyphicon-remove'></span>
+                  </a>
+
+                  <button id = 'cat-sd-criteria' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: -10%; margin-left: -47%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: -11%; margin-left: -39%'>Criteria</span>
+
+                  <button id = 'cat-sd-interaction-effects' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: -2%; margin-left: -47%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: -3%; margin-left: -39%'>Interaction Effects</span>
+
+                  <button id = 'cat-sd-scales' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 7%; margin-left: -47%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 6%; margin-left: -39%'>Scales</span>
+
+                  <button id = 'cat-sd-functions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 15%; margin-left: -47%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 14%; margin-left: -39%'>Functions</span>
+
+                  <button id = 'cat-sd-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 23%; margin-left: -47%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 22%; margin-left: -39%'>Actions</span>
+
+                  <button id = 'cat-sd-categories' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 31%; margin-left: -47%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 30%; margin-left: -39%'>Categories</span>
+
+                  <button id = 'cat-sd-reference-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 39%; margin-left: -47%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 38%; margin-left: -39%'>Reference Actions</span>
+
+                  <button id = 'cat-sd-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 39%; margin-left: 41%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 38%; margin-left: 19%'>Output</span>
+                </div>
+              </template>
+
+            </svg>
+          </div>
         </div>
 
         <!-- Executions and Results List -->
@@ -490,6 +641,7 @@
                       <div ng-class = '{"col-md-6": compare_exec != ""}'>
                         <!-- Show input and output data of all modules -->
                         <div ng-repeat = 'mod in exec.modules'>
+
                           <!-- Input Files -->
                           <div ng-if = 'mod.type == "InputFile"'>
                             <!-- Module Name -->
@@ -578,6 +730,68 @@
                             <!-- Horizontal Divider -->
                             <br><hr class = 'custom-hr'><br>
                           </div>
+
+                          <!-- Sort Module -->
+                          <div ng-if = 'mod.type == "Sort"'>
+                            <!-- Module Name -->
+                            <p class = 'header-7'>Sort{{mod.name_id}}</p>
+
+                            <!-- Objects -->
+                            <p class = 'header-8'>Objects</p>
+
+                            <table class = 'table table-bordered table-hover'>
+                              <thead>
+                                <tr>
+                                  <th class = 'text-center'>Object Name</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr ng-repeat = 'object in mod.input.objects | orderBy : "id"'>
+                                  <td>{{object.name}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+
+                            <!-- Order -->
+                            <p class = 'header-8'>Order</p>
+
+                            <div class = 'row text-center'>
+                              <ul class = 'draglist'>
+                                <li ng-drop = 'true' ng-repeat = 'obj in mod.input.objects'>
+                                  <div ng-drag = 'true' ng-class = 'obj.name'>{{obj.name}}</div>
+
+                                  <div ng-if = 'mod.input.objects.length > 1'>
+                                    <p ng-if = '$index == 0' style = 'margin-top: 20%'>Most Important</p>
+                                    <p ng-if = '$index == mod.input.objects.length - 1' style = 'margin-top: 20%'>Least Important</p>
+                                  </div>
+                                </li>
+                              </ul>
+                            </div>
+
+                            <br><br>
+
+                            <!-- Output -->
+                            <p class = 'header-8'>Output</p>
+
+                            <div class = 'row text-center'>
+                              <ul class = 'draglist'>
+                                <li ng-drop = 'true' ng-repeat = 'obj in mod.input.objects'>
+                                  <div ng-drag = 'true' ng-class = 'obj.name'>{{obj.name}}</div>
+
+                                  <div ng-if = 'mod.input.objects.length > 1'>
+                                    <p ng-if = '$index == 0' style = 'margin-top: 20%'>Most Important</p>
+                                    <p ng-if = '$index == mod.input.objects.length - 1' style = 'margin-top: 20%'>Least Important</p>
+                                  </div>
+                                </li>
+                              </ul>
+                            </div>
+
+                            <br>
+
+                            <!-- Horizontal Divider -->
+                            <br><hr class = 'custom-hr'><br>
+                          </div>
+
                         </div>
                       </div>
                     </div>

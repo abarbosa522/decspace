@@ -79,7 +79,7 @@
 
       <!-- Main tabs - Method Description and Example -->
       <ul class = 'nav nav-tabs nav-justified'>
-        <li role = 'presentation' class = 'active'><a data-toggle = 'tab' href= '#description'>Method Description</a></li>
+        <li role = 'presentation' class = 'active'><a data-toggle = 'tab' href= '#description'>Description</a></li>
         <li role = 'presentation'><a data-toggle = 'tab' href= '#example'>Example</a></li>
       </ul>
 
@@ -89,7 +89,7 @@
 
           <br>
 
-          <p>Given 3 different objects, reorder them by their importance. The object on the left should be the most important and the object on the right should be the least important.</p>
+          <p>List various objects (only the name is needed) and then reorder them by their importance. The object on the left should be the most important and the object on the right should be the least important.</p>
 
         </div>
 
@@ -105,14 +105,30 @@
 
           <br><br>
 
+          <!-- Example of Objects -->
+          <p class = 'header-5'>Objects</p>
+
+          <table class = 'table table-bordered table-hover'>
+            <thead>
+              <tr>
+                <th class = 'text-center'>Object Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Object 1</td></tr>
+              <tr><td>Object 2</td></tr>
+              <tr><td>Object 3</td></tr>
+            </tbody>
+          </table>
+
+          <br>
+          
           <!-- Example of Order -->
           <p class = 'header-5'>Order</p>
 
           <ul class = 'draglist'>
             <li class = 'drop-obj' ng-repeat = 'obj in sort_objects'>
-              <div class = 'drag-obj'>
-                {{obj.name}}
-              </div>
+              <div class = 'drag-obj'>{{obj.name}}</div>
               <p ng-if = '$index == 0'>Most Important</p>
               <p ng-if = '$index == sort_objects.length - 1'>Least Important</p>
             </li>
@@ -125,9 +141,7 @@
 
           <ul class = 'draglist'>
             <li class = 'drop-obj' ng-repeat = 'obj in sort_objects'>
-              <div class = 'drag-obj'>
-                {{obj.name}}
-              </div>
+              <div class = 'drag-obj'>{{obj.name}}</div>
               <p ng-if = '$index == 0'>Most Important</p>
               <p ng-if = '$index == sort_objects.length - 1'>Least Important</p>
             </li>
