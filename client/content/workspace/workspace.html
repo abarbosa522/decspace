@@ -9,6 +9,7 @@
     <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css'/>
     <link rel = 'stylesheet' type = 'text/css' href = '../../css/workspace.css'/>
     <link rel = 'stylesheet' type = 'text/css' href = '../../css/sort.css'/>
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/srf.css'/>
 
     <!-- jQuery -->
     <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
@@ -25,6 +26,9 @@
 
     <!-- AngularJS Services -->
     <script src = '../../js/services/OrderByService.js'></script>
+    <script src = '../../js/services/CATSDService.js'></script>
+    <script src = '../../js/services/DelphiService.js'></script>
+    <script src = '../../js/services/SRFService.js'></script>
 
     <!-- Bootstrap -->
     <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
@@ -41,6 +45,18 @@
 
     <!-- InteractJS -->
     <script type = 'text/javascript' src = '../../js/shared/interact.js'></script>
+
+    <!-- MathJax -->
+    <script type = 'text/x-mathjax-config'>
+      MathJax.Hub.Config({
+        CommonHTML: {
+          scale: 90,
+          linebreaks: { automatic: true }
+        }
+      });
+    </script>
+    <script type = 'text/javascript' async src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=AM_CHTML'></script>
+
   </head>
 
   <body ng-app = 'decspace' ng-controller = 'WorkspaceController'>
@@ -270,7 +286,7 @@
                         </thead>
                         <!-- Added Criteria -->
                         <tbody>
-                          <tr ng-repeat = 'criterion in currentModule.input.criteria' ng-class = '{danger: criterion.id == deleteIdOrderByCriterion}'>
+                          <tr ng-repeat = 'criterion in currentModule.input.criteria' ng-class = '{danger: criterion.id == deleteIdCriterion}'>
                             <td>
                               <input type = 'radio' ng-checked = 'criterion.selected == "true"' ng-click = 'selectOrderByCriterion(criterion)'>
                             </td>
@@ -291,16 +307,16 @@
                                 <option>Descendant</option>
                               </select>
                             </td>
-                            <td ng-if = 'criterion.id != deleteIdOrderByCriterion'>
-                              <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteOrderByCriterion(criterion)' title = 'Delete Criterion'>
+                            <td ng-if = 'criterion.id != deleteIdCriterion'>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(criterion, "Criteria")' title = 'Delete Criterion'>
                                 <span class = 'glyphicon glyphicon-minus'></span>
                               </button>
                             </td>
-                            <td ng-if = 'criterion.id == deleteIdOrderByCriterion'>
-                              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteOrderByCriterion(criterion)' title = 'Confirm Delete Criterion'>
+                            <td ng-if = 'criterion.id == deleteIdCriterion'>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(criterion, "Criteria")' title = 'Confirm Delete Criterion'>
                                 <span class = 'glyphicon glyphicon-ok'></span>
                               </button>
-                              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteOrderByCriterion()' title = 'Cancel Delete Criterion'>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Criteria")' title = 'Cancel Delete Criterion'>
                                 <span class = 'glyphicon glyphicon-remove'></span>
                               </button>
                             </td>
@@ -310,12 +326,12 @@
                             <td></td>
                             <td>
                               <div id = 'orderby-criteria-name' class = 'form-group'>
-                                <input class = 'form-control' type = 'text' ng-model = 'new_criterion.name'>
+                                <input class = 'form-control' type = 'text' ng-model = 'new_orderby_criterion.name'>
                               </div>
                             </td>
                             <td>
                               <div id = 'orderby-criteria-type' class = 'form-group'>
-                                <select class = 'form-control' ng-model = 'new_criterion.type'>
+                                <select class = 'form-control' ng-model = 'new_orderby_criterion.type'>
                                   <option value = '' disabled>--- Please Select ---</option>
                                   <option>Text</option>
                                   <option>Number</option>
@@ -324,7 +340,7 @@
                             </td>
                             <td>
                               <div id = 'orderby-criteria-direction' class = 'form-group'>
-                                <select class = 'form-control' ng-model = 'new_criterion.direction'>
+                                <select class = 'form-control' ng-model = 'new_orderby_criterion.direction'>
                                   <option value = '' disabled>--- Please Select ---</option>
                                   <option>Ascendant</option>
                                   <option>Descendant</option>
@@ -345,28 +361,28 @@
 
                       <table class = 'table table-bordered table-hover'>
                         <thead>
-                          <th class = 'text-center'>Action Name</th>
-                          <th class = 'text-center' ng-repeat = 'criterion in currentModule.input.criteria'>{{criterion.name}}</th>
+                          <th class = 'text-center'>Name</th>
+                          <th class = 'text-center' ng-repeat = 'orderby_criterion in currentModule.input.criteria'>{{orderby_criterion.name}}</th>
                           <th class = 'col-md-2'></th>
                         </thead>
                         <tbody>
-                          <tr ng-repeat = 'action in currentModule.input.actions' ng-class = '{danger: action.id == deleteIdOrderByAction}'>
+                          <tr ng-repeat = 'orderby_action in currentModule.input.actions' ng-class = '{danger: orderby_action.id == deleteIdAction}'>
                             <td>
-                              <input class = 'form-control' type = 'text' ng-model = 'action.name'>
+                              <input class = 'form-control' ng-model = 'orderby_action.name'>
                             </td>
-                            <td ng-repeat = 'criterion in currentModule.input.criteria'>
-                              <input class = 'form-control' ng-model = 'action[criterion.name]'>
+                            <td ng-repeat = 'orderby_criterion in currentModule.input.criteria'>
+                              <input class = 'form-control' ng-model = 'orderby_action[orderby_criterion.name]'>
                             </td>
-                            <td ng-if = 'action.id != deleteIdOrderByAction'>
-                              <button type = 'button' class = 'btn btn-danger btn-action-remove' ng-click = 'deleteOrderByAction(action)' title = 'Delete Action'>
+                            <td ng-if = 'orderby_action.id != deleteIdAction'>
+                              <button type = 'button' class = 'btn btn-danger btn-action-remove' ng-click = 'deleteInput(orderby_action, "Actions")' title = 'Delete Action'>
                                 <span class = 'glyphicon glyphicon-minus'></span>
                               </button>
                             </td>
-                            <td ng-if = 'action.id == deleteIdOrderByAction'>
-                              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteOrderByAction(action)' title = 'Confirm Delete Action'>
+                            <td ng-if = 'orderby_action.id == deleteIdAction'>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(orderby_action, "Actions")' title = 'Confirm Delete Action'>
                                 <span class = 'glyphicon glyphicon-ok'></span>
                               </button>
-                              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteOrderByAction()' title = 'Cancel Delete Action'>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Actions")' title = 'Cancel Delete Action'>
                                 <span class = 'glyphicon glyphicon-remove'></span>
                               </button>
                             </td>
@@ -374,13 +390,13 @@
                           <!-- Form to add action -->
                           <tr class = 'active'>
                             <td>
-                              <div id = 'orderby-actions-name' class = 'form-group'>
-                                <input class = 'form-control' type = 'text' ng-model = 'new_action.name'>
+                              <div id = 'orderby-action-name' class = 'form-group'>
+                                <input class = 'form-control' ng-model = 'new_orderby_action.name'>
                               </div>
                             </td>
                             <td ng-repeat = 'criterion in currentModule.input.criteria'>
-                              <div id = 'orderby-actions-{{criterion.id}}' class = 'form-group'>
-                                <input class = 'form-control' ng-model = 'new_action[criterion.name]'>
+                              <div id = 'orderby-action-{{criterion.id}}' class = 'form-group'>
+                                <input class = 'form-control' ng-model = 'new_orderby_action[criterion.name]'>
                               </div>
                             </td>
                             <td>
@@ -415,26 +431,26 @@
                       <table class = 'table table-bordered table-hover'>
                         <thead>
                           <tr>
-                            <th class = 'text-center'>Object Name</th>
+                            <th class = 'text-center'>Name</th>
                             <th class = 'col-md-2'></th>
                           </tr>
                         </thead>
                         <!-- Added Objects -->
                         <tbody>
-                          <tr ng-repeat = 'object in currentModule.input.objects | orderBy: "id"' ng-class = '{danger: object.id == deleteIdSortObject}'>
+                          <tr ng-repeat = 'object in currentModule.input.objects | orderBy: "id"' ng-class = '{danger: object.id == deleteIdObject}'>
                             <td>
                               <input class = 'form-control' type = 'text' ng-model = 'object.name'>
                             </td>
-                            <td ng-if = 'object.id != deleteIdSortObject'>
-                              <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteSortObject(object)' title = 'Delete Object'>
+                            <td ng-if = 'object.id != deleteIdObject'>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(object, "Objects")' title = 'Delete Object'>
                                 <span class = 'glyphicon glyphicon-minus'></span>
                               </button>
                             </td>
-                            <td ng-if = 'object.id == deleteIdSortObject'>
-                              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteSortObject(object)' title = 'Confirm Delete Object'>
+                            <td ng-if = 'object.id == deleteIdObject'>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(object, "Objects")' title = 'Confirm Delete Object'>
                                 <span class = 'glyphicon glyphicon-ok'></span>
                               </button>
-                              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteSortObject()' title = 'Cancel Delete Object'>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Objects")' title = 'Cancel Delete Object'>
                                 <span class = 'glyphicon glyphicon-remove'></span>
                               </button>
                             </td>
@@ -478,6 +494,803 @@
                 </div>
               </div>
 
+              <!-- CAT-SD Modal -->
+              <div id = 'cat-sd-modal' class = 'modal fade custom-modal' role = 'dialog'>
+                <div class = 'modal-dialog'>
+                  <div class = 'modal-content'>
+
+                    <div class = 'modal-header'>
+                      <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                      <h4 class = 'modal-title'>Module - CAT-SD{{currentModule.name_id}}</h4>
+                    </div>
+
+                    <div class = 'modal-body'>
+
+                      <!-- Criteria -->
+                      <p class = 'header-1'>Criteria</p>
+
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>Name</th>
+                            <th class = 'text-center'>Direction</th>
+                            <th class = 'col-md-2'></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <!-- Added Criteria  -->
+                          <tr ng-repeat = 'criterion in currentModule.input.criteria' ng-class = '{danger: criterion.id == deleteIdCriterion}'>
+                            <td>
+                              <div id = 'cat-criterion-{{criterion.id}}-name' class = 'form-group'>
+                                <input class = 'form-control' type = 'text' ng-model = 'criterion.name' ng-blur = 'blurCATCriterionName(criterion)'>
+                              </div>
+                            </td>
+                            <td>
+                              <select class = 'form-control' ng-model = 'criterion.direction'>
+                                <option disabled>--- Please Select ---</option>
+                                <option>Minimize</option>
+                                <option>Maximize</option>
+                              </select>
+                            </td>
+                            <td ng-if = 'criterion.id != deleteIdCriterion'>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(criterion, "Criteria")' title = 'Delete Criterion'>
+                                <span class = 'glyphicon glyphicon-minus'></span>
+                              </button>
+                            </td>
+                            <td ng-if = 'criterion.id == deleteIdCriterion'>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(criterion, "Criteria")' title = 'Confirm Delete Criterion'>
+                                <span class = 'glyphicon glyphicon-ok'></span>
+                              </button>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Criteria")' title = 'Cancel Delete Criterion'>
+                                <span class = 'glyphicon glyphicon-remove'></span>
+                              </button>
+                            </td>
+                          </tr>
+                          <!-- Form to add a criterion -->
+                          <tr class = 'active'>
+                            <td>
+                              <div id = 'cat-criterion-name' class = 'form-group'>
+                                <input class = 'form-control' type = 'text' ng-model = 'new_cat_criterion.name'>
+                              </div>
+                            </td>
+                            <td>
+                              <div id = 'cat-criterion-direction' class = 'form-group'>
+                                <select class = 'form-control' ng-model = 'new_cat_criterion.direction'>
+                                  <option value = '' disabled>--- Please Select ---</option>
+                                  <option>Minimize</option>
+                                  <option>Maximize</option>
+                                </select>
+                              </div>
+                            </td>
+                            <td>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'addCATCriterion()' title = 'Add Criterion'>
+                                <span class = 'glyphicon glyphicon-plus'></span>
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <br>
+
+                      <!-- Interaction Effects -->
+                      <p class = 'header-1'>Interaction Effects</p>
+
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <th class = 'text-center'>Type Of Effect</th>
+                          <th class = 'text-center'>Criterion 1</th>
+                          <th class = 'text-center'>Criterion 2</th>
+                          <th class = 'text-center'>Value</th>
+                          <th class = 'col-md-2'></th>
+                        </thead>
+                        <tbody>
+                          <!-- Added Interaction Effects -->
+                          <tr ng-repeat = 'interaction in currentModule.input["interaction effects"]' ng-class = '{danger: interaction.id == deleteIdInteractionEffect}'>
+                            <td>
+                              <select class = 'form-control' ng-model = 'interaction.type' ng-blur = 'blurCATInteractionValue(interaction)'>
+                                <option disabled>--- Please Select ---</option>
+                                <option>Mutual-Strengthening Effect</option>
+                                <option>Mutual-Weakening Effect</option>
+                                <option>Antagonistic Effect</option>
+                              </select>
+                            </td>
+                            <td>
+                              <select class = 'form-control' ng-model = 'interaction.criterion1'>
+                                <option disabled>--- Please Select ---</option>
+                                <option ng-repeat = 'criterion in currentModule.input.criteria' ng-if = 'criterion.name != interaction.criterion2'>{{criterion.name}}</option>
+                              </select>
+                            </td>
+                            <td>
+                              <select class = 'form-control' ng-model = 'interaction.criterion2'>
+                                <option disabled>--- Please Select ---</option>
+                                <option ng-repeat = 'criterion in currentModule.input.criteria' ng-if = 'criterion.name != interaction.criterion1'>{{criterion.name}}</option>
+                              </select>
+                            </td>
+                            <td>
+                              <div id = 'cat-interaction-{{interaction.id}}-value'>
+                                <input class = 'form-control' type = 'number' ng-model = 'interaction.value' ng-blur = 'blurCATInteractionValue(interaction)'>
+                              </div>
+                            </td>
+                            <td ng-if = 'interaction.id != deleteIdInteractionEffect'>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(interaction, "Interaction Effects")' title = 'Delete Interaction Effect'>
+                                <span class = 'glyphicon glyphicon-minus'></span>
+                              </button>
+                            </td>
+                            <td ng-if = 'interaction.id == deleteIdInteractionEffect'>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(interaction, "Interaction Effects")' title = 'Confirm Delete Interaction Effect'>
+                                <span class = 'glyphicon glyphicon-ok'></span>
+                              </button>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Interaction Effects")' title = 'Cancel Delete Interaction Effect'>
+                                <span class = 'glyphicon glyphicon-remove'></span>
+                              </button>
+                            </td>
+                          </tr>
+                          <!-- Form to add interaction -->
+                          <tr class = 'active'>
+                            <td>
+                              <div id = 'new-cat-interaction-type' class = 'form-group'>
+                                <select class = 'form-control' ng-model = 'new_interaction_effect.type'>
+                                  <option value = '' disabled>--- Please Select ---</option>
+                                  <option>Mutual-Strengthening Effect</option>
+                                  <option>Mutual-Weakening Effect</option>
+                                  <option>Antagonistic Effect</option>
+                                </select>
+                              </div>
+                            </td>
+                            <td>
+                              <div id = 'new-cat-interaction-criterion1'>
+                                <select class = 'form-control' ng-model = 'new_interaction_effect.criterion1'>
+                                  <option value = '' disabled>--- Please Select ---</option>
+                                  <option ng-repeat = 'criterion in currentModule.input.criteria' ng-if = 'criterion.name != new_interaction_effect.criterion2'>{{criterion.name}}</option>
+                                </select>
+                              </div>
+                            </td>
+                            <td>
+                              <div id = 'new-cat-interaction-criterion2'>
+                                <select class = 'form-control' ng-model = 'new_interaction_effect.criterion2'>
+                                  <option value = '' disabled>--- Please Select ---</option>
+                                  <option ng-repeat = 'criterion in currentModule.input.criteria' ng-if = 'criterion.name != new_interaction_effect.criterion1'>{{criterion.name}}</option>
+                                </select>
+                              </div>
+                            </td>
+                            <td>
+                              <div id = 'new-cat-interaction-value'>
+                                <input class = 'form-control' type = 'number' ng-model = 'new_interaction_effect.value'>
+                              </div>
+                            </td>
+                            <td class = 'col-md-2'>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'addCATInteractionEffect()' title = 'Add Interaction Effect'>
+                                <span class = 'glyphicon glyphicon-plus'></span>
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <br>
+
+                      <!-- Scales And Functions -->
+                      <p class = 'header-1'>Scales and Functions</p>
+
+                      <div ng-repeat = 'criterion in currentModule.input.criteria'>
+                        <p class = 'header-2'>Criterion:  {{criterion.name}}</p>
+
+                        <!-- Scales -->
+                        <table class = 'table table-bordered table-hover table-striped'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Type</th>
+                              <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Minimum Value</th>
+                              <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Maximum Value</th>
+                              <th class = 'text-center' ng-if = 'criterion.scale.type == "Categorical"'>Number of Categories</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr class = 'active'>
+                              <td>
+                                <select class = 'form-control' ng-model = 'criterion.scale.type'>
+                                  <option value = '' disabled>--- Please Select ---</option>
+                                  <option>Numerical</option>
+                                  <option>Categorical</option>
+                                </select>
+                              </td>
+                              <td ng-if = 'criterion.scale.type == "Numerical"'>
+                                <div id = 'cat-scale-{{criterion.id}}-min'>
+                                  <input class = 'form-control' type = 'number' ng-model = 'criterion.scale.min' ng-blur = 'blurCATScaleMin(criterion)'>
+                                </div>
+                              </td>
+                              <td ng-if = 'criterion.scale.type == "Numerical"'>
+                                <div id = 'cat-scale-{{criterion.id}}-max'>
+                                  <input class = 'form-control' type = 'number' ng-model = 'criterion.scale.max' ng-blur = 'blurCATScaleMax(criterion)'>
+                                </div>
+                              </td>
+                              <td ng-if = 'criterion.scale.type == "Categorical"'>
+                                <div id = 'cat-scale-{{criterion.id}}-categories'>
+                                  <input class = 'form-control' type = 'number' ng-model = 'criterion.scale.num_categories' ng-blur = 'blurCATScaleCategories(criterion)'>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+
+                        <!-- Functions -->
+                        <table class = 'table table-bordered table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center' colspan = 2>Function</th>
+                              <th class = 'text-center' colspan = 2>Condition</th>
+                              <th></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <!-- Added Branches List -->
+                            <tr ng-repeat = 'branch in criterion.branches' ng-class = '{danger: criterion.id == deleteIdBranch[0] && branch.id == deleteIdBranch[1]}'>
+                              <td class = 'col-md-2'>
+                                <input class = 'form-control' type = 'text' ng-model = 'branch.function'>
+                              </td>
+                              <td class = 'col-md-3'>
+                                <p math-jax-bind = 'branch.function'></p>
+                              </td>
+                              <td class = 'col-md-2'>
+                                <input class = 'form-control' type = 'text' ng-model = 'branch.condition'>
+                              </td>
+                              <td class = 'col-md-3'>
+                                <p math-jax-bind = 'branch.condition'></p>
+                              </td>
+                              <td class = 'col-md-2' ng-if = 'criterion.id != deleteIdBranch[0] || (criterion.id == deleteIdBranch[0] && branch.id != deleteIdBranch[1])'>
+                                <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput([criterion, branch], "Branches")' title = 'Delete Branch'>
+                                  <span class = 'glyphicon glyphicon-minus'></span>
+                                </button>
+                              </td>
+                              <td class = 'col-md-2' ng-if = 'criterion.id == deleteIdBranch[0] && branch.id == deleteIdBranch[1]'>
+                                <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput([criterion, branch], "Branches")' title = 'Confirm Delete Branch'>
+                                  <span class = 'glyphicon glyphicon-ok'></span>
+                                </button>
+                                <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Branches")' title = 'Cancel Delete Branch'>
+                                  <span class = 'glyphicon glyphicon-remove'></span>
+                                </button>
+                              </td>
+                            </tr>
+                            <!-- Form to add function branches -->
+                            <tr class = 'active'>
+                              <td class = 'col-md-2'>
+                                <div id = 'cat-branch-function-{{criterion.id}}'>
+                                  <input class = 'form-control' type = 'text' ng-model = 'new_branch[criterion.id].function'>
+                                </div>
+                              </td>
+                              <td class = 'col-md-3'>
+                                <p math-jax-bind = 'new_branch[criterion.id].function'></p>
+                              </td>
+                              <td class = 'col-md-2'>
+                                <div id = 'cat-branch-condition-{{criterion.id}}'>
+                                  <input class = 'form-control' type = 'text' ng-model = 'new_branch[criterion.id].condition'>
+                                </div>
+                              </td>
+                              <td class = 'col-md-3'>
+                                <p math-jax-bind = 'new_branch[criterion.id].condition'></p>
+                              </td>
+                              <td class = 'col-md-2'>
+                                <button type = 'button' class = 'btn btn-success' ng-click = 'addCATBranch(criterion)' title = 'Add Branch'>
+                                  <span class = 'glyphicon glyphicon-plus'></span>
+                                </button>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <br>
+
+                      <!-- Actions -->
+                      <p class = 'header-1'>Actions</p>
+
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>Action</th>
+                            <th class = 'text-center' ng-repeat = 'criterion in currentModule.input.criteria'>{{criterion.name}}</th>
+                            <th class = 'col-md-2'></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <!-- Added Actions -->
+                          <tr ng-repeat = 'action in currentModule.input.actions' ng-class = '{danger: action.id == deleteIdAction}'>
+                            <td>
+                              <div id = 'cat-action-{{action.id}}-name' class = 'form-group'>
+                                <input class = 'form-control' type = 'text' ng-model = 'action.name' ng-blur = 'blurCATActionName(action)'>
+                              </div>
+                            </td>
+                            <td ng-repeat = 'criterion in currentModule.input.criteria'>
+                              <div id = 'cat-action-{{action.id}}-criterion-{{criterion.id}}' class = 'form-group'>
+                                <input class = 'form-control' type = 'number' ng-model = 'action[criterion.name]' ng-blur = 'blurCATActionCriterion(action, criterion.name)'>
+                              </div>
+                            </td>
+                            <td ng-if = 'action.id != deleteIdAction'>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(action, "Actions")' title = 'Delete Action'>
+                                <span class = 'glyphicon glyphicon-minus'></span>
+                              </button>
+                            </td>
+                            <td ng-if = 'action.id == deleteIdAction'>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(action, "Actions")' title = 'Confirm Delete Action'>
+                                <span class = 'glyphicon glyphicon-ok'></span>
+                              </button>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Actions")' title = 'Cancel Delete Action'>
+                                <span class = 'glyphicon glyphicon-remove'></span>
+                              </button>
+                            </td>
+                          </tr>
+                          <!-- Form to add action -->
+                          <tr class = 'active'>
+                            <td>
+                              <div id = 'new-cat-action-name' class = 'form-group'>
+                                <input class = 'form-control' type = 'text' ng-model = 'new_cat_action.name'>
+                              </div>
+                            </td>
+                            <td ng-repeat = 'criterion in currentModule.input.criteria'>
+                              <div id = 'new-cat-action-criterion-{{criterion.id}}' class = 'form-group'>
+                                <input class = 'form-control' type = 'number' ng-model = 'new_cat_action[criterion.name]'>
+                              </div>
+                            </td>
+                            <td>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'addCATAction()' title = 'Add Action'>
+                                <span class = 'glyphicon glyphicon-plus'></span>
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <br>
+
+                      <!-- Categories -->
+                      <p class = 'header-1'>Categories</p>
+
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center' rowspan = '2'>Category</th>
+                            <th class = 'text-center' rowspan = '2'>Membership Degree</th>
+                            <th class = 'text-center' colspan = '{{currentModule.input.criteria.length}}'>Criteria Weights</th>
+                            <th class = 'col-md-2' rowspan = '2'></th>
+                          </tr>
+                          <tr>
+                            <th class = 'text-center' ng-repeat = 'criterion in currentModule.input.criteria'>{{criterion.name}}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <!-- Added Categories -->
+                          <tr ng-repeat = 'category in currentModule.input.categories' ng-class = '{danger: category.id == deleteIdCategory}'>
+                            <td>
+                              <div id = 'cat-category-{{category.id}}-name'>
+                                <input class = 'form-control' type = 'text' ng-model = 'category.name' ng-blur = 'blurCATCategoryName(category)'>
+                              </div>
+                            </td>
+                            <td>
+                              <div id = 'cat-category-{{category.id}}-membership-degree'>
+                                <input class = 'form-control' type = 'number' ng-model = 'category.membership_degree' ng-blur = 'blurCATCategoryMembership(category)'>
+                              </div>
+                            </td>
+                            <td ng-repeat = 'criterion in currentModule.input.criteria'>
+                              <div id = 'cat-category-{{category.id}}-criterion-{{criterion.id}}'>
+                                <input class = 'form-control' type = 'number' ng-model = 'category[criterion.name]' ng-blur = 'blurCATCategoryCriterion(category, criterion)'>
+                              </div>
+                            </td>
+                            <td ng-if = 'category.id != deleteIdCategory'>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(category, "Categories")' title = 'Delete Category'>
+                                <span class = 'glyphicon glyphicon-minus'></span>
+                              </button>
+                            </td>
+                            <td ng-if = 'category.id == deleteIdCategory'>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(category, "Categories")' title = 'Confirm Delete Category'>
+                                <span class = 'glyphicon glyphicon-ok'></span>
+                              </button>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Categories")' title = 'Cancel Delete Category'>
+                                <span class = 'glyphicon glyphicon-remove'></span>
+                              </button>
+                            </td>
+                          </tr>
+                          <!-- Form to add new category -->
+                          <tr class = 'active'>
+                            <td>
+                              <div id = 'new-cat-category-name'>
+                                <input class = 'form-control' type = 'text' ng-model = 'new_category.name'>
+                              </div>
+                            </td>
+                            <td>
+                              <div id = 'new-cat-category-membership-degree'>
+                                <input class = 'form-control' type = 'number' ng-model = 'new_category.membership_degree'>
+                              </div>
+                            </td>
+                            <td ng-repeat = 'criterion in currentModule.input.criteria'>
+                              <div id = 'new-cat-category-{{criterion.id}}'>
+                                <input class = 'form-control' type = 'number' ng-model = 'new_category[criterion.name]'>
+                              </div>
+                            </td>
+                            <td ng-if = 'currentModule.input.criteria.length == 0'></td>
+                            <td>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'addCATCategory()' title = 'Add Category'>
+                                <span class = 'glyphicon glyphicon-plus'></span>
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <br>
+
+                      <!-- Reference Actions -->
+                      <p class = 'header-1'>Reference Actions</p>
+
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <th class = 'text-center'>Category</th>
+                          <th class = 'text-center' ng-repeat = 'criterion in currentModule.input.criteria'>{{criterion.name}}</th>
+                          <th class = 'col-md-2'></th>
+                        </thead>
+                        <tbody ng-repeat = 'category in currentModule.input.categories'>
+                          <!-- Added Reference Actions -->
+                          <tr ng-repeat = 'ref in category.reference_actions' ng-class = '{danger: category.id == deleteIdReferenceAction[0] && ref.id == deleteIdReferenceAction[1]}'>
+                            <td ng-if = '$index == 0' rowspan = '{{category.reference_actions.length + 1}}'>{{category.name}}</td>
+                            <td ng-repeat = 'criterion in currentModule.input.criteria'>
+                              <div id = 'cat-ref-{{category.id}}-criterion-{{criterion.id}}'>
+                                <input class = 'form-control' type = 'number' ng-model = 'ref[criterion.name]' ng-blur = 'blurCATReferenceAction(ref, category, criterion)'>
+                              </div>
+                            </td>
+                            <td ng-if = 'category.id != deleteIdReferenceAction[0] || category.id == deleteIdReferenceAction[0] && ref.id != deleteIdReferenceAction[1]'>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput([category, ref], "Reference Actions")' title = 'Delete Reference Action'>
+                                <span class = 'glyphicon glyphicon-minus'></span>
+                              </button>
+                            </td>
+                            <td ng-if = 'category.id == deleteIdReferenceAction[0] && ref.id == deleteIdReferenceAction[1]'>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput([category, ref], "Reference Actions")' title = 'Confirm Delete Reference Action'>
+                                <span class = 'glyphicon glyphicon-ok'></span>
+                              </button>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Reference Actions")' title = 'Cancel Delete Reference Action'>
+                                <span class = 'glyphicon glyphicon-remove'></span>
+                              </button>
+                            </td>
+                          </tr>
+                          <!-- Form to add new reference action -->
+                          <tr class = 'active'>
+                            <td ng-if = '[category.reference_actions.length] == 0'>{{category.name}}</td>
+                            <td ng-repeat = 'criterion in currentModule.input.criteria'>
+                              <div id = 'new-cat-ref-{{category.id}}-criterion-{{criterion.id}}'>
+                                <input class = 'form-control' type = 'number' ng-model = 'new_reference_action[category.id][criterion.name]'>
+                              </div>
+                            </td>
+                            <td>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'addCATReferenceAction(category, $index)' title = 'Add Reference Action'>
+                                <span class = 'glyphicon glyphicon-plus'></span>
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Delphi Modal -->
+              <div id = 'delphi-modal' class = 'modal fade custom-modal'  role = 'dialog'>
+                <div class = 'modal-dialog'>
+                  <div class = 'modal-content'>
+
+                    <div class = 'modal-header'>
+                      <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                      <h4 class = 'modal-title'>Module - Delphi{{currentModule.name_id}}</h4>
+                    </div>
+
+                    <div class = 'modal-body'>
+                      <!-- Current Round -->
+                      <p class = 'header-1'>Round {{currentModule.current_round}}</p>
+
+                      <!-- Survey Subject -->
+                      <p class = 'header-1'>Survey Subject</p>
+
+                      <div id = 'delphi-subject'>
+                        <input type = 'text' class = 'form-control' ng-model = 'currentModule.input.subject' ng-blur = 'blurDelphiSubject()'>
+                      </div>
+
+                      <br>
+
+                      <!-- Specialists' Emails -->
+                      <p class = 'header-1'>Specialists' Emails</p>
+
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>Email Address</th>
+                            <th class = 'col-md-2'></th>
+                          </tr>
+                        </thead>
+                        <!-- Added Emails -->
+                        <tbody>
+                          <tr ng-repeat = 'email in currentModule.input.emails' ng-class = '{danger: email.id == deleteIdEmail}'>
+                            <td>
+                              <div id = 'delphi-email-{{email.id}}'>
+                                <input type = 'text' class = 'form-control' ng-model = 'email.address' ng-blur = 'blurDelphiEmail(email)'>
+                              </div>
+                            </td>
+                            <td ng-if = 'email.id != deleteIdEmail'>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(email, "Emails")' title = 'Delete Email'>
+                                <span class = 'glyphicon glyphicon-minus'></span>
+                              </button>
+                            </td>
+                            <td ng-if = 'email.id == deleteIdEmail'>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(email, "Emails")' title = 'Confirm Delete Email'>
+                                <span class = 'glyphicon glyphicon-ok'></span>
+                              </button>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Emails")' title = 'Cancel Delete Email'>
+                                <span class = 'glyphicon glyphicon-remove'></span>
+                              </button>
+                            </td>
+                          </tr>
+                          <!-- Form to add new email -->
+                          <tr class = 'active'>
+                            <td>
+                              <div id = 'new-delphi-email'>
+                                <input class = 'form-control' type = 'text' ng-model = 'new_delphi_email.address'>
+                              </div>
+                            </td>
+                            <td>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'addDelphiEmail()' title = 'Add Email'>
+                                <span class = 'glyphicon glyphicon-plus'></span>
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <br>
+
+                      <!-- Questions -->
+                      <p class = 'header-1'>Questions</p>
+
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>Title</th>
+                            <th class = 'text-center'>Description</th>
+                            <th class = 'col-md-2'></th>
+                          </tr>
+                        </thead>
+                        <!-- Added Questions -->
+                        <tbody>
+                          <tr ng-repeat = 'question in currentModule.input.questions' ng-class = '{danger: question.id == deleteIdQuestion}'>
+                            <td>
+                              <div id = 'delphi-question-title-{{question.id}}'>
+                                <input type = 'text' class = 'form-control' ng-model = 'question.title' ng-blur = 'blurDelphiQuestionTitle(question)'>
+                              </div>
+                            </td>
+                            <td>
+                              <div id = 'delphi-question-description-{{question.id}}'>
+                                <input type = 'text' class = 'form-control' ng-model = 'question.description' ng-blur = 'blurDelphiQuestionDescription(question)'>
+                              </div>
+                            </td>
+                            <td ng-if = 'question.id != deleteIdQuestion'>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(question, "Questions")' title = 'Delete Question'>
+                                <span class = 'glyphicon glyphicon-minus'></span>
+                              </button>
+                            </td>
+                            <td ng-if = 'question.id == delete_question'>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(question, "Questions")' title = 'Confirm Delete Question'>
+                                <span class = 'glyphicon glyphicon-ok'></span>
+                              </button>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Questions")' title = 'Cancel Delete Question'>
+                                <span class = 'glyphicon glyphicon-remove'></span>
+                              </button>
+                            </td>
+                          </tr>
+                          <!-- Form to add new question -->
+                          <tr class = 'active'>
+                            <td>
+                              <div id = 'new-delphi-question-title'>
+                                <input class = 'form-control' type = 'text' ng-model = 'new_delphi_question.title'>
+                              </div>
+                            </td>
+                            <td>
+                              <div id = 'new-delphi-question-description'>
+                                <input class = 'form-control' type = 'text' ng-model = 'new_delphi_question.description'>
+                              </div>
+                            </td>
+                            <td>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'addDelphiQuestion()' title = 'Add Question'>
+                                <span class = 'glyphicon glyphicon-plus'></span>
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SRF Modal -->
+              <div id = 'srf-modal' class = 'modal fade custom-modal'  role = 'dialog'>
+                <div class = 'modal-dialog'>
+                  <div class = 'modal-content'>
+
+                    <div class = 'modal-header'>
+                      <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                      <h4 class = 'modal-title'>Module - SRF{{currentModule.name_id}}</h4>
+                    </div>
+
+                    <div class = 'modal-body'>
+
+                      <!-- Criteria -->
+                      <p class = 'header-1'>Criteria</p>
+
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>Name</th>
+                            <th class = 'col-md-2'></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <!-- Added Criteria  -->
+                          <tr ng-repeat = 'criterion in currentModule.input.criteria' ng-class = '{danger: criterion.id == deleteIdCriterion}'>
+                            <td>
+                              <div id = 'srf-criterion-{{criterion.id}}-name' class = 'form-group'>
+                                <input class = 'form-control' type = 'text' ng-model = 'criterion.name' ng-blur = 'blurSRFCriterionName(criterion)'>
+                              </div>
+                            </td>
+                            <td ng-if = 'criterion.id != deleteIdCriterion'>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(criterion, "Criteria")' title = 'Delete Criterion'>
+                                <span class = 'glyphicon glyphicon-minus'></span>
+                              </button>
+                            </td>
+                            <td ng-if = 'criterion.id == deleteIdCriterion'>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(criterion, "Criteria")' title = 'Confirm Delete Criterion'>
+                                <span class = 'glyphicon glyphicon-ok'></span>
+                              </button>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Criteria")' title = 'Cancel Delete Criterion'>
+                                <span class = 'glyphicon glyphicon-remove'></span>
+                              </button>
+                            </td>
+                          </tr>
+                          <!-- Form to add a criterion -->
+                          <tr class = 'active'>
+                            <td>
+                              <div id = 'new-srf-criterion-name' class = 'form-group'>
+                                <input class = 'form-control' type = 'text' ng-model = 'new_srf_criterion.name'>
+                              </div>
+                            </td>
+                            <td>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'addSRFCriterion()' title = 'Add Criterion'>
+                                <span class = 'glyphicon glyphicon-plus'></span>
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <br>
+
+                      <!-- Ranking -->
+                      <p class = 'header-1'>Ranking</p>
+
+                      <!-- Criteria Cards -->
+                      <p>Criteria Cards</p>
+                      <div ng-drop = 'true' ng-drop-success = 'originalCriteriaDrop($data)'>
+                        <ul class = 'draggable-objects'>
+                          <li ng-repeat = 'criterion in currentModule.input.criteria' ng-if = 'criterion.position == -1'>
+                            <div class = 'criteria-card' ng-drag = 'true' ng-drag-data = 'criterion' data-allow-transform = 'true' title = '{{criterion.name}}'>
+                              <span style = 'display: block; margin-top: -27%'>{{criterion.name}}</span>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+
+                      <!-- White Cards -->
+                      <div style = 'margin-top: 10%'>
+                        <p>White Cards</p>
+                        <div ng-drop = 'true' ng-drop-success = 'originalWhiteDrop($data)'>
+                          <ul class = 'draggable-objects'>
+                            <li>
+                              <div class = 'white-card' ng-drag = 'true' ng-drag-data = 'white_card' data-allow-transform = 'true'></div>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+
+                      <!-- Drop Divs -->
+                      <div style = 'margin-top: 10%'>
+                        <div class = 'row' ng-repeat = 'rank in rangeRepeater(currentModule.input.ranking) track by $index' style = 'margin-top: 1%'>
+                          <div class = 'col-md-2'>
+                            <p ng-if = '$index == 0'>Most Important</p>
+                            <p ng-if = '$index == currentModule.input.ranking - 1'>Least Important</p>
+                          </div>
+
+                          <div class = 'col-md-9'>
+                            <div ng-drop = 'true' ng-drop-success = 'rankingDrop($data, $index)'>
+                              <ul class = 'draggable-objects'>
+                                <!-- Dragged Criteria -->
+                                <li ng-repeat = 'criterion in currentModule.input.criteria' ng-if = 'criterion.position == $parent.$index'>
+                                  <div class = 'criteria-card' ng-drag = 'true' ng-drag-data = 'criterion' data-allow-transform = 'true' title = '{{criterion.name}}'>
+                                    <span style = 'display: block; margin-top: -27%'>{{criterion.name}}</span>
+                                  </div>
+                                </li>
+                                <!-- Dragged White Cards -->
+                                <li ng-repeat = 'white_card in currentModule.input["white cards"]' ng-if = 'white_card.position == $parent.$index'>
+                                  <div class = 'white-card' ng-drag = 'true' ng-drag-data = 'white_card' data-allow-transform = 'true'></div>
+                                </li>
+                              </ul>
+                            </div>
+
+                            <!-- Add Drop Div Button -->
+                            <button type = 'button' class = 'btn btn-success' ng-click = 'addRanking($index)' title = 'Add Ranking' ng-if = '$index != ranking - 1' style = 'margin-top: 1%; margin-left: 7%'>
+                              <span class = 'glyphicon glyphicon-plus'></span>
+                            </button>
+                          </div>
+
+                          <div class = 'col-md-1'>
+                            <!-- Delete Drop Div Button -->
+                            <button type = 'button' class = 'btn btn-danger' ng-click = 'removeRanking($index)' title = 'Remove Ranking' ng-if = '$index != 0 && $index != currentModule.input.ranking - 1'>
+                              <span class = 'glyphicon glyphicon-minus'></span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <br>
+
+                      <p class = 'header-1'>Other Parameters</p>
+
+                      <!-- Ratio Z -->
+                      <div class = 'row'>
+                        <form class = 'form-inline'>
+                          <div id = 'srf-ratio-z' class = 'form-group'>
+                            <label>Ratio Z</label>
+                            <input type = 'number' class = 'form-control' ng-model = 'currentModule.input["ratio z"]' ng-blur = 'blurSRFRatioZ()'>
+                          </div>
+                        </form>
+                      </div>
+
+                      <br>
+
+                      <!-- Decimal Places -->
+                      <div class = 'row'>
+                        <form class = 'form-inline'>
+                          <div class = 'form-group'>
+                            <label>Number of Decimal Places</label>
+                            <select class = 'form-control' ng-model = 'currentModule.input["decimal places"]'>
+                              <option value = '' selected disabled>--- Please Select ---</option>
+                              <option>0</option>
+                              <option>1</option>
+                              <option>2</option>
+                            </select>
+                          </div>
+                        </form>
+                      </div>
+
+                      <br>
+
+                      <!-- Output - Normalized or Non-Normalized Weights -->
+                      <div class = 'row'>
+                        <form class = 'form-inline'>
+                          <div class = 'form-group'>
+                            <label>Weight Type</label>
+                            <select class = 'form-control' ng-model = 'currentModule.input["weight type"]'>
+                              <option value = '' selected disabled>--- Please Select ---</option>
+                              <option>Non-Normalized</option>
+                              <option>Normalized</option>
+                              <option>Both</option>
+                            </select>
+                          </div>
+                        </form>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Module Templates -->
 
               <!-- Input File Template -->
@@ -489,8 +1302,8 @@
                     <span class = 'glyphicon glyphicon-remove'></span>
                   </a>
 
-                  <button id = 'inputfile-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 12%; margin-left: 40%'></button>
-                  <span class = 'module-circle-span' style = 'margin-top: 10%; margin-left: 18%'>Output</span>
+                  <button id = 'inputfile-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 12%; margin-left: 41%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 10%; margin-left: 19%'>Output</span>
                 </div>
               </template>
 
@@ -509,8 +1322,8 @@
                   <button id = 'orderby-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 20%; margin-left: -48%'></button>
                   <span class = 'module-circle-span' style = 'margin-top: 19%; margin-left: -40%'>Actions</span>
 
-                  <button id = 'orderby-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 30%; margin-left: 40%'></button>
-                  <span class = 'module-circle-span' style = 'margin-top: 28%; margin-left: 18%'>Output</span>
+                  <button id = 'orderby-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 30%; margin-left: 41%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 28%; margin-left: 19%'>Output</span>
                 </div>
               </template>
 
@@ -523,11 +1336,11 @@
                     <span class = 'glyphicon glyphicon-remove'></span>
                   </a>
 
-                  <button id = 'sort-order' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 15.5%; margin-left: -47%'></button>
-                  <span class = 'module-circle-span' style = 'margin-top: 14%; margin-left: -39%'>Objects</span>
+                  <button id = 'sort-order' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 15.5%; margin-left: -48%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 14%; margin-left: -40%'>Objects</span>
 
-                  <button id = 'sort-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 15.5%; margin-left: 40%'></button>
-                  <span class = 'module-circle-span' style = 'margin-top: 14%; margin-left: 18%'>Output</span>
+                  <button id = 'sort-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 15.5%; margin-left: 41%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 14%; margin-left: 19%'>Output</span>
                 </div>
               </template>
 
@@ -540,29 +1353,84 @@
                     <span class = 'glyphicon glyphicon-remove'></span>
                   </a>
 
-                  <button id = 'cat-sd-criteria' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: -10%; margin-left: -47%'></button>
-                  <span class = 'module-circle-span' style = 'margin-top: -11%; margin-left: -39%'>Criteria</span>
+                  <button id = 'cat-sd-criteria' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: -10%; margin-left: -48%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: -11%; margin-left: -40%'>Criteria</span>
 
-                  <button id = 'cat-sd-interaction-effects' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: -2%; margin-left: -47%'></button>
-                  <span class = 'module-circle-span' style = 'margin-top: -3%; margin-left: -39%'>Interaction Effects</span>
+                  <button id = 'cat-sd-interaction-effects' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: -2%; margin-left: -48%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: -3%; margin-left: -40%'>Interaction Effects</span>
 
-                  <button id = 'cat-sd-scales' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 7%; margin-left: -47%'></button>
-                  <span class = 'module-circle-span' style = 'margin-top: 6%; margin-left: -39%'>Scales</span>
+                  <button id = 'cat-sd-scales' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 7%; margin-left: -48%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 6%; margin-left: -40%'>Scales</span>
 
-                  <button id = 'cat-sd-functions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 15%; margin-left: -47%'></button>
-                  <span class = 'module-circle-span' style = 'margin-top: 14%; margin-left: -39%'>Functions</span>
+                  <button id = 'cat-sd-functions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 15%; margin-left: -48%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 14%; margin-left: -40%'>Functions</span>
 
-                  <button id = 'cat-sd-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 23%; margin-left: -47%'></button>
-                  <span class = 'module-circle-span' style = 'margin-top: 22%; margin-left: -39%'>Actions</span>
+                  <button id = 'cat-sd-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 23%; margin-left: -48%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 22%; margin-left: -40%'>Actions</span>
 
-                  <button id = 'cat-sd-categories' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 31%; margin-left: -47%'></button>
-                  <span class = 'module-circle-span' style = 'margin-top: 30%; margin-left: -39%'>Categories</span>
+                  <button id = 'cat-sd-categories' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 31%; margin-left: -48%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 30%; margin-left: -40%'>Categories</span>
 
-                  <button id = 'cat-sd-reference-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 39%; margin-left: -47%'></button>
-                  <span class = 'module-circle-span' style = 'margin-top: 38%; margin-left: -39%'>Reference Actions</span>
+                  <button id = 'cat-sd-reference-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 39%; margin-left: -48%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 38%; margin-left: -40%'>Reference Actions</span>
 
                   <button id = 'cat-sd-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 39%; margin-left: 41%'></button>
                   <span class = 'module-circle-span' style = 'margin-top: 38%; margin-left: 19%'>Output</span>
+                </div>
+              </template>
+
+              <!-- Delphis Template -->
+              <template id = 'delphi-temp'>
+                <div id = 'delphi' class = 'module-template module-delphi draggable'>
+                  <a id = 'mod-name' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#delphi-modal' ng-click = 'selectCurrentModule($event)' style = 'display: block; margin-top: 5%'></a>
+
+                  <a href ng-click = 'deleteModule($event)' style = 'display: block; margin-top: -45%; margin-left: 108%'>
+                    <span class = 'glyphicon glyphicon-remove'></span>
+                  </a>
+
+                  <button id = 'delphi-subject' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: -10%; margin-left: -48%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: -11%; margin-left: -40%'>Subject</span>
+
+                  <button id = 'delphi-emails' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 10%; margin-left: -48%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 9%; margin-left: -40%'>Emails</span>
+
+                  <button id = 'delphi-questions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 29%; margin-left: -48%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 28%; margin-left: -40%'>Questions</span>
+
+                  <button id = 'delphi-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 29%; margin-left: 41%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 28%; margin-left: 19%'>Output</span>
+                </div>
+              </template>
+
+              <!-- SRF Template -->
+              <template id = 'srf-temp'>
+                <div id = 'srf' class = 'module-template module-srf draggable'>
+                  <a id = 'mod-name' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#srf-modal' ng-click = 'selectCurrentModule($event)' style = 'display: block; margin-top: 5%'></a>
+
+                  <a href ng-click = 'deleteModule($event)' style = 'display: block; margin-top: -45%; margin-left: 108%'>
+                    <span class = 'glyphicon glyphicon-remove'></span>
+                  </a>
+
+                  <button id = 'srf-criteria' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: -10%; margin-left: -48%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: -11%; margin-left: -40%'>Criteria</span>
+
+                  <button id = 'srf-white-cards' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 0%; margin-left: -48%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: -1%; margin-left: -40%'>White Cards</span>
+
+                  <button id = 'srf-ranking' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 10%; margin-left: -48%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 9%; margin-left: -40%'>Ranking</span>
+
+                  <button id = 'srf-ratio-z' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 20%; margin-left: -48%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 19%; margin-left: -40%'>Ratio Z</span>
+
+                  <button id = 'srf-decimal-places' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 30%; margin-left: -48%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 29%; margin-left: -40%'>Decimal Places</span>
+
+                  <button id = 'srf-weight-type' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 40%; margin-left: -48%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 39%; margin-left: -40%'>Weight Type</span>
+
+                  <button id = 'srf-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 40%; margin-left: 41%'></button>
+                  <span class = 'module-circle-span' style = 'margin-top: 39%; margin-left: 19%'>Output</span>
                 </div>
               </template>
 
@@ -591,7 +1459,7 @@
                   <span class = 'glyphicon glyphicon-remove'></span>
                 </a>
                 <!-- modal open -->
-                <a href data-toggle = 'modal' data-target = '#exec-modal'>{{execution.date}}<br>{{execution.time}}</a>
+                <a href data-toggle = 'modal' data-target = '#exec-modal' ng-click = 'aggregateModuleResults(execution)'>{{execution.date}}<br>{{execution.time}}</a>
               </li>
             </ul>
 
@@ -787,6 +1655,419 @@
                             </div>
 
                             <br>
+
+                            <!-- Horizontal Divider -->
+                            <br><hr class = 'custom-hr'><br>
+                          </div>
+
+                          <!-- CAT-SD Module -->
+                          <div ng-if = 'mod.type == "CAT-SD"'>
+                            <!-- Module Name -->
+                            <p class = 'header-7'>CAT-SD{{mod.name_id}}</p>
+
+                            <!-- Criteria -->
+                            <p class = 'header-8'>Criteria</p>
+
+                            <table class = 'table table-bordered table-hover'>
+                              <thead>
+                                <tr>
+                                  <th class = 'text-center'>Name</th>
+                                  <th class = 'text-center'>Direction</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <!-- Added Criteria  -->
+                                <tr ng-repeat = 'criterion in mod.input.criteria'>
+                                  <td>{{criterion.name}}</td>
+                                  <td>{{criterion.direction}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+
+                            <br>
+
+                            <!-- Interaction Effects -->
+                            <p class = 'header-8'>Interaction Effects</p>
+
+                            <table class = 'table table-bordered table-hover'>
+                              <thead>
+                                <th class = 'text-center'>Type Of Effect</th>
+                                <th class = 'text-center'>Criterion 1</th>
+                                <th class = 'text-center'>Criterion 2</th>
+                                <th class = 'text-center'>Value</th>
+                              </thead>
+                              <tbody>
+                                <!-- Added Interaction Effects -->
+                                <tr ng-repeat = 'interaction in mod.input["interaction effects"]'>
+                                  <td>{{interaction.type}}</td>
+                                  <td>{{interaction.criterion1}}</td>
+                                  <td>{{interaction.criterion2}}</td>
+                                  <td>{{interaction.value}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+
+                            <br>
+
+                            <!-- Scales And Functions -->
+                            <p class = 'header-8'>Scales and Functions</p>
+
+                            <div ng-repeat = 'criterion in mod.input.criteria'>
+                              <p class = 'header-9'>Criterion:  {{criterion.name}}</p>
+
+                              <!-- Scales -->
+                              <table class = 'table table-bordered table-hover'>
+                                <thead>
+                                  <tr>
+                                    <th class = 'text-center'>Type</th>
+                                    <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Minimum Value</th>
+                                    <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Maximum Value</th>
+                                    <th class = 'text-center' ng-if = 'criterion.scale.type == "Categorical"'>Number of Categories</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td>{{criterion.scale.type}}</td>
+                                    <td ng-if = 'criterion.scale.type == "Numerical"'>{{criterion.scale.min}}</td>
+                                    <td ng-if = 'criterion.scale.type == "Numerical"'>{{criterion.scale.max}}</td>
+                                    <td ng-if = 'criterion.scale.type == "Categorical"'>{{criterion.scale.num_categories}}</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+
+                              <!-- Functions -->
+                              <table class = 'table table-bordered table-hover'>
+                                <thead>
+                                  <tr>
+                                    <th class = 'text-center' colspan = 2>Function</th>
+                                    <th class = 'text-center' colspan = 2>Condition</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <!-- Added Branches List -->
+                                  <tr ng-repeat = 'branch in criterion.branches'>
+                                    <td class = 'col-md-2'>{{branch.function}}</td>
+                                    <td class = 'col-md-3'>
+                                      <p math-jax-bind = 'branch.function'></p>
+                                    </td>
+                                    <td class = 'col-md-2'>{{branch.condition}}</td>
+                                    <td class = 'col-md-3'>
+                                      <p math-jax-bind = 'branch.condition'></p>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+
+                            <br>
+
+                            <!-- Actions -->
+                            <p class = 'header-8'>Actions</p>
+
+                            <table class = 'table table-bordered table-hover'>
+                              <thead>
+                                <tr>
+                                  <th class = 'text-center'>Action</th>
+                                  <th class = 'text-center' ng-repeat = 'criterion in mod.input.criteria'>{{criterion.name}}</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr ng-repeat = 'action in mod.input.actions'>
+                                  <td>{{action.name}}</td>
+                                  <td ng-repeat = 'criterion in mod.input.criteria'>{{action[criterion.name]}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+
+                            <br>
+
+                            <!-- Categories -->
+                            <p class = 'header-8'>Categories</p>
+
+                            <table class = 'table table-bordered table-hover'>
+                              <thead>
+                                <tr>
+                                  <th class = 'text-center' rowspan = '2'>Category</th>
+                                  <th class = 'text-center' rowspan = '2'>Membership Degree</th>
+                                  <th class = 'text-center' colspan = '{{mod.input.criteria.length}}'>Criteria Weights</th>
+                                </tr>
+                                <tr>
+                                  <th class = 'text-center' ng-repeat = 'criterion in mod.input.criteria'>{{criterion.name}}</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr ng-repeat = 'category in mod.input.categories'>
+                                  <td>{{category.name}}</td>
+                                  <td>{{category.membership_degree}}</td>
+                                  <td ng-repeat = 'criterion in mod.input.criteria'>{{category[criterion.name]}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+
+                            <br>
+
+                            <!-- Reference Actions -->
+                            <p class = 'header-8'>Reference Actions</p>
+
+                            <table class = 'table table-bordered table-hover'>
+                              <thead>
+                                <th class = 'text-center'>Category</th>
+                                <th class = 'text-center' ng-repeat = 'criterion in mod.input.criteria'>{{criterion.name}}</th>
+                              </thead>
+                              <tbody ng-repeat = 'category in mod.input.categories'>
+                                <tr ng-repeat = 'ref in category.reference_actions'>
+                                  <td ng-if = '$index == 0' rowspan = '{{category.reference_actions.length + 1}}'>{{category.name}}</td>
+                                  <td ng-repeat = 'criterion in mod.input.criteria'>{{ref[criterion.name]}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+
+                            <br>
+
+                            <!-- Output -->
+                            <p class = 'header-8'>Output</p>
+
+                            <table class = 'table table-bordered table-hover'>
+                              <thead>
+                                <tr>
+                                  <th class = 'text-center'>Action</th>
+                                  <th class = 'text-center' ng-repeat = '(key, value) in mod.output'>{{key}}</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr ng-repeat = 'action in mod.input.actions'>
+                                  <td>{{action.name}}</td>
+                                  <td ng-repeat = 'result in mod.output'>
+                                    <span class = 'glyphicon glyphicon-ok' style = 'color: green' ng-if = 'result.includes(action.name)'></span>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+
+                            <!-- Horizontal Divider -->
+                            <br><hr class = 'custom-hr'><br>
+                          </div>
+
+                          <!-- Delphi Module -->
+                          <div ng-if = 'mod.type == "Delphi"'>
+                            <!-- Module Name -->
+                            <p class = 'header-7'>Delphi{{mod.name_id}}</p>
+
+                            <br>
+
+                            <!-- Current Round -->
+                            <p class = 'header-1'>Round {{mod.current_round}}</p>
+
+                            <br>
+
+                            <!-- Survey Link -->
+                            <p class = 'header-1'>Survey Link</p>
+
+                            {{mod.output.link}}
+
+                            <br><br>
+
+                            <!-- Survey Subject -->
+                            <p class = 'header-1'>Survey Subject</p>
+
+                            {{mod.input.subject}}
+
+                            <br><br>
+
+                            <!-- Users that answered -->
+                            <p class = 'header-1'>Users that answered</p>
+
+                            <table class = 'table table-bordered table-hover'>
+                              <thead>
+                                <tr>
+                                  <th class = 'text-center'>Email Address</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr ng-repeat = 'email in mod.output.emails'>
+                                  <td>{{email}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+
+                            <strong>Number Of Answers:</strong> {{mod.output.emails.length}}
+
+                            <br><br>
+
+                            <!-- Questions -->
+                            <p class = 'header-1'>Questions</p>
+
+                            <table class = 'table table-bordered table-hover'>
+                              <thead>
+                                <tr>
+                                  <th class = 'text-center'>
+                                    Title
+                                    <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeOrder("title", "descendant", mod.output.questions)'></span></a>
+                                    <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeOrder("title", "ascendant", mod.output.questions)'></span></a>
+                                  </th>
+                                  <th class = 'text-center'>
+                                    Description
+                                    <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeOrder("description", "descendant", mod.output.questions)'></span></a>
+                                    <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeOrder("description", "ascendant", mod.output.questions)'></span></a>
+                                  </th>
+                                  <th class = 'text-center'>
+                                    Total Score
+                                    <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeOrder("total_score", "descendant", mod.output.questions)'></span></a>
+                                    <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeOrder("total_score", "ascendant", mod.output.questions)'></span></a>
+                                  </th>
+                                  <th class = 'text-center'>
+                                    Average Score
+                                    <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeOrder("average", "descendant", mod.output.questions)'></span></a>
+                                    <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeOrder("average", "ascendant", mod.output.questions)'></span></a>
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr ng-repeat = 'question in mod.output.questions'>
+                                  <td>{{question.title}}</td>
+                                  <td>{{question.description}}</td>
+                                  <td>{{question.total_score}}</td>
+                                  <td>{{question.average}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+
+                            <strong>Number Of Questions:</strong> {{mod.output.questions.length}}
+
+                            <br><br>
+
+                            <!-- Suggestions -->
+                            <p class = 'header-1'>Suggestions</p>
+
+                            <table class = 'table table-bordered table-hover'>
+                              <thead>
+                                <tr>
+                                  <th class = 'text-center'>Title</th>
+                                  <th class = 'text-center'>Description</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr ng-repeat = 'suggestion in mod.output.suggestions'>
+                                  <td>{{suggestion.title}}</td>
+                                  <td>{{suggestion.description}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+
+                            <strong>Number Of Suggestions:</strong> {{mod.output.suggestions.length}}
+
+                            <!-- Horizontal Divider -->
+                            <br><hr class = 'custom-hr'><br>
+                          </div>
+
+                          <!-- SRF Module -->
+                          <div ng-if = 'mod.type == "SRF"'>
+
+                            <!-- Module Name -->
+                            <p class = 'header-7'>SRF{{mod.name_id}}</p>
+
+                            <!-- Criteria -->
+                            <p class = 'header-8'>Criteria</p>
+
+                            <table class = 'table table-bordered table-hover'>
+                              <thead>
+                                <tr>
+                                  <th class = 'text-center'>Name</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr ng-repeat = 'criterion in mod.input.criteria'>
+                                  <td>{{criterion.name}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+
+                            <br>
+
+                            <!-- Ranking -->
+                            <p class = 'header-8'>Ranking</p>
+
+                            <!-- Drop Divs -->
+                            <div class = 'row' ng-repeat = 'rank in rangeRepeater(mod.input.ranking) track by $index' style = 'margin-top: 1%'>
+                              <div class = 'col-md-2'>
+                                <p ng-if = '$index == 0'>Most Important</p>
+                                <p ng-if = '$index == mod.input.ranking - 1'>Least Important</p>
+                              </div>
+
+                              <div class = 'col-md-9'>
+                                <div ng-drop = 'true'>
+                                  <ul class = 'draggable-objects'>
+                                    <!-- Dragged Criteria -->
+                                    <li ng-repeat = 'criterion in mod.input.criteria' ng-if = 'criterion.position == $parent.$index'>
+                                      <div class = 'criteria-card undraggable-card' title = '{{criterion.name}}'>{{criterion.name}}</div>
+                                    </li>
+                                    <!-- Dragged White Cards -->
+                                    <li ng-repeat = 'white_card in mod.input["white cards"]' ng-if = 'white_card.position == $parent.$index'>
+                                      <div class = 'white-card undraggable-card'></div>
+                                    </li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+
+                            <br>
+
+                            <!-- Other Parameters -->
+                            <p class = 'header-8'>Other Parameters</p>
+
+                            <!-- Ratio Z -->
+                            <div class = 'row'>
+                              <form class = 'form-inline'>
+                                  <label>Ratio Z: </label>
+                                  {{mod.input["ratio z"]}}
+                              </form>
+                            </div>
+
+                            <br>
+
+                            <!-- Decimal Places -->
+                            <div class = 'row'>
+                              <form class = 'form-inline'>
+                                <div class = 'form-group'>
+                                  <label>Number of Decimal Places: </label>
+                                  {{mod.input['decimal places']}}
+                                </div>
+                              </form>
+                            </div>
+
+                            <br>
+
+                            <!-- Weight Type -->
+                            <div class = 'row'>
+                              <form class = 'form-inline'>
+                                <div class = 'form-group'>
+                                  <label>Weight Type: </label>
+                                  {{mod.input['weight type']}}
+                                </div>
+                              </form>
+                            </div>
+
+                            <br>
+
+                            <!-- Results -->
+                            <p class = 'header-8'>Results</p>
+
+                            <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                              <thead>
+                                <tr>
+                                  <th class = 'text-center'>Criterion</th>
+                                  <th class = 'text-center' ng-if = 'mod.input["weight type"] == "Non-Normalized" || mod.input["weight type"] == "Both"'>Non-Normalized Weight</th>
+                                  <th class = 'text-center' ng-if = 'mod.input["weight type"] == "Normalized" || mod.input["weight type"] == "Both"'>Normalized Weight</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr ng-repeat = 'result in mod.output'>
+                                  <td>{{result.name}}</td>
+                                  <td ng-if = 'mod.input["weight type"] == "Non-Normalized" || mod.input["weight type"] == "Both"'>{{result["non-normalized weight"]}}</td>
+                                  <td ng-if = 'mod.input["weight type"] == "Normalized" || mod.input["weight type"] == "Both"'>{{result["normalized weight"]}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
 
                             <!-- Horizontal Divider -->
                             <br><hr class = 'custom-hr'><br>

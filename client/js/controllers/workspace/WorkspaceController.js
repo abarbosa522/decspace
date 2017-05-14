@@ -1,4 +1,4 @@
-app.controller('WorkspaceController', function($scope, $window, $http, $compile, OrderByService) {
+app.controller('WorkspaceController', function($scope, $window, $http, $compile, OrderByService, CATSDService, DelphiService, SRFService) {
   /*** SETUP FUNCTIONS ***/
 
   //get the id of the open project
@@ -7,16 +7,16 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   //check if there is a user logged in
   function requestLogIn() {
-    $http.get('/requestlogin').success(function(res) {
-      if(typeof res.user == 'undefined')
+    $http.get('/requestlogin').then(function(res) {
+      if(typeof res.data.user == 'undefined')
         $window.location.href = '../homepage/login.html';
       else {
-        $scope.username = res.user;
+        $scope.username = res.data.user;
         //get all accounts and find the name of the logged user
-        $http.get('/accounts').success(function(response) {
-          for(account in response) {
-            if(response[account].email == $scope.username) {
-              $scope.name = response[account].name;
+        $http.get('/accounts').then(function(response) {
+          for(account in response.data) {
+            if(response.data[account].email == $scope.username) {
+              $scope.name = response.data[account].name;
               break;
             }
           }
@@ -27,7 +27,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   //log out current user
   $scope.logOut = function() {
-    $http.get('/logout').success(function(res) {
+    $http.get('/logout').then(function(res) {
       $window.location.href = '../../index.html';
     });
   }
@@ -35,7 +35,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   //change "last update" field to current date and get the selected method
   function rewriteLastUpdate() {
     //get all projects from database
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       var id_doc, proj_res;
 
       //get current date
@@ -43,25 +43,25 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       var last_update = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
 
       //get the selected project
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
           //get the name of the project
-          $scope.project_name = response[proj]['name'];
+          $scope.project_name = response.data[proj]['name'];
           //change the date of the last update of the project
-          response[proj]['last_update'] = last_update;
+          response.data[proj]['last_update'] = last_update;
           //get the id of the document, so that it can be removed from the db
-          id_doc = response[proj]['_id'];
+          id_doc = response.data[proj]['_id'];
           //project to store in the db and remove the id of the document
-          proj_res = response[proj];
+          proj_res = response.data[proj];
           delete proj_res['_id'];
           break;
         }
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function(){
+      $http.delete('/projects/' + id_doc).then(function(){
         //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+        $http.post('/projects', proj_res).then(function() {
           //retrieve the data stored in the database
           $scope.reloadData();
           //update the list of executions
@@ -123,7 +123,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   //save the current data
   $scope.saveData = function() {
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       //save the position of all modules
       for(mod in modules)
         modules[mod]['position'] = $('#' + modules[mod]['id']).offset();
@@ -131,25 +131,25 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         var id_doc, proj_res;
 
         //get the current project
-        for(proj in response) {
-          if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+        for(proj in response.data) {
+          if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
             //insert the created modules into the database
-            response[proj]['modules'] = modules;
+            response.data[proj]['modules'] = modules;
             //insert the created connections into the database
-            response[proj]['connections'] = connections;
+            response.data[proj]['connections'] = connections;
             //get the id of the document
-            id_doc = response[proj]['_id'];
+            id_doc = response.data[proj]['_id'];
             //project to store in the db
-            proj_res = response[proj];
+            proj_res = response.data[proj];
             delete proj_res['_id'];
             break;
           }
         }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function() {
+      $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+        $http.post('/projects', proj_res).then(function() {
           //show save success alert
           showAlert('save-success');
         });
@@ -159,7 +159,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   //reload last save
   $scope.reloadData = function() {
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       //remove current modules
       for(mod in modules)
         $('#' + modules[mod]['id']).remove();
@@ -172,13 +172,13 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       //reset the connections array
       connections = [];
 
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          if(response[proj]['modules'] != undefined)
-            modules = response[proj]['modules'];
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
+          if(response.data[proj]['modules'] != undefined)
+            modules = response.data[proj]['modules'];
 
-          if(response[proj]['connections'] != undefined)
-            connections = response[proj]['connections'];
+          if(response.data[proj]['connections'] != undefined)
+            connections = response.data[proj]['connections'];
 
           break;
         }
@@ -226,9 +226,18 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
               //add the unique id
               element['id'] = i;
 
-              for(var j = 0; j < cells.length; j++)
-                if(cells[j].trim() != '' && columns[j].trim() != '')
-                  element[columns[j]] = cells[j];
+              for(var j = 0; j < cells.length; j++) {
+                if(cells[j].trim() != '' && columns[j].trim() != '') {
+                  if(cells[j].trim() == "''")
+                    element[columns[j]] = '';
+                  else {
+                    if(isNaN(cells[j]))
+                      element[columns[j]] = cells[j];
+                    else
+                      element[columns[j]] = Number(cells[j]);
+                  }
+                }
+              }
 
               if(!angular.equals(element, {}))
                 data.push(element);
@@ -341,12 +350,57 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         //initialize the input data array
         new_mod['input'] = {
           'criteria' : [],
-          'interaction-effects' : [],
-          'scales' : [],
-          'functions' : [],
+          'interaction effects' : [],
           'actions' : [],
-          'categories' : [],
-          'reference-actions' : []
+          'categories' : []
+        };
+        //initialize the output data array
+        new_mod['output'] = [];
+        //store the new module into the modules array
+        modules.push(new_mod);
+        break;
+
+      case 'Delphi':
+        var new_mod = {};
+        //generate the unique id
+        var unique_id = generateUniqueId(modules);
+        //store the module id
+        new_mod['id'] = 'delphi-' + unique_id;
+        //generate and store module name
+        new_mod['name_id'] = generateUniqueNameId('Delphi');
+        //store the module type
+        new_mod['type'] = 'Delphi';
+        //initialize the input data array
+        new_mod['input'] = {
+          'subject' : '',
+          'emails' : [],
+          'questions' : []
+        };
+        new_mod['current_round'] = 1;
+        //initialize the output data array
+        new_mod['output'] = [];
+        //store the new module into the modules array
+        modules.push(new_mod);
+        break;
+
+      case 'SRF':
+        var new_mod = {};
+        //generate the unique id
+        var unique_id = generateUniqueId(modules);
+        //store the module id
+        new_mod['id'] = 'srf-' + unique_id;
+        //generate and store module name
+        new_mod['name_id'] = generateUniqueNameId('SRF');
+        //store the module type
+        new_mod['type'] = 'SRF';
+        //initialize the input data array
+        new_mod['input'] = {
+          'criteria' : [],
+          'white cards' : [],
+          'ranking' : 2,
+          'ratio z' : '',
+          'decimal places' : '',
+          'weight type': ''
         };
         //initialize the output data array
         new_mod['output'] = [];
@@ -411,7 +465,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   }
 
   //id of the currently open module
-  $scope.currentModule = '';
+  $scope.currentModule = {};
 
   //select the current module
   $scope.selectCurrentModule = function(event) {
@@ -424,15 +478,50 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     //reset the select deletion and "new" variables
     switch($scope.currentModule['type']) {
       case 'OrderBy':
-        $scope.new_criterion = {};
-        $scope.new_action = {};
-        $scope.deleteIdOrderByCriterion = '';
-        $scope.deleteIdOrderByAction = '';
+        $scope.new_orderby_criterion = {};
+        $scope.new_orderby_action = {};
+        $scope.deleteIdCriterion = '';
+        $scope.deleteIdAction = '';
         break;
 
       case 'Sort':
         $scope.new_object = {};
-        $scope.deleteIdSortObject = '';
+        $scope.deleteIdObject = '';
+        break;
+
+      case 'CAT-SD':
+        $scope.new_cat_criterion = {};
+        $scope.new_interaction_effect = {};
+
+        $scope.new_branch = {};
+        for(criterion in $scope.currentModule.input.criteria)
+          $scope.new_branch[$scope.currentModule.input.criteria[criterion]['id']] = {};
+
+        $scope.new_cat_action = {};
+        $scope.new_category = {};
+
+        $scope.new_reference_action = {};
+        for(category in $scope.currentModule.input.categories)
+          $scope.new_reference_action[$scope.currentModule.input.categories[category]['id']] = {};
+
+        $scope.deleteIdCriterion = '';
+        $scope.deleteIdInteractionEffect = '';
+        $scope.deleteIdBranch = '';
+        $scope.deleteIdAction = '';
+        $scope.deleteIdCategory = '';
+        $scope.deleteIdReferenceAction = ['', ''];
+        break;
+
+      case 'Delphi':
+        $scope.new_delphi_email = {};
+        $scope.new_delphi_question = {};
+        $scope.deleteIdEmail = '';
+        $scope.deleteIdQuestion = '';
+        break;
+
+      case 'SRF':
+        $scope.new_srf_criterion = {};
+        $scope.deleteIdCriterion = '';
         break;
     }
 
@@ -464,6 +553,11 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   function removeErrorClasses(type) {
     switch(type) {
       case 'OrderBy':
+        //Added Data
+        //Criteria
+
+
+        //New Data
         //Criteria
         $('#orderby-criteria-name').removeClass('has-error');
         $('#orderby-criteria-type').removeClass('has-error');
@@ -481,6 +575,12 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         //Objects
         $('#sort-objects-name').removeClass('has-error');
 
+        break;
+
+      case 'CAT-SD':
+        //Criteria
+        $('#cat-criteria-name').removeClass('has-error');
+        $('#cat-criteria-direction').removeClass('has-error');
         break;
     }
   }
@@ -545,6 +645,42 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         compiled_temp.appendTo($('#workspace'));
         //define the initial posiiton of the new module
         $('#cat-sd-' + unique_id).offset({top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10});
+        break;
+
+      case 'Delphi':
+        //get the method's template
+        var temp = document.getElementById('delphi-temp');
+        //clone the template
+        var temp_clone = $(temp.content).clone();
+        //make its id unique
+        var unique_id = generateUniqueId(modules);
+        temp_clone.find('#delphi').attr('id', 'delphi-' + unique_id);
+        //add the file name to the module
+        temp_clone.find('#mod-name').html('Delphi' + generateUniqueNameId('Delphi'));
+        //cloned elements need to be manually compiled - angularJS
+        var compiled_temp = $compile(temp_clone)($scope);
+        //add the new instance of the template to the document
+        compiled_temp.appendTo($('#workspace'));
+        //define the initial posiiton of the new module
+        $('#delphi-' + unique_id).offset({top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10});
+        break;
+
+      case 'SRF':
+        //get the method's template
+        var temp = document.getElementById('srf-temp');
+        //clone the template
+        var temp_clone = $(temp.content).clone();
+        //make its id unique
+        var unique_id = generateUniqueId(modules);
+        temp_clone.find('#srf').attr('id', 'srf-' + unique_id);
+        //add the file name to the module
+        temp_clone.find('#mod-name').html('SRF' + generateUniqueNameId('SRF'));
+        //cloned elements need to be manually compiled - angularJS
+        var compiled_temp = $compile(temp_clone)($scope);
+        //add the new instance of the template to the document
+        compiled_temp.appendTo($('#workspace'));
+        //define the initial posiiton of the new module
+        $('#srf-' + unique_id).offset({top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10});
         break;
     }
 
@@ -642,6 +778,40 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         //set position of module
         $('#' + mod['id']).offset(mod['position']);
         break;
+
+      case 'Delphi':
+        //get the method's template
+        var temp = document.getElementById('delphi-temp');
+        //clone the template
+        var temp_clone = $(temp.content).clone();
+        //make its id unique
+        temp_clone.find('#delphi').attr('id', mod['id']);
+        //add the module name to the module
+        temp_clone.find('#mod-name').html('Delphi' + mod['name_id']);
+        //cloned elements need to be manually compiled - angularJS
+        var compiled_temp = $compile(temp_clone)($scope);
+        //add the new instance of the template to the document
+        compiled_temp.appendTo($('#workspace'));
+        //set position of module
+        $('#' + mod['id']).offset(mod['position']);
+        break;
+
+      case 'SRF':
+        //get the method's template
+        var temp = document.getElementById('srf-temp');
+        //clone the template
+        var temp_clone = $(temp.content).clone();
+        //make its id unique
+        temp_clone.find('#srf').attr('id', mod['id']);
+        //add the module name to the module
+        temp_clone.find('#mod-name').html('SRF' + mod['name_id']);
+        //cloned elements need to be manually compiled - angularJS
+        var compiled_temp = $compile(temp_clone)($scope);
+        //add the new instance of the template to the document
+        compiled_temp.appendTo($('#workspace'));
+        //set position of module
+        $('#' + mod['id']).offset(mod['position']);
+        break;
     }
   }
 
@@ -650,21 +820,21 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   //add a new criterion
   $scope.addOrderByCriterion = function() {
     //if there is an input field not assigned
-    if($scope.new_criterion.name == undefined || $scope.new_criterion.name == '' || $scope.new_criterion.type == undefined || $scope.new_criterion.type == '' || $scope.new_criterion.direction == undefined || $scope.new_criterion.direction == '') {
+    if($scope.new_orderby_criterion.name == undefined || $scope.new_orderby_criterion.name == '' || $scope.new_orderby_criterion.type == undefined || $scope.new_orderby_criterion.type == '' || $scope.new_orderby_criterion.direction == undefined || $scope.new_orderby_criterion.direction == '') {
       //if a name has not been assigned - add error class
-      if($scope.new_criterion.name == undefined || $scope.new_criterion.name == '')
+      if($scope.new_orderby_criterion.name == undefined || $scope.new_orderby_criterion.name == '')
         $('#orderby-criteria-name').addClass('has-error');
       else
         $('#orderby-criteria-name').removeClass('has-error');
 
       //if a type has not been assigned - add error class
-      if($scope.new_criterion.type == undefined || $scope.new_criterion.type == '')
+      if($scope.new_orderby_criterion.type == undefined || $scope.new_orderby_criterion.type == '')
         $('#orderby-criteria-type').addClass('has-error');
       else
         $('#orderby-criteria-type').removeClass('has-error');
 
       //if a direction has not been assigned - add error class
-      if($scope.new_criterion.direction == undefined || $scope.new_criterion.direction == '')
+      if($scope.new_orderby_criterion.direction == undefined || $scope.new_orderby_criterion.direction == '')
         $('#orderby-criteria-direction').addClass('has-error');
       else
         $('#orderby-criteria-direction').removeClass('has-error');
@@ -672,45 +842,26 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     else {
       //assign an unique id to the new criterion
       if($scope.currentModule.input.criteria.length == 0)
-        $scope.new_criterion.id = 1;
+        $scope.new_orderby_criterion.id = 1;
       else
-        $scope.new_criterion.id = $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.length - 1]['id'] + 1;
+        $scope.new_orderby_criterion.id = $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.length - 1]['id'] + 1;
 
       //the criterion is not selected by default
-      $scope.new_criterion.selected = false;
+      $scope.new_orderby_criterion.selected = false;
 
       //add the new criterion to the
-      $scope.currentModule.input.criteria.push(angular.copy($scope.new_criterion));
+      $scope.currentModule.input.criteria.push(angular.copy($scope.new_orderby_criterion));
 
       //reset the criterion input fields
-      $scope.new_criterion.name = '';
-      $scope.new_criterion.type = '';
-      $scope.new_criterion.direction = '';
+      $scope.new_orderby_criterion.name = '';
+      $scope.new_orderby_criterion.type = '';
+      $scope.new_orderby_criterion.direction = '';
 
       //remove all error classes - just be sure
       $('#orderby-criteria-name').removeClass('has-error');
       $('#orderby-criteria-type').removeClass('has-error');
       $('#orderby-criteria-direction').removeClass('has-error');
     }
-  }
-
-  //selected criterion to be deleted
-  $scope.deleteIdOrderByCriterion = '';
-
-  //select a certain criterion to be deleted
-  $scope.deleteOrderByCriterion = function(criterion) {
-    $scope.deleteIdOrderByCriterion = criterion.id;
-  }
-
-  //delete the selected criterion
-  $scope.confirmDeleteOrderByCriterion = function(criterion) {
-    $scope.currentModule.input.criteria.splice($scope.currentModule.input.criteria.indexOf(criterion), 1);
-    $scope.deleteIdOrderByCriterion = '';
-  }
-
-  //cancel the criterion selection
-  $scope.cancelDeleteOrderByCriterion = function() {
-    $scope.deleteIdOrderByCriterion = '';
   }
 
   //select the criterion that defines the order
@@ -732,60 +883,41 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
     //check if there is an unassigned input field
     for(criterion in $scope.currentModule.input.criteria)
-      if($scope.new_action[$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_action[$scope.currentModule.input.criteria[criterion]['name']] == "")
+      if($scope.new_orderby_action[$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_orderby_action[$scope.currentModule.input.criteria[criterion]['name']] == "")
         unassigned_field = true;
 
-    if($scope.new_action.name == undefined || $scope.new_action.name == '' || unassigned_field) {
+    if($scope.new_orderby_action.name == undefined || $scope.new_orderby_action.name == '' || unassigned_field) {
       //if a name has not been assigned - add error class
-      if($scope.new_action.name == undefined || $scope.new_action.name == '')
-        $('#orderby-actions-name').addClass('has-error');
+      if($scope.new_orderby_action.name == undefined || $scope.new_orderby_action.name == '')
+        $('#orderby-action-name').addClass('has-error');
       else
-        $('#orderby-actions-name').removeClass('has-error');
+        $('#orderby-action-name').removeClass('has-error');
 
       //if the criterion field has not been assigned - add error class
       for(criterion in $scope.currentModule.input.criteria) {
-        if($scope.new_action[$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_action[$scope.currentModule.input.criteria[criterion]['name']] == "")
-          $('#orderby-actions-' + $scope.currentModule.input.criteria[criterion]['id']).addClass('has-error');
+        if($scope.new_orderby_action[$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_orderby_action[$scope.currentModule.input.criteria[criterion]['name']] == "")
+          $('#orderby-action-' + $scope.currentModule.input.criteria[criterion]['id']).addClass('has-error');
         else
-          $('#orderby-actions-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
+          $('#orderby-action-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
       }
     }
     else {
       if($scope.currentModule.input.actions.length == 0)
-        $scope.new_action.id = 1;
+        $scope.new_orderby_action.id = 1;
       else
-        $scope.new_action.id = $scope.currentModule.input.actions[$scope.currentModule.input.actions.length - 1]['id'] + 1;
+        $scope.new_orderby_action.id = $scope.currentModule.input.actions[$scope.currentModule.input.actions.length - 1]['id'] + 1;
 
-      $scope.currentModule.input.actions.push(angular.copy($scope.new_action));
+      $scope.currentModule.input.actions.push(angular.copy($scope.new_orderby_action));
 
       //reset the new action input fields and remove the error classes - just in case
-      $scope.new_action.name = '';
-      $('#orderby-actions-name').removeClass('has-error');
+      $scope.new_orderby_action.name = '';
+      $('#orderby-action-name').removeClass('has-error');
 
       for(criterion in $scope.currentModule.input.criteria) {
-        $scope.new_action[$scope.currentModule.input.criteria[criterion]['name']] = '';
-        $('#orderby-actions-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
+        $scope.new_orderby_action[$scope.currentModule.input.criteria[criterion]['name']] = '';
+        $('#orderby-action-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
       }
     }
-  }
-
-  //selected action to be deleted
-  $scope.deleteIdOrderByAction = '';
-
-  //select a certain action to be deleted
-  $scope.deleteOrderByAction = function(action) {
-    $scope.deleteIdOrderByAction = action.id;
-  }
-
-  //delete the selected action
-  $scope.confirmDeleteOrderByAction = function(action) {
-    $scope.currentModule.input.actions.splice($scope.currentModule.input.actions.indexOf(action), 1);
-    $scope.deleteIdOrderByAction = '';
-  }
-
-  //cancel the action selection
-  $scope.cancelDeleteOrderByAction = function() {
-    $scope.deleteIdOrderByAction = '';
   }
 
   /*** DATA INPUT FUNCTIONS - SORT METHOD ***/
@@ -810,25 +942,6 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     }
   }
 
-  //selected object to be deleted
-  $scope.deleteIdSortObject = '';
-
-  //select a certain object to be deleted
-  $scope.deleteSortObject = function(object) {
-    $scope.deleteIdSortObject = object.id;
-  }
-
-  //delete the selected object
-  $scope.confirmDeleteSortObject = function(object) {
-    $scope.currentModule.input.objects.splice($scope.currentModule.input.objects.indexOf(object), 1);
-    $scope.deleteIdSortObject = '';
-  }
-
-  //cancel the object deletion
-  $scope.cancelDeleteSortObject = function() {
-    $scope.deleteIdSortObject = '';
-  }
-
   $scope.onDropComplete = function(index, obj, evt) {
     var otherObj = $scope.currentModule.input.objects[index];
     var otherIndex = $scope.currentModule.input.objects.indexOf(obj);
@@ -837,6 +950,644 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   }
 
   /*** DATA INPUT FUNCTIONS - CAT-SD METHOD ***/
+
+  //add a new criterion
+  $scope.addCATCriterion = function() {
+    //if there is an input field not assigned
+    if($scope.new_cat_criterion.name == undefined || $scope.new_cat_criterion.name == '' || $scope.new_cat_criterion.direction == undefined) {
+      //if a name has not been assigned - add error class
+      if($scope.new_cat_criterion.name == undefined || $scope.new_cat_criterion.name == '')
+        $('#new-cat-criterion-name').addClass('has-error');
+      else
+        $('#new-cat-criterion-name').removeClass('has-error');
+
+      //if a direction has not been assigned - add error class
+      if($scope.new_cat_criterion.direction == undefined || $scope.new_cat_criterion.direction == '')
+        $('#new-cat-criterion-direction').addClass('has-error');
+      else
+        $('#new-cat-criterion-direction').removeClass('has-error');
+    }
+    else {
+      //assign an unique id to the new criterion
+      if($scope.currentModule.input.criteria.length == 0)
+        $scope.new_cat_criterion.id = 1;
+      else
+        $scope.new_cat_criterion.id = $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.length - 1]['id'] + 1;
+
+      //add the new criterion to the
+      $scope.currentModule.input.criteria.push(angular.copy($scope.new_cat_criterion));
+
+      //reset the criterion input fields
+      $scope.new_cat_criterion.name = '';
+      $scope.new_cat_criterion.direction = '';
+
+      //remove all error classes - just be sure
+      $('#new-cat-criterion-name').removeClass('has-error');
+      $('#new-cat-criterion-direction').removeClass('has-error');
+    }
+  }
+
+  $scope.blurCATCriterionName = function(criterion) {
+    if(criterion.name == '')
+      $('#cat-criterion-' + criterion.id + '-name').addClass('has-error');
+    else
+      $('#cat-criterion-' + criterion.id + '-name').removeClass('has-error');
+  }
+
+  $scope.addCATInteractionEffect = function() {
+    //if there is an input field not assigned
+    if($scope.new_interaction_effect.type == undefined || $scope.new_interaction_effect.criterion1 == undefined || $scope.new_interaction_effect.criterion2 == undefined || $scope.new_interaction_effect.value == undefined || $scope.new_interaction_effect.value == '') {
+      //if a type has not been assigned - add error class
+      if($scope.new_interaction_effect.type == undefined)
+        $('#new-cat-interaction-type').addClass('has-error');
+      else
+        $('#new-cat-interaction-type').removeClass('has-error');
+
+      //if a criterion1 has not been assigned - add error class
+      if($scope.new_interaction_effect.criterion1 == undefined)
+        $('#new-cat-interaction-criterion1').addClass('has-error');
+      else
+        $('#new-cat-interaction-criterion1').removeClass('has-error');
+
+      //if a criterion2 has not been assigned - add error class
+      if($scope.new_interaction_effect.criterion2 == undefined)
+        $('#new-cat-interaction-criterion2').addClass('has-error');
+      else
+        $('#new-cat-interaction-criterion2').removeClass('has-error');
+
+      //if a value has not been assigned - add error class
+      if(($scope.new_interaction_effect.value == undefined || $scope.new_interaction_effect.value == '')
+      || (($scope.new_interaction_effect.type == 'Mutual-Strengthening Effect' && $scope.new_interaction_effect.value <= 0)
+      || (($scope.new_interaction_effect.type == 'Mutual-Weakening Effect' || $scope.new_interaction_effect.type == 'Antagonistic Effect') && $scope.new_interaction_effect.value >= 0)))
+        $('#new-cat-interaction-value').addClass('has-error');
+      else
+        $('#new-cat-interaction-value').removeClass('has-error');
+    }
+    else {
+      if($scope.currentModule.input['interaction effects'].length == 0)
+        $scope.new_interaction_effect.id = 1;
+      else
+        $scope.new_interaction_effect.id = $scope.currentModule.input['interaction effects'][$scope.currentModule.input['interaction effects'].length - 1].id + 1;
+
+      $scope.currentModule.input['interaction effects'].push(angular.copy($scope.new_interaction_effect));
+
+      //reset the input fields
+      $scope.new_interaction_effect.type = '';
+      $scope.new_interaction_effect.criterion1 = '';
+      $scope.new_interaction_effect.criterion2 = '';
+      $scope.new_interaction_effect.value = '';
+
+      //remove all error classes
+      $('#new-cat-interaction-type').removeClass('has-error');
+      $('#new-cat-interaction-criterion1').removeClass('has-error');
+      $('#new-cat-interaction-criterion2').removeClass('has-error');
+      $('#new-cat-interaction-value').removeClass('has-error');
+    }
+  }
+
+  $scope.blurCATInteractionValue = function(interaction) {
+    if(interaction.value == '' || ((interaction.type == 'Mutual-Strengthening Effect' && interaction.value <= 0)
+    || ((interaction.type == 'Mutual-Weakening Effect' || interaction.type == 'Antagonistic Effect') && interaction.value >= 0)))
+      $('#cat-interaction-' + interaction.id + '-value').addClass('has-error');
+    else
+      $('#cat-interaction-' + interaction.id + '-value').removeClass('has-error');
+  }
+
+  $scope.blurCATScaleMin = function(criterion) {
+    if(criterion.scale.min == undefined)
+      $('#cat-scale-' + criterion.id + '-min').addClass('has-error');
+    else if(criterion.scale.min >= criterion.scale.max && criterion.scale.min != undefined && criterion.scale.max != undefined) {
+      $('#cat-scale-' + criterion.id + '-min').addClass('has-error');
+      $('#cat-scale-' + criterion.id + '-max').addClass('has-error');
+    }
+    else {
+      $('#cat-scale-' + criterion.id + '-min').removeClass('has-error');
+      $('#cat-scale-' + criterion.id + '-max').removeClass('has-error');
+    }
+  }
+
+  $scope.blurCATScaleMax = function(criterion) {
+    if(criterion.scale.max == undefined)
+      $('#cat-scale-' + criterion.id + '-max').addClass('has-error');
+    else if(criterion.scale.min >= criterion.scale.max && criterion.scale.min != undefined && criterion.scale.max != undefined) {
+      $('#cat-scale-' + criterion.id + '-min').addClass('has-error');
+      $('#cat-scale-' + criterion.id + '-max').addClass('has-error');
+    }
+    else {
+      $('#cat-scale-' + criterion.id + '-min').removeClass('has-error');
+      $('#cat-scale-' + criterion.id + '-max').removeClass('has-error');
+    }
+  }
+
+  $scope.blurCATScaleCategories = function(criterion) {
+    if(criterion.scale.num_categories < 2 || criterion.scale.num_categories == undefined)
+      $('#cat-scale-' + criterion.id + '-categories').addClass('has-error');
+    else
+      $('#cat-scale-' + criterion.id + '-categories').removeClass('has-error');
+  }
+
+  $scope.addCATBranch = function(criterion) {
+    //if there is an input field not assigned
+    if($scope.new_branch[criterion.id].function == undefined || $scope.new_branch[criterion.id].function == '' || $scope.new_branch[criterion.id].condition == undefined || $scope.new_branch[criterion.id].function == '') {
+      //if a function has not been assigned - add error class
+      if($scope.new_branch[criterion.id].function == undefined || $scope.new_branch[criterion.id].function == '')
+        $('#cat-branch-function-' + criterion.id).addClass('has-error');
+      else
+        $('#cat-branch-function-' + criterion.id).removeClass('has-error');
+
+      //if a condition has not been assigned - add error class
+      if($scope.new_branch[criterion.id].condition == undefined || $scope.new_branch[criterion.id].condition == '')
+        $('#cat-branch-condition-' + criterion.id).addClass('has-error');
+      else
+        $('#cat-branch-condition-' + criterion.id).removeClass('has-error');
+    }
+    else {
+      if($scope.currentModule.input.criteria[$scope.currentModule.input.criteria.indexOf(criterion)].branches == undefined) {
+        //initialize the branches array
+        $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.indexOf(criterion)].branches = [];
+        $scope.new_branch[criterion.id].id = 1;
+      }
+      else if($scope.currentModule.input.criteria[$scope.currentModule.input.criteria.indexOf(criterion)].branches.length == 0)
+        $scope.new_branch[criterion.id].id = 1;
+      else
+        $scope.new_branch[criterion.id].id = $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.indexOf(criterion)].branches[$scope.currentModule.input.criteria[$scope.currentModule.input.criteria.indexOf(criterion)].branches.length - 1].id + 1;
+
+      $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.indexOf(criterion)].branches.push(angular.copy($scope.new_branch[criterion.id]));
+
+      //reset input fields
+      $scope.new_branch[criterion.id].function = '';
+      $scope.new_branch[criterion.id].condition = '';
+
+      //remove all error classes
+      $('#cat-branch-function-' + criterion.id).removeClass('has-error');
+      $('#cat-branch-condition-' + criterion.id).removeClass('has-error');
+    }
+  }
+
+  $scope.addCATAction = function() {
+    var unassigned_field = false;
+
+    //check if there is an unassigned criteria field
+    //or that the value inserted in that field is between the criterion's scale minimum and maximum values
+    for(criterion in $scope.currentModule.input.criteria) {
+      if(($scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] == "")
+      || ($scope.currentModule.input.criteria[criterion]['scale']['type'] == 'Numerical' && ($scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] < $scope.currentModule.input.criteria[criterion]['scale']['min'] || $scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] > $scope.currentModule.input.criteria[criterion]['scale']['max']))
+      || ($scope.currentModule.input.criteria[criterion]['scale']['type'] == 'Categorical' && ($scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] > $scope.currentModule.input.criteria[criterion]['scale']['num_categories'] || $scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] < 1))) {
+        unassigned_field = true;
+        break;
+      }
+    }
+
+    if($scope.new_cat_action.name == undefined || $scope.new_cat_action.name == '' || unassigned_field) {
+      //if a name has not been assigned - add error class
+      if($scope.new_cat_action.name == undefined || $scope.new_cat_action.name == '')
+        $('#new-cat-action-name').addClass('has-error');
+      else
+        $('#new-cat-action-name').removeClass('has-error');
+
+      //if the criterion field has not been assigned - add error class
+      for(criterion in $scope.currentModule.input.criteria) {
+        if(($scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] == "")
+        || ($scope.currentModule.input.criteria[criterion]['scale']['type'] == 'Numerical' && ($scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] < $scope.currentModule.input.criteria[criterion]['scale']['min'] || $scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] > $scope.currentModule.input.criteria[criterion]['scale']['max']))
+        || ($scope.currentModule.input.criteria[criterion]['scale']['type'] == 'Categorical' && ($scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] > $scope.currentModule.input.criteria[criterion]['scale']['num_categories'] || $scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] < 1)))
+          $('#new-cat-action-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).addClass('has-error');
+        else
+          $('#new-cat-action-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
+      }
+    }
+    else {
+      if($scope.currentModule.input.actions.length == 0)
+        $scope.new_cat_action.id = 1;
+      else
+        $scope.new_cat_action.id = $scope.currentModule.input.actions[$scope.currentModule.input.actions.length - 1]['id'] + 1;
+
+      $scope.currentModule.input.actions.push(angular.copy($scope.new_cat_action));
+
+      //reset the new action input fields and remove the error classes - just in case
+      $scope.new_cat_action.name = '';
+      $('#new-cat-action-name').removeClass('has-error');
+
+      for(criterion in $scope.currentModule.input.criteria) {
+        $scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] = '';
+        $('#new-cat-action-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
+      }
+    }
+  }
+
+  $scope.blurCATActionName = function(action) {
+    if(action.name == '')
+      $('#cat-action-' + action.id + '-name').addClass('has-error');
+    else
+      $('#cat-action-' + action.id + '-name').removeClass('has-error');
+  }
+
+  $scope.blurCATActionCriterion = function(action, criterion_name) {
+    for(criterion in $scope.currentModule.input.criteria)
+      if($scope.currentModule.input.criteria[criterion]['name'] == criterion_name) {
+        if(($scope.currentModule.input.criteria[criterion]['scale']['type'] == 'Numerical' && (action[criterion_name] < $scope.currentModule.input.criteria[criterion]['scale']['min'] || action[criterion_name] > $scope.currentModule.input.criteria[criterion]['scale']['max']))
+        || ($scope.currentModule.input.criteria[criterion]['scale']['type'] == 'Categorical' && (action[criterion_name] > $scope.currentModule.input.criteria[criterion]['scale']['num_categories'] || action[criterion_name] < 1)))
+          $('#cat-action-' + action.id + '-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).addClass('has-error');
+        else
+          $('#cat-action-' + action.id + '-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
+
+        break;
+      }
+  }
+
+  $scope.addCATCategory = function() {
+    var unassigned_field = false;
+
+    //check if there is an unassigned input field
+    for(criterion in $scope.currentModule.input.criteria)
+      if($scope.new_category[$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_category[$scope.currentModule.input.criteria[criterion]['name']] == "" || $scope.new_category[$scope.currentModule.input.criteria[criterion]['name']] < 0)
+        unassigned_field = true;
+
+    if($scope.new_category.name == undefined || $scope.new_category.name == '' || $scope.new_category.membership_degree == undefined || $scope.new_category.membership_degree == '' || $scope.new_category.membership_degree < 0.5 || $scope.new_category.membership_degree > 1 || unassigned_field) {
+      //if a name has not been assigned - add error class
+      if($scope.new_category.name == undefined || $scope.new_category.name == '')
+        $('#new-cat-category-name').addClass('has-error');
+      else
+        $('#new-cat-category-name').removeClass('has-error');
+
+      //if a membership degree has not been assigned - add error class
+      if($scope.new_category.membership_degree == undefined || $scope.new_category.membership_degree == '' || $scope.new_category.membership_degree < 0.5 || $scope.new_category.membership_degree > 1)
+        $('#new-cat-category-membership-degree').addClass('has-error');
+      else
+        $('#new-cat-category-membership-degree').removeClass('has-error');
+
+      //if the criterion field has not been assigned - add error class
+      for(criterion in $scope.currentModule.input.criteria) {
+        if($scope.new_category[$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_category[$scope.currentModule.input.criteria[criterion]['name']] == "" || $scope.new_category[$scope.currentModule.input.criteria[criterion]['name']] < 0)
+          $('#new-cat-category-' + $scope.currentModule.input.criteria[criterion]['id']).addClass('has-error');
+        else
+          $('#new-cat-category-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
+      }
+    }
+    else {
+      if($scope.currentModule.input.categories.length == 0)
+        $scope.new_category.id = 1;
+      else
+        $scope.new_category.id = $scope.currentModule.input.categories[$scope.currentModule.input.categories.length - 1].id + 1;
+
+      $scope.new_category.reference_actions = [];
+      $scope.currentModule.input.categories.push(angular.copy($scope.new_category));
+
+      //reset the input fields
+      $scope.new_category.name = '';
+      $('#new-cat-category-name').removeClass('has-error');
+
+      $scope.new_category.membership_degree = '';
+      $('#new-cat-category-membership-degree').removeClass('has-error');
+
+      for(criterion in $scope.currentModule.input.criteria) {
+        $scope.new_category[$scope.currentModule.input.criteria[criterion]['name']] = '';
+        $('#new-cat-category-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
+      }
+    }
+  }
+
+  $scope.blurCATCategoryName = function(category) {
+    if(category.name == '')
+      $('#cat-category-' + category.id + '-name').addClass('has-error');
+    else
+      $('#cat-category-' + category.id + '-name').removeClass('has-error');
+  }
+
+  $scope.blurCATCategoryMembership = function(category) {
+    if(category.membership_degree == '' || category.membership_degree < 0.5 || category.membership_degree > 1)
+      $('#cat-category-' + category.id + '-membership-degree').addClass('has-error');
+    else
+      $('#cat-category-' + category.id + '-membership-degree').removeClass('has-error');
+  }
+
+  $scope.blurCATCategoryCriterion = function(category, criterion) {
+    if(category[criterion.name] == undefined || category[criterion.name] < 0)
+      $('#cat-category-' + category.id + '-criterion-' + criterion.id).addClass('has-error');
+    else
+      $('#cat-category-' + category.id + '-criterion-' + criterion.id).removeClass('has-error');
+  }
+
+  $scope.addCATReferenceAction = function(category, index) {
+    var unassigned_field = false;
+
+    //check if there is an unassigned input field
+    for(criterion in $scope.currentModule.input.criteria)
+      if(($scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] == "")
+      || ($scope.currentModule.input.criteria[criterion]['scale']['type'] == 'Numerical' && ($scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] < $scope.currentModule.input.criteria[criterion]['scale']['min'] || $scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] > $scope.currentModule.input.criteria[criterion]['scale']['max']))
+      || ($scope.currentModule.input.criteria[criterion]['scale']['type'] == 'Categorical' && ($scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] > $scope.currentModule.input.criteria[criterion]['scale']['num_categories'] || $scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] < 1)))
+        unassigned_field = true;
+
+    if(unassigned_field) {
+      //if the criterion field has not been assigned - add error class
+      for(criterion in $scope.currentModule.input.criteria) {
+        if(($scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] == "")
+        || ($scope.currentModule.input.criteria[criterion]['scale']['type'] == 'Numerical' && ($scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] < $scope.currentModule.input.criteria[criterion]['scale']['min'] || $scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] > $scope.currentModule.input.criteria[criterion]['scale']['max']))
+        || ($scope.currentModule.input.criteria[criterion]['scale']['type'] == 'Categorical' && ($scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] > $scope.currentModule.input.criteria[criterion]['scale']['num_categories'] || $scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] < 1)))
+          $('#new-cat-ref-' + category.id + '-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).addClass('has-error');
+        else
+          $('#new-cat-ref-' + category.id + '-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
+      }
+    }
+    else {
+      if($scope.currentModule.input.categories[$scope.currentModule.input.categories.indexOf(category)].reference_actions == undefined) {
+        $scope.currentModule.input.categories[$scope.currentModule.input.categories.indexOf(category)].reference_actions = [];
+        $scope.new_reference_action[category.id].id = 1;
+      }
+      else if($scope.currentModule.input.categories[$scope.currentModule.input.categories.indexOf(category)].reference_actions.length == 0)
+        $scope.new_reference_action[category.id].id = 1;
+      else
+        $scope.new_reference_action[category.id].id = $scope.currentModule.input.categories[$scope.currentModule.input.categories.indexOf(category)].reference_actions[$scope.currentModule.input.categories[$scope.currentModule.input.categories.indexOf(category)].reference_actions.length - 1].id + 1;
+
+      $scope.new_reference_action[category.id].name = 'b' + (index + 1) + ($scope.currentModule.input.categories[$scope.currentModule.input.categories.indexOf(category)].reference_actions.length + 1);
+
+      $scope.currentModule.input.categories[$scope.currentModule.input.categories.indexOf(category)].reference_actions.push(angular.copy($scope.new_reference_action[category.id]));
+
+      //reset the input fields
+      $scope.new_reference_action[category.id].name = '';
+      for(criterion in $scope.currentModule.input.criteria) {
+        $scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] = '';
+        $('#new-cat-ref-' + category.id + '-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
+      }
+    }
+  }
+
+  $scope.blurCATReferenceAction = function(ref, category, criterion) {
+    if((ref[criterion.name] == undefined || ref[criterion.name] == "")
+    || (criterion['scale']['type'] == 'Numerical' && (ref[criterion.name] < criterion['scale']['min'] || ref[criterion.name] > criterion['scale']['max']))
+    || (criterion['scale']['type'] == 'Categorical' && (ref[criterion.name] > criterion['scale']['num_categories'] || ref[criterion.name] < 1)))
+      $('#cat-ref-' + category.id + '-criterion-' + criterion['id']).addClass('has-error');
+    else
+      $('#cat-ref-' + category.id + '-criterion-' + criterion['id']).removeClass('has-error');
+  }
+
+  /*** DATA INPUT FUNCTIONS - DELPHI METHOD ***/
+
+  $scope.blurDelphiSubject = function() {
+    if($scope.currentModule.input.subject == undefined || $scope.currentModule.input.subject == '')
+      $('#delphi-subject').addClass('has-error');
+    else
+      $('#delphi-subject').removeClass('has-error');
+  }
+
+  $scope.addDelphiEmail = function() {
+    //if there is an input field not assigned
+    if($scope.new_delphi_email.address == undefined || $scope.new_delphi_email.address == '')
+      $('#new-delphi-email').addClass('has-error');
+    else {
+      //assign an unique id to the new email
+      if($scope.currentModule.input.emails.length == 0)
+        $scope.new_delphi_email.id = 1;
+      else
+        $scope.new_delphi_email.id = $scope.currentModule.input.emails[$scope.currentModule.input.emails.length - 1]['id'] + 1;
+
+      $scope.currentModule.input.emails.push(angular.copy($scope.new_delphi_email));
+
+      $scope.new_delphi_email.address = '';
+
+      //remove all error classes - just be sure
+      $('#new-delphi-email').removeClass('has-error');
+    }
+  }
+
+  $scope.blurDelphiEmail = function(email) {
+    if(email.address == undefined || email.address == '')
+      $('#delphi-email-' + email.id).addClass('has-error');
+    else
+      $('#delphi-email-' + email.id).removeClass('has-error');
+  }
+
+  $scope.addDelphiQuestion = function() {
+    //if there is an input field not assigned
+    if($scope.new_delphi_question.title == undefined || $scope.new_delphi_question.title == '' || $scope.new_delphi_question.description == undefined || $scope.new_delphi_question.description == '') {
+      if($scope.new_delphi_question.title == undefined || $scope.new_delphi_question.title == '')
+        $('#new-delphi-question-title').addClass('has-error');
+      else
+        $('#new-delphi-question-title').removeClass('has-error');
+
+      if($scope.new_delphi_question.description == undefined || $scope.new_delphi_question.description == '')
+        $('#new-delphi-question-description').addClass('has-error');
+      else
+        $('#new-delphi-question-description').removeClass('has-error');
+    }
+    else {
+      //assign an unique id to the new email
+      if($scope.currentModule.input.questions.length == 0)
+        $scope.new_delphi_question.id = 1;
+      else
+        $scope.new_delphi_question.id = $scope.currentModule.input.questions[$scope.currentModule.input.questions.length - 1]['id'] + 1;
+
+      $scope.currentModule.input.questions.push(angular.copy($scope.new_delphi_question));
+
+      $scope.new_delphi_question.title = '';
+      $scope.new_delphi_question.description = '';
+
+      //remove all error classes - just be sure
+      $('#new-delphi-question-title').removeClass('has-error');
+      $('#new-delphi-question-description').removeClass('has-error');
+    }
+  }
+
+  $scope.blurDelphiQuestionTitle = function(question) {
+    if(question.title == undefined || question.title == '')
+      $('#delphi-question-title-' + question.id).addClass('has-error');
+    else
+      $('#delphi-question-title-' + question.id).removeClass('has-error');
+  }
+
+  $scope.blurDelphiQuestionDescription = function(question) {
+    if(question.description == undefined || question.description == '')
+      $('#delphi-question-description-' + question.id).addClass('has-error');
+    else
+      $('#delphi-question-description-' + question.id).removeClass('has-error');
+  }
+
+  /*** DATA INPUT FUNCTIONS - SRF METHOD ***/
+
+  //add a new criterion
+  $scope.addSRFCriterion = function() {
+    //if there is an input field not assigned
+    if($scope.new_srf_criterion.name == undefined || $scope.new_srf_criterion.name == '') {
+      $('#new-srf-criterion-name').addClass('has-error');
+    }
+    else {
+      //assign an unique id to the new criterion
+      if($scope.currentModule.input.criteria.length == 0)
+        $scope.new_srf_criterion.id = 1;
+      else
+        $scope.new_srf_criterion.id = $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.length - 1]['id'] + 1;
+
+      //criterion starts unassigned to any rank
+      $scope.new_srf_criterion.position = -1;
+
+      //add the new criterion to the
+      $scope.currentModule.input.criteria.push(angular.copy($scope.new_srf_criterion));
+
+      //reset the criterion input fields
+      $scope.new_srf_criterion.name = '';
+
+      //remove all error classes - just be sure
+      $('#new-srf-criterion-name').removeClass('has-error');
+    }
+  }
+
+  $scope.blurSRFCriterionName = function(criterion) {
+    if(criterion.name == '')
+      $('#srf-criterion-' + criterion.id + '-name').addClass('has-error');
+    else
+      $('#srf-criterion-' + criterion.id + '-name').removeClass('has-error');
+  }
+
+  $scope.blurSRFRatioZ = function() {
+    if($scope.currentModule.input['ratio z'] == '' || $scope.currentModule.input['ratio z'] == undefined)
+      $('#srf-ratio-z').addClass('has-error');
+    else
+      $('#srf-ratio-z').removeClass('has-error');
+  }
+
+  /*** DATA DELETION FUNCTIONS ***/
+
+  //selected input to be deleted
+  $scope.deleteIdCriterion = '';
+  $scope.deleteIdAction = '';
+  $scope.deleteIdObject = '';
+  $scope.deleteIdInteractionEffect = '';
+  $scope.deleteIdBranch = ['', ''];
+  $scope.deleteIdCategory = '';
+  $scope.deleteIdReferenceAction = ['', ''];
+  $scope.deleteIdEmail = '';
+  $scope.deleteIdQuestion = '';
+
+  //select a certain input to be deleted
+  $scope.deleteInput = function(input, type) {
+    switch(type) {
+      case 'Criteria':
+        $scope.deleteIdCriterion = input.id;
+        break;
+
+      case 'Actions':
+        $scope.deleteIdAction = input.id;
+        break;
+
+      case 'Objects':
+        $scope.deleteIdObject = input.id;
+        break;
+
+      case 'Interaction Effects':
+        $scope.deleteIdInteractionEffect = input.id;
+        break;
+
+      case 'Branches':
+        $scope.deleteIdBranch = [input[0]['id'], input[1]['id']];
+        break;
+
+      case 'Categories':
+        $scope.deleteIdCategory = input.id;
+        break;
+
+      case 'Reference Actions':
+        $scope.deleteIdReferenceAction = [input[0]['id'], input[1]['id']];
+        break;
+
+      case 'Emails':
+        $scope.deleteIdEmail = input.id;
+        break;
+
+      case 'Questions':
+        $scope.deleteIdQuestion = input.id;
+        break;
+    }
+  }
+
+  //delete the selected input
+  $scope.confirmDeleteInput = function(input, type) {
+    switch(type) {
+      case 'Criteria':
+        $scope.currentModule.input.criteria.splice($scope.currentModule.input.criteria.indexOf(input), 1);
+        $scope.deleteIdCriterion = '';
+        break;
+
+      case 'Actions':
+        $scope.currentModule.input.actions.splice($scope.currentModule.input.actions.indexOf(input), 1);
+        $scope.deleteIdAction = '';
+        break;
+
+      case 'Objects':
+        $scope.currentModule.input.objects.splice($scope.currentModule.input.objects.indexOf(input), 1);
+        $scope.deleteIdObject = '';
+        break;
+
+      case 'Interaction Effects':
+        $scope.currentModule.input['interaction effects'].splice($scope.currentModule.input['interaction effects'].indexOf(input), 1);
+        $scope.deleteIdInteractionEffect = '';
+        break;
+
+      case 'Branches':
+        $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.indexOf(input[0])].branches.splice($scope.currentModule.input.criteria[$scope.currentModule.input.criteria.indexOf(input[0])].branches.indexOf(input[1]), 1);
+        $scope.deleteIdBranch = ['', ''];
+        break;
+
+      case 'Categories':
+        $scope.currentModule.input.categories.splice($scope.currentModule.input.categories.indexOf(input), 1);
+        $scope.deleteIdCategory = '';
+        break;
+
+      case 'Reference Actions':
+        $scope.currentModule.input.categories[$scope.currentModule.input.categories.indexOf(input[0])].reference_actions.splice($scope.currentModule.input.categories[$scope.currentModule.input.categories.indexOf(input[0])].reference_actions.indexOf(input[1]), 1);
+        $scope.deleteIdReferenceAction = ['', ''];
+        break;
+
+      case 'Emails':
+        $scope.currentModule.input.emails.splice($scope.currentModule.input.emails.indexOf(input), 1);
+        $scope.deleteIdEmail = '';
+        break;
+
+      case 'Questions':
+        $scope.currentModule.input.questions.splice($scope.currentModule.input.questions.indexOf(input), 1);
+        $scope.deleteIdQuestion = '';
+        break;
+    }
+  }
+
+  //cancel the input selection
+  $scope.cancelDeleteInput = function(type) {
+    switch(type) {
+      case 'Criteria':
+        $scope.deleteIdCriterion = '';
+        break;
+
+      case 'Actions':
+        $scope.deleteIdAction = '';
+        break;
+
+      case 'Objects':
+        $scope.deleteIdObject = '';
+        break;
+
+      case 'Interaction Effects':
+        $scope.deleteIdInteractionEffect = '';
+        break;
+
+      case 'Branches':
+        $scope.deleteIdBranch = ['', ''];
+        break;
+
+      case 'Categories':
+        $scope.deleteIdCategory = '';
+        break;
+
+      case 'Reference Actions':
+        $scope.deleteIdReferenceAction = ['', ''];
+        break;
+
+      case 'Emails':
+        $scope.deleteIdEmail = '';
+        break;
+
+      case 'Questions':
+        $scope.deleteIdQuestion = '';
+        break;
+    }
+  }
 
   /*** CONNECTOR FUNCTIONS ***/
 
@@ -953,10 +1704,65 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         for(mod in modules)
           //verify if the output module already contains the results
           if(modules[mod]['id'] == output && modules[mod]['output'] != undefined) {
-            for(modl in modules)
-              if(modules[modl]['id'] == input)
-                modules[modl]['input'][input_type.toLowerCase()] = angular.copy(modules[mod]['output']);
-            break;
+            for(modl in modules) {
+              if(modules[modl]['id'] == input) {
+                //SPECIAL CASES
+                //CAT-SD - SCALES
+                if(modules[modl]['type'] == 'CAT-SD' && input_type == 'scales') {
+                  for(scale in modules[mod]['output'])
+                    for(criterion in modules[modl]['input']['criteria'])
+                      if(modules[modl]['input']['criteria'][criterion]['name'] == modules[mod]['output'][scale]['criterion'])
+                        modules[modl]['input']['criteria'][criterion]['scale'] = modules[mod]['output'][scale];
+                }
+                //CAT-SD - FUNCTIONS/BRANCHES
+                else if(modules[modl]['type'] == 'CAT-SD' && input_type == 'functions') {
+                  for(branch in modules[mod]['output'])
+                    for(criterion in modules[modl]['input']['criteria'])
+                      if(modules[modl]['input']['criteria'][criterion]['name'] == modules[mod]['output'][branch]['criterion']) {
+                        if(modules[modl]['input']['criteria'][criterion]['branches'] == undefined)
+                          modules[modl]['input']['criteria'][criterion]['branches'] = [];
+
+                        modules[modl]['input']['criteria'][criterion]['branches'].push(modules[mod]['output'][branch]);
+                      }
+                }
+                //CAT-SD - REFERENCE ACTIONS
+                else if(modules[modl]['type'] == 'CAT-SD' && input_type == 'reference actions') {
+                  for(action in modules[mod]['output'])
+                    for(category in modules[modl]['input']['categories'])
+                      if(modules[modl]['input']['categories'][category]['name'] == modules[mod]['output'][action]['category']) {
+                        if(modules[modl]['input']['categories'][category].reference_actions == undefined)
+                          modules[modl]['input']['categories'][category].reference_actions = [];
+
+                        modules[modl]['input']['categories'][category].reference_actions.push(modules[mod]['output'][action]);
+                      }
+
+                  for(category in modules[modl]['input']['categories'])
+                    for(reference_action in modules[modl]['input']['categories'][category]['reference_actions'])
+                      modules[modl]['input']['categories'][category]['reference_actions'][reference_action]['name'] = 'b' + (Number(category) + 1) + (Number(reference_action) + 1);
+                }
+                //DELPHI - SUBJECT
+                else if(modules[modl]['type'] == 'Delphi' && input_type == 'subject')
+                  modules[modl]['input']['subject'] = modules[mod]['output'][0]['subject'];
+                //SRF - RANKING
+                else if(modules[modl]['type'] == 'SRF' && input_type == 'ranking')
+                  modules[modl]['input']['ranking'] = modules[mod]['output'][0]['ranking'];
+                //SRF - RATIO Z
+                else if(modules[modl]['type'] == 'SRF' && input_type == 'ratio z')
+                  modules[modl]['input']['ratio z'] = modules[mod]['output'][0]['ratio-z'];
+                //SRF - DECIMAL PLACES
+                else if(modules[modl]['type'] == 'SRF' && input_type == 'decimal places') {
+                  modules[modl]['input']['decimal places'] = modules[mod]['output'][0]['decimal-places'].toString();
+                }
+                //SRF - WEIGHT TYPE
+                else if(modules[modl]['type'] == 'SRF' && input_type == 'weight type')
+                  modules[modl]['input']['weight type'] = modules[mod]['output'][0]['weight-type'];
+                //NORMAL CASE
+                else
+                  modules[modl]['input'][input_type.toLowerCase()] = angular.copy(modules[mod]['output']);
+
+                break;
+              }
+            }
           }
       }
       //reset the drawing process
@@ -1185,7 +1991,6 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       else
         modules_data++;
     }
-
     return modules_data == modules.length;
   }
 
@@ -1216,6 +2021,31 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         mod['output'] = mod['order'];
         method_executed = true;
         break;
+
+      case 'CAT-SD':
+        var results = CATSDService.getResults(mod['input']['criteria'], mod['input']['interaction effects'], mod['input']['actions'], mod['input']['categories']);
+
+        results.then(function(resolve) {
+          mod['output'] = resolve;
+        });
+
+        method_executed = true;
+        break;
+
+      case 'Delphi':
+        var results = DelphiService.startRound($scope.username, proj_id, mod['input']['subject'], mod['input']['emails'], mod['input']['questions'], mod['current_round']);
+
+        results.then(function(resolve) {
+          mod['round_id'] = resolve['id'];
+        });
+
+        mod['current_round']++;
+        method_executed = true;
+        break;
+
+      case 'SRF':
+        mod['output'] = SRFService.getResults(mod['input']['criteria'], mod['input']['white cards'], mod['input']['ranking'], mod['input']['ratio z'], mod['input']['ratio z'], mod['input']['decimal places'], mod['input']['weight type']);
+        break;
     }
 
     return method_executed;
@@ -1233,11 +2063,11 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   //get the executions of the current project
   function getExecutions() {
-    $http.get('/projects').success(function(response) {
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+    $http.get('/projects').then(function(response) {
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
           //get the actions previously added
-          $scope.executions = response[proj]['executions'];
+          $scope.executions = response.data[proj]['executions'];
           break;
         }
       }
@@ -1247,22 +2077,22 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   //create new execution
   function newExecution() {
     //get created projects
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       //create the new execution object
       var new_exec = {};
 
       //proj_res - new project document; id_doc - id of the old project document
       var proj_res, id_doc;
 
-      for(proj in response) {
-        if(response[proj]['username'] == $scope.username && response[proj]['project_id'] == proj_id) {
+      for(proj in response.data) {
+        if(response.data[proj]['username'] == $scope.username && response.data[proj]['project_id'] == proj_id) {
           //get the largest execution_id
           var exec_id;
 
-          if(response[proj]['executions'].length == 0)
+          if(response.data[proj]['executions'].length == 0)
             exec_id = 1;
           else
-            exec_id = response[proj]['executions'][response[proj]['executions'].length - 1]['exec_id'] + 1;
+            exec_id = response.data[proj]['executions'][response.data[proj]['executions'].length - 1]['exec_id'] + 1;
 
           //define the date of the execution
           var current_date = new Date();
@@ -1276,20 +2106,20 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
           new_exec['connections'] = connections;
 
           //insert execution into database
-          response[proj]['executions'].push(new_exec);
+          response.data[proj]['executions'].push(new_exec);
           //get the id of the document, so that it can be removed from the db
-          id_doc = response[proj]['_id'];
+          id_doc = response.data[proj]['_id'];
           //project to store in the db
-          proj_res = response[proj];
+          proj_res = response.data[proj];
           delete proj_res['_id'];
           break;
         }
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function() {
+      $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+        $http.post('/projects', proj_res).then(function() {
           //reload executions
           getExecutions();
           //reset output fields
@@ -1310,28 +2140,28 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   //delete a certain execution
   $scope.confirmDeleteExecution = function() {
     //get all created projects
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       //proj_res - new project document; id_doc - id of the old project document
       var proj_res, id_doc;
 
       //find the current project
-      for(proj in response) {
-        if(response[proj]['username'] == $scope.username && response[proj]['project_id'] == proj_id) {
+      for(proj in response.data) {
+        if(response.data[proj]['username'] == $scope.username && response.data[proj]['project_id'] == proj_id) {
           //remove execution from the executions array
-          response[proj]['executions'].splice($scope.executions.indexOf($scope.exec_delete), 1);
+          response.data[proj]['executions'].splice($scope.executions.indexOf($scope.exec_delete), 1);
           //get the id of the document, so that it can be removed from the db
-          id_doc = response[proj]['_id'];
+          id_doc = response.data[proj]['_id'];
           //project to store in the db
-          proj_res = response[proj];
+          proj_res = response.data[proj];
           delete proj_res['_id'];
           break;
         }
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function() {
+      $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+        $http.post('/projects', proj_res).then(function() {
           //reload executions
           getExecutions();
           //reset selected execution to be deleted
@@ -1350,28 +2180,28 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   //confirm the deletion of all executions of the current project
   $scope.confirmDeleteAllExecutions = function() {
     //get all created projects
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       //proj_res - new project document; id_doc - id of the old project document
       var proj_res, id_doc;
 
       //find the current project
-      for(proj in response) {
-        if(response[proj]['username'] == $scope.username && response[proj]['project_id'] == proj_id) {
+      for(proj in response.data) {
+        if(response.data[proj]['username'] == $scope.username && response.data[proj]['project_id'] == proj_id) {
           //remove execution from the executions array
-          response[proj]['executions'] = [];
+          response.data[proj]['executions'] = [];
           //get the id of the document, so that it can be removed from the db
-          id_doc = response[proj]['_id'];
+          id_doc = response.data[proj]['_id'];
           //project to store in the db
-          proj_res = response[proj];
+          proj_res = response.data[proj];
           delete proj_res['_id'];
           break;
         }
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function() {
+      $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+        $http.post('/projects', proj_res).then(function() {
           //reload executions
           getExecutions();
         });
@@ -1425,6 +2255,141 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   $scope.checkPage = function(index) {
     return $scope.current_exec_page <= index && index < exec_limit + $scope.current_exec_page;
+  }
+
+  $scope.aggregateModuleResults = function(execution) {
+    for(mod in execution.modules)
+      if(execution.modules[mod]['type'] == 'Delphi') {
+        var results = DelphiService.aggregateResults(execution.modules[mod]['round_id']);
+
+        results.then(function(resolve) {
+          execution.modules[mod]['output']['questions'] = resolve[0];
+          execution.modules[mod]['output']['emails'] = resolve[1];
+          execution.modules[mod]['output']['suggestions'] = resolve[2];
+          execution.modules[mod]['output']['link'] = resolve[3];
+        });
+      }
+  }
+
+  //order a data array by a certain attribute in a certain direction
+  $scope.changeOrder = function(attr, dir, data) {
+    data.sort(sortData(attr, dir));
+  }
+
+  //sort an array by order and direction
+  function sortData(attribute, direction) {
+    return function(a, b) {
+      if(direction == 'ascendant') {
+        if(a[attribute] < b[attribute])
+          return -1;
+        if(a[attribute] > b[attribute])
+          return 1;
+        return 0;
+      }
+      else {
+        if(a[attribute] < b[attribute])
+          return 1;
+        if(a[attribute] > b[attribute])
+          return -1;
+        return 0;
+      }
+    }
+  }
+
+  /*** DRAG AND DROP FUNCTIONS  - SRF ***/
+  //white card available to be dragged
+  $scope.white_card = {
+    'white_card' : true,
+    'id' : 0
+  };
+
+  //change a card's ranking position
+  $scope.rankingDrop = function(data, index) {
+    //if the white card on the original drop was dragged
+    if(data['white_card'] && data['id'] == 0 && noCriteriaCards(index)) {
+      var new_white_card = {
+        'position' : index,
+        'id' : $scope.currentModule.input["white cards"].length + 1,
+        'white_card' : true
+      };
+
+      $scope.$apply($scope.currentModule.input["white cards"].push(new_white_card));
+    }
+    //if a criteria card was dragged
+    else if(data['white_card'] == undefined && noWhiteCards(index))
+      data['position'] = index;
+  }
+
+  //put a criteria card back into the original drop
+  $scope.originalCriteriaDrop = function(data) {
+    if(data['white_card'] == undefined)
+      data['position'] = -1;
+  }
+
+  //put a white card back into the original drop
+  $scope.originalWhiteDrop = function(data) {
+    if(data['white_card'] && data['id'] != 0) {
+      data['position'] = -1;
+      $scope.$apply($scope.currentModule.input["white cards"]);
+    }
+  }
+
+  //check if there are any white cards in the index ranking
+  function noCriteriaCards(index) {
+    for(criterion in $scope.currentModule.input.criteria)
+      if($scope.currentModule.input.criteria[criterion]['position'] == index)
+        return false;
+
+    return true;
+  }
+
+  //check if there are any criteria cards in the index ranking
+  function noWhiteCards(index) {
+    for(white in $scope.currentModule.input["white cards"])
+      if($scope.currentModule.input["white cards"][white]['position'] == index)
+        return false;
+
+    return true;
+  }
+
+  //create an array the size of $scope.ranking so that it can be used by ng-repeat
+  $scope.rangeRepeater = function(count) {
+    return new Array(count);
+  };
+
+  //increment the number of rankings
+  $scope.addRanking = function(index) {
+    for(criterion in $scope.currentModule.input.criteria)
+      if($scope.currentModule.input.criteria[criterion]['position'] > index)
+        $scope.currentModule.input.criteria[criterion]['position']++;
+
+    for(white_card in $scope.currentModule.input["white cards"])
+      if($scope.currentModule.input["white cards"][white_card]['position'] > index)
+        $scope.currentModule.input["white cards"][white_card]['position']++;
+
+    $scope.currentModule.input.ranking++;
+  }
+
+  $scope.removeRanking = function(index) {
+    //don't allow less than 2 rankings
+    if($scope.currentModule.input.ranking > 2) {
+
+      for(criterion in $scope.currentModule.input.criteria) {
+        if($scope.currentModule.input.criteria[criterion]['position'] > index)
+          $scope.currentModule.input.criteria[criterion]['position']--;
+        else if($scope.currentModule.input.criteria[criterion]['position'] == index)
+          $scope.currentModule.input.criteria[criterion]['position'] = -1;
+      }
+
+      for(white_card in $scope.currentModule.input["white cards"]) {
+        if($scope.currentModule.input["white cards"][white_card]['position'] > index)
+          $scope.currentModule.input["white cards"][white_card]['position']--;
+        else if($scope.currentModule.input["white cards"][white_card]['position'] == index)
+          $scope.currentModule.input["white cards"][white_card]['position'] = -1;
+      }
+
+      $scope.currentModule.input.ranking--;
+    }
   }
 
   /*** STARTUP FUNCTIONS ***/

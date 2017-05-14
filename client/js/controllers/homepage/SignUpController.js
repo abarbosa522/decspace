@@ -12,12 +12,12 @@ app.controller('SignUpController', function($scope, $window, $http) {
 
   $scope.signUp = function() {
     if(typeof $scope.signup.email != 'undefined') {
-      $http.get('/accounts').success(function(response) {
+      $http.get('/accounts').then(function(response) {
         //check if input email already exists
         var email_exists = false;
 
-        for(account in response) {
-          if(response[account]['email'] == $scope.signup.email) {
+        for(account in response.data) {
+          if(response.data[account]['email'] == $scope.signup.email) {
             email_exists = true;
             break;
           }
@@ -34,7 +34,7 @@ app.controller('SignUpController', function($scope, $window, $http) {
           $scope.showErrorHelp = false;
 
           //create new account
-          $http.post('/accounts', $scope.signup).success(function(response) {
+          $http.post('/accounts', $scope.signup).then(function(response) {
             $scope.showSuccessAlert = true;
           });
         }

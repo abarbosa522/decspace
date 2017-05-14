@@ -413,7 +413,7 @@
 
           <!-- Ranking -->
           <div class = 'row'>
-            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#ranking-div' style = 'float:right' ng-click = 'ranking_eye = (ranking_eye == 0 ? 1 : 0)' title = 'Hide/Show Ranking'>
+            <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#ranking-div' style = 'float: right' ng-click = 'ranking_eye = (ranking_eye == 0 ? 1 : 0)' title = 'Hide/Show Ranking'>
               <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : ranking_eye == 0, "glyphicon-eye-close" : ranking_eye == 1}'></span>
             </button>
             <p class = 'header-2'>Ranking</p>
@@ -705,8 +705,7 @@
                               </li>
                               <!-- Dragged White Cards -->
                               <li ng-repeat = 'white_card in currentExecution.white_cards' ng-if = 'white_card.position == $parent.$index'>
-                                <div class = 'white-card undraggable-card'>
-                                </div>
+                                <div class = 'white-card undraggable-card'></div>
                               </li>
                             </ul>
                           </div>

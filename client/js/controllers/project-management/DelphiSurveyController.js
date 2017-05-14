@@ -23,33 +23,33 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
   //get delphi project questions
   function getData() {
     //get the stored answers
-    $http.get('/delphi_responses').success(function(response) {
+    $http.get('/delphi_responses').then(function(response) {
       //get the current answer
-      for(answer in response) {
-        if(response[answer]['user'] == $scope.user_id && response[answer]['round_id'] == round_id) {
+      for(answer in response.data) {
+        if(response.data[answer].user == $scope.user_id && response.data[answer].round_id == round_id) {
           //get the stored answered questions
-          $scope.questions_answered = response[answer]['questions_answered'];
+          $scope.questions_answered = response.data[answer].questions_answered;
           //get the stored unanswered questions
-          $scope.questions_unanswered = response[answer]['questions_unanswered'];
+          $scope.questions_unanswered = response.data[answer].questions_unanswered;
           //get the survey subject
-          $scope.subject = response[answer]['subject'];
+          $scope.subject = response.data[answer].subject;
           //get the stored suggestions
-          $scope.suggestions = response[answer]['suggestions'];
+          $scope.suggestions = response.data[answer].suggestions;
 
           //get survey usability metrics
-          log_ins = response[answer]['usability_metrics']['log_ins'];
-          task_duration = response[answer]['usability_metrics']['task_duration'];
-          drag_and_drops = response[answer]['usability_metrics']['drag_and_drops'];
-          added_suggestions = response[answer]['usability_metrics']['added_suggestions'];
-          confirmed_deletion_suggestion = response[answer]['usability_metrics']['confirmed_deletion_suggestion'];
-          canceled_deletion_suggestion = response[answer]['usability_metrics']['canceled_deletion_suggestion'];
-          data_saves = response[answer]['usability_metrics']['data_saves'];
-          confirmed_data_resets = response[answer]['usability_metrics']['confirmed_data_resets'];
-          canceled_data_resets = response[answer]['usability_metrics']['canceled_data_resets'];
-          data_reloads = response[answer]['usability_metrics']['data_reloads'];
-          help_modal_open = response[answer]['usability_metrics']['help_modal_open'];
-          task_complete = response[answer]['usability_metrics']['task_complete'];
-          incomplete_saves = response[answer]['usability_metrics']['incomplete_saves'];
+          log_ins = response.data[answer]['usability_metrics']['log_ins'];
+          task_duration = response.data[answer]['usability_metrics']['task_duration'];
+          drag_and_drops = response.data[answer]['usability_metrics']['drag_and_drops'];
+          added_suggestions = response.data[answer]['usability_metrics']['added_suggestions'];
+          confirmed_deletion_suggestion = response.data[answer]['usability_metrics']['confirmed_deletion_suggestion'];
+          canceled_deletion_suggestion = response.data[answer]['usability_metrics']['canceled_deletion_suggestion'];
+          data_saves = response.data[answer]['usability_metrics']['data_saves'];
+          confirmed_data_resets = response.data[answer]['usability_metrics']['confirmed_data_resets'];
+          canceled_data_resets = response.data[answer]['usability_metrics']['canceled_data_resets'];
+          data_reloads = response.data[answer]['usability_metrics']['data_reloads'];
+          help_modal_open = response.data[answer]['usability_metrics']['help_modal_open'];
+          task_complete = response.data[answer]['usability_metrics']['task_complete'];
+          incomplete_saves = response.data[answer]['usability_metrics']['incomplete_saves'];
 
           //count current log in
           registerLogIn();
@@ -60,17 +60,17 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
 
       //if answer was not found, i.e. user has not answered before
       if($scope.questions_answered.length == 0 && $scope.questions_unanswered.length == 0 && $scope.subject == '') {
-        $http.get('/delphi_rounds').success(function(response) {
-          for(round in response) {
-            if(response[round]['id'] == round_id) {
-              $scope.questions_unanswered = angular.copy(response[round]['questions']);
+        $http.get('/delphi_rounds').then(function(response) {
+          for(round in response.data) {
+            if(response.data[round].id == round_id) {
+              $scope.questions_unanswered = angular.copy(response.data[round].questions);
 
               for(question in $scope.questions_unanswered) {
-                $scope.questions_unanswered[question]['position'] = -1;
-                $scope.questions_unanswered[question]['score'] = 'null';
+                $scope.questions_unanswered[question].position = -1;
+                $scope.questions_unanswered[question].score = 'null';
               }
 
-              $scope.subject = response[round]['subject'];
+              $scope.subject = response[round].subject;
 
               //create new document
               var new_answer = {};
@@ -96,10 +96,9 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
               new_answer['usability_metrics']['incomplete_saves'] = incomplete_saves;
 
               //insert the initial document without any answers, so that it can be modified later
-              $http.post('/delphi_responses', new_answer).success(function() {
+              $http.post('/delphi_responses', new_answer).then(function() {
                 buildMatrix();
               });
-
             }
           }
         });
@@ -172,46 +171,46 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
     //increment the counter of data saves
     data_saves++;
 
-    $http.get('/delphi_responses').success(function(response) {
+    $http.get('/delphi_responses').then(function(response) {
       var id_doc, answer_res;
 
       //get the current answer
-      for(answer in response) {
-        if(response[answer]['user'] == $scope.user_id && response[answer]['round_id'] == round_id) {
+      for(answer in response.data) {
+        if(response.data[answer].user == $scope.user_id && response.data[answer].round_id == round_id) {
           //store answered questions
-          response[answer]['questions_answered'] = $scope.questions_answered;
+          response.data[answer]['questions_answered'] = $scope.questions_answered;
           //store unanswered questions
-          response[answer]['questions_unanswered'] = $scope.questions_unanswered;
+          response.data[answer]['questions_unanswered'] = $scope.questions_unanswered;
           //store suggestions
-          response[answer]['suggestions'] = $scope.suggestions;
+          response.data[answer]['suggestions'] = $scope.suggestions;
           //store usability metrics
-          response[answer]['usability_metrics']['log_ins'] = log_ins;
-          response[answer]['usability_metrics']['task_duration'] = task_duration;
-          response[answer]['usability_metrics']['drag_and_drops'] = drag_and_drops;
-          response[answer]['usability_metrics']['added_suggestions'] = added_suggestions;
-          response[answer]['usability_metrics']['confirmed_deletion_suggestion'] = confirmed_deletion_suggestion;
-          response[answer]['usability_metrics']['canceled_deletion_suggestion'] = canceled_deletion_suggestion;
-          response[answer]['usability_metrics']['data_saves'] = data_saves;
-          response[answer]['usability_metrics']['confirmed_data_resets'] = confirmed_data_resets;
-          response[answer]['usability_metrics']['canceled_data_resets'] = canceled_data_resets;
-          response[answer]['usability_metrics']['data_reloads'] = data_reloads;
-          response[answer]['usability_metrics']['help_modal_open'] = help_modal_open;
-          response[answer]['usability_metrics']['task_complete'] = task_complete;
-          response[answer]['usability_metrics']['incomplete_saves'] = incomplete_saves;
+          response.data[answer]['usability_metrics']['log_ins'] = log_ins;
+          response.data[answer]['usability_metrics']['task_duration'] = task_duration;
+          response.data[answer]['usability_metrics']['drag_and_drops'] = drag_and_drops;
+          response.data[answer]['usability_metrics']['added_suggestions'] = added_suggestions;
+          response.data[answer]['usability_metrics']['confirmed_deletion_suggestion'] = confirmed_deletion_suggestion;
+          response.data[answer]['usability_metrics']['canceled_deletion_suggestion'] = canceled_deletion_suggestion;
+          response.data[answer]['usability_metrics']['data_saves'] = data_saves;
+          response.data[answer]['usability_metrics']['confirmed_data_resets'] = confirmed_data_resets;
+          response.data[answer]['usability_metrics']['canceled_data_resets'] = canceled_data_resets;
+          response.data[answer]['usability_metrics']['data_reloads'] = data_reloads;
+          response.data[answer]['usability_metrics']['help_modal_open'] = help_modal_open;
+          response.data[answer]['usability_metrics']['task_complete'] = task_complete;
+          response.data[answer]['usability_metrics']['incomplete_saves'] = incomplete_saves;
 
           //get the id of the document
-          id_doc = response[answer]['_id'];
+          id_doc = response.data[answer]['_id'];
           //answer to store in the database
-          answer_res = response[answer];
+          answer_res = response.data[answer];
           delete answer_res['_id'];
           break;
         }
       }
 
       //delete the previous document
-      $http.delete('/delphi_responses/' + id_doc).success(function() {
+      $http.delete('/delphi_responses/' + id_doc).then(function() {
         //add the new answers
-        $http.post('/delphi_responses', answer_res).success(function() {
+        $http.post('/delphi_responses', answer_res).then(function() {
           $scope.showSaveSuccess = true;
 
           //show save success alert

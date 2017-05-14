@@ -8,18 +8,18 @@ app.controller('SortMethodController', function($scope, $http, $window) {
   $scope.showResetData = false;
 
   function requestLogIn() {
-    $http.get('/requestlogin').success(function(res) {
+    $http.get('/requestlogin').then(function(res) {
 
-      if(typeof res.user == 'undefined')
+      if(res.data.user == undefined)
         $window.location.href = '../homepage/login.html';
       else {
-        $scope.username = res.user;
+        $scope.username = res.data.user;
 
         //get all accounts and find the name of the logged user
-        $http.get('/accounts').success(function(response) {
-          for(account in response) {
-            if(response[account].email == $scope.username) {
-              $scope.name = response[account].name;
+        $http.get('/accounts').then(function(response) {
+          for(account in response.data) {
+            if(response.data[account].email == $scope.username) {
+              $scope.name = response.data[account].name;
               break;
             }
           }
@@ -29,7 +29,7 @@ app.controller('SortMethodController', function($scope, $http, $window) {
   }
 
   $scope.logOut = function() {
-    $http.get('/logout').success(function(res) {
+    $http.get('/logout').then(function(res) {
       $window.location.href = '../../index.html';
     });
   }
@@ -37,7 +37,7 @@ app.controller('SortMethodController', function($scope, $http, $window) {
   //change "last update" field to current date and get the selected method
   function rewriteLastUpdate() {
     //get all projects from database
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       var id_doc, proj_res;
 
       //get current date
@@ -45,25 +45,25 @@ app.controller('SortMethodController', function($scope, $http, $window) {
       var last_update = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
 
       //get the selected project
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj].project_id == proj_id) {
           //get the name of the project
-          $scope.project_name = response[proj]['name'];
+          $scope.project_name = response.data[proj].name;
           //change the date of the last update of the project
-          response[proj]['last_update'] = last_update;
+          response.data[proj].last_update = last_update;
           //get the id of the document, so that it can be removed from the db
-          id_doc = response[proj]['_id'];
+          id_doc = response.data[proj]['_id'];
           //project to store in the db and remove the id of the document
-          proj_res = response[proj];
+          proj_res = response.data[proj];
           delete proj_res['_id'];
           break;
         }
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function(){
+      $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+        $http.post('/projects', proj_res).then(function() {
           getData();
           getExecutions();
         });
@@ -77,7 +77,6 @@ app.controller('SortMethodController', function($scope, $http, $window) {
   $scope.new_object = {};
 
   $scope.addObject = function() {
-    console.log($scope.objects)
     //if a name has not been assigned - add error class
     if($scope.new_object.name == undefined || $scope.new_object.name == '')
       $('#objects-name').addClass('has-error');
@@ -120,29 +119,27 @@ app.controller('SortMethodController', function($scope, $http, $window) {
   }
 
   $scope.saveData = function() {
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       var id_doc, proj_res;
 
       //get the current project
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj].project_id == proj_id) {
           //insert objects
-          response[proj]['objects'] = $scope.objects;
-
+          response.data[proj].objects = $scope.objects;
           //get the id of the document
-          id_doc = response[proj]['_id'];
+          id_doc = response.data[proj]['_id'];
           //project to store in the db
-          proj_res = response[proj];
+          proj_res = response.data[proj];
           delete proj_res['_id'];
           break;
         }
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function() {
+      $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+        $http.post('/projects', proj_res).then(function() {
           $scope.showSaveSuccess = true;
         });
       });
@@ -154,13 +151,13 @@ app.controller('SortMethodController', function($scope, $http, $window) {
   }
 
   function getData() {
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       //get the current project
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj].project_id == proj_id) {
           //get objects
-          if(response[proj]['objects'] != undefined)
-            $scope.objects = response[proj]['objects'];
+          if(response.data[proj].objects != undefined)
+            $scope.objects = response.data[proj].objects;
         }
       }
     });
@@ -174,51 +171,53 @@ app.controller('SortMethodController', function($scope, $http, $window) {
     //show loading button
     $scope.isLoading = true;
 
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       //get current date
       var current_date = new Date();
       var execution_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear() + ' ' + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
 
       //if a comment has not been added
-      if(typeof $scope.new_execution == 'undefined')
-        var comment = '';
+      var comment;
+      if($scope.new_execution == undefined)
+        comment = '';
       else
-        var comment = $scope.new_execution.comment;
+        comment = $scope.new_execution.comment;
 
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj].project_id == proj_id) {
           //get the largest execution_id
-          if(response[proj]['executions'].length == 0)
-            var execution_id = 1;
+          var execution_id;
+          if(response.data[proj].executions.length == 0)
+            execution_id = 1;
           else
-            var execution_id = response[proj]['executions'][response[proj]['executions'].length - 1]['execution_id'] + 1;
+            execution_id = response.data[proj].executions[response.data[proj].executions.length - 1].execution_id + 1;
 
           //insert execution into database
           var new_exec = {};
-          new_exec['execution_id'] = execution_id;
-          new_exec['objects'] = $scope.objects;
-          new_exec['comment'] = comment;
-          new_exec['execution_date'] = execution_date;
+          new_exec.execution_id = execution_id;
+          new_exec.objects = $scope.objects;
+          new_exec.comment = comment;
+          new_exec.execution_date = execution_date;
 
-          response[proj]['executions'].push(new_exec);
+          response.data[proj].executions.push(new_exec);
 
           //get the id of the document, so that it can be removed from the db
-          id_doc = response[proj]['_id'];
+          id_doc = response.data[proj]['_id'];
           //project to store in the db
-          proj_res = response[proj];
+          proj_res = response.data[proj];
           delete proj_res['_id'];
           break;
         }
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function() {
+      $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+        $http.post('/projects', proj_res).then(function() {
           getExecutions();
 
           //reset the comment input field, if it was filled
-          if(typeof $scope.new_execution != 'undefined')
+          if($scope.new_execution != undefined)
             $scope.new_execution.comment = '';
 
           //hide loading button
@@ -229,11 +228,11 @@ app.controller('SortMethodController', function($scope, $http, $window) {
   }
 
   function getExecutions() {
-    $http.get('/projects').success(function(response) {
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+    $http.get('/projects').then(function(response) {
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj].project_id == proj_id) {
           //get the actions previously added
-          $scope.executions = response[proj]['executions'];
+          $scope.executions = response.data[proj].executions;
           break;
         }
       }
@@ -245,18 +244,18 @@ app.controller('SortMethodController', function($scope, $http, $window) {
   }
 
   $scope.confirmDeleteExecution = function(execution) {
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       var id_doc, proj_res;
 
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          for(exec in response[proj]['executions']) {
-            if(response[proj]['executions'][exec]['execution_id'] == execution.execution_id) {
-              response[proj]['executions'].splice(exec, 1);
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj].project_id == proj_id) {
+          for(exec in response.data[proj].executions) {
+            if(response.data[proj].executions[exec].execution_id == execution.execution_id) {
+              response.data[proj].executions.splice(exec, 1);
               //get the id of the document, so that it can be removed from the db
-              id_doc = response[proj]['_id'];
+              id_doc = response.data[proj]['_id'];
               //project to store in the db
-              proj_res = response[proj];
+              proj_res = response.data[proj];
               delete proj_res['_id'];
               break;
             }
@@ -266,9 +265,9 @@ app.controller('SortMethodController', function($scope, $http, $window) {
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function() {
+      $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+        $http.post('/projects', proj_res).then(function() {
           //refresh the list of projects
           getExecutions();
         });
@@ -285,25 +284,25 @@ app.controller('SortMethodController', function($scope, $http, $window) {
   }
 
   $scope.confirmDeleteAllExecutions = function() {
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       var id_doc, proj_res;
 
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          response[proj]['executions'] = [];
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj].project_id == proj_id) {
+          response.data[proj].executions = [];
           //get the id of the document, so that it can be removed from the db
-          id_doc = response[proj]['_id'];
+          id_doc = response.data[proj]['_id'];
           //project to store in the db
-          proj_res = response[proj];
+          proj_res = response.data[proj];
           delete proj_res['_id'];
           break;
         }
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function(){
+      $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+        $http.post('/projects', proj_res).then(function() {
           //refresh the list of executions
           getExecutions();
           //reset delete variable
@@ -318,11 +317,13 @@ app.controller('SortMethodController', function($scope, $http, $window) {
   }
 
   $scope.reloadData = function() {
-    $http.get('/projects').success(function(response) {
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          if(response[proj]['sorted_objects'] != undefined)
-            $scope.draggableObjects = response[proj]['sorted_objects'];
+
+    $http.get('/projects').then(function(response) {
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj].project_id == proj_id) {
+          if(response.data[proj].objects != undefined)
+            $scope.objects = response.data[proj].objects;
+
           break;
         }
       }
@@ -334,12 +335,7 @@ app.controller('SortMethodController', function($scope, $http, $window) {
   }
 
   $scope.confirmResetData = function() {
-    $scope.draggableObjects = [
-      {'name' : 'Object 1'},
-      {'name' : 'Object 2'},
-      {'name' : 'Object 3'}
-    ];
-
+    $scope.objects = [];
     $scope.showResetData = false;
   }
 
@@ -384,7 +380,7 @@ app.controller('SortMethodController', function($scope, $http, $window) {
               data.push(element);
           }
           $scope.$apply(function () {
-            $scope.draggableObjects = data;
+            $scope.objects = data;
           });
       };
     }
@@ -398,7 +394,7 @@ app.controller('SortMethodController', function($scope, $http, $window) {
           data.push(JSON.parse(rows[row]));
 
         $scope.$apply(function () {
-          $scope.draggableObjects = data;
+          $scope.objects = data;
         });
       }
     }
@@ -412,8 +408,8 @@ app.controller('SortMethodController', function($scope, $http, $window) {
     if(angular.element(document.querySelector('#csv-radio')).prop('checked')) {
       var csv_str = '';
 
-      for(drag in $scope.draggableObjects) {
-        for(field in $scope.draggableObjects[drag])
+      for(drag in $scope.objects) {
+        for(field in $scope.objects[drag])
           if(field != '$$hashKey')
             csv_str += field + ';';
 
@@ -422,10 +418,10 @@ app.controller('SortMethodController', function($scope, $http, $window) {
         break;
       }
 
-      for(drag in $scope.draggableObjects) {
-        for(field in $scope.draggableObjects[drag])
+      for(drag in $scope.objects) {
+        for(field in $scope.objects[drag])
           if(field != '$$hashKey')
-            csv_str += $scope.draggableObjects[drag][field] + ';';
+            csv_str += $scope.objects[drag][field] + ';';
 
         csv_str = csv_str.substring(0, csv_str.length - 1);
         csv_str += '\n';
@@ -434,18 +430,18 @@ app.controller('SortMethodController', function($scope, $http, $window) {
       var hidden_element = document.createElement('a');
       hidden_element.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv_str);
       hidden_element.target = '_blank';
-      hidden_element.download = 'data.csv';
+      hidden_element.download = 'objects.csv';
       hidden_element.click();
     }
     if(angular.element(document.querySelector('#json-radio')).prop('checked')) {
       var json_str = '';
 
-      for(drag in $scope.draggableObjects) {
+      for(drag in $scope.objects) {
         var json_element = {};
 
-        for(field in $scope.draggableObjects[drag])
+        for(field in $scope.objects[drag])
           if(field != '$$hashKey')
-            json_element[field] = $scope.draggableObjects[drag][field];
+            json_element[field] = $scope.objects[drag][field];
 
         json_str += JSON.stringify(json_element) + '\n';
       }
@@ -453,7 +449,7 @@ app.controller('SortMethodController', function($scope, $http, $window) {
       var hidden_element = document.createElement('a');
       hidden_element.href = 'data:text/json;charset=utf-8,' + encodeURI(json_str);
       hidden_element.target = '_blank';
-      hidden_element.download = 'data.json';
+      hidden_element.download = 'objects.json';
       hidden_element.click();
     }
   }

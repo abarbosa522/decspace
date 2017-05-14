@@ -17,16 +17,16 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
   }
 
   function requestLogIn() {
-    $http.get('/requestlogin').success(function(res) {
-      if(typeof res.user == 'undefined')
+    $http.get('/requestlogin').then(function(res) {
+      if(typeof res.data.user == 'undefined')
         $window.location.href = '../homepage/login.html';
       else {
-        $scope.username = res.user;
+        $scope.username = res.data.user;
         //get all accounts and find the name of the logged user
-        $http.get('/accounts').success(function(response) {
-          for(account in response) {
-            if(response[account].email == $scope.username) {
-              $scope.name = response[account].name;
+        $http.get('/accounts').then(function(response) {
+          for(account in response.data) {
+            if(response.data[account].email == $scope.username) {
+              $scope.name = response.data[account].name;
               break;
             }
           }
@@ -36,7 +36,7 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
   }
 
   $scope.logOut = function() {
-    $http.get('/logout').success(function(res) {
+    $http.get('/logout').then(function(res) {
       $window.location.href = '../../index.html';
     });
   }
@@ -44,7 +44,7 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
   //change "last update" field to current date and get the selected method
   function rewriteLastUpdate() {
     //get all projects from database
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       var id_doc, proj_res;
 
       //get current date
@@ -52,25 +52,25 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
       var last_update = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
 
       //get the selected project
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
           //get the name of the project
-          $scope.project_name = response[proj]['name'];
+          $scope.project_name = response.data[proj]['name'];
           //change the date of the last update of the project
-          response[proj]['last_update'] = last_update;
+          response.data[proj]['last_update'] = last_update;
           //get the id of the document, so that it can be removed from the db
-          id_doc = response[proj]['_id'];
+          id_doc = response.data[proj]['_id'];
           //project to store in the db and remove the id of the document
-          proj_res = response[proj];
+          proj_res = response.data[proj];
           delete proj_res['_id'];
           break;
         }
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function(){
+      $http.delete('/projects/' + id_doc).then(function(){
         //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+        $http.post('/projects', proj_res).then(function() {
           //retrieve the data stored in the database
           $scope.reloadData();
           //update the list of executions
@@ -99,38 +99,38 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
 
   //save the current data on the database
   $scope.saveData = function() {
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       var id_doc, proj_res;
 
       //get the current project
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
           //store criteria
-          response[proj]['criteria'] = $scope.criteria;
+          response.data[proj]['criteria'] = $scope.criteria;
           //store white cards
-          response[proj]['white_cards'] = $scope.white_cards;
+          response.data[proj]['white_cards'] = $scope.white_cards;
           //store number of rankings
-          response[proj]['ranking'] = $scope.ranking;
+          response.data[proj]['ranking'] = $scope.ranking;
           //store ratio z
-          response[proj]['ratio_z'] = $scope.ratio_z;
+          response.data[proj]['ratio_z'] = $scope.ratio_z;
           //store number of decimal places
-          response[proj]['decimal_places'] = $scope.decimal_places;
+          response.data[proj]['decimal_places'] = $scope.decimal_places;
           //store the weight type
-          response[proj]['weight_type'] = $scope.weight_type;
+          response.data[proj]['weight_type'] = $scope.weight_type;
 
           //get the id of the document
-          id_doc = response[proj]['_id'];
+          id_doc = response.data[proj]['_id'];
           //project to store in the db
-          proj_res = response[proj];
+          proj_res = response.data[proj];
           delete proj_res['_id'];
           break;
         }
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function() {
+      $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+        $http.post('/projects', proj_res).then(function() {
           $scope.showSaveSuccess = true;
         });
       });
@@ -144,32 +144,32 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
 
   //reload the stored data on the database
   $scope.reloadData = function() {
-    $http.get('/projects').success(function(response) {
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+    $http.get('/projects').then(function(response) {
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
           //retrieve criteria
-          if(response[proj]['criteria'] != undefined)
-            $scope.criteria = response[proj]['criteria'];
+          if(response.data[proj]['criteria'] != undefined)
+            $scope.criteria = response.data[proj]['criteria'];
 
           //retrieve white cards
-          if(response[proj]['white_cards'] != undefined)
-            $scope.white_cards = response[proj]['white_cards'];
+          if(response.data[proj]['white_cards'] != undefined)
+            $scope.white_cards = response.data[proj]['white_cards'];
 
           //retrieve number of rankings
-          if(response[proj]['ranking'] != undefined)
-            $scope.ranking = response[proj]['ranking'];
+          if(response.data[proj]['ranking'] != undefined)
+            $scope.ranking = response.data[proj]['ranking'];
 
           //retrieve ratio z
-          if(response[proj]['ratio_z'] != undefined)
-            $scope.ratio_z = response[proj]['ratio_z'];
+          if(response.data[proj]['ratio_z'] != undefined)
+            $scope.ratio_z = response.data[proj]['ratio_z'];
 
           //retrieve number of decimal places
-          if(response[proj]['decimal_places'] != undefined)
-            $scope.decimal_places = response[proj]['decimal_places'];
+          if(response.data[proj]['decimal_places'] != undefined)
+            $scope.decimal_places = response.data[proj]['decimal_places'];
 
           //retrieve weight type
-          if(response[proj]['weight_type'] != undefined)
-            $scope.weight_type = response[proj]['weight_type'];
+          if(response.data[proj]['weight_type'] != undefined)
+            $scope.weight_type = response.data[proj]['weight_type'];
 
           break;
         }
@@ -661,7 +661,7 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
       $scope.$apply($scope.white_cards.push(new_white_card));
     }
     //if a criteria card was dragged
-    else if(noWhiteCards(index))
+    else if(data['white_card'] == undefined && noWhiteCards(index))
       data['position'] = index;
   }
 
@@ -707,11 +707,11 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
 
   //retrieve the executions stored in the database
   function getExecutions() {
-    $http.get('/projects').success(function(response) {
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+    $http.get('/projects').then(function(response) {
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
           //get the actions previously added
-          $scope.executions = response[proj]['executions'];
+          $scope.executions = response.data[proj]['executions'];
           break;
         }
       }
@@ -728,7 +728,7 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
 
     var results = SRFService.getResults($scope.criteria, $scope.white_cards, $scope.ranking, $scope.ratio_z, $scope.decimal_places, $scope.weight_type);
 
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       //get current date
       var current_date = new Date();
       var execution_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear() + ' ' + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
@@ -739,34 +739,34 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
       else
         var comment = $scope.new_execution.comment;
 
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
           //get the largest execution_id
           var execution_id;
-          if(response[proj]['executions'].length == 0)
+          if(response.data[proj]['executions'].length == 0)
             execution_id = 1;
           else
-            execution_id = response[proj]['executions'][response[proj]['executions'].length - 1]['id'] + 1;
+            execution_id = response.data[proj]['executions'][response.data[proj]['executions'].length - 1]['id'] + 1;
 
           //insert execution into database
-          response[proj]['executions'].push({'id':execution_id,'results':results,'comment':comment,
+          response.data[proj]['executions'].push({'id':execution_id,'results':results,'comment':comment,
             'criteria':$scope.criteria,'white_cards':$scope.white_cards,'ranking':$scope.ranking,
             'ratio_z':$scope.ratio_z,'decimal_places':$scope.decimal_places,'weight_type':$scope.weight_type,
             'execution_date':execution_date});
 
           //get the id of the document, so that it can be removed from the db
-          id_doc = response[proj]['_id'];
+          id_doc = response.data[proj]['_id'];
           //project to store in the db
-          proj_res = response[proj];
+          proj_res = response.data[proj];
           delete proj_res['_id'];
           break;
         }
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function() {
+      $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+        $http.post('/projects', proj_res).then(function() {
           getExecutions();
 
           //reset the comment input field, if it was filled
@@ -824,18 +824,18 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
 
   //confirm execution deletion
   $scope.confirmDeleteExecution = function(execution) {
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       var id_doc, proj_res;
 
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          for(exec in response[proj]['executions']) {
-            if(response[proj]['executions'][exec]['execution_id'] == execution.execution_id) {
-              response[proj]['executions'].splice(exec, 1);
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
+          for(exec in response.data[proj]['executions']) {
+            if(response.data[proj]['executions'][exec]['execution_id'] == execution.execution_id) {
+              response.data[proj]['executions'].splice(exec, 1);
               //get the id of the document, so that it can be removed from the db
-              id_doc = response[proj]['_id'];
+              id_doc = response.data[proj]['_id'];
               //project to store in the db
-              proj_res = response[proj];
+              proj_res = response.data[proj];
               delete proj_res['_id'];
               break;
             }
@@ -845,9 +845,9 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function() {
+      $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+        $http.post('/projects', proj_res).then(function() {
           //refresh the list of projects
           getExecutions();
         });
@@ -867,25 +867,25 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
 
   //confirm the deletion of all executions of the current project
   $scope.confirmDeleteAllExecutions = function() {
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       var id_doc, proj_res;
 
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          response[proj]['executions'] = [];
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
+          response.data[proj]['executions'] = [];
           //get the id of the document, so that it can be removed from the db
-          id_doc = response[proj]['_id'];
+          id_doc = response.data[proj]['_id'];
           //project to store in the db
-          proj_res = response[proj];
+          proj_res = response.data[proj];
           delete proj_res['_id'];
           break;
         }
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function(){
+      $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+        $http.post('/projects', proj_res).then(function() {
           //refresh the list of executions
           getExecutions();
           //reset delete variable

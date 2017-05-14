@@ -12,16 +12,14 @@ app.controller('LogInController', function($scope, $window, $http) {
   }
 
   $scope.logIn = function() {
-    $http.post('/login', $scope.login).success(function(res) {
-
-      if(res == successfulString) {
+    $http.post('/login', $scope.login).then(function(res) {
+      if(res.data == successfulString) {
         $scope.showErrorAlert = false;
         $window.location.href = '../dashboard/dashboard.html';
       }
-      else if(res == unsuccessfulString) {
+      else if(res.data == unsuccessfulString) {
         $scope.showErrorAlert = true;
       }
-
     });
   }
 

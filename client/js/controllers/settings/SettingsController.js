@@ -4,16 +4,16 @@ app.controller('SettingsController', function($scope, $window, $http) {
   $scope.inputTypeNew = 'password';
 
   function requestLogIn() {
-    $http.get('/requestlogin').success(function(res) {
-      if(typeof res.user == 'undefined')
+    $http.get('/requestlogin').then(function(res) {
+      if(res.data.user == undefined)
         $window.location.href = '../homepage/login.html';
       else {
-        $scope.username = res.user;
+        $scope.username = res.data.user;
         //get all accounts and find the name of the logged user
-        $http.get('/accounts').success(function(response) {
-          for(account in response) {
-            if(response[account].email == $scope.username) {
-              $scope.name = response[account].name;
+        $http.get('/accounts').then(function(response) {
+          for(account in response.data) {
+            if(response.data[account].email == $scope.username) {
+              $scope.name = response.data[account].name;
               break;
             }
           }
@@ -23,7 +23,7 @@ app.controller('SettingsController', function($scope, $window, $http) {
   }
 
   $scope.logOut = function() {
-    $http.get('/logout').success(function(res) {
+    $http.get('/logout').then(function(res) {
       $window.location.href = '../../index.html';
     });
   }
@@ -79,18 +79,18 @@ app.controller('SettingsController', function($scope, $window, $http) {
       $scope.showFieldsError = true;
     }
     else {
-      $http.get('/accounts').success(function(response) {
+      $http.get('/accounts').then(function(response) {
         var id_doc, account_res;
         var password_reset = false;
 
-        for(account in response) {
-          if(response[account]['email'] == $scope.username && response[account]['password'] == $scope.password.current) {
+        for(account in response.data) {
+          if(response.data[account].email == $scope.username && response.data[account].password == $scope.password.current) {
             //store and delete the document id
-            id_doc = response[account]['_id'];
-            delete response[account]['_id'];
+            id_doc = response.data[account]['_id'];
+            delete response.data[account]['_id'];
             //change the password to the new one
-            response[account]['password'] = $scope.password.new;
-            account_res = response[account];
+            response.data[account].password = $scope.password.new;
+            account_res = response.data[account];
             password_reset = true;
             break;
           }
@@ -98,9 +98,9 @@ app.controller('SettingsController', function($scope, $window, $http) {
 
         if(password_reset) {
           //delete the previous document with the list of projects
-          $http.delete('/accounts/' + id_doc).success(function() {
+          $http.delete('/accounts/' + id_doc).then(function() {
             //add the new list of projects
-            $http.post('/accounts', account_res).success(function() {
+            $http.post('/accounts', account_res).then(function() {
               //show success alert
               $scope.showPasswordError = false;
               $scope.showPasswordSuccess = true;

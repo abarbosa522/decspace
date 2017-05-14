@@ -50,16 +50,16 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
   $scope.integratedSRFService = IntegratedSRFService;
 
   function requestLogIn() {
-    $http.get('/requestlogin').success(function(res) {
-      if(typeof res.user == 'undefined')
+    $http.get('/requestlogin').then(function(res) {
+      if(typeof res.data.user == 'undefined')
         $window.location.href = '../homepage/login.html';
       else {
-        $scope.username = res.user;
+        $scope.username = res.data.user;
         //get all accounts and find the name of the logged user
-        $http.get('/accounts').success(function(response) {
-          for(account in response) {
-            if(response[account].email == $scope.username) {
-              $scope.name = response[account].name;
+        $http.get('/accounts').then(function(response) {
+          for(account in response.data) {
+            if(response.data[account].email == $scope.username) {
+              $scope.name = response.data[account].name;
               break;
             }
           }
@@ -69,7 +69,7 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
   }
 
   $scope.logOut = function() {
-    $http.get('/logout').success(function(res) {
+    $http.get('/logout').then(function(res) {
       $window.location.href = '../../index.html';
     });
   }
@@ -77,7 +77,7 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
   //change "last update" field to current date and get the selected method
   function rewriteLastUpdate() {
     //get all projects from database
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       var id_doc, proj_res;
 
       //get current date
@@ -85,25 +85,25 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
       var last_update = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
 
       //get the selected project
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
           //get the name of the project
-          $scope.project_name = response[proj]['name'];
+          $scope.project_name = response.data[proj]['name'];
           //change the date of the last update of the project
-          response[proj]['last_update'] = last_update;
+          response.data[proj]['last_update'] = last_update;
           //get the id of the document, so that it can be removed from the db
-          id_doc = response[proj]['_id'];
+          id_doc = response.data[proj]['_id'];
           //project to store in the db and remove the id of the document
-          proj_res = response[proj];
+          proj_res = response.data[proj];
           delete proj_res['_id'];
           break;
         }
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function(){
+      $http.delete('/projects/' + id_doc).then(function(){
         //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+        $http.post('/projects', proj_res).then(function() {
           getData();
           getExecutions();
         });
@@ -292,35 +292,34 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
   }
 
   $scope.saveData = function() {
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       var id_doc, proj_res;
 
       //get the current project
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
           //insert criteria
-          response[proj]['criteria'] = $scope.criteria;
+          response.data[proj]['criteria'] = $scope.criteria;
           //insert interaction effects
-          response[proj]['interaction_effects'] = $scope.interaction_effects;
+          response.data[proj]['interaction_effects'] = $scope.interaction_effects;
           //insert actions
-          response[proj]['actions'] = $scope.actions;
+          response.data[proj]['actions'] = $scope.actions;
           //insert categories
-          response[proj]['categories'] = $scope.categories;
+          response.data[proj]['categories'] = $scope.categories;
 
           //get the id of the document
-          id_doc = response[proj]['_id'];
+          id_doc = response.data[proj]['_id'];
           //project to store in the db
-          proj_res = response[proj];
+          proj_res = response.data[proj];
           delete proj_res['_id'];
           break;
         }
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function() {
+      $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+        $http.post('/projects', proj_res).then(function() {
           $scope.showSaveSuccess = true;
         });
       });
@@ -328,44 +327,44 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
   }
 
   function getData() {
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       //get the current project
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
           //get criteria
-          if(typeof response[proj]['criteria'] == 'undefined')
+          if(typeof response.data[proj]['criteria'] == 'undefined')
             $scope.criteria = [];
           else
-            $scope.criteria = response[proj]['criteria'];
+            $scope.criteria = response.data[proj]['criteria'];
 
           //get interaction effects
-          if(typeof response[proj]['interaction_effects'] == 'undefined')
+          if(typeof response.data[proj]['interaction_effects'] == 'undefined')
             $scope.interaction_effects = [];
           else
-            $scope.interaction_effects = response[proj]['interaction_effects'];
+            $scope.interaction_effects = response.data[proj]['interaction_effects'];
 
           //get actions
-          if(typeof response[proj]['actions'] == 'undefined')
+          if(typeof response.data[proj]['actions'] == 'undefined')
             $scope.actions = [];
           else
-            $scope.actions = response[proj]['actions'];
+            $scope.actions = response.data[proj]['actions'];
 
           //get categories
-          if(typeof response[proj]['categories'] == 'undefined')
+          if(typeof response.data[proj]['categories'] == 'undefined')
             $scope.categories = [];
           else
-            $scope.categories = response[proj]['categories'];
+            $scope.categories = response.data[proj]['categories'];
         }
       }
     });
   }
 
   function getExecutions() {
-    $http.get('/projects').success(function(response) {
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+    $http.get('/projects').then(function(response) {
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
           //get the actions previously added
-          $scope.executions = response[proj]['executions'];
+          $scope.executions = response.data[proj]['executions'];
           break;
         }
       }
@@ -380,7 +379,7 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
 
     results.then(function(resolve) {
 
-      $http.get('/projects').success(function(response) {
+      $http.get('/projects').then(function(response) {
         //get current date
         var current_date = new Date();
         var execution_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear() + ' ' + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
@@ -393,31 +392,31 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
           var comment = $scope.new_execution.comment;
         }
 
-        for(proj in response) {
-          if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
+        for(proj in response.data) {
+          if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
             //get the largest execution_id
-            if(response[proj]['executions'].length == 0) {
+            if(response.data[proj]['executions'].length == 0) {
               var execution_id = 1;
             }
             else {
-              var execution_id = response[proj]['executions'][response[proj]['executions'].length - 1]['execution_id'] + 1;
+              var execution_id = response.data[proj]['executions'][response.data[proj]['executions'].length - 1]['execution_id'] + 1;
             }
 
             //insert execution into database
-            response[proj]['executions'].push({'execution_id':execution_id,'criteria':$scope.criteria,'actions':$scope.actions,'categories':$scope.categories,'interaction_effects':$scope.interaction_effects,'results':resolve,'comment':comment,'execution_date':execution_date});
+            response.data[proj]['executions'].push({'execution_id':execution_id,'criteria':$scope.criteria,'actions':$scope.actions,'categories':$scope.categories,'interaction_effects':$scope.interaction_effects,'results':resolve,'comment':comment,'execution_date':execution_date});
             //get the id of the document, so that it can be removed from the db
-            id_doc = response[proj]['_id'];
+            id_doc = response.data[proj]['_id'];
             //project to store in the db
-            proj_res = response[proj];
+            proj_res = response.data[proj];
             delete proj_res['_id'];
             break;
           }
         }
 
         //delete the previous document with the list of projects
-        $http.delete('/projects/' + id_doc).success(function() {
+        $http.delete('/projects/' + id_doc).then(function() {
           //add the new list of projects
-          $http.post('/projects', proj_res).success(function() {
+          $http.post('/projects', proj_res).then(function() {
             getExecutions();
 
             //reset the comment input field, if it was filled
@@ -437,18 +436,18 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
   }
 
   $scope.confirmDeleteExecution = function(execution) {
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       var id_doc, proj_res;
 
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          for(exec in response[proj]['executions']) {
-            if(response[proj]['executions'][exec]['execution_id'] == execution.execution_id) {
-              response[proj]['executions'].splice(exec, 1);
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
+          for(exec in response.data[proj]['executions']) {
+            if(response.data[proj]['executions'][exec]['execution_id'] == execution.execution_id) {
+              response.data[proj]['executions'].splice(exec, 1);
               //get the id of the document, so that it can be removed from the db
-              id_doc = response[proj]['_id'];
+              id_doc = response.data[proj]['_id'];
               //project to store in the db
-              proj_res = response[proj];
+              proj_res = response.data[proj];
               delete proj_res['_id'];
               break;
             }
@@ -458,9 +457,9 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function() {
+      $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+        $http.post('/projects', proj_res).then(function() {
           //refresh the list of projects
           getExecutions();
         });
@@ -477,25 +476,25 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
   }
 
   $scope.confirmDeleteAllExecutions = function() {
-    $http.get('/projects').success(function(response) {
+    $http.get('/projects').then(function(response) {
       var id_doc, proj_res;
 
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          response[proj]['executions'] = [];
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
+          response.data[proj]['executions'] = [];
           //get the id of the document, so that it can be removed from the db
-          id_doc = response[proj]['_id'];
+          id_doc = response.data[proj]['_id'];
           //project to store in the db
-          proj_res = response[proj];
+          proj_res = response.data[proj];
           delete proj_res['_id'];
           break;
         }
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).success(function(){
+      $http.delete('/projects/' + id_doc).then(function(){
         //add the new list of projects
-        $http.post('/projects', proj_res).success(function() {
+        $http.post('/projects', proj_res).then(function() {
           //refresh the list of executions
           getExecutions();
           //reset delete variable
@@ -514,20 +513,20 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
   }
 
   $scope.reloadData = function() {
-    $http.get('/projects').success(function(response) {
-      for(proj in response) {
-        if(response[proj].username == $scope.username && response[proj]['project_id'] == proj_id) {
-          if(response[proj]['criteria'] != undefined)
-            $scope.criteria = response[proj]['criteria'];
+    $http.get('/projects').then(function(response) {
+      for(proj in response.data) {
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
+          if(response.data[proj]['criteria'] != undefined)
+            $scope.criteria = response.data[proj]['criteria'];
 
-          if(response[proj]['interaction_effects'] != undefined)
-            $scope.interaction_effects = response[proj]['interaction_effects'];
+          if(response.data[proj]['interaction_effects'] != undefined)
+            $scope.interaction_effects = response.data[proj]['interaction_effects'];
 
-          if(response[proj]['actions'] != undefined)
-            $scope.actions = response[proj]['actions'];
+          if(response.data[proj]['actions'] != undefined)
+            $scope.actions = response.data[proj]['actions'];
 
-          if(response[proj]['categories'] != undefined)
-            $scope.categories = response[proj]['categories'];
+          if(response.data[proj]['categories'] != undefined)
+            $scope.categories = response.data[proj]['categories'];
 
           break;
         }

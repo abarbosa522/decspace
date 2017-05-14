@@ -34,6 +34,14 @@
   height: 27%;
 }
 
+.module-delphi {
+  height: 23%;
+}
+
+.module-srf {
+  height: 28%;
+}
+
 .module-circle {
   position: absolute;
   border-radius: 100%;

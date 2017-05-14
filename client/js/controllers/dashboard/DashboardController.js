@@ -3,16 +3,16 @@ app.controller('DashboardController', function($scope, $window, $http) {
 
   //check if there is a user logged in
   function requestLogIn() {
-    $http.get('/requestlogin').success(function(res) {
-      if(typeof res.user == 'undefined')
+    $http.get('/requestlogin').then(function(res) {
+      if(typeof res.data.user == 'undefined')
         $window.location.href = '../homepage/login.html';
       else {
-        $scope.username = res.user;
+        $scope.username = res.data.user;
         //get all accounts and find the name of the logged user
-        $http.get('/accounts').success(function(response) {
-          for(account in response) {
-            if(response[account].email == $scope.username) {
-              $scope.name = response[account].name;
+        $http.get('/accounts').then(function(response) {
+          for(account in response.data) {
+            if(response.data[account].email == $scope.username) {
+              $scope.name = response.data[account].name;
               break;
             }
           }
@@ -23,7 +23,7 @@ app.controller('DashboardController', function($scope, $window, $http) {
 
   //user log out
   $scope.logOut = function() {
-    $http.get('/logout').success(function(res) {
+    $http.get('/logout').then(function(res) {
       $window.location.href = '../../index.html';
     });
   }

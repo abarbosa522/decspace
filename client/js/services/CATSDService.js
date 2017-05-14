@@ -47,7 +47,7 @@ app.service('CATSDService', function($http, $q) {
       similarityValues = resolve;
 
       assignActions();
-
+      
       deferred.resolve(assignedActions);
     });
 
@@ -114,8 +114,8 @@ app.service('CATSDService', function($http, $q) {
   function applyCriterionFunction() {
     var deferred = $q.defer();
 
-    $http.get('/expr-eval', {params: {'criteria':criteria, 'actions':actions, 'categories':categories, 'antagonisticSet':[antagonisticSet]}}).success(function(res) {
-      deferred.resolve(res);
+    $http.get('/expr-eval', {params: {'criteria':criteria, 'actions':actions, 'categories':categories, 'antagonisticSet':[antagonisticSet]}}).then(function(res) {
+      deferred.resolve(res.data);
     });
 
     return deferred.promise;
