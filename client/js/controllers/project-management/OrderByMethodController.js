@@ -11,8 +11,6 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
 
   $scope.deleteIdExecution = '';
 
-  $scope.showResetData = false;
-
   //eye icons variables
   $scope.criteria_eye = 1;
   $scope.actions_eye = 1;
@@ -85,70 +83,82 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
       $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
         $http.post('/projects', proj_res).then(function() {
-          getCriteria();
-          getActions();
+          $scope.reloadData(false);
           getExecutions();
         });
       });
     });
   }
 
-  function getCriteria() {
-    $http.get('/projects').then(function(response) {
-      //get the selected project
-      for(proj in response.data) {
-        if(response.data[proj].username == $scope.username && response.data[proj].project_id == proj_id) {
-          if(response.data[proj].criteria == undefined)
-            $scope.criteria = [];
-          else
-            $scope.criteria = response.data[proj].criteria;
+  //hide all alerts
+  function hideAlerts() {
+    $('#save-success').hide();
+    $('#reload-success').hide();
+  }
 
-          break;
-        }
-      }
+  //show certain alert and hide it smoothly
+  function showAlert(alert_id) {
+    //show alert
+    angular.element(document.querySelector('#' + alert_id)).alert();
+    //hide alert
+    angular.element(document.querySelector('#' + alert_id)).fadeTo(3000, 500).slideUp(500, function(){
+      angular.element(document.querySelector('#' + alert_id)).slideUp(500);
     });
   }
 
-  //get the number of parameters of a scope variable
-  function getNumberOfFields(scope_var) {
-    var i = 0;
+  $scope.new_criterion = {};
 
-    for(field in scope_var)
-      i++;
-
-    return i;
-  }
-
+  //add a new criterion
   $scope.addCriterion = function() {
-    //don't allow any of the fields to be empty - name, type and direction
-    if(getNumberOfFields($scope.new_criterion) < 3 || $scope.new_criterion.name == '' || $scope.new_criterion.type == '' || $scope.new_criterion.direction == '') {
-      $scope.showCriterionFieldsError = true;
-      $scope.showCriterionNameError = false;
+    var can_add_criterion = true;
+
+    //if a name has not been assigned to the new criterion - add error class
+    if($scope.new_criterion.name == undefined || $scope.new_criterion.name == '') {
+      $('#new-criterion-name').addClass('has-error');
+      can_add_criterion = false;
     }
-    //check if any there is another criterion with the same name - do not allow that
-    else {
-      $scope.showCriterionFieldsError = false;
-      $scope.showCriterionNameError = false;
+    else
+      $('#new-criterion-name').removeClass('has-error');
 
-      for(criterion in $scope.criteria) {
-        if($scope.new_criterion.name == $scope.criteria[criterion]['name']) {
-          $scope.showCriterionNameError = true;
-          break;
-        }
-      }
+    //if a type has not been assigned to the new criterion - add error class
+    if($scope.new_criterion.type == undefined || $scope.new_criterion.type == '') {
+      $('#new-criterion-type').addClass('has-error');
+      can_add_criterion = false;
+    }
+    else
+      $('#new-criterion-type').removeClass('has-error');
 
+    //if a direction has not been assigned to the new criterion - add error class
+    if($scope.new_criterion.direction == undefined || $scope.new_criterion.direction == '') {
+      $('#new-criterion-direction').addClass('has-error');
+      can_add_criterion = false;
+    }
+    else
+      $('#new-criterion-direction').removeClass('has-error');
+
+    //check if the new criterion can be added, i.e. no error class was added
+    if(can_add_criterion) {
+      //assign an unique id to the new criterion
       if($scope.criteria.length == 0)
         $scope.new_criterion.id = 1;
       else
         $scope.new_criterion.id = $scope.criteria[$scope.criteria.length - 1]['id'] + 1;
 
+      //the criterion is not selected by default
       $scope.new_criterion.selected = 'false';
 
+      //add the new criterion to the
       $scope.criteria.push(angular.copy($scope.new_criterion));
 
+      //reset the criterion input fields
       $scope.new_criterion.name = '';
       $scope.new_criterion.type = '';
       $scope.new_criterion.direction = '';
+
+      //remove all error classes - just be sure
+      $('#new-criterion-name').removeClass('has-error');
+      $('#new-criterion-type').removeClass('has-error');
+      $('#new-criterion-direction').removeClass('has-error');
     }
   }
 
@@ -175,40 +185,38 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
     }
   }
 
-  function getActions() {
-    $http.get('/projects').then(function(response) {
-      for(proj in response.data) {
-        if(response.data[proj].username == $scope.username && response.data[proj].project_id == proj_id) {
-          //get the actions previously added
-          if(response.data[proj].actions == undefined)
-            $scope.actions = [];
-          else
-            $scope.actions = response.data[proj].actions;
-
-          break;
-        }
-      }
-    });
+  $scope.blurCriterionName = function(criterion) {
+    if(criterion.name == '')
+      $('#criterion-' + criterion.id + '-name').addClass('has-error');
+    else
+      $('#criterion-' + criterion.id + '-name').removeClass('has-error');
   }
 
-  $scope.addAction = function() {
-    //don't allow to insert an action with an empty field
-    if(getNumberOfFields($scope.new_action) <= $scope.criteria.length) {
-      $scope.showActionFieldsError = true;
-      $scope.showActionNameError = false;
-    }
-    //don't actions with the same name
-    else {
-      $scope.showActionFieldsError = false;
-      $scope.showActionNameError = false;
+  $scope.new_action = {};
 
-      for(action in $scope.actions) {
-        if($scope.new_action.name == $scope.actions[action]['name']) {
-          $scope.showActionNameError = true;
-          break;
-        }
+  //add a new action
+  $scope.addAction = function() {
+    var can_add_action = true;
+
+    //if a name has not been assigned to the new action - add error class
+    if($scope.new_action.name == undefined || $scope.new_action.name == '') {
+      $('#new-action-name').addClass('has-error');
+      can_add_action = false;
+    }
+    else
+      $('#new-action-name').removeClass('has-error');
+
+    //if a criterion value has not been assigned to the new action - add error class
+    for(criterion in $scope.criteria) {
+      if($scope.new_action[$scope.criteria[criterion]['name']] == undefined || $scope.new_action[$scope.criteria[criterion]['name']] == '') {
+        $('#new-action-criterion-' + $scope.criteria[criterion]['id']).addClass('has-error');
+        can_add_action = false;
+      }
+      else
+        $('#new-action-criterion-' + $scope.criteria[criterion]['id']).removeClass('has-error');
       }
 
+    if(can_add_action) {
       if($scope.actions.length == 0)
         $scope.new_action.id = 1;
       else
@@ -216,12 +224,29 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
 
       $scope.actions.push(angular.copy($scope.new_action));
 
+      //reset the new action input fields and remove the error classes - just in case
       $scope.new_action.name = '';
+      $('#new-action-name').removeClass('has-error');
 
-      for(criterion in $scope.criteria)
+      for(criterion in $scope.criteria) {
         $scope.new_action[$scope.criteria[criterion]['name']] = '';
-
+        $('#new-action-criterion-' + $scope.criteria[criterion]['id']).removeClass('has-error');
+      }
     }
+  }
+
+  $scope.blurActionName = function(action) {
+    if(action.name == '')
+      $('#action-' + action.id + '-name').addClass('has-error');
+    else
+      $('#action-' + action.id + '-name').removeClass('has-error');
+  }
+
+  $scope.blurActionCriterion = function(action, criterion) {
+    if(action[criterion.name] == '')
+      $('#action-' + action.id + '-criterion-' + criterion.id).addClass('has-error');
+    else
+      $('#action-' + action.id + '-criterion-' + criterion.id).removeClass('has-error');
   }
 
   //delete a certain criterion
@@ -291,7 +316,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
             if(response.data[proj].executions.length == 0)
               execution_id = 1;
             else
-              execution_id = response.data[proj].executions[response.data[proj].execution.length - 1].execution_id + 1;
+              execution_id = response.data[proj].executions[response.data[proj].executions.length - 1].execution_id + 1;
 
             //insert execution into database
             var new_exec = {};
@@ -355,7 +380,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
       $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
         $http.post('/projects', proj_res).then(function() {
-          $scope.showSaveSuccess = true;
+          showAlert('save-success');
         });
       });
     });
@@ -365,7 +390,7 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
     $scope.showSaveSuccess = false;
   }
 
-  $scope.reloadData = function() {
+  $scope.reloadData = function(alertShowing) {
     $http.get('/projects').then(function(response) {
       for(proj in response.data) {
         if(response.data[proj].username == $scope.username && response.data[proj].project_id == proj_id) {
@@ -375,24 +400,18 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
           if(response.data[proj].actions != undefined)
             $scope.actions = response.data[proj].actions;
 
+          if(alertShowing)
+            showAlert('reload-success');
+
           break;
         }
       }
     });
   }
 
-  $scope.resetData = function() {
-    $scope.showResetData = true;
-  }
-
   $scope.confirmResetData = function() {
     $scope.criteria = [];
     $scope.actions = [];
-    $scope.showResetData = false;
-  }
-
-  $scope.cancelResetData = function() {
-    $scope.showResetData = false;
   }
 
   $scope.importData = function() {
@@ -689,4 +708,5 @@ app.controller('OrderByMethodController', function($scope, $window, $http, Order
 
   requestLogIn();
   rewriteLastUpdate();
+  hideAlerts();
 });

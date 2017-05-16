@@ -18,7 +18,6 @@ app.controller('ProjectsController', function($scope, $window, $http) {
           }
         });
       }
-      getProjects();
     });
   }
 
@@ -39,14 +38,13 @@ app.controller('ProjectsController', function($scope, $window, $http) {
 
       //get the created projects by the logged user
       for(project in response.data)
-        if(response.data[project].username == $scope.username)
+        if(response.data[project].username == $scope.username && response.data[project].method == undefined)
           user_projects.push(response.data[project]);
 
       $scope.projects = user_projects;
 
       //sort projects
-      if(currentOrder[0] != '' && currentOrder[1] != '')
-        $scope.projects.sort(sortData(currentOrder[0], currentOrder[1]));
+      sortProjects();
 
       //show/hide the "delete all projects" button
       if($scope.projects.length == 0)
@@ -58,17 +56,13 @@ app.controller('ProjectsController', function($scope, $window, $http) {
 
   /*** PROJECTS FUNCTIONS ***/
 
+  $scope.project = {};
+
   //add a new project
   $scope.addProject = function() {
-    //if a name for the new projects was not defined
-    if(typeof $scope.project.name == 'undefined' || $scope.project.name == '') {
-      //show name alert and don't add the project
-      $scope.showNameErrorAlert = true;
-    }
+    if($scope.project.name == undefined || $scope.project.name == '')
+      $('#new-project-name').addClass('has-error');
     else {
-      //hide alerts, in case they were showing before
-      $scope.showNameErrorAlert = false;
-
       //get all projects from the database
       $http.get('/projects').then(function(response) {
         //get current date
@@ -99,6 +93,7 @@ app.controller('ProjectsController', function($scope, $window, $http) {
           getProjects();
           //reset the input fields
           $scope.project.name = '';
+          $('#new-project-name').removeClass('has-error');
         });
       });
     }
@@ -178,11 +173,6 @@ app.controller('ProjectsController', function($scope, $window, $http) {
     $scope.delete_id_project = '';
   }
 
-  //select all projects to be deleted
-  $scope.deleteAllProjects = function() {
-    $scope.delete_id_project = 'all';
-  }
-
   //confirm the deletion of all projects of the current user
   $scope.confirmDeleteAll = function() {
     $http.get('/projects').then(function(response) {
@@ -190,7 +180,7 @@ app.controller('ProjectsController', function($scope, $window, $http) {
 
       //get the selected project
       for(proj in response.data) {
-        if(response.data[proj].username == $scope.username) {
+        if(response.data[proj].username == $scope.username && response.data[proj].method == undefined) {
           //get the id of the document, so that it can be removed from the db
           id_doc = response.data[proj]['_id'];
           $http.delete('/projects/' + id_doc);
@@ -204,11 +194,6 @@ app.controller('ProjectsController', function($scope, $window, $http) {
     });
   }
 
-  //cancel the selection of all projects
-  $scope.cancelDeleteAll = function() {
-    $scope.delete_id_project = '';
-  }
-
   /*** ORDER PROJECTS FUNCTIONS ***/
 
   //reorder the projects by "attr" and "dir"
@@ -216,11 +201,16 @@ app.controller('ProjectsController', function($scope, $window, $http) {
     //store the current attr and dir, in case a new project is added
     currentOrder = [attr, dir];
 
-    //sort the project by attr and dir
-    if(attr == 'creation_date' || attr == 'last_update')
-      $scope.projects.sort(sortDates(attr, dir));
-    else
-      $scope.projects.sort(sortData(attr, dir));
+    sortProjects();
+  }
+
+  function sortProjects() {
+    if(currentOrder[0] != '' && currentOrder[1] != '') {
+      if(currentOrder[0] == 'creation_date' || currentOrder[0] == 'last_update')
+        $scope.projects.sort(sortDates(currentOrder[0], currentOrder[1]));
+      else
+        $scope.projects.sort(sortData(currentOrder[0], currentOrder[1]));
+    }
   }
 
   //sort by "order" and "direction"
@@ -281,4 +271,5 @@ app.controller('ProjectsController', function($scope, $window, $http) {
 
   /*** STARTUP FUNCTIONS ***/
   requestLogIn();
+  getProjects();
 });

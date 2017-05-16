@@ -525,7 +525,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         break;
     }
 
-    removeErrorClasses($scope.currentModule['type']);
+    resetErrorClasses($scope.currentModule['type']);
   }
 
   //find the largest id on a data array and increment it
@@ -549,38 +549,39 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     return ++mod_num;
   }
 
-  //remove error classes from the input fields
-  function removeErrorClasses(type) {
+  //remove error classes from the forms to add new data
+  //add error classes to the added fields, if necessary
+  function resetErrorClasses(type) {
     switch(type) {
       case 'OrderBy':
-        //Added Data
         //Criteria
-
-
-        //New Data
-        //Criteria
-        $('#orderby-criteria-name').removeClass('has-error');
-        $('#orderby-criteria-type').removeClass('has-error');
-        $('#orderby-criteria-direction').removeClass('has-error');
+        $('#new-orderby-criterion-name').removeClass('has-error');
+        $('#new-orderby-criterion-type').removeClass('has-error');
+        $('#new-orderby-criterion-direction').removeClass('has-error');
 
         //Actions
-        $('#orderby-actions-name').removeClass('has-error');
-
+        $('#new-orderby-action-name').removeClass('has-error');
         for(criterion in $scope.currentModule.input.criteria)
-          $('#orderby-actions-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
+          $('#new-orderby-action-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
 
         break;
 
       case 'Sort':
         //Objects
-        $('#sort-objects-name').removeClass('has-error');
+        $('#new-sort-object-name').removeClass('has-error');
 
         break;
 
       case 'CAT-SD':
         //Criteria
-        $('#cat-criteria-name').removeClass('has-error');
-        $('#cat-criteria-direction').removeClass('has-error');
+        $('#new-cat-criterion-name').removeClass('has-error');
+        $('#new-cat-criterion-direction').removeClass('has-error');
+
+        //Interaction Effects
+        $('#new-cat-interaction-type').removeClass('has-error');
+        $('#new-cat-interaction-criterion1').removeClass('has-error');
+        $('#new-cat-interaction-criterion2').removeClass('has-error');
+        $('#new-cat-interaction-value').removeClass('has-error');
         break;
     }
   }
@@ -819,27 +820,34 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   //add a new criterion
   $scope.addOrderByCriterion = function() {
-    //if there is an input field not assigned
-    if($scope.new_orderby_criterion.name == undefined || $scope.new_orderby_criterion.name == '' || $scope.new_orderby_criterion.type == undefined || $scope.new_orderby_criterion.type == '' || $scope.new_orderby_criterion.direction == undefined || $scope.new_orderby_criterion.direction == '') {
-      //if a name has not been assigned - add error class
-      if($scope.new_orderby_criterion.name == undefined || $scope.new_orderby_criterion.name == '')
-        $('#orderby-criteria-name').addClass('has-error');
-      else
-        $('#orderby-criteria-name').removeClass('has-error');
+    var can_add_criterion = true;
 
-      //if a type has not been assigned - add error class
-      if($scope.new_orderby_criterion.type == undefined || $scope.new_orderby_criterion.type == '')
-        $('#orderby-criteria-type').addClass('has-error');
-      else
-        $('#orderby-criteria-type').removeClass('has-error');
-
-      //if a direction has not been assigned - add error class
-      if($scope.new_orderby_criterion.direction == undefined || $scope.new_orderby_criterion.direction == '')
-        $('#orderby-criteria-direction').addClass('has-error');
-      else
-        $('#orderby-criteria-direction').removeClass('has-error');
+    //if a name has not been assigned to the new criterion - add error class
+    if($scope.new_orderby_criterion.name == undefined || $scope.new_orderby_criterion.name == '') {
+      $('#new-orderby-criterion-name').addClass('has-error');
+      can_add_criterion = false;
     }
-    else {
+    else
+      $('#new-orderby-criterion-name').removeClass('has-error');
+
+    //if a type has not been assigned to the new criterion - add error class
+    if($scope.new_orderby_criterion.type == undefined || $scope.new_orderby_criterion.type == '') {
+      $('#new-orderby-criterion-type').addClass('has-error');
+      can_add_criterion = false;
+    }
+    else
+      $('#new-orderby-criterion-type').removeClass('has-error');
+
+    //if a direction has not been assigned to the new criterion - add error class
+    if($scope.new_orderby_criterion.direction == undefined || $scope.new_orderby_criterion.direction == '') {
+      $('#new-orderby-criterion-direction').addClass('has-error');
+      can_add_criterion = false;
+    }
+    else
+      $('#new-orderby-criterion-direction').removeClass('has-error');
+
+    //check if the new criterion can be added, i.e. no error class was added
+    if(can_add_criterion) {
       //assign an unique id to the new criterion
       if($scope.currentModule.input.criteria.length == 0)
         $scope.new_orderby_criterion.id = 1;
@@ -858,10 +866,17 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       $scope.new_orderby_criterion.direction = '';
 
       //remove all error classes - just be sure
-      $('#orderby-criteria-name').removeClass('has-error');
-      $('#orderby-criteria-type').removeClass('has-error');
-      $('#orderby-criteria-direction').removeClass('has-error');
+      $('#new-orderby-criterion-name').removeClass('has-error');
+      $('#new-orderby-criterion-type').removeClass('has-error');
+      $('#new-orderby-criterion-direction').removeClass('has-error');
     }
+  }
+
+  $scope.blurOrderByCriterionName = function(criterion) {
+    if(criterion.name == '')
+      $('#orderby-criterion-' + criterion.id + '-name').addClass('has-error');
+    else
+      $('#orderby-criterion-' + criterion.id + '-name').removeClass('has-error');
   }
 
   //select the criterion that defines the order
@@ -879,29 +894,27 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   //add a new action
   $scope.addOrderByAction = function() {
-    var unassigned_field = false;
+    var can_add_action = true;
 
-    //check if there is an unassigned input field
-    for(criterion in $scope.currentModule.input.criteria)
-      if($scope.new_orderby_action[$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_orderby_action[$scope.currentModule.input.criteria[criterion]['name']] == "")
-        unassigned_field = true;
-
-    if($scope.new_orderby_action.name == undefined || $scope.new_orderby_action.name == '' || unassigned_field) {
-      //if a name has not been assigned - add error class
-      if($scope.new_orderby_action.name == undefined || $scope.new_orderby_action.name == '')
-        $('#orderby-action-name').addClass('has-error');
-      else
-        $('#orderby-action-name').removeClass('has-error');
-
-      //if the criterion field has not been assigned - add error class
-      for(criterion in $scope.currentModule.input.criteria) {
-        if($scope.new_orderby_action[$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_orderby_action[$scope.currentModule.input.criteria[criterion]['name']] == "")
-          $('#orderby-action-' + $scope.currentModule.input.criteria[criterion]['id']).addClass('has-error');
-        else
-          $('#orderby-action-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
-      }
+    //if a name has not been assigned to the new action - add error class
+    if($scope.new_orderby_action.name == undefined || $scope.new_orderby_action.name == '') {
+      $('#new-orderby-action-name').addClass('has-error');
+      can_add_action = false;
     }
-    else {
+    else
+      $('#new-orderby-action-name').removeClass('has-error');
+
+    //if a criterion value has not been assigned to the new action - add error class
+    for(criterion in $scope.currentModule.input.criteria) {
+      if($scope.new_orderby_action[$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_orderby_action[$scope.currentModule.input.criteria[criterion]['name']] == "") {
+        $('#new-orderby-action-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).addClass('has-error');
+        can_add_action = false;
+      }
+      else
+        $('#new-orderby-action-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
+      }
+
+    if(can_add_action) {
       if($scope.currentModule.input.actions.length == 0)
         $scope.new_orderby_action.id = 1;
       else
@@ -911,23 +924,37 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
       //reset the new action input fields and remove the error classes - just in case
       $scope.new_orderby_action.name = '';
-      $('#orderby-action-name').removeClass('has-error');
+      $('#new-orderby-action-name').removeClass('has-error');
 
       for(criterion in $scope.currentModule.input.criteria) {
         $scope.new_orderby_action[$scope.currentModule.input.criteria[criterion]['name']] = '';
-        $('#orderby-action-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
+        $('#new-orderby-action-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
       }
     }
+  }
+
+  $scope.blurOrderByActionName = function(action) {
+    if(action.name == '')
+      $('#orderby-action-' + action.id + '-name').addClass('has-error');
+    else
+      $('#orderby-action-' + action.id + '-name').removeClasss('has-error');
+  }
+
+  $scope.blurOrderByActionCriterion = function(action, criterion) {
+    if(action[criterion.name] == '')
+      $('#orderby-action-' + action.id + '-criterion-' + criterion.id).addClass('has-error');
+    else
+      $('#orderby-action-' + action.id + '-criterion-' + criterion.id).removeClass('has-error');
   }
 
   /*** DATA INPUT FUNCTIONS - SORT METHOD ***/
 
   $scope.addSortObject = function() {
-    //if a name has not been assigned - add error class
+    //if a name has not been assigned to the new object - add error class
     if($scope.new_object.name == undefined || $scope.new_object.name == '')
-      $('#sort-objects-name').addClass('has-error');
+      $('#new-sort-object-name').addClass('has-error');
     else {
-      $('#sort-objects-name').removeClass('has-error');
+      $('#new-sort-object-name').removeClass('has-error');
 
       if($scope.currentModule.input.objects.length == 0)
         $scope.new_object.id = 1;
@@ -938,8 +965,15 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
       //reset the new object input field and remove the error class - just in case
       $scope.new_object.name = '';
-      $('#sort-object-name').removeClass('has-error');
+      $('#new-sort-object-name').removeClass('has-error');
     }
+  }
+
+  $scope.blurSortObjectName = function(object) {
+    if(object.name == '')
+      $('#sort-object-' + object.id).addClass('has-error');
+    else
+      $('#sort-object-' + object.id).removeClass('has-error');
   }
 
   $scope.onDropComplete = function(index, obj, evt) {
@@ -953,21 +987,25 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   //add a new criterion
   $scope.addCATCriterion = function() {
-    //if there is an input field not assigned
-    if($scope.new_cat_criterion.name == undefined || $scope.new_cat_criterion.name == '' || $scope.new_cat_criterion.direction == undefined) {
-      //if a name has not been assigned - add error class
-      if($scope.new_cat_criterion.name == undefined || $scope.new_cat_criterion.name == '')
-        $('#new-cat-criterion-name').addClass('has-error');
-      else
-        $('#new-cat-criterion-name').removeClass('has-error');
+    var can_add_criterion = true;
 
-      //if a direction has not been assigned - add error class
-      if($scope.new_cat_criterion.direction == undefined || $scope.new_cat_criterion.direction == '')
-        $('#new-cat-criterion-direction').addClass('has-error');
-      else
-        $('#new-cat-criterion-direction').removeClass('has-error');
+    //if a name has not been assigned to the new criterion - add error class
+    if($scope.new_cat_criterion.name == undefined || $scope.new_cat_criterion.name == '') {
+      $('#new-cat-criterion-name').addClass('has-error');
+      can_add_criterion = false;
     }
-    else {
+    else
+      $('#new-cat-criterion-name').removeClass('has-error');
+
+    //if a direction has not been assigned to the new criterion - add error class
+    if($scope.new_cat_criterion.direction == undefined || $scope.new_cat_criterion.direction == '') {
+      $('#new-cat-criterion-direction').addClass('has-error');
+      can_add_criterion = false;
+    }
+    else
+      $('#new-cat-criterion-direction').removeClass('has-error');
+
+    if(can_add_criterion){
       //assign an unique id to the new criterion
       if($scope.currentModule.input.criteria.length == 0)
         $scope.new_cat_criterion.id = 1;
@@ -995,35 +1033,43 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   }
 
   $scope.addCATInteractionEffect = function() {
-    //if there is an input field not assigned
-    if($scope.new_interaction_effect.type == undefined || $scope.new_interaction_effect.criterion1 == undefined || $scope.new_interaction_effect.criterion2 == undefined || $scope.new_interaction_effect.value == undefined || $scope.new_interaction_effect.value == '') {
-      //if a type has not been assigned - add error class
-      if($scope.new_interaction_effect.type == undefined)
-        $('#new-cat-interaction-type').addClass('has-error');
-      else
-        $('#new-cat-interaction-type').removeClass('has-error');
+    var can_add_interaction = true;
 
-      //if a criterion1 has not been assigned - add error class
-      if($scope.new_interaction_effect.criterion1 == undefined)
-        $('#new-cat-interaction-criterion1').addClass('has-error');
-      else
-        $('#new-cat-interaction-criterion1').removeClass('has-error');
-
-      //if a criterion2 has not been assigned - add error class
-      if($scope.new_interaction_effect.criterion2 == undefined)
-        $('#new-cat-interaction-criterion2').addClass('has-error');
-      else
-        $('#new-cat-interaction-criterion2').removeClass('has-error');
-
-      //if a value has not been assigned - add error class
-      if(($scope.new_interaction_effect.value == undefined || $scope.new_interaction_effect.value == '')
-      || (($scope.new_interaction_effect.type == 'Mutual-Strengthening Effect' && $scope.new_interaction_effect.value <= 0)
-      || (($scope.new_interaction_effect.type == 'Mutual-Weakening Effect' || $scope.new_interaction_effect.type == 'Antagonistic Effect') && $scope.new_interaction_effect.value >= 0)))
-        $('#new-cat-interaction-value').addClass('has-error');
-      else
-        $('#new-cat-interaction-value').removeClass('has-error');
+    //if a type of effect was not assigned to the new interaction - add error class
+    if($scope.new_interaction_effect.type == undefined) {
+      $('#new-cat-interaction-type').addClass('has-error');
+      can_add_interaction = false;
     }
-    else {
+    else
+      $('#new-cat-interaction-type').removeClass('has-error');
+
+    //if the first criterion was not assigned to the new interaction - add error class
+    if($scope.new_interaction_effect.criterion1 == undefined) {
+      $('#new-cat-interaction-criterion1').addClass('has-error');
+      can_add_interaction = false;
+    }
+    else
+      $('#new-cat-interaction-criterion1').removeClass('has-error');
+
+    //if the second criterion was not assigned to the new interaction - add error class
+    if($scope.new_interaction_effect.criterion2 == undefined) {
+      $('#new-cat-interaction-criterion2').addClass('has-error');
+      can_add_interaction = false;
+    }
+    else
+      $('#new-cat-interaction-criterion2').removeClass('has-error');
+
+    //if a value was not correctly assigned to the new interaction - add error class
+    if(($scope.new_interaction_effect.value == undefined || $scope.new_interaction_effect.value == '')
+    || (($scope.new_interaction_effect.type == 'Mutual-Strengthening Effect' && $scope.new_interaction_effect.value <= 0)
+    || (($scope.new_interaction_effect.type == 'Mutual-Weakening Effect' || $scope.new_interaction_effect.type == 'Antagonistic Effect') && $scope.new_interaction_effect.value >= 0))) {
+      $('#new-cat-interaction-value').addClass('has-error');
+      can_add_interaction = false;
+    }
+    else
+      $('#new-cat-interaction-value').removeClass('has-error');
+
+    if(can_add_interaction){
       if($scope.currentModule.input['interaction effects'].length == 0)
         $scope.new_interaction_effect.id = 1;
       else
@@ -1051,6 +1097,13 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       $('#cat-interaction-' + interaction.id + '-value').addClass('has-error');
     else
       $('#cat-interaction-' + interaction.id + '-value').removeClass('has-error');
+  }
+
+  $scope.blurCATScaleType = function(criterion) {
+    if(criterion.scale.type == '' || criterion.scale.type == undefined)
+      $('#cat-scale-' + criterion.id + '-type').addClass('has-error');
+    else
+      $('#cat-scale-' + criterion.id + '-type').removeClass('has-error');
   }
 
   $scope.blurCATScaleMin = function(criterion) {
@@ -1087,21 +1140,25 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   }
 
   $scope.addCATBranch = function(criterion) {
-    //if there is an input field not assigned
-    if($scope.new_branch[criterion.id].function == undefined || $scope.new_branch[criterion.id].function == '' || $scope.new_branch[criterion.id].condition == undefined || $scope.new_branch[criterion.id].function == '') {
-      //if a function has not been assigned - add error class
-      if($scope.new_branch[criterion.id].function == undefined || $scope.new_branch[criterion.id].function == '')
-        $('#cat-branch-function-' + criterion.id).addClass('has-error');
-      else
-        $('#cat-branch-function-' + criterion.id).removeClass('has-error');
+    var can_add_branch = true;
 
-      //if a condition has not been assigned - add error class
-      if($scope.new_branch[criterion.id].condition == undefined || $scope.new_branch[criterion.id].condition == '')
-        $('#cat-branch-condition-' + criterion.id).addClass('has-error');
-      else
-        $('#cat-branch-condition-' + criterion.id).removeClass('has-error');
+    //if a function was not assigned - add error class
+    if($scope.new_branch[criterion.id].function == undefined || $scope.new_branch[criterion.id].function == '') {
+      $('#new-cat-branch-function-' + criterion.id).addClass('has-error');
+      can_add_branch = false;
     }
-    else {
+    else
+      $('#new-cat-branch-function-' + criterion.id).removeClass('has-error');
+
+    //if a condition was not assigned - add error class
+    if($scope.new_branch[criterion.id].condition == undefined || $scope.new_branch[criterion.id].condition == '') {
+      $('#new-cat-branch-condition-' + criterion.id).addClass('has-error');
+      can_add_branch = false;
+    }
+    else
+      $('#new-cat-branch-condition-' + criterion.id).removeClass('has-error');
+
+    if(can_add_branch) {
       if($scope.currentModule.input.criteria[$scope.currentModule.input.criteria.indexOf(criterion)].branches == undefined) {
         //initialize the branches array
         $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.indexOf(criterion)].branches = [];
@@ -1119,43 +1176,49 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       $scope.new_branch[criterion.id].condition = '';
 
       //remove all error classes
-      $('#cat-branch-function-' + criterion.id).removeClass('has-error');
-      $('#cat-branch-condition-' + criterion.id).removeClass('has-error');
+      $('#new-cat-branch-function-' + criterion.id).removeClass('has-error');
+      $('#new-cat-branch-condition-' + criterion.id).removeClass('has-error');
     }
   }
 
-  $scope.addCATAction = function() {
-    var unassigned_field = false;
+  $scope.blurCATBranchFunction = function(branch, criterion) {
+    if(branch.function == '' || branch.function == undefined)
+      $('#cat-branch-' + branch.id + '-function-' + criterion.id).addClass('has-error');
+    else
+      $('#cat-branch-' + branch.id + '-function-' + criterion.id).removeClass('has-error');
+  }
 
-    //check if there is an unassigned criteria field
-    //or that the value inserted in that field is between the criterion's scale minimum and maximum values
+  $scope.blurCATBranchCondition = function(branch, criterion) {
+    if(branch.condition == '' || branch.condition == undefined)
+      $('#cat-branch-' + branch.id + '-condition-' + criterion.id).addClass('has-error');
+    else
+      $('#cat-branch-' + branch.id + '-condition-' + criterion.id).removeClass('has-error');
+  }
+
+  $scope.addCATAction = function() {
+    var can_add_action = true;
+
+    //if a name was not assigned to the new action - add error class
+    if($scope.new_cat_action.name == undefined || $scope.new_cat_action.name == '') {
+      $('#new-cat-action-name').addClass('has-error');
+      can_add_action = false;
+    }
+    else
+      $('#new-cat-action-name').removeClass('has-error');
+
+    //if the criterion field has not been assigned - add error class
     for(criterion in $scope.currentModule.input.criteria) {
       if(($scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] == "")
       || ($scope.currentModule.input.criteria[criterion]['scale']['type'] == 'Numerical' && ($scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] < $scope.currentModule.input.criteria[criterion]['scale']['min'] || $scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] > $scope.currentModule.input.criteria[criterion]['scale']['max']))
       || ($scope.currentModule.input.criteria[criterion]['scale']['type'] == 'Categorical' && ($scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] > $scope.currentModule.input.criteria[criterion]['scale']['num_categories'] || $scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] < 1))) {
-        unassigned_field = true;
-        break;
+        $('#new-cat-action-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).addClass('has-error');
+        can_add_action = false;
       }
-    }
-
-    if($scope.new_cat_action.name == undefined || $scope.new_cat_action.name == '' || unassigned_field) {
-      //if a name has not been assigned - add error class
-      if($scope.new_cat_action.name == undefined || $scope.new_cat_action.name == '')
-        $('#new-cat-action-name').addClass('has-error');
       else
-        $('#new-cat-action-name').removeClass('has-error');
-
-      //if the criterion field has not been assigned - add error class
-      for(criterion in $scope.currentModule.input.criteria) {
-        if(($scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] == "")
-        || ($scope.currentModule.input.criteria[criterion]['scale']['type'] == 'Numerical' && ($scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] < $scope.currentModule.input.criteria[criterion]['scale']['min'] || $scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] > $scope.currentModule.input.criteria[criterion]['scale']['max']))
-        || ($scope.currentModule.input.criteria[criterion]['scale']['type'] == 'Categorical' && ($scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] > $scope.currentModule.input.criteria[criterion]['scale']['num_categories'] || $scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] < 1)))
-          $('#new-cat-action-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).addClass('has-error');
-        else
-          $('#new-cat-action-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
-      }
+        $('#new-cat-action-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
     }
-    else {
+
+    if(can_add_action) {
       if($scope.currentModule.input.actions.length == 0)
         $scope.new_cat_action.id = 1;
       else
@@ -1195,35 +1258,35 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   }
 
   $scope.addCATCategory = function() {
-    var unassigned_field = false;
+    var can_add_category = true;
 
-    //check if there is an unassigned input field
-    for(criterion in $scope.currentModule.input.criteria)
-      if($scope.new_category[$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_category[$scope.currentModule.input.criteria[criterion]['name']] == "" || $scope.new_category[$scope.currentModule.input.criteria[criterion]['name']] < 0)
-        unassigned_field = true;
-
-    if($scope.new_category.name == undefined || $scope.new_category.name == '' || $scope.new_category.membership_degree == undefined || $scope.new_category.membership_degree == '' || $scope.new_category.membership_degree < 0.5 || $scope.new_category.membership_degree > 1 || unassigned_field) {
-      //if a name has not been assigned - add error class
-      if($scope.new_category.name == undefined || $scope.new_category.name == '')
-        $('#new-cat-category-name').addClass('has-error');
-      else
-        $('#new-cat-category-name').removeClass('has-error');
-
-      //if a membership degree has not been assigned - add error class
-      if($scope.new_category.membership_degree == undefined || $scope.new_category.membership_degree == '' || $scope.new_category.membership_degree < 0.5 || $scope.new_category.membership_degree > 1)
-        $('#new-cat-category-membership-degree').addClass('has-error');
-      else
-        $('#new-cat-category-membership-degree').removeClass('has-error');
-
-      //if the criterion field has not been assigned - add error class
-      for(criterion in $scope.currentModule.input.criteria) {
-        if($scope.new_category[$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_category[$scope.currentModule.input.criteria[criterion]['name']] == "" || $scope.new_category[$scope.currentModule.input.criteria[criterion]['name']] < 0)
-          $('#new-cat-category-' + $scope.currentModule.input.criteria[criterion]['id']).addClass('has-error');
-        else
-          $('#new-cat-category-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
-      }
+    //if a name was not assigned to the new category - add error class
+    if($scope.new_category.name == undefined || $scope.new_category.name == '') {
+      $('#new-cat-category-name').addClass('has-error');
+      can_add_category = false;
     }
-    else {
+    else
+      $('#new-cat-category-name').removeClass('has-error');
+
+    //if a membership degree was not assigned to the new category- add error class
+    if($scope.new_category.membership_degree == undefined || $scope.new_category.membership_degree == '' || $scope.new_category.membership_degree < 0.5 || $scope.new_category.membership_degree > 1) {
+      $('#new-cat-category-membership-degree').addClass('has-error');
+      can_add_category = false;
+    }
+    else
+      $('#new-cat-category-membership-degree').removeClass('has-error');
+
+    //if a criterion value was not correctly assigned to the new category - add error class
+    for(criterion in $scope.currentModule.input.criteria) {
+      if($scope.new_category[$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_category[$scope.currentModule.input.criteria[criterion]['name']] == "" || $scope.new_category[$scope.currentModule.input.criteria[criterion]['name']] < 0) {
+        $('#new-cat-category-' + $scope.currentModule.input.criteria[criterion]['id']).addClass('has-error');
+        can_add_category = false;
+      }
+      else
+        $('#new-cat-category-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
+    }
+
+    if(can_add_category){
       if($scope.currentModule.input.categories.length == 0)
         $scope.new_category.id = 1;
       else
@@ -1268,27 +1331,21 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   }
 
   $scope.addCATReferenceAction = function(category, index) {
-    var unassigned_field = false;
+    var can_add_reference = true;
 
-    //check if there is an unassigned input field
-    for(criterion in $scope.currentModule.input.criteria)
+    //if a criterion value was not correctly assigned - add error class
+    for(criterion in $scope.currentModule.input.criteria) {
       if(($scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] == "")
       || ($scope.currentModule.input.criteria[criterion]['scale']['type'] == 'Numerical' && ($scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] < $scope.currentModule.input.criteria[criterion]['scale']['min'] || $scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] > $scope.currentModule.input.criteria[criterion]['scale']['max']))
-      || ($scope.currentModule.input.criteria[criterion]['scale']['type'] == 'Categorical' && ($scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] > $scope.currentModule.input.criteria[criterion]['scale']['num_categories'] || $scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] < 1)))
-        unassigned_field = true;
-
-    if(unassigned_field) {
-      //if the criterion field has not been assigned - add error class
-      for(criterion in $scope.currentModule.input.criteria) {
-        if(($scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] == "")
-        || ($scope.currentModule.input.criteria[criterion]['scale']['type'] == 'Numerical' && ($scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] < $scope.currentModule.input.criteria[criterion]['scale']['min'] || $scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] > $scope.currentModule.input.criteria[criterion]['scale']['max']))
-        || ($scope.currentModule.input.criteria[criterion]['scale']['type'] == 'Categorical' && ($scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] > $scope.currentModule.input.criteria[criterion]['scale']['num_categories'] || $scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] < 1)))
-          $('#new-cat-ref-' + category.id + '-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).addClass('has-error');
-        else
-          $('#new-cat-ref-' + category.id + '-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
+      || ($scope.currentModule.input.criteria[criterion]['scale']['type'] == 'Categorical' && ($scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] > $scope.currentModule.input.criteria[criterion]['scale']['num_categories'] || $scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] < 1))) {
+        $('#new-cat-ref-' + category.id + '-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).addClass('has-error');
+        can_add_reference = false;
       }
+      else
+        $('#new-cat-ref-' + category.id + '-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
     }
-    else {
+
+    if(can_add_reference) {
       if($scope.currentModule.input.categories[$scope.currentModule.input.categories.indexOf(category)].reference_actions == undefined) {
         $scope.currentModule.input.categories[$scope.currentModule.input.categories.indexOf(category)].reference_actions = [];
         $scope.new_reference_action[category.id].id = 1;
@@ -1315,9 +1372,9 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     if((ref[criterion.name] == undefined || ref[criterion.name] == "")
     || (criterion['scale']['type'] == 'Numerical' && (ref[criterion.name] < criterion['scale']['min'] || ref[criterion.name] > criterion['scale']['max']))
     || (criterion['scale']['type'] == 'Categorical' && (ref[criterion.name] > criterion['scale']['num_categories'] || ref[criterion.name] < 1)))
-      $('#cat-ref-' + category.id + '-criterion-' + criterion['id']).addClass('has-error');
+      $('#cat-ref-' + ref.id + '-' + category.id + '-criterion-' + criterion['id']).addClass('has-error');
     else
-      $('#cat-ref-' + category.id + '-criterion-' + criterion['id']).removeClass('has-error');
+      $('#cat-ref-' + ref.id + '-' + category.id + '-criterion-' + criterion['id']).removeClass('has-error');
   }
 
   /*** DATA INPUT FUNCTIONS - DELPHI METHOD ***/
@@ -1357,19 +1414,25 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   }
 
   $scope.addDelphiQuestion = function() {
-    //if there is an input field not assigned
-    if($scope.new_delphi_question.title == undefined || $scope.new_delphi_question.title == '' || $scope.new_delphi_question.description == undefined || $scope.new_delphi_question.description == '') {
-      if($scope.new_delphi_question.title == undefined || $scope.new_delphi_question.title == '')
-        $('#new-delphi-question-title').addClass('has-error');
-      else
-        $('#new-delphi-question-title').removeClass('has-error');
+    var can_add_question = true;
 
-      if($scope.new_delphi_question.description == undefined || $scope.new_delphi_question.description == '')
-        $('#new-delphi-question-description').addClass('has-error');
-      else
-        $('#new-delphi-question-description').removeClass('has-error');
+    //if a title was not assigned to the new question
+    if($scope.new_delphi_question.title == undefined || $scope.new_delphi_question.title == '') {
+      $('#new-delphi-question-title').addClass('has-error');
+      can_add_question = false;
     }
-    else {
+    else
+      $('#new-delphi-question-title').removeClass('has-error');
+
+    //if a description was not assigned to the new question
+    if($scope.new_delphi_question.description == undefined || $scope.new_delphi_question.description == '') {
+      $('#new-delphi-question-description').addClass('has-error');
+      can_add_question = false;
+    }
+    else
+      $('#new-delphi-question-description').removeClass('has-error');
+
+    if(can_add_question) {
       //assign an unique id to the new email
       if($scope.currentModule.input.questions.length == 0)
         $scope.new_delphi_question.id = 1;
@@ -1442,6 +1505,20 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       $('#srf-ratio-z').addClass('has-error');
     else
       $('#srf-ratio-z').removeClass('has-error');
+  }
+
+  $scope.blurSRFDecimalPlaces = function() {
+    if($scope.currentModule.input['decimal places'] == undefined || $scope.currentModule.input['decimal places'] == '')
+      $('#srf-decimal-places').addClass('has-error');
+    else
+      $('#srf-decimal-places').removeClass('has-error');
+  }
+
+  $scope.blurSRFWeightType = function() {
+    if($scope.currentModule.input['weight type'] == undefined || $scope.currentModule.input['weight type'] == '')
+      $('#srf-weight-type').addClass('has-error');
+    else
+      $('#srf-weight-type').removeClass('has-error');
   }
 
   /*** DATA DELETION FUNCTIONS ***/

@@ -64,10 +64,26 @@ app.controller('SortMethodController', function($scope, $http, $window) {
       $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
         $http.post('/projects', proj_res).then(function() {
-          getData();
+          $scope.reloadData(false);
           getExecutions();
         });
       });
+    });
+  }
+
+  //hide all alerts
+  function hideAlerts() {
+    $('#save-success').hide();
+    $('#reload-success').hide();
+  }
+
+  //show certain alert and hide it smoothly
+  function showAlert(alert_id) {
+    //show alert
+    angular.element(document.querySelector('#' + alert_id)).alert();
+    //hide alert
+    angular.element(document.querySelector('#' + alert_id)).fadeTo(3000, 500).slideUp(500, function(){
+      angular.element(document.querySelector('#' + alert_id)).slideUp(500);
     });
   }
 
@@ -79,9 +95,9 @@ app.controller('SortMethodController', function($scope, $http, $window) {
   $scope.addObject = function() {
     //if a name has not been assigned - add error class
     if($scope.new_object.name == undefined || $scope.new_object.name == '')
-      $('#objects-name').addClass('has-error');
+      $('#new-object-name').addClass('has-error');
     else {
-      $('#objects-name').removeClass('has-error');
+      $('#new-object-name').removeClass('has-error');
 
       if($scope.objects.length == 0)
         $scope.new_object.id = 1;
@@ -92,8 +108,15 @@ app.controller('SortMethodController', function($scope, $http, $window) {
 
       //reset the new object input field and remove the error class - just in case
       $scope.new_object.name = '';
-      $('#objects-name').removeClass('has-error');
+      $('#new-object-name').removeClass('has-error');
     }
+  }
+
+  $scope.blurObjectName = function(object) {
+    if(object.name == '')
+      $('#object-' + object.id + '-name').addClass('has-error');
+    else
+      $('#object-' + object.id + '-name').removeClass('has-error');
   }
 
   $scope.deleteObject = function(object) {
@@ -140,26 +163,9 @@ app.controller('SortMethodController', function($scope, $http, $window) {
       $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
         $http.post('/projects', proj_res).then(function() {
-          $scope.showSaveSuccess = true;
+          showAlert('save-success');
         });
       });
-    });
-  }
-
-  $scope.changeSaveSuccess = function() {
-    $scope.showSaveSuccess = false;
-  }
-
-  function getData() {
-    $http.get('/projects').then(function(response) {
-      //get the current project
-      for(proj in response.data) {
-        if(response.data[proj].username == $scope.username && response.data[proj].project_id == proj_id) {
-          //get objects
-          if(response.data[proj].objects != undefined)
-            $scope.objects = response.data[proj].objects;
-        }
-      }
     });
   }
 
@@ -316,13 +322,15 @@ app.controller('SortMethodController', function($scope, $http, $window) {
     $scope.deleteIdExecution = '';
   }
 
-  $scope.reloadData = function() {
-
+  $scope.reloadData = function(alertShowing) {
     $http.get('/projects').then(function(response) {
       for(proj in response.data) {
         if(response.data[proj].username == $scope.username && response.data[proj].project_id == proj_id) {
           if(response.data[proj].objects != undefined)
             $scope.objects = response.data[proj].objects;
+
+          if(alertShowing)
+            showAlert('reload-success');
 
           break;
         }
@@ -468,4 +476,5 @@ app.controller('SortMethodController', function($scope, $http, $window) {
 
   requestLogIn();
   rewriteLastUpdate();
+  hideAlerts();
 });

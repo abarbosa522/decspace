@@ -72,7 +72,7 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
         //add the new list of projects
         $http.post('/projects', proj_res).then(function() {
           //retrieve the data stored in the database
-          $scope.reloadData();
+          $scope.reloadData(false);
           //update the list of executions
           getExecutions();
         });
@@ -89,13 +89,23 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
     }
   }
 
+  //hide all alerts
+  function hideAlerts() {
+    $('#save-success').hide();
+    $('#reload-success').hide();
+  }
+
+  //show certain alert and hide it smoothly
+  function showAlert(alert_id) {
+    //show alert
+    angular.element(document.querySelector('#' + alert_id)).alert();
+    //hide alert
+    angular.element(document.querySelector('#' + alert_id)).fadeTo(3000, 500).slideUp(500, function(){
+      angular.element(document.querySelector('#' + alert_id)).slideUp(500);
+    });
+  }
+
   /*** BUTTON BAR FUNCTIONS ***/
-
-  //variable to show or hide the save success message
-  $scope.showSaveSuccess = false;
-
-  //variable to show or hide the confirmation or cancel reset data
-  $scope.showResetData = false;
 
   //save the current data on the database
   $scope.saveData = function() {
@@ -131,19 +141,14 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
       $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
         $http.post('/projects', proj_res).then(function() {
-          $scope.showSaveSuccess = true;
+          showAlert('save-success');
         });
       });
     });
   }
 
-  //hide successful save message after being dismissed
-  $scope.changeSaveSuccess = function() {
-    $scope.showSaveSuccess = false;
-  }
-
   //reload the stored data on the database
-  $scope.reloadData = function() {
+  $scope.reloadData = function(alertShowing) {
     $http.get('/projects').then(function(response) {
       for(proj in response.data) {
         if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
@@ -171,15 +176,13 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
           if(response.data[proj]['weight_type'] != undefined)
             $scope.weight_type = response.data[proj]['weight_type'];
 
+          if(alertShowing)
+            showAlert('reload-success');
+
           break;
         }
       }
     });
-  }
-
-  //show confirmation and cancel buttons for resetting the current data
-  $scope.resetData = function() {
-    $scope.showResetData = true;
   }
 
   //confirm reset of the current data
@@ -191,15 +194,6 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
     $scope.ratio_z = null;
     $scope.decimal_places = null;
     $scope.weight_type = null;
-
-    //hide the reset confirmation and cancelation buttons
-    $scope.showResetData = false;
-  }
-
-  //cancel the data reset
-  $scope.cancelResetData = function() {
-    //hide the reset confirmation and cancelation buttons
-    $scope.showResetData = false;
   }
 
   /*** IMPORT AND EXPORT FUNCTIONS ***/
@@ -542,19 +536,34 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
   //variable that controls the showing/hiding of the criteria
   $scope.criteria_eye = 1;
 
+  //variable that holds the input data of a new criterion
+  $scope.new_criterion = {};
+
   //add a new criterion
   $scope.addCriterion = function() {
-    if($scope.criteria.length == 0)
-      $scope.new_criterion.id = 1;
+    if($scope.new_criterion.name == '' || $scope.new_criterion.name == undefined)
+      $('#new-criterion-name').addClass('has-error');
+    else {
+      if($scope.criteria.length == 0)
+        $scope.new_criterion.id = 1;
+      else
+        $scope.new_criterion.id = $scope.criteria[$scope.criteria.length - 1]['id'] + 1;
+
+      //criterion starts unassigned to any rank
+      $scope.new_criterion.position = -1;
+
+      $scope.criteria.push(angular.copy($scope.new_criterion));
+
+      $scope.new_criterion.name = '';
+      $('#new-criterion-name').removeClass('has-error');
+    }
+  }
+
+  $scope.blurCriterion = function(criterion) {
+    if(criterion.name == '')
+      $('#criterion-' + criterion.id + '-name').addClass('has-error');
     else
-      $scope.new_criterion.id = $scope.criteria[$scope.criteria.length - 1]['id'] + 1;
-
-    //criterion starts unassigned to any rank
-    $scope.new_criterion.position = -1;
-
-    $scope.criteria.push(angular.copy($scope.new_criterion));
-
-    $scope.new_criterion.name = '';
+      $('#criterion-' + criterion.id + '-name').removeClass('has-error');
   }
 
   //delete a certain criterion
@@ -645,6 +654,27 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
 
   //controls the showing/hiding of the other parameters
   $scope.param_eye = 1;
+
+  $scope.blurRatioZ = function() {
+    if($scope.ratio_z == '' || $scope.ratio_z == undefined)
+      $('#ratio-z').addClass('has-error');
+    else
+      $('#ratio-z').removeClass('has-error');
+  }
+
+  $scope.blurDecimalPlaces = function() {
+    if($scope.decimal_places == undefined || $scope.decimal_places == '')
+      $('#decimal-places').addClass('has-error');
+    else
+      $('#decimal-places').removeClass('has-error');
+  }
+
+  $scope.blurWeightType = function() {
+    if($scope.weight_type == undefined || $scope.weight_type == '')
+      $('#weight-type').addClass('has-error');
+    else
+      $('#weight-type').removeClass('has-error');
+  }
 
   /*** DRAG AND DROP FUNCTIONS ***/
 
@@ -902,4 +932,5 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
 
   /*** STARTUP FUNCTIONS ***/
   startup();
+  hideAlerts();
 });

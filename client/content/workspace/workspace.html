@@ -291,7 +291,9 @@
                               <input type = 'radio' ng-checked = 'criterion.selected == "true"' ng-click = 'selectOrderByCriterion(criterion)'>
                             </td>
                             <td>
-                              <input class = 'form-control' type = 'text' ng-model = 'criterion.name'>
+                              <div id = 'orderby-criterion-{{criterion.id}}-name'>
+                                <input class = 'form-control' type = 'text' ng-model = 'criterion.name' ng-blur = 'blurOrderByCriterionName(criterion)'>
+                              </div>
                             </td>
                             <td>
                               <select class = 'form-control' ng-model = 'criterion.type'>
@@ -325,12 +327,12 @@
                           <tr class = 'active'>
                             <td></td>
                             <td>
-                              <div id = 'orderby-criteria-name' class = 'form-group'>
+                              <div id = 'new-orderby-criterion-name' class = 'form-group'>
                                 <input class = 'form-control' type = 'text' ng-model = 'new_orderby_criterion.name'>
                               </div>
                             </td>
                             <td>
-                              <div id = 'orderby-criteria-type' class = 'form-group'>
+                              <div id = 'new-orderby-criterion-type' class = 'form-group'>
                                 <select class = 'form-control' ng-model = 'new_orderby_criterion.type'>
                                   <option value = '' disabled>--- Please Select ---</option>
                                   <option>Text</option>
@@ -339,7 +341,7 @@
                               </div>
                             </td>
                             <td>
-                              <div id = 'orderby-criteria-direction' class = 'form-group'>
+                              <div id = 'new-orderby-criterion-direction' class = 'form-group'>
                                 <select class = 'form-control' ng-model = 'new_orderby_criterion.direction'>
                                   <option value = '' disabled>--- Please Select ---</option>
                                   <option>Ascendant</option>
@@ -368,10 +370,14 @@
                         <tbody>
                           <tr ng-repeat = 'orderby_action in currentModule.input.actions' ng-class = '{danger: orderby_action.id == deleteIdAction}'>
                             <td>
-                              <input class = 'form-control' ng-model = 'orderby_action.name'>
+                              <div id = 'orderby-action-{{orderby_action.id}}-name'>
+                                <input class = 'form-control' ng-model = 'orderby_action.name' ng-blur = 'blurOrderByActionName(orderby_action)'>
+                              </div>
                             </td>
                             <td ng-repeat = 'orderby_criterion in currentModule.input.criteria'>
-                              <input class = 'form-control' ng-model = 'orderby_action[orderby_criterion.name]'>
+                              <div id = 'orderby-action-{{orderby_action.id}}-criterion-{{orderby_criterion.id}}'>
+                                <input class = 'form-control' ng-model = 'orderby_action[orderby_criterion.name]' ng-blur = 'blurOrderByActionCriterion(orderby_action, orderby_criterion)'>
+                              </div>
                             </td>
                             <td ng-if = 'orderby_action.id != deleteIdAction'>
                               <button type = 'button' class = 'btn btn-danger btn-action-remove' ng-click = 'deleteInput(orderby_action, "Actions")' title = 'Delete Action'>
@@ -390,12 +396,12 @@
                           <!-- Form to add action -->
                           <tr class = 'active'>
                             <td>
-                              <div id = 'orderby-action-name' class = 'form-group'>
+                              <div id = 'new-orderby-action-name' class = 'form-group'>
                                 <input class = 'form-control' ng-model = 'new_orderby_action.name'>
                               </div>
                             </td>
                             <td ng-repeat = 'criterion in currentModule.input.criteria'>
-                              <div id = 'orderby-action-{{criterion.id}}' class = 'form-group'>
+                              <div id = 'new-orderby-action-criterion-{{criterion.id}}' class = 'form-group'>
                                 <input class = 'form-control' ng-model = 'new_orderby_action[criterion.name]'>
                               </div>
                             </td>
@@ -439,7 +445,9 @@
                         <tbody>
                           <tr ng-repeat = 'object in currentModule.input.objects | orderBy: "id"' ng-class = '{danger: object.id == deleteIdObject}'>
                             <td>
-                              <input class = 'form-control' type = 'text' ng-model = 'object.name'>
+                              <div id = 'sort-object-{{object.id}}'>
+                                <input class = 'form-control' type = 'text' ng-model = 'object.name' ng-blur = 'blurSortObjectName(object)'>
+                              </div>
                             </td>
                             <td ng-if = 'object.id != deleteIdObject'>
                               <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(object, "Objects")' title = 'Delete Object'>
@@ -458,7 +466,7 @@
                           <!-- Form to add object -->
                           <tr class = 'active'>
                             <td>
-                              <div id = 'sort-objects-name' class = 'form-group'>
+                              <div id = 'new-sort-object-name' class = 'form-group'>
                                 <input class = 'form-control' type = 'text' ng-model = 'new_object.name'>
                               </div>
                             </td>
@@ -476,8 +484,8 @@
 
                       <div class = 'row text-center'>
                         <ul class = 'draglist'>
-                          <li ng-repeat = 'obj in currentModule.input.objects' ng-drop = 'true' ng-drop-success = 'onDropComplete($index, $data, $event)'>
-                            <div ng-drag = 'true' ng-drag-data = 'obj' ng-class = 'obj.name'>{{obj.name}}</div>
+                          <li class = 'sort-drop' ng-repeat = 'obj in currentModule.input.objects' ng-drop = 'true' ng-drop-success = 'onDropComplete($index, $data, $event)'>
+                            <div class = 'sort-drag' ng-drag = 'true' ng-drag-data = 'obj' ng-class = 'obj.name'>{{obj.name}}</div>
 
                             <div ng-if = 'currentModule.input.objects.length > 1'>
                               <p ng-if = '$index == 0' style = 'margin-top: 20%'>Most Important</p>
@@ -549,12 +557,12 @@
                           <!-- Form to add a criterion -->
                           <tr class = 'active'>
                             <td>
-                              <div id = 'cat-criterion-name' class = 'form-group'>
+                              <div id = 'new-cat-criterion-name' class = 'form-group'>
                                 <input class = 'form-control' type = 'text' ng-model = 'new_cat_criterion.name'>
                               </div>
                             </td>
                             <td>
-                              <div id = 'cat-criterion-direction' class = 'form-group'>
+                              <div id = 'new-cat-criterion-direction' class = 'form-group'>
                                 <select class = 'form-control' ng-model = 'new_cat_criterion.direction'>
                                   <option value = '' disabled>--- Please Select ---</option>
                                   <option>Minimize</option>
@@ -689,11 +697,13 @@
                           <tbody>
                             <tr class = 'active'>
                               <td>
-                                <select class = 'form-control' ng-model = 'criterion.scale.type'>
-                                  <option value = '' disabled>--- Please Select ---</option>
-                                  <option>Numerical</option>
-                                  <option>Categorical</option>
-                                </select>
+                                <div id = 'cat-scale-{{criterion.id}}-type'>
+                                  <select class = 'form-control' ng-model = 'criterion.scale.type' ng-blur = 'blurCATScaleType(criterion)'>
+                                    <option value = '' disabled>--- Please Select ---</option>
+                                    <option>Numerical</option>
+                                    <option>Categorical</option>
+                                  </select>
+                                </div>
                               </td>
                               <td ng-if = 'criterion.scale.type == "Numerical"'>
                                 <div id = 'cat-scale-{{criterion.id}}-min'>
@@ -727,13 +737,17 @@
                             <!-- Added Branches List -->
                             <tr ng-repeat = 'branch in criterion.branches' ng-class = '{danger: criterion.id == deleteIdBranch[0] && branch.id == deleteIdBranch[1]}'>
                               <td class = 'col-md-2'>
-                                <input class = 'form-control' type = 'text' ng-model = 'branch.function'>
+                                <div id = 'cat-branch-{{branch.id}}-function-{{criterion.id}}'>
+                                  <input class = 'form-control' type = 'text' ng-model = 'branch.function' ng-blur = 'blurCATBranchFunction(branch, criterion)'>
+                                </div>
                               </td>
                               <td class = 'col-md-3'>
                                 <p math-jax-bind = 'branch.function'></p>
                               </td>
                               <td class = 'col-md-2'>
-                                <input class = 'form-control' type = 'text' ng-model = 'branch.condition'>
+                                <div id = 'cat-branch-{{branch.id}}-condition-{{criterion.id}}'>
+                                  <input class = 'form-control' type = 'text' ng-model = 'branch.condition' ng-blur = 'blurCATBranchCondition(branch, criterion)'>
+                                </div>
                               </td>
                               <td class = 'col-md-3'>
                                 <p math-jax-bind = 'branch.condition'></p>
@@ -755,7 +769,7 @@
                             <!-- Form to add function branches -->
                             <tr class = 'active'>
                               <td class = 'col-md-2'>
-                                <div id = 'cat-branch-function-{{criterion.id}}'>
+                                <div id = 'new-cat-branch-function-{{criterion.id}}'>
                                   <input class = 'form-control' type = 'text' ng-model = 'new_branch[criterion.id].function'>
                                 </div>
                               </td>
@@ -763,7 +777,7 @@
                                 <p math-jax-bind = 'new_branch[criterion.id].function'></p>
                               </td>
                               <td class = 'col-md-2'>
-                                <div id = 'cat-branch-condition-{{criterion.id}}'>
+                                <div id = 'new-cat-branch-condition-{{criterion.id}}'>
                                   <input class = 'form-control' type = 'text' ng-model = 'new_branch[criterion.id].condition'>
                                 </div>
                               </td>
@@ -797,12 +811,12 @@
                           <!-- Added Actions -->
                           <tr ng-repeat = 'action in currentModule.input.actions' ng-class = '{danger: action.id == deleteIdAction}'>
                             <td>
-                              <div id = 'cat-action-{{action.id}}-name' class = 'form-group'>
+                              <div id = 'cat-action-{{action.id}}-name'>
                                 <input class = 'form-control' type = 'text' ng-model = 'action.name' ng-blur = 'blurCATActionName(action)'>
                               </div>
                             </td>
                             <td ng-repeat = 'criterion in currentModule.input.criteria'>
-                              <div id = 'cat-action-{{action.id}}-criterion-{{criterion.id}}' class = 'form-group'>
+                              <div id = 'cat-action-{{action.id}}-criterion-{{criterion.id}}'>
                                 <input class = 'form-control' type = 'number' ng-model = 'action[criterion.name]' ng-blur = 'blurCATActionCriterion(action, criterion.name)'>
                               </div>
                             </td>
@@ -823,12 +837,12 @@
                           <!-- Form to add action -->
                           <tr class = 'active'>
                             <td>
-                              <div id = 'new-cat-action-name' class = 'form-group'>
+                              <div id = 'new-cat-action-name'>
                                 <input class = 'form-control' type = 'text' ng-model = 'new_cat_action.name'>
                               </div>
                             </td>
                             <td ng-repeat = 'criterion in currentModule.input.criteria'>
-                              <div id = 'new-cat-action-criterion-{{criterion.id}}' class = 'form-group'>
+                              <div id = 'new-cat-action-criterion-{{criterion.id}}'>
                                 <input class = 'form-control' type = 'number' ng-model = 'new_cat_action[criterion.name]'>
                               </div>
                             </td>
@@ -933,7 +947,7 @@
                           <tr ng-repeat = 'ref in category.reference_actions' ng-class = '{danger: category.id == deleteIdReferenceAction[0] && ref.id == deleteIdReferenceAction[1]}'>
                             <td ng-if = '$index == 0' rowspan = '{{category.reference_actions.length + 1}}'>{{category.name}}</td>
                             <td ng-repeat = 'criterion in currentModule.input.criteria'>
-                              <div id = 'cat-ref-{{category.id}}-criterion-{{criterion.id}}'>
+                              <div id = 'cat-ref-{{ref.id}}-{{category.id}}-criterion-{{criterion.id}}'>
                                 <input class = 'form-control' type = 'number' ng-model = 'ref[criterion.name]' ng-blur = 'blurCATReferenceAction(ref, category, criterion)'>
                               </div>
                             </td>
@@ -1177,114 +1191,117 @@
 
                       <!-- Criteria Cards -->
                       <p>Criteria Cards</p>
-                      <div ng-drop = 'true' ng-drop-success = 'originalCriteriaDrop($data)'>
+                      <div class = 'srf-drop' ng-drop = 'true' ng-drop-success = 'originalCriteriaDrop($data)'>
                         <ul class = 'draggable-objects'>
                           <li ng-repeat = 'criterion in currentModule.input.criteria' ng-if = 'criterion.position == -1'>
-                            <div class = 'criteria-card' ng-drag = 'true' ng-drag-data = 'criterion' data-allow-transform = 'true' title = '{{criterion.name}}'>
-                              <span style = 'display: block; margin-top: -27%'>{{criterion.name}}</span>
+                            <div class = 'srf-drag criteria-card' ng-drag = 'true' ng-drag-data = 'criterion' data-allow-transform = 'true' title = '{{criterion.name}}'>
+                            {{criterion.name}}
                             </div>
                           </li>
                         </ul>
                       </div>
 
+                      <br>
+
                       <!-- White Cards -->
-                      <div style = 'margin-top: 10%'>
-                        <p>White Cards</p>
-                        <div ng-drop = 'true' ng-drop-success = 'originalWhiteDrop($data)'>
-                          <ul class = 'draggable-objects'>
-                            <li>
-                              <div class = 'white-card' ng-drag = 'true' ng-drag-data = 'white_card' data-allow-transform = 'true'></div>
-                            </li>
-                          </ul>
-                        </div>
+                      <p>White Cards</p>
+                      <div class = 'srf-drop' ng-drop = 'true' ng-drop-success = 'originalWhiteDrop($data)'>
+                        <ul class = 'draggable-objects'>
+                          <li>
+                            <div class = 'srf-drag white-card' ng-drag = 'true' ng-drag-data = 'white_card' data-allow-transform = 'true'></div>
+                          </li>
+                        </ul>
                       </div>
+
+                      <br>
 
                       <!-- Drop Divs -->
-                      <div style = 'margin-top: 10%'>
-                        <div class = 'row' ng-repeat = 'rank in rangeRepeater(currentModule.input.ranking) track by $index' style = 'margin-top: 1%'>
-                          <div class = 'col-md-2'>
-                            <p ng-if = '$index == 0'>Most Important</p>
-                            <p ng-if = '$index == currentModule.input.ranking - 1'>Least Important</p>
+                      <div class = 'row' ng-repeat = 'rank in rangeRepeater(currentModule.input.ranking) track by $index' style = 'margin-top: 1%'>
+                        <div class = 'col-md-2'>
+                          <p ng-if = '$index == 0'>Most Important</p>
+                          <p ng-if = '$index == currentModule.input.ranking - 1'>Least Important</p>
+                        </div>
+
+                        <div class = 'col-md-9'>
+                          <div class = 'srf-drop' ng-drop = 'true' ng-drop-success = 'rankingDrop($data, $index)'>
+                            <ul class = 'draggable-objects'>
+                              <!-- Dragged Criteria -->
+                              <li ng-repeat = 'criterion in currentModule.input.criteria' ng-if = 'criterion.position == $parent.$index'>
+                                <div class = 'srf-drag criteria-card' ng-drag = 'true' ng-drag-data = 'criterion' data-allow-transform = 'true' title = '{{criterion.name}}'>
+                                  {{criterion.name}}
+                                </div>
+                              </li>
+                              <!-- Dragged White Cards -->
+                              <li ng-repeat = 'white_card in currentModule.input["white cards"]' ng-if = 'white_card.position == $parent.$index'>
+                                <div class = 'srf-drag white-card' ng-drag = 'true' ng-drag-data = 'white_card' data-allow-transform = 'true'></div>
+                              </li>
+                            </ul>
                           </div>
 
-                          <div class = 'col-md-9'>
-                            <div ng-drop = 'true' ng-drop-success = 'rankingDrop($data, $index)'>
-                              <ul class = 'draggable-objects'>
-                                <!-- Dragged Criteria -->
-                                <li ng-repeat = 'criterion in currentModule.input.criteria' ng-if = 'criterion.position == $parent.$index'>
-                                  <div class = 'criteria-card' ng-drag = 'true' ng-drag-data = 'criterion' data-allow-transform = 'true' title = '{{criterion.name}}'>
-                                    <span style = 'display: block; margin-top: -27%'>{{criterion.name}}</span>
-                                  </div>
-                                </li>
-                                <!-- Dragged White Cards -->
-                                <li ng-repeat = 'white_card in currentModule.input["white cards"]' ng-if = 'white_card.position == $parent.$index'>
-                                  <div class = 'white-card' ng-drag = 'true' ng-drag-data = 'white_card' data-allow-transform = 'true'></div>
-                                </li>
-                              </ul>
-                            </div>
+                          <!-- Add Drop Div Button -->
+                          <button type = 'button' class = 'btn btn-success' ng-click = 'addRanking($index)' title = 'Add Ranking' ng-if = '$index != ranking - 1' style = 'margin-top: 1%; margin-left: 7%'>
+                            <span class = 'glyphicon glyphicon-plus'></span>
+                          </button>
+                        </div>
 
-                            <!-- Add Drop Div Button -->
-                            <button type = 'button' class = 'btn btn-success' ng-click = 'addRanking($index)' title = 'Add Ranking' ng-if = '$index != ranking - 1' style = 'margin-top: 1%; margin-left: 7%'>
-                              <span class = 'glyphicon glyphicon-plus'></span>
-                            </button>
-                          </div>
-
-                          <div class = 'col-md-1'>
-                            <!-- Delete Drop Div Button -->
-                            <button type = 'button' class = 'btn btn-danger' ng-click = 'removeRanking($index)' title = 'Remove Ranking' ng-if = '$index != 0 && $index != currentModule.input.ranking - 1'>
-                              <span class = 'glyphicon glyphicon-minus'></span>
-                            </button>
-                          </div>
+                        <div class = 'col-md-1'>
+                          <!-- Delete Drop Div Button -->
+                          <button type = 'button' class = 'btn btn-danger' ng-click = 'removeRanking($index)' title = 'Remove Ranking' ng-if = '$index != 0 && $index != currentModule.input.ranking - 1'>
+                            <span class = 'glyphicon glyphicon-minus'></span>
+                          </button>
                         </div>
                       </div>
 
                       <br>
 
+                      <!-- Other Parameters -->
                       <p class = 'header-1'>Other Parameters</p>
 
-                      <!-- Ratio Z -->
-                      <div class = 'row'>
-                        <form class = 'form-inline'>
-                          <div id = 'srf-ratio-z' class = 'form-group'>
-                            <label>Ratio Z</label>
-                            <input type = 'number' class = 'form-control' ng-model = 'currentModule.input["ratio z"]' ng-blur = 'blurSRFRatioZ()'>
-                          </div>
-                        </form>
-                      </div>
-
-                      <br>
-
-                      <!-- Decimal Places -->
-                      <div class = 'row'>
-                        <form class = 'form-inline'>
-                          <div class = 'form-group'>
-                            <label>Number of Decimal Places</label>
-                            <select class = 'form-control' ng-model = 'currentModule.input["decimal places"]'>
-                              <option value = '' selected disabled>--- Please Select ---</option>
-                              <option>0</option>
-                              <option>1</option>
-                              <option>2</option>
-                            </select>
-                          </div>
-                        </form>
-                      </div>
-
-                      <br>
-
-                      <!-- Output - Normalized or Non-Normalized Weights -->
-                      <div class = 'row'>
-                        <form class = 'form-inline'>
-                          <div class = 'form-group'>
-                            <label>Weight Type</label>
-                            <select class = 'form-control' ng-model = 'currentModule.input["weight type"]'>
-                              <option value = '' selected disabled>--- Please Select ---</option>
-                              <option>Non-Normalized</option>
-                              <option>Normalized</option>
-                              <option>Both</option>
-                            </select>
-                          </div>
-                        </form>
-                      </div>
+                      <table class = 'table'>
+                        <thead>
+                          <th class = 'col-md-6' style = 'border: none'></th>
+                          <th class = 'col-md-6' style = 'border: none'></th>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <!-- Ratio Z -->
+                            <td style = 'border: none'><strong>Ratio Z</strong></td>
+                            <td style = 'border: none'>
+                              <div id = 'srf-ratio-z'>
+                                <input type = 'number' class = 'form-control' ng-model = 'currentModule.input["ratio z"]' ng-blur = 'blurSRFRatioZ()'>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <!-- Decimal Places -->
+                            <td style = 'border: none'><strong>Decimal Places</strong></td>
+                            <td style = 'border: none'>
+                              <div id = 'srf-decimal-places'>
+                                <select class = 'form-control' ng-model = 'currentModule.input["decimal places"]' ng-blur = 'blurSRFDecimalPlaces()'>
+                                  <option value = '' selected disabled>--- Please Select ---</option>
+                                  <option>0</option>
+                                  <option>1</option>
+                                  <option>2</option>
+                                </select>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <!-- Weight Type -->
+                            <td style = 'border: none'><strong>Weight Type</strong></td>
+                            <td style = 'border: none'>
+                              <div id = 'srf-weight-type'>
+                                <select class = 'form-control' ng-model = 'currentModule.input["weight type"]' ng-blur = 'blurSRFWeightType()'>
+                                  <option value = '' selected disabled>--- Please Select ---</option>
+                                  <option>Non-Normalized</option>
+                                  <option>Normalized</option>
+                                  <option>Both</option>
+                                </select>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
 
                     </div>
                   </div>
@@ -1995,7 +2012,7 @@
                               </div>
 
                               <div class = 'col-md-9'>
-                                <div ng-drop = 'true'>
+                                <div class = 'srf-drop' ng-drop = 'true'>
                                   <ul class = 'draggable-objects'>
                                     <!-- Dragged Criteria -->
                                     <li ng-repeat = 'criterion in mod.input.criteria' ng-if = 'criterion.position == $parent.$index'>
@@ -2015,37 +2032,29 @@
                             <!-- Other Parameters -->
                             <p class = 'header-8'>Other Parameters</p>
 
-                            <!-- Ratio Z -->
-                            <div class = 'row'>
-                              <form class = 'form-inline'>
-                                  <label>Ratio Z: </label>
-                                  {{mod.input["ratio z"]}}
-                              </form>
-                            </div>
-
-                            <br>
-
-                            <!-- Decimal Places -->
-                            <div class = 'row'>
-                              <form class = 'form-inline'>
-                                <div class = 'form-group'>
-                                  <label>Number of Decimal Places: </label>
-                                  {{mod.input['decimal places']}}
-                                </div>
-                              </form>
-                            </div>
-
-                            <br>
-
-                            <!-- Weight Type -->
-                            <div class = 'row'>
-                              <form class = 'form-inline'>
-                                <div class = 'form-group'>
-                                  <label>Weight Type: </label>
-                                  {{mod.input['weight type']}}
-                                </div>
-                              </form>
-                            </div>
+                            <table class = 'table'>
+                              <thead>
+                                <th class = 'col-md-6' style = 'border: none'></th>
+                                <th class = 'col-md-6' style = 'border: none'></th>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <!-- Ratio Z -->
+                                  <td style = 'border: none'><strong style = 'float: right'>Ratio Z</strong></td>
+                                  <td style = 'border: none'><div style = 'float: left'>{{mod.input["ratio z"]}}</div></td>
+                                </tr>
+                                <tr>
+                                  <!-- Decimal Places -->
+                                  <td style = 'border: none'><strong style = 'float: right'>Decimal Places</strong></td>
+                                  <td style = 'border: none'><div style = 'float: left'>{{mod.input['decimal places']}}</div></td>
+                                </tr>
+                                <tr>
+                                  <!-- Weight Type -->
+                                  <td style = 'border: none'><strong style = 'float: right'>Weight Type</strong></td>
+                                  <td style = 'border: none'><div style = 'float: left'>{{mod.input['weight type']}}</div></td>
+                                </tr>
+                              </tbody>
+                            </table>
 
                             <br>
 

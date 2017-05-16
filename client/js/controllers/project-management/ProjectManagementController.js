@@ -18,7 +18,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
           }
         });
       }
-      getProjects();
+
     });
   }
 
@@ -49,26 +49,27 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
     }
   }
 
+  $scope.project = {};
+
   //add a new project
   $scope.addProject = function() {
-    //if a method has not chosen
-    if(typeof $scope.project.method == 'undefined' || $scope.project.method == '') {
-      //show method alert and don't add the project
-      $scope.showMethodErrorAlert = true;
-      //hide the name error alert
-      $scope.showNameErrorAlert = false;
-    }
-    else if(typeof $scope.project.name == 'undefined' || $scope.project.name == '') {
-      //show name alert and don't add the project
-      $scope.showNameErrorAlert = true;
-      //hide the method error alert
-      $scope.showMethodErrorAlert = false;
-    }
-    else {
-      //hide alerts, in case they were showing before
-      $scope.showMethodErrorAlert = false;
-      $scope.showNameErrorAlert = false;
+    var can_add_project = true;
 
+    if($scope.project.name == undefined || $scope.project.name == '') {
+      $('#new-project-name').addClass('has-error');
+      can_add_project = false;
+    }
+    else
+      $('#new-project-name').removeClass('has-error');
+
+    if($scope.project.method == undefined || $scope.project.method == '') {
+      $('#new-project-method').addClass('has-error');
+      can_add_project = false;
+    }
+    else
+      $('#new-project-method').removeClass('has-error');
+
+    if(can_add_project) {
       //get all projects from the database
       $http.get('/projects').then(function(response) {
         //get current date
@@ -85,13 +86,17 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
         project_id++;
 
         //create the new project
-        var proj_text = '{"project_id":' + project_id + ',"username":"' + $scope.username + '","name":"' + $scope.project.name + '","method":"' + $scope.project.method + '","creation_date":"' + creation_date + '","last_update":"' + creation_date + '","executions":[]}';
-
-        //transform to json
-        var proj_obj = JSON.parse(proj_text);
+        var new_proj = {};
+        new_proj.project_id = project_id;
+        new_proj.username = $scope.username;
+        new_proj.name = $scope.project.name;
+        new_proj.method = $scope.project.method;
+        new_proj.creation_date = creation_date;
+        new_proj.last_update = creation_date;
+        new_proj.executions = [];
 
         //add the new project to the database
-        $http.post('/projects', proj_obj).then(function() {
+        $http.post('/projects', new_proj).then(function() {
           //refresh the list of projects
           getProjects();
           //reset the input fields
@@ -174,7 +179,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
 
       //get the created projects by the logged user
       for(project in response.data) {
-        if(response.data[project].username == $scope.username) {
+        if(response.data[project].username == $scope.username && response.data[project].method != undefined) {
           user_projects.push(response.data[project]);
         }
       }
@@ -182,21 +187,22 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
       $scope.projects = user_projects;
 
       //sort projects
-      if(currentOrder[0] != '' && currentOrder[1] != '') {
-        $scope.projects.sort(sortData(currentOrder[0], currentOrder[1]));
-      }
-
-      //show/hide the "delete all projects" button
-      if($scope.projects.length == 0)
-        $scope.showDeleteAll = false;
-      else
-        $scope.showDeleteAll = true;
+      sortProjects();
     });
   }
 
   $scope.changeCurrentOrder = function(attr, dir) {
     currentOrder = [attr, dir];
-    getProjects();
+    sortProjects();
+  }
+
+  function sortProjects() {
+    if(currentOrder[0] != '' && currentOrder[1] != '') {
+      if(currentOrder[0] == 'creation_date' || currentOrder[0] == 'last_update')
+        $scope.projects.sort(sortDates(currentOrder[0], currentOrder[1]));
+      else
+        $scope.projects.sort(sortData(currentOrder[0], currentOrder[1]));
+    }
   }
 
   function sortData(order, direction) {
@@ -218,8 +224,40 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
     }
   }
 
-  $scope.deleteAllProjects = function() {
-    $scope.delete_id_project = 'all';
+  //sort dates by "order" and "direction"
+  function sortDates(order, direction) {
+    return function(a, b) {
+      //parse the first date
+      var date1 = new Date();
+      var day = a[order].substr(0, a[order].indexOf('-'));
+      var month = a[order].substr(a[order].indexOf('-') + 1);
+      month = month.substr(0, month.indexOf('-'));
+      var year = a[order].substr(a[order].lastIndexOf('-') + 1, a[order].length - 1);
+      date1.setFullYear(year, Number(month) - 1, day);
+
+      //parse the second date
+      var date2 = new Date();
+      day = b[order].substr(0, b[order].indexOf('-'));
+      month = b[order].substr(b[order].indexOf('-') + 1);
+      month = month.substr(0, month.indexOf('-'));
+      year = b[order].substr(b[order].lastIndexOf('-') + 1, b[order].length - 1);
+      date2.setFullYear(year, Number(month) - 1, day);
+
+      if(direction == 'ascendant') {
+        if(date1 < date2)
+          return -1;
+        if(date1 > date2)
+          return 1;
+        return 0;
+      }
+      else {
+        if(date1 < date2)
+          return 1;
+        if(date1 > date2)
+          return -1;
+        return 0;
+      }
+    }
   }
 
   $scope.confirmDeleteAll = function() {
@@ -228,7 +266,7 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
 
       //get the selected project
       for(proj in response.data) {
-        if(response.data[proj].username == $scope.username) {
+        if(response.data[proj].username == $scope.username && response.data[proj].method != undefined) {
           //get the id of the document, so that it can be removed from the db
           id_doc = response.data[proj]['_id'];
           $http.delete('/projects/' + id_doc);
@@ -242,9 +280,6 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
     });
   }
 
-  $scope.cancelDeleteAll = function() {
-    $scope.delete_id_project = '';
-  }
-
   requestLogIn();
+  getProjects();
 });

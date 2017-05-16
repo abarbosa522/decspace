@@ -75,27 +75,13 @@
 
       <!-- Main tabs - Method Description, Data Input and Results and Execution -->
       <ul class = 'nav nav-tabs nav-justified'>
-        <li role = 'presentation' class = 'active'><a data-toggle = 'tab' href= '#description'>Method Description</a></li>
-        <li role = 'presentation'><a data-toggle = 'tab' href= '#data-input'>Data Input</a></li>
+        <li role = 'presentation' class = 'active'><a data-toggle = 'tab' href= '#data-input'>Data Input</a></li>
         <li role = 'presentation'><a data-toggle = 'tab' href= '#results'>Results and Executions</a></li>
       </ul>
 
       <div class = 'tab-content'>
-        <!-- Method Description -->
-        <div id = 'description' class = 'tab-pane fade in active' style = 'text-align:left'>
-          <br>
-
-          <p class = 'header-1'>Sort</p>
-
-          <br>
-
-          <p>Given 3 different objects, reorder them by their importance. The object on the left should be the most important and the object on the right should be the least important.</p>
-        </div>
-
         <!-- Data Input -->
-        <div id = 'data-input' class = 'tab-pane fade'>
-
-          <br>
+        <div id = 'data-input' class = 'tab-pane fade in active'>
 
           <!-- Button Bar -->
           <div class = 'btn-toolbar' role = 'toolbar'>
@@ -106,23 +92,13 @@
               </button>
 
               <!-- Reload Data Button -->
-              <button type = 'button' class = 'btn btn-info' ng-click = 'reloadData()' title = 'Reload Data'>
+              <button type = 'button' class = 'btn btn-info' ng-click = 'reloadData(true)' title = 'Reload Data'>
                 <span class = 'glyphicon glyphicon-refresh'></span>
               </button>
 
               <!-- Reset Data Button -->
-              <button type = 'button' class = 'btn btn-danger' ng-click = 'resetData()' title = 'Reset Data' ng-if = '!showResetData'>
+              <button type = 'button' class = 'btn btn-danger' title = 'Reset Data' data-toggle = 'modal' data-target = '#reset-data-modal'>
                 <span class = 'glyphicon glyphicon-trash'></span>
-              </button>
-
-              <!-- Confirm Reset Data -->
-              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmResetData()' title = 'Confirm Data Reset' ng-if = 'showResetData'>
-                <span class = 'glyphicon glyphicon-ok'></span>
-              </button>
-
-              <!-- Cancel Reset Data -->
-              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelResetData()' title = 'Cancel Data Reset' ng-if = 'showResetData'>
-                <span class = 'glyphicon glyphicon-remove'></span>
               </button>
             </div>
 
@@ -139,14 +115,47 @@
             </div>
           </div>
 
-          <br>
-
           <!-- Data Saved Alert -->
-          <div class = 'alert alert-success alert-dismissible' role = 'alert' ng-if = 'showSaveSuccess' ng-cloak>
-            <button type = 'button' class = 'close' data-dismiss = 'alert' aria-label = 'Close' ng-click = 'changeSaveSuccess()'>
-              <span aria-hidden = 'true'>&times;</span>
-            </button>
+          <div class = 'alert alert-success projects-custom-alert' id = 'save-success' ng-cloak>
             Data <strong>successfully</strong> saved.
+          </div>
+
+          <!-- Data Reloaded Alert -->
+          <div class = 'alert alert-success projects-custom-alert' id = 'reload-success' ng-cloak>
+            Data <strong>successfully</strong> reloaded.
+          </div>
+
+          <!-- Reset Data Modal -->
+          <div class = 'modal fade' id = 'reset-data-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>Are you sure you want to reset the current input data?</h4>
+                </div>
+                <div class = 'modal-body'>
+                  <div class = 'row'>
+                    <div class = 'col-md-2'>
+                    </div>
+
+                    <div class = 'col-md-4'>
+                      <button type = 'button' class = 'btn btn-primary' ng-click = 'confirmResetData()' data-dismiss = 'modal' title = 'Confirm Reset Data'>
+                        Yes
+                      </button>
+                    </div>
+
+                    <div class = 'col-md-4'>
+                      <button type = 'button' class = 'btn btn-primary' data-dismiss = 'modal' title = 'Cancel Reset Data'>
+                        No
+                      </button>
+                    </div>
+
+                    <div class = 'col-md-2'>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Import Modal -->
@@ -199,12 +208,16 @@
             </div>
           </div>
 
+          <a class = 'header-1' href = '../method-catalog/sort.html'>Sort</a>
+
+          <br>
+
           <!-- Objects -->
           <div class = 'row'>
             <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#objects-table' style = 'float: right' ng-click = 'objects_eye = (objects_eye == 0 ? 1 : 0)' title = 'Hide/Show Objects'>
               <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : objects_eye == 0, "glyphicon-eye-close" : objects_eye == 1}'></span>
             </button>
-            <p class = 'header-1'>Objects</p>
+            <p class = 'header-2'>Objects</p>
           </div>
 
           <div id = 'objects-table' class = 'collapse in'>
@@ -219,7 +232,9 @@
               <tbody>
                 <tr ng-repeat = 'object in objects | orderBy: "id"' ng-class = '{danger: object.id == deleteIdObject}'>
                   <td>
-                    <input class = 'form-control' type = 'text' ng-model = 'object.name'>
+                    <div id = 'object-{{object.id}}-name'>
+                      <input class = 'form-control' type = 'text' ng-model = 'object.name' ng-blur = 'blurObjectName(object)'>
+                    </div>
                   </td>
                   <td ng-if = 'object.id != deleteIdObject'>
                     <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteObject(object)' title = 'Delete Object'>
@@ -238,7 +253,7 @@
                 <!-- Form to add object -->
                 <tr class = 'active'>
                   <td>
-                    <div id = 'objects-name' class = 'form-group'>
+                    <div id = 'new-object-name' class = 'form-group'>
                       <input class = 'form-control' type = 'text' ng-model = 'new_object.name'>
                     </div>
                   </td>
@@ -255,15 +270,15 @@
           <!-- Object Ordering - Draggable Area -->
           <div class = 'row'>
             <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#order-table' style = 'float: right' ng-click = 'order_eye = (order_eye == 0 ? 1 : 0)' title = 'Hide/Show Order'>
-              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : order_eye == 0, "glyphicon-eye-close" : order_eye == 1}'></span>
+              <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open": order_eye == 0, "glyphicon-eye-close": order_eye == 1}'></span>
             </button>
-            <p class = 'header-1'>Order</p>
+            <p class = 'header-2'>Order</p>
           </div>
 
           <div id = 'order-table' class = 'row text-center collapse in'>
             <ul class = 'draglist'>
-              <li ng-repeat = 'obj in objects' ng-drop = 'true' ng-drop-success = 'onDropComplete($index, $data, $event)'>
-                <div ng-drag = 'true' ng-drag-data = 'obj' ng-class = 'obj.name'>{{obj.name}}</div>
+              <li class = 'sort-drop' ng-repeat = 'obj in objects' ng-drop = 'true' ng-drop-success = 'onDropComplete($index, $data, $event)'>
+                <div class = 'sort-drag' ng-drag = 'true' ng-drag-data = 'obj' ng-class = 'obj.name'>{{obj.name}}</div>
 
                 <div ng-if = 'objects.length > 1'>
                   <p ng-if = '$index == 0' style = 'margin-top: 20%'>Most Important</p>

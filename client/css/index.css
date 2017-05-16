@@ -135,10 +135,6 @@ nav > div > div > ul > li {
   width: 95%;
 }
 
-.break_words {
-  word-break: break-all;
-}
-
 #srf-modal .modal-dialog {
   width: 95%;
 }
@@ -158,4 +154,16 @@ nav > div > div > ul > li {
 	margin-top: 2px;
 	border-top: 1px solid #8c8b8b;
 	border-bottom: 1px solid #fff;
+}
+
+.borderless-table td {
+  border: none;
+}
+
+.projects-custom-alert {
+  position: absolute;
+  width: 30%;
+  height: 10%;
+  margin-top: -2%;
+  margin-left: 50%;
 }

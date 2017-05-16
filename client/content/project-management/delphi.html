@@ -86,29 +86,13 @@
 
       <!-- Main tabs - Method Description, Data Input and Results and Execution -->
       <ul class = 'nav nav-tabs nav-justified'>
-        <li role = 'presentation' class = 'active'><a data-toggle = 'tab' href= '#description'>Method Description</a></li>
-        <li role = 'presentation'><a data-toggle = 'tab' href= '#data-input'>Round Configuration</a></li>
+        <li role = 'presentation' class = 'active'><a data-toggle = 'tab' href= '#data-input'>Round Configuration</a></li>
         <li role = 'presentation'><a data-toggle = 'tab' href= '#results'>Results and Executions</a></li>
       </ul>
 
       <div class = 'tab-content'>
-        <!-- Method Description -->
-        <div id = 'description' class = 'tab-pane fade in active' style = 'text-align:left'>
-          <br>
-
-          <p class = 'header-1'>Delphi</p>
-
-          <br>
-
-          <p>Mostly used for obtaining an opinion, judgment or choice consensus.</p>
-          <p>It is divided in various rounds. In each round, a survey is sent to the specialists.</p>
-          <p>The Q-Sort technique is used to answer the surveys.</p>
-        </div>
-
         <!-- Data Input -->
-        <div id = 'data-input' class = 'tab-pane fade'>
-
-          <br>
+        <div id = 'data-input' class = 'tab-pane fade in active'>
 
           <!-- Button Bar -->
           <div class = 'btn-toolbar' role = 'toolbar'>
@@ -119,23 +103,13 @@
               </button>
 
               <!-- Reload Data Button -->
-              <button type = 'button' class = 'btn btn-info' ng-click = 'reloadData()' title = 'Reload Data'>
+              <button type = 'button' class = 'btn btn-info' ng-click = 'reloadData(true)' title = 'Reload Data'>
                 <span class = 'glyphicon glyphicon-refresh'></span>
               </button>
 
               <!-- Reset Data Button -->
-              <button type = 'button' class = 'btn btn-danger' ng-click = 'resetData()' title = 'Reset Data' ng-if = '!showResetData'>
+              <button type = 'button' class = 'btn btn-danger' title = 'Reset Data' data-toggle = 'modal' data-target = '#reset-data-modal'>
                 <span class = 'glyphicon glyphicon-trash'></span>
-              </button>
-
-              <!-- Confirm Reset Data -->
-              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmResetData()' title = 'Confirm Data Reset' ng-if = 'showResetData'>
-                <span class = 'glyphicon glyphicon-ok'></span>
-              </button>
-
-              <!-- Cancel Reset Data -->
-              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelResetData()' title = 'Cancel Data Reset' ng-if = 'showResetData'>
-                <span class = 'glyphicon glyphicon-remove'></span>
               </button>
             </div>
 
@@ -153,11 +127,46 @@
           </div>
 
           <!-- Data Saved Alert -->
-          <div class = 'alert alert-success alert-dismissible' role = 'alert' ng-if = 'showSaveSuccess' ng-cloak>
-            <button type = 'button' class = 'close' data-dismiss = 'alert' aria-label = 'Close' ng-click = 'changeSaveSuccess()'>
-              <span aria-hidden = 'true'>&times;</span>
-            </button>
+          <div class = 'alert alert-success projects-custom-alert' id = 'save-success' ng-cloak>
             Data <strong>successfully</strong> saved.
+          </div>
+
+          <!-- Data Reloaded Alert -->
+          <div class = 'alert alert-success projects-custom-alert' id = 'reload-success' ng-cloak>
+            Data <strong>successfully</strong> reloaded.
+          </div>
+
+          <!-- Reset Data Modal -->
+          <div class = 'modal fade' id = 'reset-data-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>Are you sure you want to reset the current input data?</h4>
+                </div>
+                <div class = 'modal-body'>
+                  <div class = 'row'>
+                    <div class = 'col-md-2'>
+                    </div>
+
+                    <div class = 'col-md-4'>
+                      <button type = 'button' class = 'btn btn-primary' ng-click = 'confirmResetData()' data-dismiss = 'modal' title = 'Confirm Reset Data'>
+                        Yes
+                      </button>
+                    </div>
+
+                    <div class = 'col-md-4'>
+                      <button type = 'button' class = 'btn btn-primary' data-dismiss = 'modal' title = 'Cancel Reset Data'>
+                        No
+                      </button>
+                    </div>
+
+                    <div class = 'col-md-2'>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Import Modal -->
@@ -303,7 +312,12 @@
             </div>
           </div>
 
-          <p class = 'header-1'>Round {{current_execution_project_id}}</p>
+          <!-- Link to Method Catalog -->
+          <a class = 'header-1' href = '../method-catalog/delphi.html'>Delphi</a>
+
+          <br>
+
+          <p class = 'header-2'>Round {{current_execution_project_id}}</p>
 
           <br>
 
@@ -316,7 +330,9 @@
           </div>
 
           <div id = 'subject-table' class = 'collapse in'>
-            <input type = 'text' class = 'form-control' ng-model = 'subject'>
+            <div id = 'subject'>
+              <input type = 'text' class = 'form-control' ng-model = 'subject' ng-blur = 'blurSubject()'>
+            </div>
           </div>
 
           <br>
@@ -341,7 +357,9 @@
               <tbody>
                 <tr ng-repeat = 'email in emails' ng-class = '{danger: email.id == delete_email}'>
                   <td>
-                    <input type = 'text' class = 'form-control' ng-model = 'email.address'>
+                    <div id = 'email-{{email.id}}'>
+                      <input type = 'text' class = 'form-control' ng-model = 'email.address' ng-blur = 'blurEmail(email)'>
+                    </div>
                   </td>
                   <td ng-if = 'email.id != delete_email'>
                     <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteEmail(email)' title = 'Delete Email'>
@@ -360,7 +378,9 @@
                 <!-- Form to add new email -->
                 <tr class = 'active'>
                   <td>
-                    <input class = 'form-control' type = 'text' ng-model = 'new_email.address'>
+                    <div id = 'new-email'>
+                      <input class = 'form-control' type = 'text' ng-model = 'new_email.address'>
+                    </div>
                   </td>
                   <td>
                     <button type = 'button' class = 'btn btn-success' ng-click = 'addEmail()' title = 'Add Email'>
@@ -395,10 +415,14 @@
               <tbody>
                 <tr ng-repeat = 'question in questions' ng-class = '{danger: question.id == delete_question}'>
                   <td>
-                    <input type = 'text' class = 'form-control' ng-model = 'question.content'>
+                    <div id = 'question-title-{{question.id}}'>
+                      <input type = 'text' class = 'form-control' ng-model = 'question.title' ng-blur = 'blurQuestionTitle(question)'>
+                    </div>
                   </td>
                   <td>
-                    <input type = 'text' class = 'form-control' ng-model = 'question.description'>
+                    <div id = 'question-description-{{question.id}}'>
+                      <input type = 'text' class = 'form-control' ng-model = 'question.description' ng-blur = 'blurQuestionDescription(question)'>
+                    </div>
                   </td>
                   <td ng-if = 'question.id != delete_question'>
                     <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteQuestion(question)' title = 'Delete Question'>
@@ -417,10 +441,14 @@
                 <!-- Form to add new question -->
                 <tr class = 'active'>
                   <td>
-                    <input class = 'form-control' type = 'text' ng-model = 'new_question.content'>
+                    <div id = 'new-question-title'>
+                      <input class = 'form-control' type = 'text' ng-model = 'new_question.title'>
+                    </div>
                   </td>
                   <td>
-                    <input class = 'form-control' type = 'text' ng-model = 'new_question.description'>
+                    <div id = 'new-question-description'>
+                      <input class = 'form-control' type = 'text' ng-model = 'new_question.description'>
+                    </div>
                   </td>
                   <td>
                     <button type = 'button' class = 'btn btn-success' ng-click = 'addQuestion()' title = 'Add Question'>
@@ -639,7 +667,7 @@
                           </thead>
                           <tbody>
                             <tr ng-repeat = 'question in currentExecution.questions'>
-                              <td>{{question.content}}</td>
+                              <td>{{question.title}}</td>
                               <td>{{question.description}}</td>
                               <td>{{question.total_score}}</td>
                               <td>{{question.average}}</td>
@@ -678,7 +706,7 @@
                           </thead>
                           <tbody>
                             <tr ng-repeat = 'question in compareExecution.questions'>
-                              <td>{{question.content}}</td>
+                              <td>{{question.title}}</td>
                               <td>{{question.description}}</td>
                               <td>{{question.total_score}}</td>
                               <td>{{question.average}}</td>

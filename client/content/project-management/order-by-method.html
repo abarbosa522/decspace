@@ -77,27 +77,14 @@
 
       <!-- Main tabs - Method Description, Data Input and Results and Execution -->
       <ul class = 'nav nav-tabs nav-justified'>
-        <li role = 'presentation' class = 'active'><a data-toggle = 'tab' href= '#description'>Method Description</a></li>
-        <li role = 'presentation'><a data-toggle = 'tab' href= '#data-input'>Data Input</a></li>
+        <li role = 'presentation' class = 'active'><a data-toggle = 'tab' href= '#data-input'>Data Input</a></li>
         <li role = 'presentation'><a data-toggle = 'tab' href= '#results'>Results and Executions</a></li>
       </ul>
 
       <div class = 'tab-content'>
-        <!-- Method Description -->
-        <div id = 'description' class = 'tab-pane fade in active' style = 'text-align:left'>
-          <br>
-
-          <p class = 'header-1'>Order By</p>
-
-          <br>
-
-          <p>Orders a given group of actions by a certain criterion in a specific direction (ascendant and descendant).</p>
-        </div>
 
         <!-- Data Input -->
-        <div id = 'data-input' class = 'tab-pane fade'>
-
-          <br>
+        <div id = 'data-input' class = 'tab-pane fade in active'>
 
           <!-- Button Bar -->
           <div class = 'btn-toolbar' role = 'toolbar'>
@@ -108,23 +95,13 @@
               </button>
 
               <!-- Reload Data Button -->
-              <button type = 'button' class = 'btn btn-info' ng-click = 'reloadData()' title = 'Reload Data'>
+              <button type = 'button' class = 'btn btn-info' ng-click = 'reloadData(true)' title = 'Reload Data'>
                 <span class = 'glyphicon glyphicon-refresh'></span>
               </button>
 
               <!-- Reset Data Button -->
-              <button type = 'button' class = 'btn btn-danger' ng-click = 'resetData()' title = 'Reset Data' ng-if = '!showResetData'>
+              <button type = 'button' class = 'btn btn-danger' title = 'Reset Data' data-toggle = 'modal' data-target = '#reset-data-modal'>
                 <span class = 'glyphicon glyphicon-trash'></span>
-              </button>
-
-              <!-- Confirm Reset Data -->
-              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmResetData()' title = 'Confirm Data Reset' ng-if = 'showResetData'>
-                <span class = 'glyphicon glyphicon-ok'></span>
-              </button>
-
-              <!-- Cancel Reset Data -->
-              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelResetData()' title = 'Cancel Data Reset' ng-if = 'showResetData'>
-                <span class = 'glyphicon glyphicon-remove'></span>
               </button>
             </div>
 
@@ -141,14 +118,47 @@
             </div>
           </div>
 
-          <br>
-
           <!-- Data Saved Alert -->
-          <div class = 'alert alert-success alert-dismissible' role = 'alert' ng-if = 'showSaveSuccess' ng-cloak>
-            <button type = 'button' class = 'close' data-dismiss = 'alert' aria-label = 'Close' ng-click = 'changeSaveSuccess()'>
-              <span aria-hidden = 'true'>&times;</span>
-            </button>
+          <div class = 'alert alert-success projects-custom-alert' id = 'save-success' ng-cloak>
             Data <strong>successfully</strong> saved.
+          </div>
+
+          <!-- Data Reloaded Alert -->
+          <div class = 'alert alert-success projects-custom-alert' id = 'reload-success' ng-cloak>
+            Data <strong>successfully</strong> reloaded.
+          </div>
+
+          <!-- Reset Data Modal -->
+          <div class = 'modal fade' id = 'reset-data-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>Are you sure you want to reset the current input data?</h4>
+                </div>
+                <div class = 'modal-body'>
+                  <div class = 'row'>
+                    <div class = 'col-md-2'>
+                    </div>
+
+                    <div class = 'col-md-4'>
+                      <button type = 'button' class = 'btn btn-primary' ng-click = 'confirmResetData()' data-dismiss = 'modal' title = 'Confirm Reset Data'>
+                        Yes
+                      </button>
+                    </div>
+
+                    <div class = 'col-md-4'>
+                      <button type = 'button' class = 'btn btn-primary' data-dismiss = 'modal' title = 'Cancel Reset Data'>
+                        No
+                      </button>
+                    </div>
+
+                    <div class = 'col-md-2'>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Import Modal -->
@@ -273,12 +283,17 @@
             </div>
           </div>
 
+          <!-- Link to Method Catalog -->
+          <a class = 'header-1' href = '../method-catalog/orderby.html'>OrderBy</a>
+
+          <br>
+
           <!-- Criteria -->
           <div class = 'row'>
             <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#criteria-table' style = 'float:right' ng-click = 'criteria_eye = (criteria_eye == 0 ? 1 : 0)' title = 'Hide/Show Criteria'>
               <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : criteria_eye == 0, "glyphicon-eye-close" : criteria_eye == 1}'></span>
             </button>
-            <p class = 'header-1'>Criteria</p>
+            <p class = 'header-2'>Criteria</p>
           </div>
 
           <div id = 'criteria-table' class = 'collapse in'>
@@ -286,15 +301,9 @@
               <thead>
                 <tr>
                   <th class = 'text-center'>Order by</th>
-                  <th class = 'text-center'>
-                    Name
-                  </th>
-                  <th class = 'text-center'>
-                    Type
-                  </th>
-                  <th class = 'text-center'>
-                    Direction
-                  </th>
+                  <th class = 'text-center'>Name</th>
+                  <th class = 'text-center'>Type</th>
+                  <th class = 'text-center'>Direction</th>
                   <th class = 'col-md-2'></th>
                 </tr>
               </thead>
@@ -305,17 +314,19 @@
                     <input type = 'radio' ng-checked = 'criterion.selected == "true"' ng-click = 'selectCriterion(criterion)' >
                   </td>
                   <td>
-                    <input class = 'form-control' type = 'text' ng-model = 'criterion.name'>
+                    <div id = 'criterion-{{criterion.id}}-name'>
+                      <input class = 'form-control' type = 'text' ng-model = 'criterion.name' ng-blur = 'blurCriterionName(criterion)'>
+                    </div>
                   </td>
                   <td>
-                    <select ng-model = 'criterion.type'>
+                    <select class = 'form-control' ng-model = 'criterion.type'>
                       <option disabled>--- Please Select ---</option>
                       <option>Text</option>
                       <option>Number</option>
                     </select>
                   </td>
                   <td>
-                    <select ng-model = 'criterion.direction'>
+                    <select class = 'form-control' ng-model = 'criterion.direction'>
                       <option disabled>--- Please Select ---</option>
                       <option>Ascendant</option>
                       <option>Descendant</option>
@@ -339,21 +350,27 @@
                 <tr class = 'active'>
                   <td></td>
                   <td>
-                    <input class = 'form-control' type = 'text' ng-model = 'new_criterion.name'>
+                    <div id = 'new-criterion-name'>
+                      <input class = 'form-control' type = 'text' ng-model = 'new_criterion.name'>
+                    </div>
                   </td>
                   <td>
-                    <select ng-model = 'new_criterion.type'>
-                      <option value = '' disabled>--- Please Select ---</option>
-                      <option>Text</option>
-                      <option>Number</option>
-                    </select>
-                  </td>
+                    <div id = 'new-criterion-type'>
+                      <select class = 'form-control' ng-model = 'new_criterion.type'>
+                        <option value = '' disabled>--- Please Select ---</option>
+                        <option>Text</option>
+                        <option>Number</option>
+                      </select>
+                    </td>
+                  </div>
                   <td>
-                    <select ng-model = 'new_criterion.direction'>
-                      <option value = '' disabled>--- Please Select ---</option>
-                      <option>Ascendant</option>
-                      <option>Descendant</option>
-                    </select>
+                    <div id = 'new-criterion-direction'>
+                      <select class = 'form-control' ng-model = 'new_criterion.direction'>
+                        <option value = '' disabled>--- Please Select ---</option>
+                        <option>Ascendant</option>
+                        <option>Descendant</option>
+                      </select>
+                    </div>
                   </td>
                   <td>
                     <button type = 'button' class = 'btn btn-success' ng-click = 'addCriterion()' data-toggle = 'tooltip' title = 'Add Criterion'>
@@ -365,40 +382,32 @@
             </table>
           </div>
 
-          <div class = 'alert alert-danger' role = 'alert' ng-if = 'showCriterionFieldsError' ng-cloak>
-            <strong>Not</strong> all of the fields of the criterion have been filled.
-          </div>
-
-          <div class = 'alert alert-danger' role = 'alert' ng-if = 'showCriterionNameError' ng-cloak>
-            A criterion with the <strong>same name</strong> has already been added.
-          </div>
-
           <!-- Actions -->
           <div class = 'row'>
             <button class = 'btn btn-default' data-toggle = 'collapse' data-target = '#performance-table' style = 'float:right' ng-click = 'actions_eye = (actions_eye == 0 ? 1 : 0)' title = 'Hide/Show Actions'>
               <span class = 'glyphicon' ng-class = '{"glyphicon-eye-open" : actions_eye == 0, "glyphicon-eye-close" : actions_eye == 1}'></span>
             </button>
-            <p class = 'header-1'>Actions</p>
+            <p class = 'header-2'>Actions</p>
           </div>
 
           <div id = 'performance-table' class = 'collapse in'>
             <table class = 'table table-bordered table-hover'>
               <thead>
-                <th class = 'text-center'>
-                  Name
-                </th>
-                <th class = 'text-center' ng-repeat = 'criterion in criteria'>
-                  {{criterion.name}}
-                </th>
+                <th class = 'text-center'>Name</th>
+                <th class = 'text-center' ng-repeat = 'criterion in criteria'>{{criterion.name}}</th>
                 <th class = 'col-md-2'></th>
               </thead>
               <tbody>
                 <tr ng-repeat = 'action in actions' ng-class = '{danger: action.id == deleteIdAction}'>
                   <td>
-                    <input class = 'form-control' type = 'text' ng-model = 'action.name'>
+                    <div id = 'action-{{action.id}}-name'>
+                      <input class = 'form-control' type = 'text' ng-model = 'action.name' ng-blur = 'blurActionName(action)'>
+                    </div>
                   </td>
                   <td ng-repeat = 'criterion in criteria'>
-                    <input class = 'form-control' ng-model = 'action[criterion.name]'>
+                    <div id = 'action-{{action.id}}-criterion-{{criterion.id}}'>
+                      <input class = 'form-control' ng-model = 'action[criterion.name]' ng-blur = 'blurActionCriterion(action, criterion)'>
+                    </div>
                   </td>
                   <td ng-if = 'action.id != deleteIdAction'>
                     <button type = 'button' class = 'btn btn-danger btn-action-remove' ng-click = 'deleteAction(action)' data-toggle = 'tooltip' title = 'Delete Action'>
@@ -417,10 +426,14 @@
                 <!-- Form to add action -->
                 <tr class = 'active'>
                   <td>
-                    <input class = 'form-control' type = 'text' ng-model = 'new_action.name'>
+                    <div id = 'new-action-name'>
+                      <input class = 'form-control' type = 'text' ng-model = 'new_action.name'>
+                    </div>
                   </td>
                   <td ng-repeat = 'criterion in criteria'>
-                    <input class = 'form-control' ng-model = 'new_action[criterion.name]'>
+                    <div id = 'new-action-criterion-{{criterion.id}}'>
+                      <input class = 'form-control' ng-model = 'new_action[criterion.name]'>
+                    </div>
                   </td>
                   <td>
                     <button type = 'button' class = 'btn btn-success btn-action-add' ng-click = 'addAction()' data-toggle = 'tooltip' title = 'Add Action'>
@@ -432,13 +445,6 @@
             </table>
           </div>
 
-          <div class = 'alert alert-danger' role = 'alert' ng-if = 'showActionFieldsError' ng-cloak>
-            <strong>Not</strong> all of the fields of the action have been filled.
-          </div>
-
-          <div class = 'alert alert-danger' role = 'alert' ng-if = 'showActionNameError' ng-cloak>
-            An action with the <strong>same name</strong> has already been added.
-          </div>
         </div>
 
         <!-- Results and Execution -->

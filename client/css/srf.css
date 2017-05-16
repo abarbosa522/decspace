@@ -4,7 +4,7 @@
   box-sizing: border-box;
 }
 
-[ng-drag] {
+.srf-drag {
   -moz-user-select: -moz-none;
   -khtml-user-select: none;
   -webkit-user-select: none;
@@ -12,12 +12,13 @@
   user-select: none;
 }
 
-[ng-drag] {
+.srf-drag {
   width: 120px;
   height: 40px;
   cursor: move;
   overflow: hidden;
   border: solid 1px black;
+  margin-top: 10%;
 }
 
 .white-card {
@@ -35,6 +36,7 @@
   height: 40px;
   overflow: hidden;
   border: solid 1px black;
+  margin-top: 10%;
 }
 
 ul.draggable-objects:after {
@@ -54,28 +56,29 @@ ul.draggable-objects:after {
   margin-left: 1%;
 }
 
-[ng-drag].drag-over {
+.srf-drag.drag-over {
   border: solid 1px black;
 }
 
-[ng-drag].dragging {
+.srf-drag.dragging {
   opacity: 0.5;
 }
 
-[ng-drop] {
+.srf-drop {
   background: rgba(208, 208, 208, 0.5);
   text-align: center;
   width: 100%;
-  height: 50px;
+  height: 69px;
   position: relative;
   display: table;
+  border: 1px solid black;
 }
 
-[ng-drop].drag-enter {
-  border: solid 1px black;
+.srf-drop.drag-enter {
+  border: 1px solid blue;
 }
 
-[ng-drop] div {
+.srf-drop div {
   position: relative;
   z-index: 2;
 }

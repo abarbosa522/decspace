@@ -61,20 +61,30 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
         //add the new list of projects
         $http.post('/projects', proj_res).then(function() {
           //retrieve the data stored in the database
-          $scope.reloadData();
+          $scope.reloadData(false);
           getExecutions();
         });
       });
     });
   }
 
+  //hide all alerts
+  function hideAlerts() {
+    $('#save-success').hide();
+    $('#reload-success').hide();
+  }
+
+  //show certain alert and hide it smoothly
+  function showAlert(alert_id) {
+    //show alert
+    angular.element(document.querySelector('#' + alert_id)).alert();
+    //hide alert
+    angular.element(document.querySelector('#' + alert_id)).fadeTo(3000, 500).slideUp(500, function(){
+      angular.element(document.querySelector('#' + alert_id)).slideUp(500);
+    });
+  }
+
   /*** BUTTON BAR FUNCTIONS ***/
-
-  //variable to show or hide the save success message
-  $scope.showSaveSuccess = false;
-
-  //variable to show or hide the confirmation or cancel reset data
-  $scope.showResetData = false;
 
   //save the current data on the database
   $scope.saveData = function() {
@@ -104,19 +114,14 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
       $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
         $http.post('/projects', proj_res).then(function() {
-          $scope.showSaveSuccess = true;
+          showAlert('save-success');
         });
       });
     });
   }
 
-  //hide successful save message after being dismissed
-  $scope.changeSaveSuccess = function() {
-    $scope.showSaveSuccess = false;
-  }
-
   //reload the stored data on the database
-  $scope.reloadData = function() {
+  $scope.reloadData = function(alertShowing) {
     $http.get('/projects').then(function(response) {
       for(proj in response.data) {
         if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
@@ -130,15 +135,13 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
           if(response.data[proj]['questions'] != undefined)
             $scope.questions = response.data[proj]['questions'];
 
+          if(alertShowing)
+            showAlert('reload-success');
+
           break;
         }
       }
     });
-  }
-
-  //show confirmation and cancel buttons for resetting the current data
-  $scope.resetData = function() {
-    $scope.showResetData = true;
   }
 
   //confirm reset of the current data
@@ -147,15 +150,6 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
     $scope.emails = [];
     $scope.questions = [];
     $scope.subject = '';
-
-    //hide the reset confirmation and cancelation buttons
-    $scope.showResetData = false;
-  }
-
-  //cancel the data reset
-  $scope.cancelResetData = function() {
-    //hide the reset confirmation and cancelation buttons
-    $scope.showResetData = false;
   }
 
   /*** IMPORT AND EXPORT FUNCTIONS ***/
@@ -393,6 +387,13 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
   //variable that controls the showing/hiding of the subject
   $scope.subject_eye = 1;
 
+  $scope.blurSubject = function() {
+    if($scope.subject == undefined || $scope.subject == '')
+      $('#subject').addClass('has-error');
+    else
+      $('#subject').removeClass('has-error');
+  }
+
   /*** INPUT DATA - EMAILS ***/
 
   //variable that stores all the current email addresses
@@ -404,16 +405,33 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
   //variable that controls the showing/hiding of the emails
   $scope.emails_eye = 1;
 
-  //add a new email
+  $scope.new_email = {};
+
   $scope.addEmail = function() {
-    if($scope.emails.length == 0)
-      $scope.new_email.id = 1;
+    //if there is an input field not assigned
+    if($scope.new_email.address == undefined || $scope.new_email.address == '')
+      $('#new-email').addClass('has-error');
+    else {
+      //assign an unique id to the new email
+      if($scope.emails.length == 0)
+        $scope.new_email.id = 1;
+      else
+        $scope.new_email.id = $scope.emails[$scope.emails.length - 1]['id'] + 1;
+
+      $scope.emails.push(angular.copy($scope.new_email));
+
+      $scope.new_email.address = '';
+
+      //remove all error classes - just be sure
+      $('#new-email').removeClass('has-error');
+    }
+  }
+
+  $scope.blurEmail = function(email) {
+    if(email.address == undefined || email.address == '')
+      $('#email-' + email.id).addClass('has-error');
     else
-      $scope.new_email.id = $scope.emails[$scope.emails.length - 1]['id'] + 1;
-
-    $scope.emails.push(angular.copy($scope.new_email));
-
-    $scope.new_email.address = '';
+      $('#email-' + email.id).removeClass('has-error');
   }
 
   //delete a certain email
@@ -443,19 +461,59 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
   //variable that controls the showing/hiding of the questions
   $scope.questions_eye = 1;
 
-  //add a new question
+  $scope.new_question = {};
+
   $scope.addQuestion = function() {
-    if($scope.questions.length == 0)
-      $scope.new_question.id = 1;
+    var can_add_question = true;
+
+    //if a title was not assigned to the new question
+    if($scope.new_question.title == undefined || $scope.new_question.title == '') {
+      $('#new-question-title').addClass('has-error');
+      can_add_question = false;
+    }
     else
-      $scope.new_question.id = $scope.questions[$scope.questions.length - 1]['id'] + 1;
+      $('#new-question-title').removeClass('has-error');
 
-    $scope.questions.push(angular.copy($scope.new_question));
+    //if a description was not assigned to the new question
+    if($scope.new_question.description == undefined || $scope.new_question.description == '') {
+      $('#new-question-description').addClass('has-error');
+      can_add_question = false;
+    }
+    else
+      $('#new-question-description').removeClass('has-error');
 
-    $scope.new_question.content = '';
-    $scope.new_question.description = '';
+    if(can_add_question) {
+      //assign an unique id to the new email
+      if($scope.questions.length == 0)
+        $scope.new_question.id = 1;
+      else
+        $scope.new_question.id = $scope.questions[$scope.questions.length - 1]['id'] + 1;
+
+      $scope.questions.push(angular.copy($scope.new_question));
+
+      $scope.new_question.title = '';
+      $scope.new_question.description = '';
+
+      //remove all error classes - just be sure
+      $('#new-question-title').removeClass('has-error');
+      $('#new-question-description').removeClass('has-error');
+    }
   }
 
+  $scope.blurQuestionTitle = function(question) {
+    if(question.title == undefined || question.title == '')
+      $('#question-title-' + question.id).addClass('has-error');
+    else
+      $('#question-title-' + question.id).removeClass('has-error');
+  }
+
+  $scope.blurQuestionDescription = function(question) {
+    if(question.description == undefined || question.description == '')
+      $('#question-description-' + question.id).addClass('has-error');
+    else
+      $('#question-description-' + question.id).removeClass('has-error');
+  }
+  
   //delete a certain question
   $scope.deleteQuestion = function(question) {
     $scope.delete_question = question.id;
@@ -821,4 +879,5 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
   /*** STARTUP FUNCTIONS ***/
   requestLogIn();
   rewriteLastUpdate();
+  hideAlerts();
 });

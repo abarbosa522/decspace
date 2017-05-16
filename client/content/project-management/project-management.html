@@ -82,29 +82,29 @@
           <tr>
             <th class = 'text-center'>
               Name
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrder("name", "descendant")'></span></a>
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrder("name", "ascendant")'></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeCurrentOrder("name", "descendant")' title = "Sort 'Name' Downwards"></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeCurrentOrder("name", "ascendant")' title = "Sort 'Name' Upwards"></span></a>
             </th>
             <th class = 'text-center'>
               Method
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrder("method", "descendant")'></span></a>
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrder("method", "ascendant")'></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeCurrentOrder("method", "descendant")' title = "Sort 'Method' Downwards"></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeCurrentOrder("method", "ascendant")' title = "Sort 'Method' Upwards"></span></a>
             </th>
             <th class = 'text-center'>
               Creation Date
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrder("creation_date", "descendant")'></span></a>
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrder("creation_date", "ascendant")'></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrder("creation_date", "descendant")' title = "Sort 'Creation Date' Downwards"></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrder("creation_date", "ascendant")' title = "Sort 'Creation Date' Upwards"></span></a>
             </th>
             <th class = 'text-center'>
               Last Update
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrder("last_update", "descendant")'></span></a>
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrder("last_update", "ascendant")'></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float:right' ng-click = 'changeCurrentOrder("last_update", "descendant")' title = "Sort 'Last Update' Downwards"></span></a>
+              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float:right' ng-click = 'changeCurrentOrder("last_update", "ascendant")' title = "Sort 'Last Update' Upwards"></span></a>
             </th>
             <th></th>
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat = 'project in projects' ng-class = '{danger: delete_id_project == project.project_id || delete_id_project == "all"}'>
+          <tr ng-repeat = 'project in projects' ng-class = '{danger: delete_id_project == project.project_id}'>
             <!-- Project Name -->
             <td>{{project.name}}</td>
 
@@ -144,19 +144,23 @@
           <tr class = 'active'>
             <!-- Name Input -->
             <td>
-              <input id = 'input-name' type = 'text' class = 'form-control' placeholder = 'New Project' ng-model = 'project.name'>
+              <div id = 'new-project-name'>
+                <input type = 'text' class = 'form-control' placeholder = 'New Project Name' ng-model = 'project.name'>
+              </div>
             </td>
 
             <!-- Method List -->
             <td>
-              <select id = 'input-method' ng-model = 'project.method'>
-                <option value = '' selected disabled>--- Please Select ---</option>
-                <option>CAT-SD</option>
-                <option>Delphi</option>
-                <option>OrderBy</option>
-                <option>Sort</option>
-                <option>SRF</option>
-              </select>
+              <div id = 'new-project-method'>
+                <select class = 'form-control' ng-model = 'project.method'>
+                  <option value = '' selected disabled>--- Please Select ---</option>
+                  <option>CAT-SD</option>
+                  <option>Delphi</option>
+                  <option>OrderBy</option>
+                  <option>Sort</option>
+                  <option>SRF</option>
+                </select>
+              </div>
             </td>
 
             <td></td>
@@ -165,7 +169,7 @@
 
             <!-- Add Button -->
             <td>
-              <button type = 'button' class = 'btn btn-success btn-add' ng-click = 'addProject()' data-toggle = 'tooltip' title = 'Add Project'>
+              <button type = 'button' class = 'btn btn-success btn-add' ng-click = 'addProject()' title = 'Add Project'>
                 <span class = 'glyphicon glyphicon-plus'></span>
               </button>
             </td>
@@ -173,34 +177,43 @@
         </tbody>
       </table>
 
-      <div ng-cloak>
-        <div class = 'col-md-9'>
-        </div>
-
-        <div class = 'col-md-3' ng-if = 'delete_id_project != "all"'>
-          <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteAllProjects()'>
-            Delete All Projects
-          </button>
-        </div>
-
-        <div class = 'col-md-3' ng-if = 'delete_id_project == "all"'>
-          <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAll()' title = 'Confirm Delete'>
-            <span class = 'glyphicon glyphicon-ok'></span>
-          </button>
-          <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAll()' title = 'Cancel Delete'>
-            <span class = 'glyphicon glyphicon-remove'></span>
-          </button>
-        </div>
-      </div>
+      <!-- Delete All Projects Button -->
+      <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteAllProjects()' data-toggle = 'modal' data-target = '#delete-all-projects-modal' style = 'float: right' ng-if = 'projects.length > 0'>
+        Delete All Projects
+      </button>
 
       <br><br>
 
-      <div class = 'alert alert-danger' role = 'alert' ng-if = 'showMethodErrorAlert' ng-cloak>
-        A method has <strong>not</strong> been chosen.
-      </div>
+      <!-- Delete All Projects Modal -->
+      <div class = 'modal fade' id = 'delete-all-projects-modal' role = 'dialog'>
+        <div class = 'modal-dialog'>
+          <div class = 'modal-content'>
+            <div class = 'modal-header'>
+              <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+              <h4 class = 'modal-title'>Are you sure you want to delete all 'Single-Method' projects?</h4>
+            </div>
+            <div class = 'modal-body'>
+              <div class = 'row'>
+                <div class = 'col-md-2'>
+                </div>
 
-      <div class = 'alert alert-danger' role = 'alert' ng-if = 'showNameErrorAlert' ng-cloak>
-        A name was <strong>not</strong> been defined.
+                <div class = 'col-md-4'>
+                  <button type = 'button' class = 'btn btn-primary' ng-click = 'confirmDeleteAll()' data-dismiss = 'modal' title = 'Confirm Delete All Projects'>
+                    Yes
+                  </button>
+                </div>
+
+                <div class = 'col-md-4'>
+                  <button type = 'button' class = 'btn btn-primary' data-dismiss = 'modal' title = 'Cancel Delete All Projects'>
+                    No
+                  </button>
+                </div>
+
+                <div class = 'col-md-2'></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>

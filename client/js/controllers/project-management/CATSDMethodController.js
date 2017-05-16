@@ -42,8 +42,6 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
   $scope.reference_actions_exec_eye = 1;
   $scope.results_exec_eye = 1;
 
-  $scope.showResetData = false;
-
   $scope.currentExecution = '';
   $scope.compareExecution = '';
 
@@ -104,28 +102,76 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
       $http.delete('/projects/' + id_doc).then(function(){
         //add the new list of projects
         $http.post('/projects', proj_res).then(function() {
-          getData();
+          $scope.reloadData(false);
           getExecutions();
         });
       });
     });
   }
 
-  $scope.addCriterion = function() {
-    if($scope.criteria.length == 0)
-      $scope.new_criterion.id = 1;
-    else
-      $scope.new_criterion.id = $scope.criteria[$scope.criteria.length - 1].id + 1;
+  //hide all alerts
+  function hideAlerts() {
+    $('#save-success').hide();
+    $('#reload-success').hide();
+  }
 
-    if(typeof $scope.new_criterion.direction == 'undefined')
+  //show certain alert and hide it smoothly
+  function showAlert(alert_id) {
+    //show alert
+    angular.element(document.querySelector('#' + alert_id)).alert();
+    //hide alert
+    angular.element(document.querySelector('#' + alert_id)).fadeTo(3000, 500).slideUp(500, function(){
+      angular.element(document.querySelector('#' + alert_id)).slideUp(500);
+    });
+  }
+
+  $scope.new_criterion = {};
+
+  //add a new criterion
+  $scope.addCriterion = function() {
+    var can_add_criterion = true;
+
+    //if a name has not been assigned to the new criterion - add error class
+    if($scope.new_criterion.name == undefined || $scope.new_criterion.name == '') {
+      $('#new-criterion-name').addClass('has-error');
+      can_add_criterion = false;
+    }
+    else
+      $('#new-criterion-name').removeClass('has-error');
+
+    //if a direction has not been assigned to the new criterion - add error class
+    if($scope.new_criterion.direction == undefined || $scope.new_criterion.direction == '') {
+      $('#new-criterion-direction').addClass('has-error');
+      can_add_criterion = false;
+    }
+    else
+      $('#new-criterion-direction').removeClass('has-error');
+
+    if(can_add_criterion){
+      //assign an unique id to the new criterion
+      if($scope.criteria.length == 0)
+        $scope.new_criterion.id = 1;
+      else
+        $scope.new_criterion.id = $scope.criteria[$scope.criteria.length - 1]['id'] + 1;
+
+      //add the new criterion to the
+      $scope.criteria.push(angular.copy($scope.new_criterion));
+
+      //reset the criterion input fields
+      $scope.new_criterion.name = '';
       $scope.new_criterion.direction = '';
 
-    $scope.new_criterion.branches = [];
-    $scope.criteria.push(angular.copy($scope.new_criterion));
+      //remove all error classes - just be sure
+      $('#new-criterion-name').removeClass('has-error');
+      $('#new-criterion-direction').removeClass('has-error');
+    }
+  }
 
-    //reset the input fields
-    $scope.new_criterion.direction = '';
-    $scope.new_criterion.name = '';
+  $scope.blurCriterionName = function(criterion) {
+    if(criterion.name == '')
+      $('#criterion-' + criterion.id + '-name').addClass('has-error');
+    else
+      $('#criterion-' + criterion.id + '-name').removeClass('has-error');
   }
 
   $scope.deleteCriterion = function(criterion) {
@@ -141,28 +187,73 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
     $scope.deleteIdCriterion = '';
   }
 
+  $scope.new_interaction_effect = {};
+
   $scope.addInteractionEffect = function() {
-    if($scope.interaction_effects.length == 0)
-      $scope.new_interaction_effect.id = 1;
+    var can_add_interaction = true;
+
+    //if a type of effect was not assigned to the new interaction - add error class
+    if($scope.new_interaction_effect.type == undefined) {
+      $('#new-interaction-type').addClass('has-error');
+      can_add_interaction = false;
+    }
     else
-      $scope.new_interaction_effect.id = $scope.interaction_effects[$scope.interaction_effects.length - 1].id + 1;
+      $('#new-interaction-type').removeClass('has-error');
 
-    if(typeof $scope.new_interaction_effect.type == 'undefined')
+    //if the first criterion was not assigned to the new interaction - add error class
+    if($scope.new_interaction_effect.criterion1 == undefined) {
+      $('#new-interaction-criterion1').addClass('has-error');
+      can_add_interaction = false;
+    }
+    else
+      $('#new-interaction-criterion1').removeClass('has-error');
+
+    //if the second criterion was not assigned to the new interaction - add error class
+    if($scope.new_interaction_effect.criterion2 == undefined) {
+      $('#new-interaction-criterion2').addClass('has-error');
+      can_add_interaction = false;
+    }
+    else
+      $('#new-interaction-criterion2').removeClass('has-error');
+
+    //if a value was not correctly assigned to the new interaction - add error class
+    if(($scope.new_interaction_effect.value == undefined || $scope.new_interaction_effect.value == '')
+    || (($scope.new_interaction_effect.type == 'Mutual-Strengthening Effect' && $scope.new_interaction_effect.value <= 0)
+    || (($scope.new_interaction_effect.type == 'Mutual-Weakening Effect' || $scope.new_interaction_effect.type == 'Antagonistic Effect') && $scope.new_interaction_effect.value >= 0))) {
+      $('#new-interaction-value').addClass('has-error');
+      can_add_interaction = false;
+    }
+    else
+      $('#new-interaction-value').removeClass('has-error');
+
+    if(can_add_interaction){
+      if($scope.interaction_effects.length == 0)
+        $scope.new_interaction_effect.id = 1;
+      else
+        $scope.new_interaction_effect.id = $scope.interaction_effects[$scope.interaction_effects.length - 1].id + 1;
+
+      $scope.interaction_effects.push(angular.copy($scope.new_interaction_effect));
+
+      //reset the input fields
       $scope.new_interaction_effect.type = '';
-
-    if(typeof $scope.new_interaction_effect.criterion1 == 'undefined')
       $scope.new_interaction_effect.criterion1 = '';
-
-    if(typeof $scope.new_interaction_effect.criterion2 == 'undefined')
       $scope.new_interaction_effect.criterion2 = '';
+      $scope.new_interaction_effect.value = '';
 
-    $scope.interaction_effects.push(angular.copy($scope.new_interaction_effect));
+      //remove all error classes
+      $('#new-interaction-type').removeClass('has-error');
+      $('#new-interaction-criterion1').removeClass('has-error');
+      $('#new-interaction-criterion2').removeClass('has-error');
+      $('#new-interaction-value').removeClass('has-error');
+    }
+  }
 
-    //reset the input fields
-    $scope.new_interaction_effect.type = '';
-    $scope.new_interaction_effect.criterion1 = '';
-    $scope.new_interaction_effect.criterion2 = '';
-    $scope.new_interaction_effect.value = '';
+  $scope.blurInteractionValue = function(interaction) {
+    if(interaction.value == '' || ((interaction.type == 'Mutual-Strengthening Effect' && interaction.value <= 0)
+    || ((interaction.type == 'Mutual-Weakening Effect' || interaction.type == 'Antagonistic Effect') && interaction.value >= 0)))
+      $('#interaction-' + interaction.id + '-value').addClass('has-error');
+    else
+      $('#interaction-' + interaction.id + '-value').removeClass('has-error');
   }
 
   $scope.deleteInteractionEffect = function(interaction) {
@@ -178,17 +269,105 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
     $scope.deleteIdInteractionEffect = '';
   }
 
-  $scope.addBranch = function(criterion) {
-    if($scope.criteria[$scope.criteria.indexOf(criterion)].branches.length == 0)
-      $scope.new_branch[criterion.id].id = 1;
+  $scope.blurScaleType = function(criterion) {
+    if(criterion.scale.type == '' || criterion.scale.type == undefined)
+      $('#scale-' + criterion.id + '-type').addClass('has-error');
     else
-      $scope.new_branch[criterion.id].id = $scope.criteria[$scope.criteria.indexOf(criterion)].branches[$scope.criteria[$scope.criteria.indexOf(criterion)].branches.length - 1].id + 1;
+      $('#scale-' + criterion.id + '-type').removeClass('has-error');
+  }
 
-    $scope.criteria[$scope.criteria.indexOf(criterion)].branches.push(angular.copy($scope.new_branch[criterion.id]));
+  $scope.blurScaleMin = function(criterion) {
+    if(criterion.scale.min == undefined)
+      $('#scale-' + criterion.id + '-min').addClass('has-error');
+    else if(criterion.scale.min >= criterion.scale.max && criterion.scale.min != undefined && criterion.scale.max != undefined) {
+      $('#scale-' + criterion.id + '-min').addClass('has-error');
+      $('#scale-' + criterion.id + '-max').addClass('has-error');
+    }
+    else {
+      $('#scale-' + criterion.id + '-min').removeClass('has-error');
+      $('#scale-' + criterion.id + '-max').removeClass('has-error');
+    }
+  }
 
-    //reset input fields
-    $scope.new_branch[criterion.id].function = '';
-    $scope.new_branch[criterion.id].condition = '';
+  $scope.blurScaleMax = function(criterion) {
+    if(criterion.scale.max == undefined)
+      $('#scale-' + criterion.id + '-max').addClass('has-error');
+    else if(criterion.scale.min >= criterion.scale.max && criterion.scale.min != undefined && criterion.scale.max != undefined) {
+      $('#scale-' + criterion.id + '-min').addClass('has-error');
+      $('#scale-' + criterion.id + '-max').addClass('has-error');
+    }
+    else {
+      $('#scale-' + criterion.id + '-min').removeClass('has-error');
+      $('#scale-' + criterion.id + '-max').removeClass('has-error');
+    }
+  }
+
+  $scope.blurScaleCategories = function(criterion) {
+    if(criterion.scale.num_categories < 2 || criterion.scale.num_categories == undefined)
+      $('#scale-' + criterion.id + '-categories').addClass('has-error');
+    else
+      $('#scale-' + criterion.id + '-categories').removeClass('has-error');
+  }
+
+  $scope.new_branch = {};
+
+  $scope.addBranch = function(criterion) {
+    var can_add_branch = true;
+
+    if($scope.new_branch[criterion.id] == undefined)
+      $scope.new_branch[criterion.id] = {};
+
+    //if a function was not assigned - add error class
+    if($scope.new_branch[criterion.id].function == undefined || $scope.new_branch[criterion.id].function == '') {
+      $('#new-branch-function-' + criterion.id).addClass('has-error');
+      can_add_branch = false;
+    }
+    else
+      $('#new-branch-function-' + criterion.id).removeClass('has-error');
+
+    //if a condition was not assigned - add error class
+    if($scope.new_branch[criterion.id].condition == undefined || $scope.new_branch[criterion.id].condition == '') {
+      $('#new-branch-condition-' + criterion.id).addClass('has-error');
+      can_add_branch = false;
+    }
+    else
+      $('#new-branch-condition-' + criterion.id).removeClass('has-error');
+
+    if(can_add_branch) {
+      if($scope.criteria[$scope.criteria.indexOf(criterion)].branches == undefined) {
+        //initialize the branches array
+        $scope.criteria[$scope.criteria.indexOf(criterion)].branches = [];
+        $scope.new_branch[criterion.id].id = 1;
+      }
+      else if($scope.criteria[$scope.criteria.indexOf(criterion)].branches.length == 0)
+        $scope.new_branch[criterion.id].id = 1;
+      else
+        $scope.new_branch[criterion.id].id = $scope.criteria[$scope.criteria.indexOf(criterion)].branches[$scope.criteria[$scope.criteria.indexOf(criterion)].branches.length - 1].id + 1;
+
+      $scope.criteria[$scope.criteria.indexOf(criterion)].branches.push(angular.copy($scope.new_branch[criterion.id]));
+
+      //reset input fields
+      $scope.new_branch[criterion.id].function = '';
+      $scope.new_branch[criterion.id].condition = '';
+
+      //remove all error classes
+      $('#new-branch-function-' + criterion.id).removeClass('has-error');
+      $('#new-branch-condition-' + criterion.id).removeClass('has-error');
+    }
+  }
+
+  $scope.blurBranchFunction = function(branch, criterion) {
+    if(branch.function == '' || branch.function == undefined)
+      $('#branch-' + branch.id + '-function-' + criterion.id).addClass('has-error');
+    else
+      $('#branch-' + branch.id + '-function-' + criterion.id).removeClass('has-error');
+  }
+
+  $scope.blurBranchCondition = function(branch, criterion) {
+    if(branch.condition == '' || branch.condition == undefined)
+      $('#branch-' + branch.id + '-condition-' + criterion.id).addClass('has-error');
+    else
+      $('#branch-' + branch.id + '-condition-' + criterion.id).removeClass('has-error');
   }
 
   $scope.deleteBranch = function(criterion, branch) {
@@ -205,18 +384,68 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
     $scope.deleteIdBranch = ['', ''];
   }
 
+  $scope.new_action = {};
+
   $scope.addAction = function() {
-    if($scope.actions.length == 0)
-      $scope.new_action.id = 1;
+    var can_add_action = true;
+
+    //if a name was not assigned to the new action - add error class
+    if($scope.new_action.name == undefined || $scope.new_action.name == '') {
+      $('#new-action-name').addClass('has-error');
+      can_add_action = false;
+    }
     else
-      $scope.new_action.id = $scope.actions[$scope.actions.length - 1].id + 1;
+      $('#new-action-name').removeClass('has-error');
 
-    $scope.actions.push(angular.copy($scope.new_action));
+    //if the criterion field has not been assigned - add error class
+    for(criterion in $scope.criteria) {
+      if(($scope.new_action[$scope.criteria[criterion]['name']] == undefined || $scope.new_action[$scope.criteria[criterion]['name']] == "")
+      || ($scope.criteria[criterion]['scale']['type'] == 'Numerical' && ($scope.new_action[$scope.criteria[criterion]['name']] < $scope.criteria[criterion]['scale']['min'] || $scope.new_action[$scope.criteria[criterion]['name']] > $scope.criteria[criterion]['scale']['max']))
+      || ($scope.criteria[criterion]['scale']['type'] == 'Categorical' && ($scope.new_action[$scope.criteria[criterion]['name']] > $scope.criteria[criterion]['scale']['num_categories'] || $scope.new_action[$scope.criteria[criterion]['name']] < 1))) {
+        $('#new-action-criterion-' + $scope.criteria[criterion]['id']).addClass('has-error');
+        can_add_action = false;
+      }
+      else
+        $('#new-action-criterion-' + $scope.criteria[criterion]['id']).removeClass('has-error');
+    }
 
-    //reset the input fields
-    $scope.new_action.name = '';
+    if(can_add_action) {
+      if($scope.actions.length == 0)
+        $scope.new_action.id = 1;
+      else
+        $scope.new_action.id = $scope.actions[$scope.actions.length - 1]['id'] + 1;
+
+      $scope.actions.push(angular.copy($scope.new_action));
+
+      //reset the new action input fields and remove the error classes - just in case
+      $scope.new_action.name = '';
+      $('#new-action-name').removeClass('has-error');
+
+      for(criterion in $scope.criteria) {
+        $scope.new_action[$scope.criteria[criterion]['name']] = '';
+        $('#new-action-criterion-' + $scope.criteria[criterion]['id']).removeClass('has-error');
+      }
+    }
+  }
+
+  $scope.blurActionName = function(action) {
+    if(action.name == '')
+      $('#action-' + action.id + '-name').addClass('has-error');
+    else
+      $('#action-' + action.id + '-name').removeClass('has-error');
+  }
+
+  $scope.blurActionCriterion = function(action, criterion_name) {
     for(criterion in $scope.criteria)
-      $scope.new_action[$scope.criteria[criterion]['name']] = '';
+      if($scope.criteria[criterion]['name'] == criterion_name) {
+        if(($scope.criteria[criterion]['scale']['type'] == 'Numerical' && (action[criterion_name] < $scope.criteria[criterion]['scale']['min'] || action[criterion_name] > $scope.criteria[criterion]['scale']['max']))
+        || ($scope.criteria[criterion]['scale']['type'] == 'Categorical' && (action[criterion_name] > $scope.criteria[criterion]['scale']['num_categories'] || action[criterion_name] < 1)))
+          $('#action-' + action.id + '-criterion-' + $scope.criteria[criterion]['id']).addClass('has-error');
+        else
+          $('#action-' + action.id + '-criterion-' + $scope.criteria[criterion]['id']).removeClass('has-error');
+
+        break;
+      }
   }
 
   $scope.deleteAction = function(action) {
@@ -232,20 +461,79 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
     $scope.deleteIdAction = '';
   }
 
+  $scope.new_category = {};
+
   $scope.addCategory = function() {
-    if($scope.categories.length == 0)
-      $scope.new_category.id = 1;
+    var can_add_category = true;
+
+    //if a name was not assigned to the new category - add error class
+    if($scope.new_category.name == undefined || $scope.new_category.name == '') {
+      $('#new-category-name').addClass('has-error');
+      can_add_category = false;
+    }
     else
-      $scope.new_category.id = $scope.categories[$scope.categories.length - 1].id + 1;
+      $('#new-category-name').removeClass('has-error');
 
-    $scope.new_category.reference_actions = [];
-    $scope.categories.push(angular.copy($scope.new_category));
+    //if a membership degree was not assigned to the new category- add error class
+    if($scope.new_category.membership_degree == undefined || $scope.new_category.membership_degree == '' || $scope.new_category.membership_degree < 0.5 || $scope.new_category.membership_degree > 1) {
+      $('#new-category-membership-degree').addClass('has-error');
+      can_add_category = false;
+    }
+    else
+      $('#new-category-membership-degree').removeClass('has-error');
 
-    //reset the input fields
-    $scope.new_category.name = '';
-    $scope.new_category.membership_degree = '';
-    for(criterion in $scope.criteria)
-      $scope.new_category[$scope.criteria[criterion]['name']] = '';
+    //if a criterion value was not correctly assigned to the new category - add error class
+    for(criterion in $scope.criteria) {
+      if($scope.new_category[$scope.criteria[criterion]['name']] == undefined || $scope.new_category[$scope.criteria[criterion]['name']] == '' || $scope.new_category[$scope.criteria[criterion]['name']] < 0) {
+        $('#new-category-' + $scope.criteria[criterion]['id']).addClass('has-error');
+        can_add_category = false;
+      }
+      else
+        $('#new-category-' + $scope.criteria[criterion]['id']).removeClass('has-error');
+    }
+
+    if(can_add_category){
+      if($scope.categories.length == 0)
+        $scope.new_category.id = 1;
+      else
+        $scope.new_category.id = $scope.categories[$scope.categories.length - 1].id + 1;
+
+      $scope.new_category.reference_actions = [];
+      $scope.categories.push(angular.copy($scope.new_category));
+
+      //reset the input fields
+      $scope.new_category.name = '';
+      $('#new-category-name').removeClass('has-error');
+
+      $scope.new_category.membership_degree = '';
+      $('#new-category-membership-degree').removeClass('has-error');
+
+      for(criterion in $scope.criteria) {
+        $scope.new_category[$scope.criteria[criterion]['name']] = '';
+        $('#new-category-' + $scope.criteria[criterion]['id']).removeClass('has-error');
+      }
+    }
+  }
+
+  $scope.blurCategoryName = function(category) {
+    if(category.name == '')
+      $('#category-' + category.id + '-name').addClass('has-error');
+    else
+      $('#category-' + category.id + '-name').removeClass('has-error');
+  }
+
+  $scope.blurCategoryMembership = function(category) {
+    if(category.membership_degree == '' || category.membership_degree < 0.5 || category.membership_degree > 1)
+      $('#category-' + category.id + '-membership-degree').addClass('has-error');
+    else
+      $('#category-' + category.id + '-membership-degree').removeClass('has-error');
+  }
+
+  $scope.blurCategoryCriterion = function(category, criterion) {
+    if(category[criterion.name] == undefined || category[criterion.name] < 0)
+      $('#category-' + category.id + '-criterion-' + criterion.id).addClass('has-error');
+    else
+      $('#category-' + category.id + '-criterion-' + criterion.id).removeClass('has-error');
   }
 
   $scope.deleteCategory = function(category) {
@@ -261,20 +549,56 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
     $scope.deleteIdCategory = '';
   }
 
+  $scope.new_reference_action = {};
+
   $scope.addReferenceAction = function(category, index) {
-    if($scope.categories[$scope.categories.indexOf(category)].reference_actions.length == 0)
-      $scope.new_reference_action[category.id].id = 1;
+    var can_add_reference = true;
+
+    if($scope.new_reference_action[category.id] == undefined)
+      $scope.new_reference_action[category.id] = {};
+
+    //if a criterion value was not correctly assigned - add error class
+    for(criterion in $scope.criteria) {
+      if(($scope.new_reference_action[category.id][$scope.criteria[criterion]['name']] == undefined || $scope.new_reference_action[category.id][$scope.criteria[criterion]['name']] == "")
+      || ($scope.criteria[criterion]['scale']['type'] == 'Numerical' && ($scope.new_reference_action[category.id][$scope.criteria[criterion]['name']] < $scope.criteria[criterion]['scale']['min'] || $scope.new_reference_action[category.id][$scope.criteria[criterion]['name']] > $scope.criteria[criterion]['scale']['max']))
+      || ($scope.criteria[criterion]['scale']['type'] == 'Categorical' && ($scope.new_reference_action[category.id][$scope.criteria[criterion]['name']] > $scope.criteria[criterion]['scale']['num_categories'] || $scope.new_reference_action[category.id][$scope.criteria[criterion]['name']] < 1))) {
+        $('#new-ref-' + category.id + '-criterion-' + $scope.criteria[criterion]['id']).addClass('has-error');
+        can_add_reference = false;
+      }
+      else
+        $('#new-ref-' + category.id + '-criterion-' + $scope.criteria[criterion]['id']).removeClass('has-error');
+    }
+
+    if(can_add_reference) {
+      if($scope.categories[$scope.categories.indexOf(category)].reference_actions == undefined) {
+        $scope.categories[$scope.categories.indexOf(category)].reference_actions = [];
+        $scope.new_reference_action[category.id].id = 1;
+      }
+      else if($scope.categories[$scope.categories.indexOf(category)].reference_actions.length == 0)
+        $scope.new_reference_action[category.id].id = 1;
+      else
+        $scope.new_reference_action[category.id].id = $scope.categories[$scope.categories.indexOf(category)].reference_actions[$scope.categories[$scope.categories.indexOf(category)].reference_actions.length - 1].id + 1;
+
+      $scope.new_reference_action[category.id].name = 'b' + (index + 1) + ($scope.categories[$scope.categories.indexOf(category)].reference_actions.length + 1);
+
+      $scope.categories[$scope.categories.indexOf(category)].reference_actions.push(angular.copy($scope.new_reference_action[category.id]));
+
+      //reset the input fields
+      $scope.new_reference_action[category.id].name = '';
+      for(criterion in $scope.criteria) {
+        $scope.new_reference_action[category.id][$scope.criteria[criterion]['name']] = '';
+        $('#new-ref-' + category.id + '-criterion-' + $scope.criteria[criterion]['id']).removeClass('has-error');
+      }
+    }
+  }
+
+  $scope.blurReferenceAction = function(ref, category, criterion) {
+    if((ref[criterion.name] == undefined || ref[criterion.name] == '')
+    || (criterion['scale']['type'] == 'Numerical' && (ref[criterion.name] < criterion['scale']['min'] || ref[criterion.name] > criterion['scale']['max']))
+    || (criterion['scale']['type'] == 'Categorical' && (ref[criterion.name] > criterion['scale']['num_categories'] || ref[criterion.name] < 1)))
+      $('#ref-' + ref.id + '-' + category.id + '-criterion-' + criterion.id).addClass('has-error');
     else
-      $scope.new_reference_action[category.id].id = $scope.categories[$scope.categories.indexOf(category)].reference_actions[$scope.categories[$scope.categories.indexOf(category)].reference_actions.length - 1].id + 1;
-
-    $scope.new_reference_action[category.id].name = 'b' + (index + 1) + ($scope.categories[$scope.categories.indexOf(category)].reference_actions.length + 1);
-
-    $scope.categories[$scope.categories.indexOf(category)].reference_actions.push(angular.copy($scope.new_reference_action[category.id]));
-
-    //reset the input fields
-    $scope.new_reference_action[category.id].name = '';
-    for(criterion in $scope.criteria)
-      $scope.new_reference_action[category.id][$scope.criteria[criterion]['name']] = '';
+      $('#ref-' + ref.id + '-' + category.id + '-criterion-' + criterion.id).removeClass('has-error');
   }
 
   $scope.deleteReferenceAction = function(category, reference_action) {
@@ -320,42 +644,9 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
       $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
         $http.post('/projects', proj_res).then(function() {
-          $scope.showSaveSuccess = true;
+          showAlert('save-success');
         });
       });
-    });
-  }
-
-  function getData() {
-    $http.get('/projects').then(function(response) {
-      //get the current project
-      for(proj in response.data) {
-        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
-          //get criteria
-          if(typeof response.data[proj]['criteria'] == 'undefined')
-            $scope.criteria = [];
-          else
-            $scope.criteria = response.data[proj]['criteria'];
-
-          //get interaction effects
-          if(typeof response.data[proj]['interaction_effects'] == 'undefined')
-            $scope.interaction_effects = [];
-          else
-            $scope.interaction_effects = response.data[proj]['interaction_effects'];
-
-          //get actions
-          if(typeof response.data[proj]['actions'] == 'undefined')
-            $scope.actions = [];
-          else
-            $scope.actions = response.data[proj]['actions'];
-
-          //get categories
-          if(typeof response.data[proj]['categories'] == 'undefined')
-            $scope.categories = [];
-          else
-            $scope.categories = response.data[proj]['categories'];
-        }
-      }
     });
   }
 
@@ -512,7 +803,7 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
     $scope.showSaveSuccess = false;
   }
 
-  $scope.reloadData = function() {
+  $scope.reloadData = function(alertShowing) {
     $http.get('/projects').then(function(response) {
       for(proj in response.data) {
         if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
@@ -528,14 +819,13 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
           if(response.data[proj]['categories'] != undefined)
             $scope.categories = response.data[proj]['categories'];
 
+          if(alertShowing)
+            showAlert('reload-success');
+
           break;
         }
       }
     });
-  }
-
-  $scope.resetData = function() {
-    $scope.showResetData = true;
   }
 
   $scope.confirmResetData = function() {
@@ -543,10 +833,6 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
     $scope.interaction_effects = [];
     $scope.actions = [];
     $scope.categories = [];
-    $scope.showResetData = false;
-  }
-
-  $scope.cancelResetData = function() {
     $scope.showResetData = false;
   }
 
@@ -1179,4 +1465,5 @@ app.controller('CATSDMethodController', function($scope, $window, $http, CATSDSe
 
   requestLogIn();
   rewriteLastUpdate();
+  hideAlerts();
 });
