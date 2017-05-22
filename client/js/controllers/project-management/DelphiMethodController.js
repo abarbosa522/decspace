@@ -513,7 +513,7 @@ app.controller('DelphiMethodController', function($scope, $window, $http, Delphi
     else
       $('#question-description-' + question.id).removeClass('has-error');
   }
-  
+
   //delete a certain question
   $scope.deleteQuestion = function(question) {
     $scope.delete_question = question.id;

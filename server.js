@@ -36,7 +36,7 @@ app.post('/login', getAccounts, function(req, res) {
   if(correct_log_in) {
     req.session.user = user;
     delete req.body.accounts;
-    res.send('Successful Login');
+    res.send(user);
   }
   else {
     res.send('Invalid Login');

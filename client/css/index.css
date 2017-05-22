@@ -156,14 +156,14 @@ nav > div > div > ul > li {
 	border-bottom: 1px solid #fff;
 }
 
-.borderless-table td {
-  border: none;
-}
-
 .projects-custom-alert {
   position: absolute;
   width: 30%;
   height: 10%;
   margin-top: -2%;
   margin-left: 50%;
+}
+
+.borderless-table-project td, .borderless-table-project th {
+  border: none;
 }

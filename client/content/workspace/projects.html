@@ -22,6 +22,9 @@
     <!-- AngularJS Controllers -->
     <script src = '../../js/controllers/workspace/ProjectsController.js'></script>
 
+    <!-- AngularJS Services -->
+    <script src = '../../js/services/SortDataService.js'></script>
+
     <!-- Bootstrap -->
     <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
     <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.js'></script>
@@ -76,90 +79,242 @@
         <li class = 'active'>Workspace - Projects</li>
       </ul>
 
-      <p class = 'header-1'>Workspace - Projects</p>
+      <div class = 'row'>
+        <span class = 'header-1' style = 'margin-left: 10%'>Workspace - Projects</span>
+
+        <button type = 'button' class = 'btn btn-default' ng-click = 'changeView("list")' title = 'List View' style = 'float: right; margin-top: 1%' ng-class = '{active : current_view == "list"}'>
+          <i class = 'fa fa-list fa-lg'></i>
+        </button>
+
+        <button type = 'button' class = 'btn btn-default' ng-click = 'changeView("table")' title = 'Table View' style = 'float: right; margin-top: 1%' ng-class = '{active : current_view == "table"}'>
+          <i class = 'fa fa-table fa-lg'></i>
+        </button>
+      </div>
 
       <br>
 
-      <table class = 'table table-bordered table-hover' data-toggle = 'table'>
-        <thead>
-          <tr>
-            <th class = 'text-center'>
-              Name
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeCurrentOrder("name", "descendant")' title = 'Sort "Name" Downwards'></span></a>
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeCurrentOrder("name", "ascendant")' title = 'Sort "Name" Upwards'></span></a>
-            </th>
+      <!-- TABLE VIEW -->
+      <div ng-if = 'current_view == "table"'>
+        <table class = 'table table-bordered table-hover' data-toggle = 'table'>
+          <thead>
+            <tr>
+              <th class = 'text-center'>
+                Name
+                <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeCurrentOrder("name", "descendant")' title = 'Sort "Name" Downwards'></span></a>
+                <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeCurrentOrder("name", "ascendant")' title = 'Sort "Name" Upwards'></span></a>
+              </th>
 
-            <th class = 'text-center'>
-              Creation Date
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeCurrentOrder("creation_date", "descendant")' title = 'Sort "Creation Date" Downwards'></span></a>
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeCurrentOrder("creation_date", "ascendant")' title = 'Sort "Creation Date" Upwards'></span></a>
-            </th>
+              <th class = 'text-center'>
+                Creation Date
+                <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeCurrentOrder("creation_date", "descendant")' title = 'Sort "Creation Date" Downwards'></span></a>
+                <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeCurrentOrder("creation_date", "ascendant")' title = 'Sort "Creation Date" Upwards'></span></a>
+              </th>
 
-            <th class = 'text-center'>
-              Last Update
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeCurrentOrder("last_update", "descendant")' title = 'Sort "Last Update" Downwards'></span></a>
-              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeCurrentOrder("last_update", "ascendant")' title = 'Sort "Last Update" Upwards'></span></a>
-            </th>
+              <th class = 'text-center'>
+                Last Update
+                <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeCurrentOrder("last_update", "descendant")' title = 'Sort "Last Update" Downwards'></span></a>
+                <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeCurrentOrder("last_update", "ascendant")' title = 'Sort "Last Update" Upwards'></span></a>
+              </th>
 
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr ng-repeat = 'project in projects' ng-class = '{danger: delete_id_project == project.project_id || delete_id_project == "all"}'>
-            <!-- Project Name -->
-            <td>{{project.name}}</td>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat = 'project in projects' ng-class = '{danger: delete_id_project == project.project_id || delete_id_project == "all"}'>
+              <!-- Project Name -->
+              <td>{{project.name}}</td>
 
-            <!-- Creation Date -->
-            <td>{{project.creation_date}}</td>
+              <!-- Creation Date -->
+              <td>{{project.creation_date}}</td>
 
-            <!-- Last Update -->
-            <td>{{project.last_update}}</td>
+              <!-- Last Update -->
+              <td>{{project.last_update}}</td>
 
-            <!-- Open, Edit, Duplicate and Delete Project -->
-            <td ng-if = 'delete_id_project != project.project_id'>
-              <button type = 'button' class = 'btn btn-primary' ng-click = 'openProject(project)' title = 'Open Project'>
-                <span class = 'glyphicon glyphicon-folder-open'></span>
-              </button>
+              <!-- Open, Edit, Duplicate and Delete Project -->
+              <td ng-if = 'delete_id_project != project.project_id'>
+                <button type = 'button' class = 'btn btn-primary' ng-click = 'openProject(project)' title = 'Open Project'>
+                  <span class = 'glyphicon glyphicon-folder-open'></span>
+                </button>
 
-              <button type = 'button' class = 'btn btn-info' ng-click = 'duplicateProject(project)' title = 'Duplicate Project'>
-                <span class = 'glyphicon glyphicon-duplicate'></span>
-              </button>
+                <button type = 'button' class = 'btn btn-info' ng-click = 'duplicateProject(project)' title = 'Duplicate Project'>
+                  <span class = 'glyphicon glyphicon-duplicate'></span>
+                </button>
 
-              <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteProject(project)' title = 'Delete Project'>
-                <span class = 'glyphicon glyphicon-minus'></span>
-              </button>
-            </td>
-            <td ng-if = 'delete_id_project == project.project_id'>
-              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDelete(project)' title = 'Confirm Delete'>
-                <span class = 'glyphicon glyphicon-ok'></span>
-              </button>
-              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDelete()' title = 'Cancel Delete'>
-                <span class = 'glyphicon glyphicon-remove'></span>
-              </button>
-            </td>
-          </tr>
+                <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteProject(project)' title = 'Delete Project'>
+                  <span class = 'glyphicon glyphicon-minus'></span>
+                </button>
+              </td>
+              <td ng-if = 'delete_id_project == project.project_id'>
+                <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDelete(project)' title = 'Confirm Delete'>
+                  <span class = 'glyphicon glyphicon-ok'></span>
+                </button>
+                <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDelete()' title = 'Cancel Delete'>
+                  <span class = 'glyphicon glyphicon-remove'></span>
+                </button>
+              </td>
+            </tr>
 
-          <tr class = 'active'>
-            <!-- Name Input -->
-            <td>
-              <div id = 'new-project-name'>
-                <input id = 'input-name' type = 'text' class = 'form-control' placeholder = 'New Project Name' ng-model = 'project.name'>
-              </div>
-            </td>
+            <tr class = 'active'>
+              <!-- Name Input -->
+              <td>
+                <div id = 'new-project-name'>
+                  <input id = 'input-name' type = 'text' class = 'form-control' placeholder = 'New Project Name' ng-model = 'project.name'>
+                </div>
+              </td>
 
-            <td></td>
+              <td></td>
 
-            <td></td>
+              <td></td>
 
-            <!-- Add Button -->
-            <td>
-              <button type = 'button' class = 'btn btn-success btn-add' ng-click = 'addProject()' title = 'Add Project'>
-                <span class = 'glyphicon glyphicon-plus'></span>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              <!-- Add Button -->
+              <td>
+                <button type = 'button' class = 'btn btn-success btn-add' ng-click = 'addProject()' title = 'Add Project'>
+                  <span class = 'glyphicon glyphicon-plus'></span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- LIST VIEW -->
+      <div ng-if = 'current_view == "list"' ng-cloak>
+        <table class = 'table table-hover' style = 'border: none'>
+          <thead>
+            <tr>
+              <th class = 'col-md-1' style = 'border: none'></th>
+              <th class = 'col-md-8' style = 'border: none'></th>
+              <th class = 'col-md-3' style = 'border: none'></th>
+            </tr>
+          </thead>
+          <tbody style = 'border: none'>
+            <!-- NAME LIST -->
+            <tr ng-click = 'openList("name")' ng-class = '{active: current_list == "name"}'>
+              <td>
+                <a href ng-if = 'current_list != "name"'><span class = 'glyphicon glyphicon-chevron-right'></span></a>
+                <a href ng-if = 'current_list == "name"'><span class = 'glyphicon glyphicon-chevron-down'></span></a>
+              </td>
+              <td colspan = '2'><strong style = 'margin-left: -8%'>Name</strong></td>
+            </tr>
+            <tr ng-repeat = 'project in projects' ng-if = 'current_list == "name"' ng-class = '{danger: delete_id_project == project.project_id}' ng-cloak>
+              <td></td>
+              <td><span style = 'margin-left: 27%'>{{project.name}}</span></td>
+              <!-- Open, Edit, Duplicate and Delete Project -->
+              <td ng-if = 'delete_id_project != project.project_id'>
+                <button type = 'button' class = 'btn btn-primary' ng-click = 'openProject(project)' title = 'Open Project'>
+                  <span class = 'glyphicon glyphicon-folder-open'></span>
+                </button>
+
+                <button type = 'button' class = 'btn btn-info' ng-click = 'duplicateProject(project)' title = 'Duplicate Project'>
+                  <span class = 'glyphicon glyphicon-duplicate'></span>
+                </button>
+
+                <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteProject(project)' title = 'Delete Project'>
+                  <span class = 'glyphicon glyphicon-minus'></span>
+                </button>
+              </td>
+              <td ng-if = 'delete_id_project == project.project_id'>
+                <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDelete(project)' title = 'Confirm Delete'>
+                  <span class = 'glyphicon glyphicon-ok'></span>
+                </button>
+                <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDelete()' title = 'Cancel Delete'>
+                  <span class = 'glyphicon glyphicon-remove'></span>
+                </button>
+              </td>
+            </tr>
+
+            <!-- CREATION DATE LIST -->
+            <tr ng-click = 'openList("creation_date")' ng-class = '{active: current_list == "creation_date"}'>
+              <td>
+                <a href ng-if = 'current_list != "creation_date"'><span class = 'glyphicon glyphicon-chevron-right'></span></a>
+                <a href ng-if = 'current_list == "creation_date"'><span class = 'glyphicon glyphicon-chevron-down'></span></a>
+              </td>
+              <td colspan = '2'><strong style = 'margin-left: -8%'>Creation Date</strong></td>
+            </tr>
+            <tr ng-repeat = 'project in projects' ng-if = 'current_list == "creation_date"' ng-class = '{danger: delete_id_project == project.project_id}' ng-cloak>
+              <td></td>
+              <td><span style = 'margin-left: 27%'>{{project.name}} ({{project.creation_date}})</span></td>
+              <!-- Open, Edit, Duplicate and Delete Project -->
+              <td ng-if = 'delete_id_project != project.project_id'>
+                <button type = 'button' class = 'btn btn-primary' ng-click = 'openProject(project)' title = 'Open Project'>
+                  <span class = 'glyphicon glyphicon-folder-open'></span>
+                </button>
+
+                <button type = 'button' class = 'btn btn-info' ng-click = 'duplicateProject(project)' title = 'Duplicate Project'>
+                  <span class = 'glyphicon glyphicon-duplicate'></span>
+                </button>
+
+                <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteProject(project)' title = 'Delete Project'>
+                  <span class = 'glyphicon glyphicon-minus'></span>
+                </button>
+              </td>
+              <td ng-if = 'delete_id_project == project.project_id'>
+                <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDelete(project)' title = 'Confirm Delete'>
+                  <span class = 'glyphicon glyphicon-ok'></span>
+                </button>
+                <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDelete()' title = 'Cancel Delete'>
+                  <span class = 'glyphicon glyphicon-remove'></span>
+                </button>
+              </td>
+            </tr>
+
+            <!-- LAST UPDATE LIST -->
+            <tr ng-click = 'openList("last_update")' ng-class = '{active: current_list == "last_update"}'>
+              <td>
+                <a href ng-if = 'current_list != "last_update"'><span class = 'glyphicon glyphicon-chevron-right'></span></a>
+                <a href ng-if = 'current_list == "last_update"'><span class = 'glyphicon glyphicon-chevron-down'></span></a>
+              </td>
+              <td colspan = '2'><strong style = 'margin-left: -8%'>Last Update</strong></td>
+            </tr>
+            <tr ng-repeat = 'project in projects' ng-if = 'current_list == "last_update"' ng-class = '{danger: delete_id_project == project.project_id}' ng-cloak>
+              <td></td>
+              <td><span style = 'margin-left: 27%'>{{project.name}} ({{project.last_update}})</span></td>
+              <!-- Open, Edit, Duplicate and Delete Project -->
+              <td ng-if = 'delete_id_project != project.project_id'>
+                <button type = 'button' class = 'btn btn-primary' ng-click = 'openProject(project)' title = 'Open Project'>
+                  <span class = 'glyphicon glyphicon-folder-open'></span>
+                </button>
+
+                <button type = 'button' class = 'btn btn-info' ng-click = 'duplicateProject(project)' title = 'Duplicate Project'>
+                  <span class = 'glyphicon glyphicon-duplicate'></span>
+                </button>
+
+                <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteProject(project)' title = 'Delete Project'>
+                  <span class = 'glyphicon glyphicon-minus'></span>
+                </button>
+              </td>
+              <td ng-if = 'delete_id_project == project.project_id'>
+                <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDelete(project)' title = 'Confirm Delete'>
+                  <span class = 'glyphicon glyphicon-ok'></span>
+                </button>
+                <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDelete()' title = 'Cancel Delete'>
+                  <span class = 'glyphicon glyphicon-remove'></span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class = 'table table-hover'>
+          <tbody>
+            <tr class = 'active'>
+              <!-- Name Input -->
+              <td>
+                <div id = 'new-project-name'>
+                  <input id = 'input-name' type = 'text' class = 'form-control' placeholder = 'New Project Name' ng-model = 'project.name'>
+                </div>
+              </td>
+
+              <!-- Add Button -->
+              <td>
+                <button type = 'button' class = 'btn btn-success btn-add' ng-click = 'addProject()' title = 'Add Project'>
+                  <span class = 'glyphicon glyphicon-plus'></span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <!-- Delete All Projects Button -->
       <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteAllProjects()' data-toggle = 'modal' data-target = '#delete-all-projects-modal' style = 'float: right' ng-if = 'projects.length > 0'>

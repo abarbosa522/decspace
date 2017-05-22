@@ -50,6 +50,11 @@ app.controller('DashboardController', function($scope, $window, $http) {
     $window.location.href = '../settings/settings.html';
   }
 
+  //redirect to the Administrator page
+  $scope.toAdministratorRights = function() {
+    $window.location.href = '../administrator/administrator.html';
+  }
+
   /*** STARTUP FUNCTIONS ***/
   requestLogIn();
 });

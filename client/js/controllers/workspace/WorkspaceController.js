@@ -1,4 +1,4 @@
-app.controller('WorkspaceController', function($scope, $window, $http, $compile, OrderByService, CATSDService, DelphiService, SRFService) {
+app.controller('WorkspaceController', function($scope, $window, $http, $compile, $q, OrderByService, CATSDService, DelphiService, SRFService) {
   /*** SETUP FUNCTIONS ***/
 
   //get the id of the open project
@@ -59,11 +59,11 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       }
 
       //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).then(function(){
+      $http.delete('/projects/' + id_doc).then(function() {
         //add the new list of projects
         $http.post('/projects', proj_res).then(function() {
           //retrieve the data stored in the database
-          $scope.reloadData();
+          $scope.reloadData(false);
           //update the list of executions
           getExecutions();
         });
@@ -158,7 +158,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   }
 
   //reload last save
-  $scope.reloadData = function() {
+  $scope.reloadData = function(alertShowing) {
     $http.get('/projects').then(function(response) {
       //remove current modules
       for(mod in modules)
@@ -190,6 +190,9 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       //add the connections previously stored in the database
       for(connection in connections)
         reloadConnection(connections[connection]);
+
+      if(alertShowing)
+        showAlert('reload-success');
     });
   }
 
@@ -270,6 +273,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   //hide all alerts
   function hideAlerts() {
     $('#save-success').hide();
+    $('#reload-success').hide();
     $('#invalid-connection1').hide();
     $('#invalid-connection2').hide();
     $('#invalid-connection3').hide();
@@ -418,7 +422,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     new_mod['id'] = 'inputfile-' + unique_id;
 
     //store the module type
-    new_mod['type'] = 'InputFile';
+    new_mod['type'] = 'Input File';
     //store the name of the file
     new_mod['name'] = name;
     //store the imported data
@@ -459,7 +463,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     for(id in connections_ids)
       for(connect in connections)
         if(connections[connect]['id'] == connections_ids[id]) {
-          deleteConnection(connect);
+          deleteConnectionData(connections[connect]);
           break;
         }
   }
@@ -729,7 +733,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         $('#' + mod['id']).offset(mod['position']);
         break;
 
-      case 'InputFile':
+      case 'Input File':
         //get the input file template
         var temp = document.getElementById('inputfile-temp');
         //clone the template
@@ -1827,9 +1831,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
                 else if(modules[modl]['type'] == 'SRF' && input_type == 'ratio z')
                   modules[modl]['input']['ratio z'] = modules[mod]['output'][0]['ratio-z'];
                 //SRF - DECIMAL PLACES
-                else if(modules[modl]['type'] == 'SRF' && input_type == 'decimal places') {
+                else if(modules[modl]['type'] == 'SRF' && input_type == 'decimal places')
                   modules[modl]['input']['decimal places'] = modules[mod]['output'][0]['decimal-places'].toString();
-                }
                 //SRF - WEIGHT TYPE
                 else if(modules[modl]['type'] == 'SRF' && input_type == 'weight type')
                   modules[modl]['input']['weight type'] = modules[mod]['output'][0]['weight-type'];
@@ -1841,6 +1844,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
               }
             }
           }
+
+          console.log(connections)
       }
       //reset the drawing process
       $scope.drawing_line = false;
@@ -1964,17 +1969,13 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
     //find the index of the clicked connector
     for(connection in connections)
-      if(connections[connection]['id'] == event.target.attributes.id.value) {
+      if(connections[connection].id == event.target.attributes.id.value) {
         connection_id = connection
         break;
       }
 
     //reset the data transfered from one module to another
-    for(mod in modules)
-      if(modules[mod]['id'] == connections[connection_id]['input']) {
-        modules[mod]['input'][connections[connection_id]['input_type'].toLowerCase()] = [];
-        break;
-      }
+    deleteConnectionData(connections[connection_id]);
 
     //remove the connector from the connections array
     connections.splice(connection_id, 1);
@@ -1984,19 +1985,43 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   }
 
   //deletes a certain connection
-  function deleteConnection(connection) {
+  function deleteConnectionData(connection) {
     //reset the data transfered from one module to another
     for(mod in modules)
-      if(modules[mod]['id'] == connections[connection]['input']) {
-        modules[mod]['input'][connections[connection]['input_type'].toLowerCase()] = [];
+      if(modules[mod].id == connection.input) {
+        //SPECIAL CASES
+        //CAT-SD SCALES
+        if(modules[mod].type == 'CAT-SD' && connection.input_type == 'scales') {
+          for(criterion in modules[mod].input.criteria)
+            modules[mod].input.criteria[criterion].scale = [];
+        }
+        //CAT-SD - FUNCTIONS/BRANCHES
+        else if(modules[mod].type == 'CAT-SD' && connection.input_type == 'functions') {
+          for(criterion in modules[mod].input.criteria)
+            modules[mod].input.criteria[criterion].branches = [];
+        }
+        //CAT-SD - REFERENCE ACTIONS
+        else if(modules[mod].type == 'CAT-SD' && connection.input_type == 'reference actions') {
+          for(category in modules[mod].input.categories)
+            modules[mod].input.categories[category].reference_actions = [];
+        }
+        //SRF - RANKING
+        else if(modules[mod].type == 'SRF' && connection.input_type == 'ranking')
+          modules[mod].input.ranking = 2;
+        //SRF - RATIO Z
+        else if(modules[mod].type == 'SRF' && connection.input_type == 'ratio z')
+          modules[mod].input['ratio z'] = '';
+        //SRF - DECIMAL PLACES
+        else if(modules[mod].type == 'SRF' && connection.input_type == 'decimal places')
+          modules[mod].input['decimal places'] = '';
+        //SRF - WEIGHT TYPE
+        else if(modules[mod].type == 'SRF' && connection.input_type == 'weight type')
+          modules[mod].input['weight type'] = '';
+        else
+          modules[mod].input[connection.input_type.toLowerCase()] = [];
+
         break;
       }
-
-    //remove the connector from the connections array
-    connections.splice(connection, 1);
-
-    //remove the connection from the screen
-    //does not need to be performed??
   }
 
   /*** WORKFLOW EXECUTION ***/
@@ -2022,9 +2047,14 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
           else {
             //transfer data between the connections of the current module
             transferData(modules[mod]);
-            //try to execute method
-            if(executeMethod(modules[mod]))
-              mod_exec++;
+
+            //check if current module received all necessary data
+            //or another module needs to executed first
+            if(checkModData(modules[mod])) {
+              //try to execute method
+              if(executeMethod(modules[mod]))
+                mod_exec++;
+            }
           }
         }
       }
@@ -2047,12 +2077,17 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
     for(mod in modules) {
       //input files do not have input points, therefore they do not need to be checked
-      if(modules[mod]['type'] != 'InputFile') {
+      if(modules[mod]['type'] != 'Input File') {
         var input_data = 0;
         //check connections for each input point of the current module
         for(input in modules[mod]['input']) {
-          if(modules[mod]['input'][input].length > 0)
+          if(modules[mod]['input'][input].length > 0) {
             input_data++;
+          }
+          //SPECIAL CASE - DELPHI EMAILS
+          else if(modules[mod].type == 'Delphi' && input == 'emails') {
+            input_data++;
+          }
           else {
             for(connection in connections)
               if(connections[connection]['input'] == modules[mod]['id'] && connections[connection]['input_type'] == input) {
@@ -2071,6 +2106,19 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     return modules_data == modules.length;
   }
 
+  //check if a certain module has already received all necessary data
+  function checkModData(mod) {
+    for(input in mod.input) {
+      //SPECIAL CASE - DELPHI EMAILS
+      if(mod.type == 'Delphi' && input == 'emails')
+        continue;
+      else if(mod.input[input].length == 0)
+        return false;
+    }
+
+    return true;
+  }
+
   //transfer the data to a certain module, according to its connections
   function transferData(mod) {
     for(input in mod['input'])
@@ -2079,9 +2127,10 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         for(connection in connections)
           if(connections[connection]['input'] == mod['id'] && connections[connection]['input_type'] == input)
             //find the module connected to the input point and get its output data
-            for(modl in modules)
+            for(modl in modules) {
               if(modules[modl]['id'] == connections[connection]['output'] && modules[modl]['output'].length > 0)
                 mod['input'][input] = modules[modl]['output'];
+            }
   }
 
   //execute the method correspondent to the mod module
@@ -2090,38 +2139,37 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
     switch(mod['type']) {
       case 'OrderBy':
-        mod['output'] = OrderByService.getResults(mod['input']['criteria'], mod['input']['actions']);
+        mod.output = OrderByService.getResults(mod.input.criteria, mod.input.actions);
         method_executed = true;
         break;
 
       case 'Sort':
-        mod['output'] = mod['order'];
+        mod.output = mod.input.objects;
         method_executed = true;
         break;
 
       case 'CAT-SD':
-        var results = CATSDService.getResults(mod['input']['criteria'], mod['input']['interaction effects'], mod['input']['actions'], mod['input']['categories']);
+        var results = CATSDService.getResults(mod.input.criteria, mod.input['interaction effects'], mod.input.actions, mod.input.categories);
 
         results.then(function(resolve) {
-          mod['output'] = resolve;
+          mod.output = resolve;
         });
 
         method_executed = true;
         break;
 
       case 'Delphi':
-        var results = DelphiService.startRound($scope.username, proj_id, mod['input']['subject'], mod['input']['emails'], mod['input']['questions'], mod['current_round']);
+        var results = DelphiService.startRound($scope.username, proj_id, mod.input.subject, mod.input.emails, mod.input.questions, mod.current_round);
 
         results.then(function(resolve) {
-          mod['round_id'] = resolve['id'];
+          mod.round_id = resolve.id;
         });
 
-        mod['current_round']++;
         method_executed = true;
         break;
 
       case 'SRF':
-        mod['output'] = SRFService.getResults(mod['input']['criteria'], mod['input']['white cards'], mod['input']['ranking'], mod['input']['ratio z'], mod['input']['ratio z'], mod['input']['decimal places'], mod['input']['weight type']);
+        mod.output = SRFService.getResults(mod.input.criteria, mod.input['white cards'], mod.input.ranking, mod.input['ratio z'], mod.input['decimal places'], mod.input['weight type']);
         break;
     }
 
@@ -2130,7 +2178,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   function resetOutputFields() {
     for(mod in modules)
-      if(modules[mod]['type'] != 'InputFile')
+      if(modules[mod]['type'] != 'Input File')
         modules[mod]['output'] = [];
   }
 
@@ -2201,9 +2249,17 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
           getExecutions();
           //reset output fields
           resetOutputFields();
+          //increment Delphi's round counter
+          incrementDelphiRound();
         });
       });
     });
+  }
+
+  function incrementDelphiRound() {
+    for(mod in modules)
+      if(modules[mod].type == 'Delphi')
+        modules[mod].current_round++;
   }
 
   //execution selected to be deleted
@@ -2264,7 +2320,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       //find the current project
       for(proj in response.data) {
         if(response.data[proj]['username'] == $scope.username && response.data[proj]['project_id'] == proj_id) {
-          //remove execution from the executions array
+          //remove all executions from the executions array
           response.data[proj]['executions'] = [];
           //get the id of the document, so that it can be removed from the db
           id_doc = response.data[proj]['_id'];
@@ -2281,6 +2337,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         $http.post('/projects', proj_res).then(function() {
           //reload executions
           getExecutions();
+          //reset the execution pages counter
+          $scope.current_exec_page = 0;
         });
       });
     });
@@ -2301,7 +2359,10 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   //define exec as the currently selected execution
   $scope.selectExecution = function(exec) {
     $scope.current_exec = exec;
+    //reset the compare execution variable
     $scope.compare_exec = '';
+    //reset the filtering execution variable
+    $scope.filter_exec = '';
   }
 
   $scope.selectCompareExecution = function(exec) {
@@ -2335,17 +2396,20 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   }
 
   $scope.aggregateModuleResults = function(execution) {
-    for(mod in execution.modules)
-      if(execution.modules[mod]['type'] == 'Delphi') {
-        var results = DelphiService.aggregateResults(execution.modules[mod]['round_id']);
+    for(mod in execution.modules) {
+      if(execution.modules[mod].type == 'Delphi') {
+        var change_mod = mod;
+
+        var results = DelphiService.aggregateResults(execution.modules[change_mod].round_id);
 
         results.then(function(resolve) {
-          execution.modules[mod]['output']['questions'] = resolve[0];
-          execution.modules[mod]['output']['emails'] = resolve[1];
-          execution.modules[mod]['output']['suggestions'] = resolve[2];
-          execution.modules[mod]['output']['link'] = resolve[3];
+          execution.modules[change_mod].output.questions = resolve[0];
+          execution.modules[change_mod].output.emails = resolve[1];
+          execution.modules[change_mod].output.suggestions = resolve[2];
+          execution.modules[change_mod].output.link = resolve[3];
         });
       }
+    }
   }
 
   //order a data array by a certain attribute in a certain direction
@@ -2467,6 +2531,14 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
       $scope.currentModule.input.ranking--;
     }
+  }
+
+  /*** EXECUTION FILTERING ***/
+
+  $scope.filter_exec = '';
+
+  $scope.selectFilterExec = function(filter) {
+    $scope.filter_exec = filter;
   }
 
   /*** STARTUP FUNCTIONS ***/

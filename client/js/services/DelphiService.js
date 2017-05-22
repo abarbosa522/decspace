@@ -8,29 +8,29 @@ app.service('DelphiService', function($http, $q) {
       var id = 0;
 
       for(round in response.data)
-        if(response.data[round]['id'] > id)
-          id = response.data[round]['id'];
+        if(response.data[round].id > id)
+          id = response.data[round].id;
 
       id++;
 
       //create the new round
       var new_round = {};
       //define the id of the round
-      new_round['id'] = id;
+      new_round.id = id;
       //project this round belongs to
-      new_round['project_id'] = proj_id;
+      new_round.project_id = proj_id;
       //id in the project context
-      new_round['execution_project_id'] = current_round;
+      new_round.execution_project_id = current_round;
       //who created the round
-      new_round['username'] = username;
+      new_round.username = username;
       //list of emails
-      new_round['emails'] = emails;
+      new_round.emails = emails;
       //list of questions
-      new_round['questions'] = questions;
+      new_round.questions = questions;
       //survey subject
-      new_round['subject'] = subject;
+      new_round.subject = subject;
       //generate survey link
-      new_round['link'] = 'http://vps288667.ovh.net:8082/content/project-management/delphi-login.html?round=' + new_round['id'];
+      new_round.link = 'http://vps288667.ovh.net:8082/content/project-management/delphi-login.html?round=' + new_round.id;
 
       //add the new list of projects
       $http.post('/delphi_rounds', new_round).then(function() {
@@ -52,29 +52,30 @@ app.service('DelphiService', function($http, $q) {
       //create a new answer document
       var new_answer = {};
       //define the corresponding round id
-      new_answer['round_id'] = new_round['id'];
+      new_answer.round_id = new_round.id;
       //define the user that created the round
-      new_answer['user_creator'] = new_round['username'];
+      new_answer.user_creator = new_round.username;
       //define the user that will answer the survey
-      new_answer['user'] = new_round['emails'][email]['address'];
+      new_answer.user = new_round.emails[email].address;
       //define the empty set of answers
-      new_answer['questions_answered'] = [];
+      new_answer.questions_answered = [];
       //define the subject survey
-      new_answer['subject'] = new_round['subject'];
+      new_answer.subject = new_round.subject;
       //define the suggestions
-      new_answer['suggestions'] = [];
+      new_answer.suggestions = [];
       //define the set of unanswered question
-      new_answer['questions_unanswered'] = [];
+      new_answer.questions_unanswered = [];
 
       //add the position to the questions - corresponding to the drop box they are in
       //-1 means that the question has not been assigned a drop box
       for(question in questions) {
         var new_question = {};
-        new_question['content'] = questions[question]['content'];
-        new_question['id'] = questions[question]['id'];
-        new_question['position'] = -1;
-        new_question['score'] = 'null';
-        new_answer['questions_unanswered'].push(new_question);
+        new_question.title = questions[question].title;
+        new_question.description = questions[question].description;
+        new_question.id = questions[question].id;
+        new_question.position = -1;
+        new_question.score = 'null';
+        new_answer.questions_unanswered.push(new_question);
       }
 
       //usability metrics

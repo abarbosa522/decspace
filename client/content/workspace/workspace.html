@@ -141,7 +141,7 @@
               </button>
 
               <!-- Reload Data Button -->
-              <button type = 'button' class = 'btn btn-info' ng-click = 'reloadData()' title = 'Reload Workflow'>
+              <button type = 'button' class = 'btn btn-info' ng-click = 'reloadData(true)' title = 'Reload Workflow'>
                 <span class = 'glyphicon glyphicon-refresh'></span>
               </button>
             </div>
@@ -163,6 +163,10 @@
           <!-- Alerts -->
           <div class = 'alert alert-success custom-alert' id = 'save-success' ng-cloak>
             Workflow <strong>successfully</strong> saved.
+          </div>
+
+          <div class = 'alert alert-success custom-alert' id = 'reload-success' ng-cloak>
+            Workflow <strong>successfully</strong> reloaded.
           </div>
 
           <div class = 'alert alert-danger custom-alert' id = 'invalid-connection1' ng-cloak>
@@ -266,7 +270,7 @@
 
                     <div class = 'modal-header'>
                       <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-                      <h4 class = 'modal-title'>Module - OrderBy{{currentModule.name_id}}</h4>
+                      <h4 class = 'modal-title'>Module - <a href = '../method-catalog/orderby.html'>OrderBy{{currentModule.name_id}}</a></h4>
                     </div>
 
                     <div class = 'modal-body'>
@@ -426,7 +430,7 @@
 
                     <div class = 'modal-header'>
                       <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-                      <h4 class = 'modal-title'>Module - Sort{{currentModule.name_id}}</h4>
+                      <h4 class = 'modal-title'>Module - <a href = '../method-catalog/sort.html'>Sort{{currentModule.name_id}}</a></h4>
                     </div>
 
                     <div class = 'modal-body'>
@@ -509,7 +513,7 @@
 
                     <div class = 'modal-header'>
                       <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-                      <h4 class = 'modal-title'>Module - CAT-SD{{currentModule.name_id}}</h4>
+                      <h4 class = 'modal-title'>Module - <a href = '../method-catalog/cat-sd.html'>CAT-SD{{currentModule.name_id}}</a></h4>
                     </div>
 
                     <div class = 'modal-body'>
@@ -994,7 +998,7 @@
 
                     <div class = 'modal-header'>
                       <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-                      <h4 class = 'modal-title'>Module - Delphi{{currentModule.name_id}}</h4>
+                      <h4 class = 'modal-title'>Module - <a href = '../method-catalog/delphi.html'>Delphi{{currentModule.name_id}}</a></h4>
                     </div>
 
                     <div class = 'modal-body'>
@@ -1089,7 +1093,7 @@
                                 <span class = 'glyphicon glyphicon-minus'></span>
                               </button>
                             </td>
-                            <td ng-if = 'question.id == delete_question'>
+                            <td ng-if = 'question.id == deleteIdQuestion'>
                               <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(question, "Questions")' title = 'Confirm Delete Question'>
                                 <span class = 'glyphicon glyphicon-ok'></span>
                               </button>
@@ -1131,7 +1135,7 @@
 
                     <div class = 'modal-header'>
                       <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-                      <h4 class = 'modal-title'>Module - SRF{{currentModule.name_id}}</h4>
+                      <h4 class = 'modal-title'>Module - <a href = '../method-catalog/srf.html'>SRF{{currentModule.name_id}}</a></h4>
                     </div>
 
                     <div class = 'modal-body'>
@@ -1312,7 +1316,7 @@
 
               <!-- Input File Template -->
               <template id = 'inputfile-temp'>
-                <div id = 'inputfile' class = 'module-template module-inputfile draggable' style = 'position:absolute; margin-top: 100%'>
+                <div id = 'inputfile' class = 'module-template module-inputfile draggable' style = 'position:absolute; margin-top: 100%; overflow: hidden'>
                   <a id = 'filename' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#inputfile-modal' ng-click = 'selectCurrentModule($event)' style = 'position: absolute; margin-top: -5%; margin-left: -20%'></a>
 
                   <a href ng-click = 'deleteModule($event)' style = 'display: block; margin-top: -23%; margin-left: 108%'>
@@ -1503,7 +1507,7 @@
                       <span class = 'glyphicon glyphicon-transfer'></span>
                     </button>
 
-                    <ul class = 'dropdown-menu' aria-labelledby = 'dropdownbtn'>
+                    <ul class = 'dropdown-menu'>
                       <li ng-repeat = 'execution in executions' ng-if = 'execution != current_exec'>
                         <a href ng-click = 'selectCompareExecution(execution)'>Execution {{execution.exec_id}}</a>
                       </li>
@@ -1512,12 +1516,34 @@
                     </ul>
                   </div>
 
+                  <!-- Filter Button -->
+                  <div class = 'dropdown row' style = 'float: left; margin-left: 1.5%'>
+                    <button class = 'btn btn-primary dropdown-toggle' type = 'button' data-toggle = 'dropdown' aria-haspopup = 'true' aria-expanded = 'true' title = 'Filter Executions'>
+                      <span class = 'glyphicon glyphicon-filter'></span>
+                    </button>
+
+                    <ul class = 'dropdown-menu'>
+                      <li class = 'dropdown-header'>Filter By:</li>
+                      <li class = 'dropdown-header'>Type Of Module</li>
+                      <li><a href ng-click = 'selectFilterExec("Input File")'>Input File</a></li>
+                      <li ng-repeat = 'method in methods'><a href ng-click = 'selectFilterExec(method)'>{{method}}</a></li>
+                      <li class = 'divider' role = 'separator'></li>
+                      <li class = 'dropdown-header'>Single Module</li>
+                      <li ng-repeat = 'module in current_exec.modules'>
+                        <a href ng-if = 'module.type == "Input File"' ng-click = 'selectFilterExec(module.id)'>{{module.name}}</a>
+                        <a href ng-if = 'module.type != "Input File"' ng-click = 'selectFilterExec(module.id)'>{{module.type}}{{module.name_id}}</a>
+                      </li>
+                      <li class = 'divider' role = 'separator'></li>
+                      <li><a href ng-click = 'selectFilterExec("")'>No Filter</a></li>
+                    </ul>
+                  </div>
+
                   <!-- Close Button -->
                   <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
 
                   <!-- Execution Title -->
-                  <p class = 'header-1' ng-if = 'compare_exec == ""'>Execution {{current_exec.exec_id}}</p>
-                  <p class = 'header-1' ng-if = 'compare_exec != ""'>Execution {{current_exec.exec_id}} - Execution {{compare_exec.exec_id}}</p>
+                  <p class = 'header-1' ng-if = 'compare_exec == ""' style = 'display: inline-block; margin-left: -5%'>Execution {{current_exec.exec_id}}</p>
+                  <p class = 'header-1' ng-if = 'compare_exec != ""' style = 'display: inline-block; margin-left: -5%'>Execution {{current_exec.exec_id}} - Execution {{compare_exec.exec_id}}</p>
                 </div>
 
                 <div class = 'modal-body'>
@@ -1528,9 +1554,9 @@
                         <div ng-repeat = 'mod in exec.modules'>
 
                           <!-- Input Files -->
-                          <div ng-if = 'mod.type == "InputFile"'>
+                          <div ng-if = 'mod.type == "Input File" && (filter_exec == "" || filter_exec == "Input File" || filter_exec == mod.id)'>
                             <!-- Module Name -->
-                            <p class = 'header-7'>{{mod.name}}</p>
+                            <p class = 'header-7'>Input File - {{mod.name}}</p>
                             <!-- Output -->
                             <p class = 'header-8'>Output</p>
 
@@ -1552,7 +1578,7 @@
                           </div>
 
                           <!-- OrderBy Module -->
-                          <div ng-if = 'mod.type == "OrderBy"'>
+                          <div ng-if = 'mod.type == "OrderBy" && (filter_exec == "" || filter_exec == "OrderBy" || filter_exec == mod.id)'>
                             <!-- Module Name -->
                             <p class = 'header-7'>OrderBy{{mod.name_id}}</p>
                             <!-- Criteria -->
@@ -1617,7 +1643,7 @@
                           </div>
 
                           <!-- Sort Module -->
-                          <div ng-if = 'mod.type == "Sort"'>
+                          <div ng-if = 'mod.type == "Sort" && (filter_exec == "" || filter_exec == "Sort" || filter_exec == mod.id)'>
                             <!-- Module Name -->
                             <p class = 'header-7'>Sort{{mod.name_id}}</p>
 
@@ -1642,8 +1668,8 @@
 
                             <div class = 'row text-center'>
                               <ul class = 'draglist'>
-                                <li ng-drop = 'true' ng-repeat = 'obj in mod.input.objects'>
-                                  <div ng-drag = 'true' ng-class = 'obj.name'>{{obj.name}}</div>
+                                <li class = 'drop-obj' ng-repeat = 'obj in mod.input.objects'>
+                                  <div class = 'drag-obj'ng-class = 'obj.name'>{{obj.name}}</div>
 
                                   <div ng-if = 'mod.input.objects.length > 1'>
                                     <p ng-if = '$index == 0' style = 'margin-top: 20%'>Most Important</p>
@@ -1660,8 +1686,8 @@
 
                             <div class = 'row text-center'>
                               <ul class = 'draglist'>
-                                <li ng-drop = 'true' ng-repeat = 'obj in mod.input.objects'>
-                                  <div ng-drag = 'true' ng-class = 'obj.name'>{{obj.name}}</div>
+                                <li class = 'drop-obj' ng-repeat = 'obj in mod.input.objects'>
+                                  <div class = 'drag-obj' ng-class = 'obj.name'>{{obj.name}}</div>
 
                                   <div ng-if = 'mod.input.objects.length > 1'>
                                     <p ng-if = '$index == 0' style = 'margin-top: 20%'>Most Important</p>
@@ -1678,7 +1704,7 @@
                           </div>
 
                           <!-- CAT-SD Module -->
-                          <div ng-if = 'mod.type == "CAT-SD"'>
+                          <div ng-if = 'mod.type == "CAT-SD" && (filter_exec == "" || filter_exec == "CAT-SD" || filter_exec == mod.id)'>
                             <!-- Module Name -->
                             <p class = 'header-7'>CAT-SD{{mod.name_id}}</p>
 
@@ -1866,7 +1892,7 @@
                           </div>
 
                           <!-- Delphi Module -->
-                          <div ng-if = 'mod.type == "Delphi"'>
+                          <div ng-if = 'mod.type == "Delphi" && (filter_exec == "" || filter_exec == "Delphi" || filter_exec == mod.id)'>
                             <!-- Module Name -->
                             <p class = 'header-7'>Delphi{{mod.name_id}}</p>
 
@@ -1978,7 +2004,7 @@
                           </div>
 
                           <!-- SRF Module -->
-                          <div ng-if = 'mod.type == "SRF"'>
+                          <div ng-if = 'mod.type == "SRF" && (filter_exec == "" || filter_exec == "SRF" || filter_exec == mod.id)'>
 
                             <!-- Module Name -->
                             <p class = 'header-7'>SRF{{mod.name_id}}</p>

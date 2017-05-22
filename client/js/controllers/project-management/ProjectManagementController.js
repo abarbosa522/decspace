@@ -1,6 +1,8 @@
-app.controller('ProjectManagementController', function($scope, $window, $http) {
+app.controller('ProjectManagementController', function($scope, $window, $http, SortDataService) {
   //order that projects should be retrieved from db
   var currentOrder = ['', ''];
+
+  $scope.methods = ['CAT-SD', 'Delphi', 'OrderBy', 'Sort', 'SRF'];
 
   function requestLogIn() {
     $http.get('/requestlogin').then(function(res) {
@@ -18,7 +20,6 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
           }
         });
       }
-
     });
   }
 
@@ -199,64 +200,9 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
   function sortProjects() {
     if(currentOrder[0] != '' && currentOrder[1] != '') {
       if(currentOrder[0] == 'creation_date' || currentOrder[0] == 'last_update')
-        $scope.projects.sort(sortDates(currentOrder[0], currentOrder[1]));
+        $scope.projects = SortDataService.sortDataDates($scope.projects, currentOrder[0], currentOrder[1]);
       else
-        $scope.projects.sort(sortData(currentOrder[0], currentOrder[1]));
-    }
-  }
-
-  function sortData(order, direction) {
-    return function(a, b) {
-      if(direction == 'ascendant') {
-        if(a[order] < b[order])
-          return -1;
-        if(a[order] > b[order])
-          return 1;
-        return 0;
-      }
-      else {
-        if(a[order] < b[order])
-          return 1;
-        if(a[order] > b[order])
-          return -1;
-        return 0;
-      }
-    }
-  }
-
-  //sort dates by "order" and "direction"
-  function sortDates(order, direction) {
-    return function(a, b) {
-      //parse the first date
-      var date1 = new Date();
-      var day = a[order].substr(0, a[order].indexOf('-'));
-      var month = a[order].substr(a[order].indexOf('-') + 1);
-      month = month.substr(0, month.indexOf('-'));
-      var year = a[order].substr(a[order].lastIndexOf('-') + 1, a[order].length - 1);
-      date1.setFullYear(year, Number(month) - 1, day);
-
-      //parse the second date
-      var date2 = new Date();
-      day = b[order].substr(0, b[order].indexOf('-'));
-      month = b[order].substr(b[order].indexOf('-') + 1);
-      month = month.substr(0, month.indexOf('-'));
-      year = b[order].substr(b[order].lastIndexOf('-') + 1, b[order].length - 1);
-      date2.setFullYear(year, Number(month) - 1, day);
-
-      if(direction == 'ascendant') {
-        if(date1 < date2)
-          return -1;
-        if(date1 > date2)
-          return 1;
-        return 0;
-      }
-      else {
-        if(date1 < date2)
-          return 1;
-        if(date1 > date2)
-          return -1;
-        return 0;
-      }
+        $scope.projects = SortDataService.sortDataVar($scope.projects, currentOrder[0], currentOrder[1]);
     }
   }
 
@@ -278,6 +224,45 @@ app.controller('ProjectManagementController', function($scope, $window, $http) {
 
       $scope.delete_id_project = '';
     });
+  }
+
+  /*** PROJECT VIEWS ***/
+
+  $scope.current_view = 'table';
+
+  $scope.changeView = function(view) {
+    $scope.current_view = view;
+  }
+
+  /*** LIST VIEW ***/
+
+  $scope.current_list = '';
+
+  $scope.openList = function(list) {
+    if($scope.current_list == list)
+      $scope.current_list = '';
+    else {
+      $scope.current_list = list;
+
+      if(list == 'creation_date' || list == 'last_update')
+        $scope.projects = SortDataService.sortDataDates($scope.projects, list, 'ascendant');
+      else
+        $scope.projects = SortDataService.sortDataVar($scope.projects, list, 'ascendant');
+    }
+
+    $scope.method_list = '';
+    $scope.delete_id_project = '';
+  }
+
+  $scope.method_list = '';
+
+  $scope.openMethodList = function(list) {
+    if($scope.method_list == list)
+      $scope.method_list = '';
+    else
+      $scope.method_list = list;
+
+    $scope.projects = SortDataService.sortDataVar($scope.projects, 'name', 'ascendant');
   }
 
   requestLogIn();

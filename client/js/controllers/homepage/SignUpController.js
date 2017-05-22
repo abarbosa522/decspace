@@ -33,6 +33,10 @@ app.controller('SignUpController', function($scope, $window, $http) {
           angular.element(document.querySelector('#input-email-div')).removeClass('has-error has-feedback');
           $scope.showErrorHelp = false;
 
+          //get current date
+          var current_date = new Date();
+          $scope.signup.sign_up_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
+
           //create new account
           $http.post('/accounts', $scope.signup).then(function(response) {
             $scope.showSuccessAlert = true;

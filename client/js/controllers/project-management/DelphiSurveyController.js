@@ -70,7 +70,7 @@ app.controller('DelphiSurveyController', function($scope, $window, $http) {
                 $scope.questions_unanswered[question].score = 'null';
               }
 
-              $scope.subject = response[round].subject;
+              $scope.subject = angular.copy(response.data[round].subject);
 
               //create new document
               var new_answer = {};

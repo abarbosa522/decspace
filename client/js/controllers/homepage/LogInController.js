@@ -13,13 +13,35 @@ app.controller('LogInController', function($scope, $window, $http) {
 
   $scope.logIn = function() {
     $http.post('/login', $scope.login).then(function(res) {
-      if(res.data == successfulString) {
-        $scope.showErrorAlert = false;
-        $window.location.href = '../dashboard/dashboard.html';
+      if(res.data != unsuccessfulString) {
+
+        $http.get('/accounts').then(function(response) {
+          var id_doc, proj_res;
+
+          for(account in response.data)
+            if(response.data[account].email == res.data) {
+              //get current date
+              var current_date = new Date();
+              var last_login = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
+              response.data[account].last_login = last_login;
+              id_doc = response.data[account]['_id'];
+              proj_res = response.data[account];
+              delete proj_res['_id'];
+              break;
+            }
+
+          //delete the previous document with the list of projects
+          $http.delete('/accounts/' + id_doc).then(function() {
+            //add the new list of projects
+            $http.post('/accounts', proj_res).then(function() {
+              $scope.showErrorAlert = false;
+              $window.location.href = '../dashboard/dashboard.html';
+            });
+          });
+        });
       }
-      else if(res.data == unsuccessfulString) {
+      else
         $scope.showErrorAlert = true;
-      }
     });
   }
 

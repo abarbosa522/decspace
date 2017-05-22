@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DecSpace - Administrator</title>
+
+    <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
+
+    <!-- CSS Stylesheet -->
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css' />
+
+    <!-- jQuery -->
+    <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
+    <script type = 'text/javascript' src = '../../js/shared/jquery-ui-1.12.0/jquery-ui.js'></script>
+
+    <!-- AngularJS -->
+    <script src = '../../js/shared/angular.min.js'></script>
+
+    <!-- AngularJS Modules -->
+    <script src = '../../js/app.js'></script>
+
+    <!-- AngularJS Controllers -->
+    <script src = '../../js/controllers/administrator/AdministratorController.js'></script>
+
+    <!-- Bootstrap -->
+    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
+    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.js'></script>
+
+    <!-- Google Web Fonts -->
+    <link href = 'https://fonts.googleapis.com/css?family=Open+Sans:400,600i' rel = 'stylesheet'>
+
+    <!-- ng-draggable module -->
+    <script src = '../../js/shared/ng-draggable/ngDraggable.js'></script>
+  </head>
+
+  <body ng-app = 'decspace' ng-controller = 'AdministratorController'>
+
+    <!-- Navigation Bar -->
+    <nav class = 'navbar navbar-custom navbar-fixed-top'>
+      <div class = 'container'>
+        <!-- Title -->
+        <div class = 'navbar-header'>
+          <a class = 'navbar-brand' href = '../dashboard/dashboard.html'>DecSpace</a>
+        </div>
+
+        <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
+        <ul class = 'nav navbar-nav navbar-right'>
+          <li>
+            <p class = 'navbar-text' style = 'font-weight:600;font-style:italic'>Welcome, {{name}}!</p>
+          </li>
+
+          <li><a href = '../homepage/about.html'>About</a></li>
+
+          <li><a href = '../homepage/faq.html'>FAQ</a></li>
+
+          <li><a href = '../homepage/contactus.html'>Contact Us</a></li>
+
+          <li>
+            <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'logOut()'>
+              <span class = 'glyphicon glyphicon-log-out'></span>
+              Log Out
+            </button>
+          </li>
+        </ul>
+
+      </div>
+    </nav>
+
+    <div id = 'main-content' class = 'container'>
+      <ul class = 'breadcrumb'>
+        <li><a href = '../dashboard/dashboard.html'>Dashboard</a></li>
+        <li class = 'active'>Administrator</li>
+      </ul>
+
+      <p class = 'header-1'>Administrator</p>
+
+      <br>
+
+      <p class = 'header-2'>Users</p>
+
+      <table class = 'table table-bordered table-hover' data-toggle = 'table'>
+        <thead>
+          <tr>
+            <th class = 'text-center'>
+              Email Address
+              <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'newSortUsers("email", "descendant")' title = "Sort 'Email Address' Downwards"></span></a>
+              <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'newSortUsers("email", "ascendant")' title = "Sort 'Email Address' Upwards"></span></a>
+            </th>
+            <th class = 'text-center'>
+              Name
+              <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'newSortUsers("name", "descendant")' title = "Sort 'Name' Downwards"></span></a>
+              <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'newSortUsers("name", "ascendant")' title = "Sort 'Name' Upwards"></span></a>
+            </th>
+            <th class = 'text-center'>
+              Number of Projects
+              <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'newSortUsers("num_projects", "descendant")' title = "Sort 'Number Of Projects' Downwards"></span></a>
+              <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'newSortUsers("num_projects", "ascendant")' title = "Sort 'Number Of Projects' Upwards"></span></a>
+            </th>
+            <th class = 'text-center'>
+              Last Login
+              <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'newSortUsers("last_login", "descendant")' title = "Sort 'Last Login' Downwards"></span></a>
+              <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'newSortUsers("last_login", "ascendant")' title = "Sort 'Last Login' Upwards"></span></a>
+            </th>
+            <th class = 'text-center'>
+              Sign Up Date
+              <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'newSortUsers("sign_up_date", "descendant")' title = "Sort 'Sign Up Date' Downwards"></span></a>
+              <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'newSortUsers("sign_up_date", "ascendant")' title = "Sort 'Sign Up Date' Upwards"></span></a>
+            </th>
+            <th class = 'col-md-2'></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat = 'user in users' ng-class = '{danger: delete_id_user == user.email}'>
+            <!-- Email Address -->
+            <td>{{user.email}}</td>
+
+            <!-- Name -->
+            <td>{{user.name}}</td>
+
+            <!-- Number of Projects -->
+            <td>{{user.num_projects}}</td>
+
+            <!-- Last Login -->
+            <td>{{user.last_login}}</td>
+
+            <!-- Sign Up Date -->
+            <td>{{user.sign_up_date}}</td>
+
+            <!-- Delete User Button -->
+            <td ng-if = 'delete_id_user != user.email'>
+              <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteUser(user)' title = 'Delete User'>
+                <span class = 'glyphicon glyphicon-minus'></span>
+              </button>
+            </td>
+
+            <!-- Confirm And Cancel User Deletion -->
+            <td ng-if = 'delete_id_user == user.email'>
+              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteUser(user)' title = 'Confirm Delete User'>
+                <span class = 'glyphicon glyphicon-ok'></span>
+              </button>
+              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteUser()' title = 'Cancel Delete User'>
+                <span class = 'glyphicon glyphicon-remove'></span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <strong>Number of Users:</strong> {{users.length}}
+
+      <br><br>
+
+      <p class = 'header-2'>Projects</p>
+
+      <table class = 'table table-bordered table-hover' data-toggle = 'table'>
+        <thead>
+          <tr>
+            <th class = 'text-center col-md-2'>
+              Name
+              <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'newSortProjects("name", "descendant")' title = "Sort 'Name' Downwards"></span></a>
+              <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'newSortProjects("name", "ascendant")' title = "Sort 'Name' Upwards"></span></a>
+            </th>
+            <th class = 'text-center col-md-2'>
+              User
+              <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'newSortProjects("username", "descendant")' title = "Sort 'User' Downwards"></span></a>
+              <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'newSortProjects("username", "ascendant")' title = "Sort 'User' Upwards"></span></a>
+            </th>
+            <th class = 'text-center col-md-2'>
+              Type
+              <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'newSortProjects("type", "descendant")' title = "Sort 'Type' Downwards"></span></a>
+              <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'newSortProjects("type", "ascendant")' title = "Sort 'Type' Upwards"></span></a>
+            </th>
+            <th class = 'text-center col-md-2'>
+              Creation Date
+              <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'newSortProjects("creation_date", "descendant")' title = "Sort 'Creation Date' Downwards"></span></a>
+              <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'newSortProjects("creation_date", "ascendant")' title = "Sort 'Creation Date' Upwards"></span></a>
+            </th>
+            <th class = 'text-center col-md-2'>
+              Last Update
+              <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'newSortProjects("last_update", "descendant")' title = "Sort 'Last Update' Downwards"></span></a>
+              <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'newSortProjects("last_update", "ascendant")' title = "Sort 'Last Update' Upwards"></span></a>
+            </th>
+            <th class = 'col-md-2'></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat = 'project in projects' ng-class = '{danger: (delete_id_project[0] == project.project_id && delete_id_project[1] == project.username)}'>
+            <!-- Name -->
+            <td>{{project.name}}</td>
+
+            <!-- User -->
+            <td>{{project.username}}</td>
+
+            <!-- Type -->
+            <td>
+              <span ng-if = 'project.method != undefined'>Single-Method</span>
+              <span ng-if = 'project.method == undefined'>Multi-Method</span>
+            </td>
+
+            <!-- Creation Date -->
+            <td>{{project.creation_date}}</td>
+
+            <!-- Last Update -->
+            <td>{{project.last_update}}</td>
+
+            <!-- Delete Project Button -->
+            <td ng-if = '(delete_id_project[0] != project.project_id && delete_id_project[1] != project.username) ||
+            (delete_id_project[0] == project.project_id && delete_id_project[1] != project.username) ||
+            (delete_id_project[0] != project.project_id && delete_id_project[1] == project.username)'>
+              <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteProject(project)' title = 'Delete Project'>
+                <span class = 'glyphicon glyphicon-minus'></span>
+              </button>
+            </td>
+
+            <!-- Confirm And Cancel Project Deletion -->
+            <td ng-if = 'delete_id_project[0] == project.project_id && delete_id_project[1] == project.username'>
+              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteProject(project)' title = 'Confirm Delete Project'>
+                <span class = 'glyphicon glyphicon-ok'></span>
+              </button>
+              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteProject()' title = 'Cancel Delete Project'>
+                <span class = 'glyphicon glyphicon-remove'></span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <strong>Number of Projects:</strong> {{projects.length}}
+
+      <br><br>
+      
+    </div>
+
+  </body>
+</html>

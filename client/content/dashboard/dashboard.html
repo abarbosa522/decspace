@@ -79,19 +79,19 @@
 
       <p class = 'header-1'>Dashboard</p>
 
-      <hr/>
+      <hr>
 
       <!-- First Button Row -->
       <div class = 'row'>
         <div class = 'col-md-4'>
           <button type = 'button' class = 'btn btn-default btn-lg' ng-click = 'toProjectManagement()'>
-            <span class = 'glyphicon glyphicon-th-list'></span>
+            <i class = 'fa fa-cube fa-lg'></i>
           </button>
         </div>
 
         <div class = 'col-md-4'>
           <button type = 'button' class = 'btn btn-default btn-lg' ng-click = 'toWorkspaceProjects()'>
-            <i class = 'fa fa-desktop fa-lg'></i>
+            <i class = 'fa fa-cubes fa-lg'></i>
           </button>
         </div>
 
@@ -104,17 +104,11 @@
 
       <!-- First Title Row -->
       <div class = 'row'>
-        <div class = 'col-md-4'>
-          <span>Projects</span>
-        </div>
+        <div class = 'col-md-4'>Single-Method Projects</div>
 
-        <div class = 'col-md-4'>
-          <span>Workspace</span>
-        </div>
+        <div class = 'col-md-4'>Workspace (Multi-Method Projects)</div>
 
-        <div class = 'col-md-4'>
-          <span>Method Catalog</span>
-        </div>
+        <div class = 'col-md-4'>Method Catalog</div>
       </div>
 
       <br>
@@ -126,13 +120,19 @@
             <span class = 'glyphicon glyphicon-cog'></span>
           </button>
         </div>
+
+        <div class = 'col-md-4' ng-if = 'username == "admin@admin"' ng-cloak>
+          <button type = 'button' class = 'btn btn-default btn-lg' ng-click = 'toAdministratorRights()'>
+            <span class = 'glyphicon glyphicon-stats'></span>
+          </button>
+        </div>
       </div>
 
       <!-- Second Title Row -->
       <div class = 'row'>
-        <div class = 'col-md-4'>
-          <span>Settings</span>
-        </div>
+        <div class = 'col-md-4'>Settings</div>
+
+        <div class = 'col-md-4' ng-if = 'username == "admin@admin"' ng-cloak>Administrator</div>
       </div>
 
     </div>
