@@ -44,7 +44,7 @@ app.controller('ContactUsController', function($scope, $http, $window) {
 
   $scope.logOut = function() {
     $http.get('/logout').then(function(res) {
-      $window.location.href = '../../index.html';
+      $window.location.reload();
     });
   }
 

@@ -1,12 +1,12 @@
-app.controller('MethodCatalogController', function($scope, $window, $http) {
-  /*** SETUP FUNCTIONS ***/
+app.controller('MethodCatalogController', function($scope, $window, $http, MethodsService) {
+  /*** LOGIN FUNCTIONS ***/
 
-  //check if there is a user logged in
   function requestLogIn() {
     $http.get('/requestlogin').then(function(res) {
-      if(res.data.user == undefined)
-        $window.location.href = '../homepage/login.html';
+      if(typeof res.data.user == 'undefined')
+        $scope.loggedIn = false;
       else {
+        $scope.loggedIn = true;
         $scope.username = res.data.user;
         //get all accounts and find the name of the logged user
         $http.get('/accounts').then(function(response) {
@@ -21,17 +21,24 @@ app.controller('MethodCatalogController', function($scope, $window, $http) {
     });
   }
 
-  //log out current user
   $scope.logOut = function() {
     $http.get('/logout').then(function(res) {
       $window.location.href = '../../index.html';
     });
   }
 
+  $scope.toSignUp = function() {
+    $window.location.href = '../homepage/signup.html';
+  }
+
+  $scope.toLogIn = function() {
+    $window.location.href = '../homepage/login.html';
+  }
+
   /*** METHODS ***/
 
   //list of methods currently available
-  $scope.methods = ['CAT-SD', 'Delphi', 'OrderBy', 'Sort', 'SRF'];
+  $scope.methods = MethodsService.getMethods();
 
   //redirect to the method page
   $scope.toMethod = function(method) {

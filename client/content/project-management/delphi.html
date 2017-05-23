@@ -40,25 +40,29 @@
     <!-- Navigation Bar -->
     <nav class = 'navbar navbar-custom navbar-fixed-top'>
       <div class = 'container'>
-        <!-- Title -->
+        <!-- Brand and toggle get grouped for better mobile display -->
         <div class = 'navbar-header'>
-          <button type = 'button' class = 'navbar-toggle collapsed' data-toggle = 'collapse' data-target = '#navbar-collapsed' aria-expanded = 'false'>
+          <button type = 'button' class = 'navbar-toggle collapsed' data-toggle = 'collapse' data-target = '#top-navbar' aria-expanded = 'false'>
             <span class = 'sr-only'>Toggle navigation</span>
             <span class = 'icon-bar'></span>
             <span class = 'icon-bar'></span>
             <span class = 'icon-bar'></span>
           </button>
+          <!-- Title -->
           <a class = 'navbar-brand' href = '../dashboard/dashboard.html'>DecSpace</a>
         </div>
 
-        <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
-        <div class = 'collapse navbar-collapse' id = 'navbar-collapsed'>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class = 'collapse navbar-collapse' id = 'top-navbar'>
+          <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
           <ul class = 'nav navbar-nav navbar-right'>
             <li>
-              <p class = 'navbar-text' style = 'font-weight:600;font-style:italic'>Welcome, {{name}}!</p>
+              <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic'>Welcome, {{name}}!</p>
             </li>
 
             <li><a href = '../homepage/about.html'>About</a></li>
+
+            <li><a href = '../method-catalog/method-catalog.html'>Method Catalog</a></li>
 
             <li><a href = '../homepage/faq.html'>FAQ</a></li>
 
@@ -72,7 +76,6 @@
             </li>
           </ul>
         </div>
-
       </div>
     </nav>
 

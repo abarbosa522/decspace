@@ -35,85 +35,68 @@
 
   <body ng-app = 'decspace' ng-controller = 'AboutController'>
 
-    <div ng-if = '!loggedIn' ng-cloak>
-      <!-- Navigation Bar -->
-      <nav class = 'navbar navbar-custom navbar-fixed-top'>
-        <div class = 'container'>
+    <!-- Navigation Bar -->
+    <nav class = 'navbar navbar-custom navbar-fixed-top'>
+      <div class = 'container'>
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class = 'navbar-header'>
+          <button type = 'button' class = 'navbar-toggle collapsed' data-toggle = 'collapse' data-target = '#top-navbar' aria-expanded = 'false'>
+            <span class = 'sr-only'>Toggle navigation</span>
+            <span class = 'icon-bar'></span>
+            <span class = 'icon-bar'></span>
+            <span class = 'icon-bar'></span>
+          </button>
           <!-- Title -->
-          <div class = 'navbar-header'>
-            <a class = 'navbar-brand' href = '../../index.html'>DecSpace</a>
-          </div>
+          <a class = 'navbar-brand' href = '../../index.html'>DecSpace</a>
+        </div>
 
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class = 'collapse navbar-collapse' id = 'top-navbar'>
           <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
           <ul class = 'nav navbar-nav navbar-right'>
+
+            <li ng-if = 'loggedIn' ng-cloak>
+              <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic'>Welcome, {{name}}!</p>
+            </li>
+
             <li class = 'active'><a href = 'about.html'>About</a></li>
+            <li><a href = '../method-catalog/method-catalog.html'>Method Catalog</a></li>
             <li><a href = 'faq.html'>FAQ</a></li>
             <li><a href = 'contactus.html'>Contact Us</a></li>
 
-            <li>
+            <li ng-if = '!loggedIn' ng-cloak>
               <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'toSignUp()'>
                 <span class = 'glyphicon glyphicon-user'></span>
                 Sign Up
               </button>
             </li>
 
-            <li>
-              <p class = 'navbar-text'>or</p>
+            <li ng-if = '!loggedIn' ng-cloak>
+              <span class = 'navbar-text'>or</span>
             </li>
 
-            <li>
+            <li ng-if = '!loggedIn' ng-cloak>
               <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'toLogIn()'>
                 <span class = 'glyphicon glyphicon-log-in'></span>
                 Log In
               </button>
             </li>
-          </ul>
 
-        </div>
-      </nav>
-    </div>
-
-    <div ng-if = 'loggedIn' ng-cloak>
-      <!-- Navigation Bar -->
-      <nav class = 'navbar navbar-custom navbar-fixed-top'>
-        <div class = 'container'>
-          <!-- Title -->
-          <div class = 'navbar-header'>
-            <a class = 'navbar-brand' href = '../dashboard/dashboard.html'>DecSpace</a>
-          </div>
-
-          <ul class = 'nav navbar-nav'>
-
-          </ul>
-          <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
-          <ul class = 'nav navbar-nav navbar-right'>
-
-            <li>
-              <p class = 'navbar-text' style = 'font-weight:600;font-style:italic'>Welcome, {{name}}!</p>
-            </li>
-
-            <li class = 'active'><a href = '../homepage/about.html'>About</a></li>
-
-            <li><a href = '../homepage/faq.html'>FAQ</a></li>
-
-            <li><a href = '../homepage/contactus.html'>Contact Us</a></li>
-
-            <li>
+            <li ng-if = 'loggedIn' ng-cloak>
               <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'logOut()'>
                 <span class = 'glyphicon glyphicon-log-out'></span>
                 Log Out
               </button>
             </li>
           </ul>
-
         </div>
-      </nav>
-    </div>
+      </div>
+    </nav>
 
     <div id = 'main-content' class = 'container'>
 
       <div ng-if = 'loggedIn' ng-cloak>
-        <ul class = 'breadcrumb' style = 'text-align:center'>
+        <ul class = 'breadcrumb' style = 'text-align: center'>
           <li><a href = '../dashboard/dashboard.html'>Dashboard</a></li>
           <li class = 'active'>About</li>
         </ul>

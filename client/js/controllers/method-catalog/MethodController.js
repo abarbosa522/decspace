@@ -1,12 +1,12 @@
 app.controller('MethodController', function($scope, $window, $http) {
-  /*** SETUP FUNCTIONS ***/
+  /*** LOGIN FUNCTIONS ***/
 
-  //check if there is a user logged in
   function requestLogIn() {
     $http.get('/requestlogin').then(function(res) {
-      if(res.data.user == undefined)
-        $window.location.href = '../homepage/login.html';
+      if(typeof res.data.user == 'undefined')
+        $scope.loggedIn = false;
       else {
+        $scope.loggedIn = true;
         $scope.username = res.data.user;
         //get all accounts and find the name of the logged user
         $http.get('/accounts').then(function(response) {
@@ -21,11 +21,18 @@ app.controller('MethodController', function($scope, $window, $http) {
     });
   }
 
-  //log out current user
   $scope.logOut = function() {
     $http.get('/logout').then(function(res) {
-      $window.location.href = '../../index.html';
+      $window.location.reload();
     });
+  }
+
+  $scope.toSignUp = function() {
+    $window.location.href = '../homepage/signup.html';
+  }
+
+  $scope.toLogIn = function() {
+    $window.location.href = '../homepage/login.html';
   }
 
   /*** EXPORT FUNCTION ***/

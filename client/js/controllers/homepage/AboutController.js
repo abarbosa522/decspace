@@ -30,7 +30,7 @@ app.controller('AboutController', function($scope, $window, $http) {
 
   $scope.logOut = function() {
     $http.get('/logout').then(function(res) {
-      $window.location.href = '../../index.html';
+      $window.location.reload();
     });
   }
 
