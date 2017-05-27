@@ -24,7 +24,7 @@ app.controller('ContactUsController', function($scope, $http, $window) {
 
   function requestLogIn() {
     $http.get('/requestlogin').then(function(res) {
-      if(typeof res.data.user == 'undefined')
+      if(res.data.user == undefined || res.data.user == 'johndoe@decspace.com')
         $scope.loggedIn = false;
       else {
         $scope.loggedIn = true;

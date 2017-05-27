@@ -121,14 +121,21 @@ app.controller('ProjectsController', function($scope, $window, $http, SortDataSe
       }
       project_id++;
 
+      //define the copy number
+      var copy_number = 0;
+
+      for(proj in response.data)
+        if(response.data[proj].name == project.name)
+          copy_number++;
+
       //create the new project
       var new_proj = angular.copy(project);
       delete new_proj['_id'];
-      new_proj['project_id'] = project_id;
-      new_proj['name'] += ' - Copy';
-      new_proj['creation_date'] = creation_date;
-      new_proj['last_update'] = creation_date;
-
+      new_proj.project_id = project_id;
+      new_proj.creation_date = creation_date;
+      new_proj.last_update = creation_date;
+      new_proj.copy_number = copy_number;
+      
       //add the new list of projects
       $http.post('/projects', new_proj).then(function() {
         //refresh the list of projects

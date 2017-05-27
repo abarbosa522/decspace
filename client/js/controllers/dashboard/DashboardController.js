@@ -1,12 +1,17 @@
 app.controller('DashboardController', function($scope, $window, $http) {
   /*** SETUP FUNCTIONS ***/
 
+  $scope.unregisteredUser = false;
+
   //check if there is a user logged in
   function requestLogIn() {
     $http.get('/requestlogin').then(function(res) {
-      if(typeof res.data.user == 'undefined')
+      if(res.data.user == undefined)
         $window.location.href = '../homepage/login.html';
       else {
+        if(res.data.user == 'johndoe@decspace.com')
+          $scope.unregisteredUser = true;
+          
         $scope.username = res.data.user;
         //get all accounts and find the name of the logged user
         $http.get('/accounts').then(function(response) {
@@ -53,6 +58,11 @@ app.controller('DashboardController', function($scope, $window, $http) {
   //redirect to the Administrator page
   $scope.toAdministratorRights = function() {
     $window.location.href = '../administrator/administrator.html';
+  }
+
+  //redirect to the Sign Up page
+  $scope.toSignUp = function() {
+    $window.location.href = '../homepage/signup.html';
   }
 
   /*** STARTUP FUNCTIONS ***/

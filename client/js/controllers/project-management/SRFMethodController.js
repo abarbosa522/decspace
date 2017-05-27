@@ -690,8 +690,8 @@ app.controller('SRFMethodController', function($scope, $window, $http, SRFServic
 
       $scope.$apply($scope.white_cards.push(new_white_card));
     }
-    //if a criteria card was dragged
-    else if(data['white_card'] == undefined && noWhiteCards(index))
+    //if a criteria card was dragged or a white card previously dragged was dragged once more
+    else if((data['white_card'] == undefined && noWhiteCards(index)) || (data['white_card'] && noCriteriaCards(index)))
       data['position'] = index;
   }
 

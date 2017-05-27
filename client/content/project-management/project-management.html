@@ -87,11 +87,11 @@
 
       <ul class = 'breadcrumb'>
         <li><a href = '../dashboard/dashboard.html'>Dashboard</a></li>
-        <li class = 'active'>Projects</li>
+        <li class = 'active'>Single-Method Projects</li>
       </ul>
 
       <div class = 'row'>
-        <span class = 'header-1' style = 'margin-left: 10%'>Projects</span>
+        <span class = 'header-1' style = 'margin-left: 10%'>Single-Method Projects</span>
 
         <button type = 'button' class = 'btn btn-default' ng-click = 'changeView("list")' title = 'List View' style = 'float: right; margin-top: 1%' ng-class = '{active : current_view == "list"}'>
           <i class = 'fa fa-list fa-lg'></i>
@@ -129,14 +129,16 @@
                 <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeCurrentOrder("last_update", "descendant")' title = "Sort 'Last Update' Downwards"></span></a>
                 <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeCurrentOrder("last_update", "ascendant")' title = "Sort 'Last Update' Upwards"></span></a>
               </th>
-              <th></th>
+              <th class = 'col-md-2'></th>
             </tr>
           </thead>
           <tbody>
             <tr ng-repeat = 'project in projects' ng-class = '{danger: delete_id_project == project.project_id}'>
               <!-- Project Name -->
-              <td>{{project.name}}</td>
+              <td ng-if = 'project.copy_number == undefined'>{{project.name}}</td>
 
+              <td ng-if = 'project.copy_number != undefined'>{{project.name}}({{project.copy_number}})</td>
+              
               <!-- Project Method -->
               <td>{{project.method}}</td>
 

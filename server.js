@@ -43,6 +43,12 @@ app.post('/login', getAccounts, function(req, res) {
   }
 });
 
+//unregistered log in
+app.post('/unregisteredLogIn', function(req, res) {
+  req.session.user = 'johndoe@decspace.com';
+  res.send('ok');
+});
+
 //request log in
 app.get('/requestlogin', function(req, res) {
   res.send(req.session);

@@ -39,7 +39,7 @@
   <body ng-app = 'decspace' ng-controller = 'DashboardController'>
 
     <!-- Navigation Bar -->
-    <nav class = 'navbar navbar-custom navbar-fixed-top'>
+    <nav class = 'navbar navbar-custom navbar-fixed-top' >
       <div class = 'container'>
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class = 'navbar-header'>
@@ -50,7 +50,9 @@
             <span class = 'icon-bar'></span>
           </button>
           <!-- Title -->
-          <a class = 'navbar-brand' href = 'dashboard.html'>DecSpace</a>
+          <a class = 'navbar-brand' href = 'dashboard.html' ng-if = '!unregisteredUser' ng-cloak>DecSpace</a>
+
+          <a class = 'navbar-brand' href = '../../index.html' ng-if = 'unregisteredUser' ng-cloak>DecSpace</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -58,7 +60,13 @@
           <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
           <ul class = 'nav navbar-nav navbar-right'>
             <li>
-              <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic'>Welcome, {{name}}!</p>
+              <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic' ng-if = '!unregisteredUser' ng-cloak>
+                Welcome, {{name}}!
+              </p>
+
+              <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic' ng-if = 'unregisteredUser' ng-cloak>
+                Welcome, Unregistered User!
+              </p>
             </li>
 
             <li><a href = '../homepage/about.html'>About</a></li>
@@ -69,10 +77,17 @@
 
             <li><a href = '../homepage/contactus.html'>Contact Us</a></li>
 
-            <li>
+            <li ng-if = '!unregisteredUser' ng-cloak>
               <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'logOut()'>
                 <span class = 'glyphicon glyphicon-log-out'></span>
                 Log Out
+              </button>
+            </li>
+
+            <li ng-if = 'unregisteredUser' ng-cloak>
+              <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'toSignUp()'>
+                <span class = 'glyphicon glyphicon-user'></span>
+                Sign Up
               </button>
             </li>
           </ul>

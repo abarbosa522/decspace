@@ -2457,7 +2457,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       $scope.$apply($scope.currentModule.input["white cards"].push(new_white_card));
     }
     //if a criteria card was dragged
-    else if(data['white_card'] == undefined && noWhiteCards(index))
+    else if((data['white_card'] == undefined && noWhiteCards(index)) || (data['white_card'] && noCriteriaCards(index)))
       data['position'] = index;
   }
 

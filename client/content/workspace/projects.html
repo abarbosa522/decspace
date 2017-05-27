@@ -127,13 +127,15 @@
                 <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeCurrentOrder("last_update", "ascendant")' title = 'Sort "Last Update" Upwards'></span></a>
               </th>
 
-              <th></th>
+              <th class = 'col-md-2'></th>
             </tr>
           </thead>
           <tbody>
             <tr ng-repeat = 'project in projects' ng-class = '{danger: delete_id_project == project.project_id || delete_id_project == "all"}'>
               <!-- Project Name -->
-              <td>{{project.name}}</td>
+              <td ng-if = 'project.copy_number == undefined'>{{project.name}}</td>
+
+              <td ng-if = 'project.copy_number != undefined'>{{project.name}}({{project.copy_number}})</td>
 
               <!-- Creation Date -->
               <td>{{project.creation_date}}</td>

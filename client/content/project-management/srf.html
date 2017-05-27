@@ -84,7 +84,7 @@
     <div id = 'main-content' class = 'container'>
       <ul class = 'breadcrumb'>
         <li><a href = '../dashboard/dashboard.html'>Dashboard</a></li>
-        <li><a href = 'project-management.html'>Projects</a></li>
+        <li><a href = 'project-management.html'>Single-Method Projects</a></li>
         <li class = 'active'>Project - {{project_name}}</li>
       </ul>
 
@@ -499,7 +499,7 @@
                 </div>
 
                 <!-- Add Drop Div Button -->
-                <button type = 'button' class = 'btn btn-success' ng-click = 'addRanking($index)' title = 'Add Ranking' ng-if = '$index != ranking - 1' style = 'margin-top: 1%; margin-left: 7%'>
+                <button type = 'button' class = 'btn btn-success' ng-click = 'addRanking($index)' title = 'Add Ranking' ng-if = '$index != ranking - 1' style = 'margin-left: 105.2%'>
                   <span class = 'glyphicon glyphicon-plus'></span>
                 </button>
               </div>
@@ -527,21 +527,26 @@
 
             <table class = 'table'>
               <thead>
-                <th class = 'col-md-6' style = 'border: none'></th>
-                <th class = 'col-md-6' style = 'border: none'></th>
+                <th class = 'col-md-3' style = 'border: none'></th>
+                <th class = 'col-md-3' style = 'border: none'></th>
+                <th class = 'col-md-3' style = 'border: none'></th>
+                <th class = 'col-md-3' style = 'border: none'></th>
               </thead>
               <tbody>
                 <tr>
                   <!-- Ratio Z -->
+                  <td style = 'border: none'></td>
                   <td style = 'border: none'><strong>Ratio Z</strong></td>
                   <td style = 'border: none'>
                     <div id = 'ratio-z'>
                       <input type = 'number' class = 'form-control' ng-model = 'ratio_z' ng-blur = 'blurRatioZ()'>
                     </div>
                   </td>
+                  <td style = 'border: none'></td>
                 </tr>
                 <tr>
                   <!-- Decimal Places -->
+                  <td style = 'border: none'></td>
                   <td style = 'border: none'><strong>Decimal Places</strong></td>
                   <td style = 'border: none'>
                     <div id = 'decimal-places'>
@@ -553,9 +558,11 @@
                       </select>
                     </div>
                   </td>
+                  <td style = 'border: none'></td>
                 </tr>
                 <tr>
                   <!-- Weight Type -->
+                  <td style = 'border: none'></td>
                   <td style = 'border: none'><strong>Weight Type</strong></td>
                   <td style = 'border: none'>
                     <div id = 'weight-type'>
@@ -567,6 +574,7 @@
                       </select>
                     </div>
                   </td>
+                  <td style = 'border: none'></td>
                 </tr>
               </tbody>
             </table>
