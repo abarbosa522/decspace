@@ -34,14 +34,13 @@ app.controller('LogInController', function($scope, $window, $http) {
           $http.delete('/accounts/' + id_doc).then(function() {
             //add the new list of projects
             $http.post('/accounts', proj_res).then(function() {
-              $scope.showErrorAlert = false;
               $window.location.href = '../dashboard/dashboard.html';
             });
           });
         });
       }
       else
-        $scope.showErrorAlert = true;
+        showAlert('login-error');
     });
   }
 
@@ -61,4 +60,21 @@ app.controller('LogInController', function($scope, $window, $http) {
       angular.element(document.querySelector('#eye-image')).addClass('glyphicon-eye-open');
     }
   }
+
+  //hide all alerts
+  function hideAlerts() {
+    $('#login-error').hide();
+  }
+
+  //show certain alert and hide it smoothly
+  function showAlert(alert_id) {
+    //show alert
+    angular.element(document.querySelector('#' + alert_id)).alert();
+    //hide alert
+    angular.element(document.querySelector('#' + alert_id)).fadeTo(3000, 500).slideUp(500, function() {
+      angular.element(document.querySelector('#' + alert_id)).slideUp(500);
+    });
+  }
+
+  hideAlerts();
 });

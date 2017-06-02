@@ -67,11 +67,7 @@
             </li>
 
             <li>
-              <p class = 'navbar-text'>or</p>
-            </li>
-
-            <li>
-              <button type = 'button' class = 'btn btn-default navbar-btn btn-custom active' ng-click = 'toLogIn()'>
+              <button type = 'button' class = 'btn btn-default navbar-btn active' ng-click = 'toLogIn()' style = 'margin-left: 5%'>
                 <span class = 'glyphicon glyphicon-log-in'></span>
                 Log In
               </button>
@@ -106,8 +102,8 @@
             <span class = 'glyphicon glyphicon-lock'></span>
           </label>
 
-          <div id = 'input-password-div' class = 'col-sm-4 input-group'>
-            <input id = 'input-password' type = '{{inputType}}' class = 'form-control' placeholder = 'Password' ng-model = 'login.password'>
+          <div id = 'input-password' class = 'col-sm-4 input-group'>
+            <input type = '{{inputType}}' class = 'form-control' placeholder = 'Password' ng-model = 'login.password'>
 
             <span class = 'input-group-btn'>
               <button class = 'btn btn-default' type = 'button' ng-click = 'showPassword()' title = 'Show/Hide Password'>
@@ -130,8 +126,14 @@
 
       <br>
 
-      <div class = 'alert alert-danger' role = 'alert'  ng-if = 'showErrorAlert' ng-cloak>
-        Incorrect email or password.
+      <div class = 'row'>
+        <div class = 'col-md-2'></div>
+
+        <div id = 'login-error' class = 'alert alert-danger col-md-8' role = 'alert' ng-cloak>
+          <strong>Incorrect</strong> email or password.
+        </div>
+
+        <div class = 'col-md-2'></div>
       </div>
 
     </div>

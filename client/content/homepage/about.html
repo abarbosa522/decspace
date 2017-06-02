@@ -78,11 +78,7 @@
             </li>
 
             <li ng-if = '!loggedIn' ng-cloak>
-              <span class = 'navbar-text'>or</span>
-            </li>
-
-            <li ng-if = '!loggedIn' ng-cloak>
-              <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'toLogIn()'>
+              <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'toLogIn()' style = 'margin-left: 5%'>
                 <span class = 'glyphicon glyphicon-log-in'></span>
                 Log In
               </button>
@@ -101,16 +97,7 @@
 
     <div id = 'main-content' class = 'container'>
 
-      <div ng-if = 'loggedIn' ng-cloak>
-        <ul class = 'breadcrumb' style = 'text-align: center'>
-          <li><a href = '../dashboard/dashboard.html'>Dashboard</a></li>
-          <li class = 'active'>About</li>
-        </ul>
-      </div>
-
-      <div ng-if = '!loggedIn' ng-cloak>
-        <br>
-      </div>
+      <br>
 
       <p class = 'header-1' style = 'text-align:center'>About</p>
 
@@ -124,15 +111,15 @@
        But even if none of the avaiable methods satisfies the user, it is possible to create new methods, so that different kinds of problems can be accessed.</p>
 
        <p>DecSpace also aims to provide the following features:</p>
-         <ul>
-           <li><strong>Platform Independence</strong> - it is available on most platforms regardless of the user's device (computer, smartphone or tablet) or operating system, since it is a web application.</li>
-           <li><strong>User differentiation</strong> - users with different levels of experience with web applications and MCDA methods get to work in different manners, so that they can be as efficient as possible. This is accomplished by providing different views to the different users.</li>
-           <li><strong>Data import and export</strong> - if the user already has the necessary data structured in an external file in CSV or JSON format, then it is possible to directly input that data into the project. It is also possible to export the current data of a certain project, so that it can be externally saved and imported to other projects.</li>
-           <li><strong>Method Catalog</strong> - present a collection of the descriptions of all available methods, so that new users don't have to blindly choose (or research in other sites) the most appropriate method to their new project.</li>
-           <li><strong>Result Charts</strong> - some methods' results can be shown with the help of plot and graphic design (e.g. bar, line, flow or tree charts). </li>
-           <li><strong>Result Comparison</strong> - problems of the same nature may have solutions structured in the same way, therefore these kind of results can be directly compared with each other for a better perspective on them.</li>
-           <li><strong>Result Sharing</strong> - the results of a certain execution of a project can be shared via e-mail with other users. All details of that execution are shown on the sent message.</li>
-         </ul>
+       <ul>
+         <li><strong>Platform Independence</strong> - it is available on most platforms regardless of the user's device (computer, smartphone or tablet) or operating system, since it is a web application.</li>
+         <li><strong>User differentiation</strong> - users with different levels of experience with web applications and MCDA methods get to work in different manners, so that they can be as efficient as possible. This is accomplished by providing different views to the different users.</li>
+         <li><strong>Data import and export</strong> - if the user already has the necessary data structured in an external file in CSV or JSON format, then it is possible to directly input that data into the project. It is also possible to export the current data of a certain project, so that it can be externally saved and imported to other projects.</li>
+         <li><strong>Method Catalog</strong> - present a collection of the descriptions of all available methods, so that new users don't have to blindly choose (or research in other sites) the most appropriate method to their new project.</li>
+         <li><strong>Result Charts</strong> - some methods' results can be shown with the help of plot and graphic design (e.g. bar, line, flow or tree charts). </li>
+         <li><strong>Result Comparison</strong> - problems of the same nature may have solutions structured in the same way, therefore these kind of results can be directly compared with each other for a better perspective on them.</li>
+         <li><strong>Result Sharing</strong> - the results of a certain execution of a project can be shared via e-mail with other users. All details of that execution are shown on the sent message.</li>
+       </ul>
     </div>
   </body>
 </html>

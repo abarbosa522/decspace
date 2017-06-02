@@ -26,9 +26,9 @@ app.post('/login', getAccounts, function(req, res) {
 
   //check if the email and password match to the information in the database
   for(account in accounts) {
-    if(accounts[account]['email'] == req.body.email && accounts[account]['password'] == req.body.password) {
+    if(accounts[account].email == req.body.email && accounts[account].password == req.body.password) {
       correct_log_in = true;
-      user = accounts[account]['email'];
+      user = accounts[account].email;
       break;
     }
   }
@@ -45,8 +45,30 @@ app.post('/login', getAccounts, function(req, res) {
 
 //unregistered log in
 app.post('/unregisteredLogIn', function(req, res) {
-  req.session.user = 'johndoe@decspace.com';
-  res.send('ok');
+  db1.accounts.find().sort( {name: 1}, function (err, doc) {
+    var unregistered_logged_in = 0;
+    var new_unregistered;
+
+    //count the number of logged in unregistered users
+    //and make a copy of the original unregistered user
+    for(user in doc) {
+      if(doc[user].name == 'Unregistered')
+        unregistered_logged_in++;
+      if(doc[user].email == 'unregistered@decspace.com')
+        new_unregistered = doc[user];
+    }
+
+    //change the email address, just to uniquely define the new unregistered user
+    new_unregistered.email += unregistered_logged_in;
+    //remove the db id
+    delete new_unregistered['_id'];
+
+    db1.accounts.insert(new_unregistered, function(err, doc2) {
+      //login the newly created unregistered user
+      req.session.user = doc2.email;
+      res.send('ok');
+    });
+  });
 });
 
 //request log in
@@ -56,8 +78,29 @@ app.get('/requestlogin', function(req, res) {
 
 //log out
 app.get('/logout', function(req, res) {
-  req.session.reset();
-  res.send(req.session);
+  //if it is an unregistered user, delete it
+  if(req.session.user.includes('unregistered@decspace.com')) {
+    //find the id of the unregistered user
+    db1.accounts.find().sort( {name: 1}, function(err, doc) {
+      var id;
+
+      for(user in doc)
+        if(doc[user].email == req.session.user) {
+          id = doc[user]['_id'];
+          break;
+        }
+
+      //remove the unregistered user from the db
+      db1.accounts.remove({_id: mongojs.ObjectId(id)});
+      //reset the session
+      req.session.reset();
+      res.send(req.session);
+    });
+  }
+  else {
+    req.session.reset();
+    res.send(req.session);
+  }
 });
 
 /*** EMAIL HANDLING ***/

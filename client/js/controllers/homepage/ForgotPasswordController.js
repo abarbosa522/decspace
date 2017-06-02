@@ -10,36 +10,46 @@ app.controller('ForgotPasswordController', function($scope, $window, $http) {
   }
 
   $scope.recoverPassword = function() {
-    $http.get('/accounts').success(function(response) {
+    $http.get('/accounts').then(function(response) {
       var valid_email = false;
 
-      for(account in response) {
-        if(response[account]['email'] == $scope.forgot.email) {
+      for(account in response.data) {
+        if(response.data[account].email == $scope.forgot.email) {
           valid_email = true;
-          $scope.forgot.password = response[account]['password'];
+          $scope.forgot.password = response.data[account].password;
           break;
         }
       }
 
       if(valid_email) {
-        $http.post('/password', $scope.forgot).success(function(response) {
-          if(response == message_template) {
-            $scope.showSuccessAlert = true;
-            $scope.showErrorEmailAlert = false;
-            $scope.showErrorMessageAlert = false;
-          }
-          else {
-            $scope.showSuccessAlert = false;
-            $scope.showErrorEmailAlert = false;
-            $scope.showErrorMessageAlert = true;
-          }
+        $http.post('/password', $scope.forgot).then(function(response) {
+          if(response.data == message_template)
+            showAlert('successful-forgot');
+          else
+            showAlert('error-forgot');
         });
       }
-      else {
-        $scope.showSuccessAlert = false;
-        $scope.showErrorEmailAlert = true;
-        $scope.showErrorMessageAlert = false;
-      }
+      else
+        showAlert('wrong-email');
     });
   }
+
+  //hide all alerts
+  function hideAlerts() {
+    $('#successful-forgot').hide();
+    $('#wrong-email').hide();
+    $('#error-forgot').hide();
+  }
+
+  //show certain alert and hide it smoothly
+  function showAlert(alert_id) {
+    //show alert
+    angular.element(document.querySelector('#' + alert_id)).alert();
+    //hide alert
+    angular.element(document.querySelector('#' + alert_id)).fadeTo(3000, 500).slideUp(500, function(){
+      angular.element(document.querySelector('#' + alert_id)).slideUp(500);
+    });
+  }
+
+  hideAlerts();
 });

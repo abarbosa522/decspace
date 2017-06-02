@@ -135,7 +135,7 @@ app.controller('ProjectsController', function($scope, $window, $http, SortDataSe
       new_proj.creation_date = creation_date;
       new_proj.last_update = creation_date;
       new_proj.copy_number = copy_number;
-      
+
       //add the new list of projects
       $http.post('/projects', new_proj).then(function() {
         //refresh the list of projects

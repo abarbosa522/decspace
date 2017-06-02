@@ -2,16 +2,55 @@ app.controller('SignUpController', function($scope, $window, $http) {
 
   $scope.inputType = 'password';
 
+  //initialize the signup object
+  $scope.signup = {};
+
+  //account privacy is public by default
+  $scope.signup.privacy = 'public';
+
+  //redirect to the Sign Up page
   $scope.toSignUp = function() {
     $window.location.href = 'signup.html';
   }
 
+  //redirect to the Log In page
   $scope.toLogIn = function() {
     $window.location.href = 'login.html';
   }
 
+  //register new account
   $scope.signUp = function() {
-    if(typeof $scope.signup.email != 'undefined') {
+    var can_register = true;
+
+    //if a name was not assigned
+    if($scope.signup.name == undefined || $scope.signup.name == '') {
+      $('#input-name').addClass('has-error');
+      can_register = false;
+    }
+    else
+      $('#input-name').removeClass('has-error');
+
+    //if an email was not assigned
+    if($scope.signup.email == undefined || $scope.signup.email == '') {
+      $('#input-email').addClass('has-error');
+      can_register = false;
+    }
+    else
+      $('#input-email').removeClass('has-error');
+
+    //if a password was not assigned
+    if($scope.signup.password == undefined || $scope.signup.password == '') {
+      $('#input-password').addClass('has-error');
+      can_register = false;
+    }
+    else
+      $('#input-password').removeClass('has-error');
+
+    if(can_register) {
+      $('#input-name').removeClass('has-error');
+      $('#input-email').removeClass('has-error');
+      $('#input-password').removeClass('has-error');
+
       $http.get('/accounts').then(function(response) {
         //check if input email already exists
         var email_exists = false;
@@ -39,13 +78,14 @@ app.controller('SignUpController', function($scope, $window, $http) {
 
           //create new account
           $http.post('/accounts', $scope.signup).then(function(response) {
-            $scope.showSuccessAlert = true;
+            showAlert('successful-register');
           });
         }
       });
     }
   }
 
+  //show or hide input password
   $scope.showPassword = function() {
     if($scope.inputType == 'password') {
       $scope.inputType = 'text';
@@ -62,4 +102,21 @@ app.controller('SignUpController', function($scope, $window, $http) {
       angular.element(document.querySelector('#eye-image')).addClass('glyphicon-eye-open');
     }
   }
+
+  //hide all alerts
+  function hideAlerts() {
+    $('#successful-register').hide();
+  }
+
+  //show certain alert and hide it smoothly
+  function showAlert(alert_id) {
+    //show alert
+    angular.element(document.querySelector('#' + alert_id)).alert();
+    //hide alert
+    angular.element(document.querySelector('#' + alert_id)).fadeTo(3000, 500).slideUp(500, function(){
+      angular.element(document.querySelector('#' + alert_id)).slideUp(500);
+    });
+  }
+
+  hideAlerts();
 });
