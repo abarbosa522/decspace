@@ -10,7 +10,7 @@ app.controller('IndexController', function($scope, $window, $http) {
 
   $scope.unregisteredLogIn = function() {
     $http.post('/unregisteredLogIn').then(function(res) {
-      $window.location.href = 'content/dashboard/dashboard.html';
+      $window.location.href = 'content/workspace/projects.html';
     });
   }
 

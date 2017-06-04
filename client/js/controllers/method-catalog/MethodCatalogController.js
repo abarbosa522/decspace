@@ -16,6 +16,12 @@ app.controller('MethodCatalogController', function($scope, $window, $http, Metho
               break;
             }
           }
+
+          //check if the logged user is unregistered
+          if($scope.username.includes('unregistered@decspace.com'))
+            $scope.unregistered_user = true;
+          else
+            $scope.unregistered_user = false;
         });
       }
     });
@@ -23,7 +29,7 @@ app.controller('MethodCatalogController', function($scope, $window, $http, Metho
 
   $scope.logOut = function() {
     $http.get('/logout').then(function(res) {
-      $window.location.href = '../../index.html';
+      $window.location.reload();
     });
   }
 

@@ -46,7 +46,7 @@
             <span class = 'icon-bar'></span>
           </button>
           <!-- Title -->
-          <a class = 'navbar-brand' href = '../dashboard/dashboard.html'>DecSpace</a>
+          <a class = 'navbar-brand' href = '../workspace/projects.html'>DecSpace</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -54,7 +54,9 @@
           <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
           <ul class = 'nav navbar-nav navbar-right'>
             <li>
-              <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic'>Welcome, {{name}}!</p>
+              <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic' ng-if = '!unregistered_user' ng-cloak>Welcome, {{name}}!</p>
+
+              <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic' ng-if = 'unregistered_user' ng-cloak>Welcome!</p>
             </li>
 
             <li><a href = '../homepage/about.html'>About</a></li>
@@ -65,6 +67,10 @@
 
             <li><a href = '../homepage/contactus.html'>Contact Us</a></li>
 
+            <li class = 'active'><a href = '../settings/settings.html'>Settings</a></li>
+
+            <li><a href = '../administrator/administrator.html' ng-if = 'username == "admin@admin"' ng-cloak>Administrator</a></li>
+            
             <li>
               <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'logOut()'>
                 <span class = 'glyphicon glyphicon-log-out'></span>
@@ -77,10 +83,7 @@
     </nav>
 
     <div id = 'main-content' class = 'container'>
-      <ul class = 'breadcrumb'>
-        <li><a href = '../dashboard/dashboard.html'>Dashboard</a></li>
-        <li class = 'active'>Settings</li>
-      </ul>
+      <br>
 
       <p class = 'header-1'>Settings</p>
 

@@ -16,6 +16,12 @@ app.controller('MethodController', function($scope, $window, $http) {
               break;
             }
           }
+
+          //check if the logged user is unregistered
+          if($scope.username.includes('unregistered@decspace.com'))
+            $scope.unregistered_user = true;
+          else
+            $scope.unregistered_user = false;
         });
       }
     });

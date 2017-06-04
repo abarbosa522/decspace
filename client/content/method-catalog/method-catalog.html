@@ -54,7 +54,7 @@
           </div>
 
           <div ng-if = 'loggedIn' ng-cloak>
-            <a class = 'navbar-brand' href = '../dashboard/dashboard.html'>DecSpace</a>
+            <a class = 'navbar-brand' href = '../workspace/projects.html'>DecSpace</a>
           </div>
         </div>
 
@@ -63,7 +63,9 @@
           <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
           <ul class = 'nav navbar-nav navbar-right'>
             <li ng-if = 'loggedIn' ng-cloak>
-              <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic'>Welcome, {{name}}!</p>
+              <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic' ng-if = '!unregistered_user' ng-cloak>Welcome, {{name}}!</p>
+
+              <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic' ng-if = 'unregistered_user' ng-cloak>Welcome!</p>
             </li>
 
             <li><a href = '../homepage/about.html'>About</a></li>
@@ -71,6 +73,10 @@
             <li><a href = '../homepage/faq.html'>FAQ</a></li>
             <li><a href = '../homepage/contactus.html'>Contact Us</a></li>
 
+            <li ng-if = 'loggedIn'><a href = '../settings/settings.html'>Settings</a></li>
+
+            <li><a href = '../administrator/administrator.html' ng-if = 'username == "admin@admin"' ng-cloak>Administrator</a></li>
+            
             <li ng-if = '!loggedIn' ng-cloak>
               <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'toSignUp()'>
                 <span class = 'glyphicon glyphicon-user'></span>
@@ -97,17 +103,7 @@
     </nav>
 
     <div id = 'main-content' class = 'container'>
-
-      <div ng-if = 'loggedIn' ng-cloak>
-        <ul class = 'breadcrumb' style = 'text-align: center'>
-          <li><a href = '../dashboard/dashboard.html'>Dashboard</a></li>
-          <li class = 'active'>Method Catalog</li>
-        </ul>
-      </div>
-
-      <div ng-if = '!loggedIn' ng-cloak>
-        <br>
-      </div>
+      <br>
 
       <p class = 'header-1'>Method Catalog</p>
 

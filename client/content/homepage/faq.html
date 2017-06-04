@@ -52,7 +52,7 @@
           </div>
 
           <div ng-if = 'loggedIn' ng-cloak>
-            <a class = 'navbar-brand' href = '../dashboard/dashboard.html'>DecSpace</a>
+            <a class = 'navbar-brand' href = '../workspace/projects.html'>DecSpace</a>
           </div>
         </div>
 
@@ -69,6 +69,10 @@
             <li class = 'active'><a href = 'faq.html'>FAQ</a></li>
             <li><a href = 'contactus.html'>Contact Us</a></li>
 
+            <li ng-if = 'loggedIn'><a href = '../settings/settings.html'>Settings</a></li>
+
+            <li><a href = '../administrator/administrator.html' ng-if = 'username == "admin@admin"' ng-cloak>Administrator</a></li>
+            
             <li ng-if = '!loggedIn' ng-cloak>
               <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'toSignUp()'>
                 <span class = 'glyphicon glyphicon-user'></span>
@@ -96,16 +100,7 @@
 
     <div id = 'main-content' class = 'container'>
 
-      <div ng-if = 'loggedIn' ng-cloak>
-        <ul class = 'breadcrumb' style = 'text-align: center'>
-          <li><a href = '../dashboard/dashboard.html'>Dashboard</a></li>
-          <li class = 'active'>FAQ</li>
-        </ul>
-      </div>
-
-      <div ng-if = '!loggedIn' ng-cloak>
-        <br>
-      </div>
+      <br>
 
       <p class = 'header-1'>FAQ</p>
       <p>Frequently Asked Questions</p>
