@@ -195,17 +195,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   //if workflow == '', then reload last saved workflow
   $scope.reloadData = function(alertShowing, workflow) {
     $http.get('/projects').then(function(response) {
-      //remove current modules
-      for(mod in modules)
-        $('#' + modules[mod]['id']).remove();
-      //reset the modules array
-      modules = [];
-
-      //remove all existant connections
-      for(connection in connections)
-        $('#' + connections[connection]['id']).remove();
-      //reset the connections array
-      connections = [];
+      //remove current modules and connections
+      resetCurrentData();
 
       //reload last saved workflow
       if(workflow == '') {
@@ -1415,8 +1406,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
           }
         }
       }
-      //create new execution
-      newExecution();
+      //create the modules with the results of the executed methods
+      createOutputModules();
       //show the successful execution alert
       showAlert('execution-success');
     }
@@ -1533,11 +1524,18 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     return method_executed;
   }
 
-  function resetOutputFields() {
+  //create the output modules for the executed methods
+  //if an output module already exists, overwrite it
+  //if the output point is connected to another module, create the output module and connect it to both modules
+  function createOutputModules() {
+
+  }
+
+/*  function resetOutputFields() {
     for(mod in modules)
       if(modules[mod]['type'] != 'Input File')
         modules[mod]['output'] = [];
-  }
+  }*/
 
   /*** ARCHIVE FUNCTIONS ***/
   $scope.archive = {};
@@ -1647,7 +1645,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       }
 
       //transform modules data to CSV files
-      var files = JSONtoCSV(workflow_data.modules[mod]);
+      var files = generateCSVFiles(workflow_data.modules[mod]);
 
       //add files to the respective folders
       for(input_file in files[0]) {
@@ -1676,55 +1674,20 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     });
   }
 
-  function JSONtoCSV(data) {
+  function generateCSVFiles(data) {
     //generate input files
     var input_files = [], input_titles = [];
 
     //iterate over input data (e.g, criteria and actions)
     for(input in data.input) {
+      //store title
       input_titles.push(input);
-
-      //create new csv file
-      var csv_str = '';
-
-      //iterate over the fields
-      for(field in data.input[input][0]) {
-        if(data.input[input][0][field].length != undefined)
-          csv_str += field + ';';
-      }
-
-      csv_str = csv_str.substring(0, csv_str.length - 1);
-      csv_str += '\n';
-
-      for(obj in data.input[input]) {
-        for(item in data.input[input][obj])
-          if(data.input[input][obj][item].length != undefined)
-            csv_str += data.input[input][obj][item] + ';';
-
-        csv_str = csv_str.substring(0, csv_str.length - 1);
-        csv_str += '\n';
-      }
-
-      input_files.push(csv_str);
+      //transform json data into csv
+      input_files.push(JSONtoCSV(data.input[input]));
     }
 
     //generate output file
-    var output_file = '';
-
-    //iterate over the fields
-    for(field in data.output[0])
-      output_file += field + ';';
-
-    output_file = output_file.substring(0, output_file.length - 1);
-    output_file += '\n';
-
-    for(obj in data.output) {
-      for(item in data.output[obj])
-        output_file += data.output[obj][item] + ';';
-
-      output_file = output_file.substring(0, output_file.length - 1);
-      output_file += '\n';
-    }
+    var output_file = JSONtoCSV(data.output);
 
     return [input_files, output_file, input_titles];
   }
@@ -1733,16 +1696,119 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     var input_workflow = document.getElementById('input-workflow');
 
     for(i = 0; i < input_workflow.files.length; i++) {
-      //console.log(input_workflow.files[i])
       var zip = new JSZip();
 
       JSZip.loadAsync(input_workflow.files[i]).then(function(zip) {
-        for(file in zip.files)
-          zip.file("data.json").async("string").then(function(data) {
-            console.log(JSON.parse(data));
-          });
+        zip.file("data.json").async("string").then(function(data) {
+          var original_data = JSON.parse(data);
+
+          for(mod in original_data.modules) {
+            //unzip input data
+            for(input in original_data.modules[mod].input) {
+              unzipFile(zip, original_data.modules[mod].input[input], mod, input, function(res_data, res_mod, res_input) {
+                original_data.modules[res_mod].input[res_input] = CSVtoJSON(res_data);
+              });
+            }
+
+            //unzip output data
+            unzipFile(zip, original_data.modules[mod].output, mod, 0, function(res_data, res_mod, res_pos) {
+              original_data.modules[res_mod].output = CSVtoJSON(res_data);
+            });
+          }
+
+          //remove current modules and connections
+          resetCurrentData();
+
+          //reload imported data
+          modules = original_data.modules;
+          for(mod in modules)
+            reloadModule(modules[mod]);
+
+          connections = original_data.connections;
+          for(connection in connections)
+            reloadConnection(connections[connection]);
+        });
       });
     }
+  }
+
+  //get the data from a zipped file
+  function unzipFile(zip, data, mod, input, callback) {
+    zip.file(data).async('string').then(function(res_data) {
+      callback(res_data, mod, input);
+    });
+  }
+
+  function JSONtoCSV(data) {
+    //create new csv file
+    var csv_str = '';
+
+    //iterate over the fields
+    for(field in data[0]) {
+      if(data[0][field].length != undefined)
+        csv_str += field + ';';
+    }
+
+    csv_str = csv_str.substring(0, csv_str.length - 1);
+    csv_str += '\n';
+
+    for(obj in data) {
+      for(item in data[obj])
+        if(data[obj][item].length != undefined)
+          csv_str += data[obj][item] + ';';
+
+      csv_str = csv_str.substring(0, csv_str.length - 1);
+      csv_str += '\n';
+    }
+
+    return csv_str;
+  }
+
+  function CSVtoJSON(data) {
+    var res_data = [];
+
+    var rows = data.split("\n");
+
+    for(row in rows)
+      rows[row] = rows[row].trim();
+
+    var columns = rows[0].split(";");
+
+    //remove whitespaces and empty strings
+    for(column in columns)
+      columns[column] = columns[column].trim();
+
+    for(var i = 1; i < rows.length; i++) {
+      var cells = rows[i].split(";");
+      var element = {};
+
+      //add the unique id
+      element['id'] = i;
+
+      for(var j = 0; j < cells.length; j++)
+        if(cells[j].trim() != '' && columns[j].trim() != '')
+          element[columns[j]] = cells[j];
+
+      if(!angular.equals(element, {}))
+        res_data.push(element);
+    }
+
+    return res_data;
+  }
+
+  //reset current modules and connections
+  function resetCurrentData() {
+    //remove current modules
+    for(mod in modules)
+      $('#' + modules[mod]['id']).remove();
+    //reset the modules array
+    modules = [];
+
+    //remove all existant connections
+    for(connection in connections)
+      $('#' + connections[connection]['id']).remove();
+    //reset the connections array
+    connections = [];
   }
 
   /*** STARTUP FUNCTIONS ***/
