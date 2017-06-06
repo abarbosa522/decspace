@@ -91,7 +91,7 @@ app.controller('ProjectsController', function($scope, $window, $http, SortDataSe
         new_proj['name'] = $scope.project.name;
         new_proj['creation_date'] = creation_date;
         new_proj['last_update'] = creation_date;
-        new_proj['executions'] = [];
+        new_proj['archive'] = [];
 
         //add the new project to the database
         $http.post('/projects', new_proj).then(function() {

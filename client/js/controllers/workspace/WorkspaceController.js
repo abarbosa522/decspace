@@ -69,9 +69,9 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         //add the new list of projects
         $http.post('/projects', proj_res).then(function() {
           //retrieve the data stored in the database
-          $scope.reloadData(false);
+          $scope.reloadData(false, '');
           //update the list of executions
-          //getExecutions();
+          getArchive();
         });
       });
     });
@@ -106,7 +106,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       }
   });
 
-  function dragMoveListener (event) {
+  function dragMoveListener(event) {
     var target = event.target,
         // keep the dragged position in the data-x/data-y attributes
         x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
@@ -128,7 +128,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   /*** BUTTON BAR FUNCTIONS ***/
 
   //save the current data
-  $scope.saveData = function() {
+  $scope.saveData = function(callback) {
     $http.get('/projects').then(function(response) {
       //save the position of all modules
       for(mod in modules)
@@ -139,10 +139,31 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         //get the current project
         for(proj in response.data) {
           if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
-            //insert the created modules into the database
-            response.data[proj]['modules'] = modules;
-            //insert the created connections into the database
-            response.data[proj]['connections'] = connections;
+            var new_workflow = {};
+            new_workflow.modules = modules;
+            new_workflow.connections = connections;
+
+            //get current date
+            var current_date = new Date();
+            var save_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
+            var save_time = + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
+
+            new_workflow.date = save_date;
+            new_workflow.time = save_time;
+
+            new_workflow.comment = $scope.save_comment;
+
+            var largest_id = 0;
+
+            for(workflow in response.data[proj].archive)
+              if(response.data[proj].archive[workflow].id > largest_id)
+                largest_id = response.data[proj].archive[workflow].id;
+
+            largest_id++;
+
+            new_workflow.id = largest_id;
+
+            response.data[proj].archive.push(new_workflow);
             //get the id of the document
             id_doc = response.data[proj]['_id'];
             //project to store in the db
@@ -158,13 +179,21 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         $http.post('/projects', proj_res).then(function() {
           //show save success alert
           showAlert('save-success');
+          //refresh archive
+          getArchive();
+          //reset comment variable
+          $scope.comment = '';
+
+          if(callback != undefined)
+            callback();
         });
       });
     });
   }
 
-  //reload last save
-  $scope.reloadData = function(alertShowing) {
+  //reload workflow
+  //if workflow == '', then reload last saved workflow
+  $scope.reloadData = function(alertShowing, workflow) {
     $http.get('/projects').then(function(response) {
       //remove current modules
       for(mod in modules)
@@ -178,16 +207,27 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       //reset the connections array
       connections = [];
 
-      for(proj in response.data) {
-        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
-          if(response.data[proj]['modules'] != undefined)
-            modules = response.data[proj]['modules'];
-
-          if(response.data[proj]['connections'] != undefined)
-            connections = response.data[proj]['connections'];
-
-          break;
-        }
+      //reload last saved workflow
+      if(workflow == '') {
+        for(proj in response.data)
+          if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
+            if(response.data[proj].archive.length > 0) {
+              modules = response.data[proj].archive[response.data[proj].archive.length - 1].modules;
+              connections = response.data[proj].archive[response.data[proj].archive.length - 1].connections;
+            }
+            break;
+          }
+      }
+      else {
+        for(proj in response.data)
+          if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
+            for(workf in response.data[proj].archive)
+              if(response.data[proj].archive[workf].id == workflow) {
+                modules = response.data[proj].archive[workf].modules;
+                connections = response.data[proj].archive[workf].connections;
+                break;
+              }
+          }
       }
 
       //add the modules previously stored in the database
@@ -437,9 +477,27 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     modules.push(new_mod);
   }
 
+  $scope.module_delete = '';
+  $scope.module_delete_name = '';
+
+  //select a module to be deleted
+  $scope.selectDeleteModule = function(event) {
+    $scope.module_delete = event;
+
+    for(mod in modules)
+      if(modules[mod].id == $scope.module_delete.target.parentNode.parentNode.attributes.id.value) {
+        if(modules[mod].type != 'Input File')
+          $scope.module_delete_name = modules[mod].type + modules[mod].name_id;
+        else
+          $scope.module_delete_name = modules[mod].name;
+      }
+
+    $('#delete-module-modal').modal();
+  }
+
   //delete a certain module
-  $scope.deleteModule = function(event) {
-    var mod_id = event.target.parentNode.parentNode.attributes.id.value;
+  $scope.deleteModule = function() {
+    var mod_id = $scope.module_delete.target.parentNode.parentNode.attributes.id.value;
 
     //remove module from the DOM
     $('#' + mod_id).remove();
@@ -1479,6 +1537,212 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     for(mod in modules)
       if(modules[mod]['type'] != 'Input File')
         modules[mod]['output'] = [];
+  }
+
+  /*** ARCHIVE FUNCTIONS ***/
+  $scope.archive = {};
+
+  //refresh the archive, i.e. list of saved workflows
+  function getArchive() {
+    $http.get('/projects').then(function(response) {
+      //get the current project
+      for(proj in response.data)
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
+          $scope.archive = response.data[proj].archive;
+          break;
+        }
+    });
+  }
+
+  //open the save workflow modal
+  $scope.openSaveDataModal = function() {
+    $scope.save_comment = '';
+    $('#save-modal').modal();
+  }
+
+  //holds the workflow selected to be deleted
+  $scope.delete_workflow = '';
+
+  //select a workflow to be deleted
+  $scope.deleteWorkflow = function(workflow) {
+    $scope.delete_workflow = workflow.id;
+  }
+
+  //delete workflow
+  $scope.confirmDeleteWorkflow = function(workflow) {
+    $http.get('/projects').then(function(response) {
+      var proj_res, id_doc;
+
+      //get the current project
+      for(proj in response.data)
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
+          for(workf in response.data[proj].archive) {
+            if(response.data[proj].archive[workf].id == workflow.id) {
+              response.data[proj].archive.splice(workf, 1);
+              //get the id of the document, so that it can be removed from the db
+              id_doc = response.data[proj]['_id'];
+              //project to store in the db and remove the id of the document
+              proj_res = response.data[proj];
+              delete proj_res['_id'];
+            }
+          }
+          break;
+        }
+
+      //delete the previous document with the list of projects
+      $http.delete('/projects/' + id_doc).then(function() {
+        //add the new list of projects
+        $http.post('/projects', proj_res).then(function() {
+          //update the list of executions
+          getArchive();
+        });
+      });
+    });
+  }
+
+  //cancel the deletion of a workflow
+  $scope.cancelDeleteWorkflow = function() {
+    $scope.delete_workflow = '';
+  }
+
+  //workflow selected to be reloaded
+  $scope.reload_workflow = '';
+
+  //open the confirmation box to save before reloading
+  $scope.openSaveConfirmation = function(workflow) {
+    $scope.reload_workflow = workflow.id;
+    $('#archive-modal').modal('hide');
+    $('#save-confirmation-reload-modal').modal();
+  }
+
+  //save current workflow and reload the selected one
+  $scope.confirmSaveReloadWorkflow = function() {
+    $scope.saveData(function() {
+      $scope.reloadData(true, $scope.reload_workflow);
+    });
+  }
+
+  $scope.exportWorkflow = function(workflow) {
+    //make a copy of the workflow data
+    var workflow_data = angular.copy(workflow);
+
+    //create zip file
+    var zip = new JSZip();
+    //create modules folder
+    zip.folder('modules data');
+
+    for(mod in workflow_data.modules) {
+      //create folder for module data
+      var input_folder, output_folder;
+
+      if(workflow_data.modules[mod].type == 'Input File') {
+        zip.folder('modules data/' + workflow_data.modules[mod].name);
+        input_folder = zip.folder('modules data/' + workflow_data.modules[mod].name + '/input');
+        output_folder = zip.folder('modules data/' + workflow_data.modules[mod].name + '/output');
+      }
+      else {
+        zip.folder('modules data/' + workflow_data.modules[mod].type + workflow_data.modules[mod].name_id);
+        input_folder = zip.folder('modules data/' + workflow_data.modules[mod].type + workflow_data.modules[mod].name_id + '/input');
+        output_folder = zip.folder('modules data/' + workflow_data.modules[mod].type + workflow_data.modules[mod].name_id + '/output');
+      }
+
+      //transform modules data to CSV files
+      var files = JSONtoCSV(workflow_data.modules[mod]);
+
+      //add files to the respective folders
+      for(input_file in files[0]) {
+        input_folder.file(files[2][input_file] + '.csv', files[0][input_file]);
+
+        //modify the workflow data to reference the data files
+        if(workflow_data.modules[mod].type == 'Input File')
+          workflow_data.modules[mod].input[files[2][input_file]] = 'modules data/' + workflow_data.modules[mod].name + '/input/' + files[2][input_file] + '.csv';
+        else
+          workflow_data.modules[mod].input[files[2][input_file]] = 'modules data/' + workflow_data.modules[mod].type + workflow_data.modules[mod].name_id + '/input/' + files[2][input_file] + '.csv';
+      }
+
+      output_folder.file('output.csv', files[1]);
+
+      if(workflow_data.modules[mod].type == 'Input File')
+        workflow_data.modules[mod].output = 'modules data/' + workflow_data.modules[mod].name + '/output/output.csv';
+      else
+        workflow_data.modules[mod].output = 'modules data/' + workflow_data.modules[mod].type + workflow_data.modules[mod].name_id + '/output/output.csv';
+    }
+
+    zip.file('data.json', JSON.stringify(workflow_data));
+
+    zip.generateAsync({type:"blob"}).then(function(content) {
+      // see FileSaver.js
+      saveAs(content, "workflow.zip");
+    });
+  }
+
+  function JSONtoCSV(data) {
+    //generate input files
+    var input_files = [], input_titles = [];
+
+    //iterate over input data (e.g, criteria and actions)
+    for(input in data.input) {
+      input_titles.push(input);
+
+      //create new csv file
+      var csv_str = '';
+
+      //iterate over the fields
+      for(field in data.input[input][0]) {
+        if(data.input[input][0][field].length != undefined)
+          csv_str += field + ';';
+      }
+
+      csv_str = csv_str.substring(0, csv_str.length - 1);
+      csv_str += '\n';
+
+      for(obj in data.input[input]) {
+        for(item in data.input[input][obj])
+          if(data.input[input][obj][item].length != undefined)
+            csv_str += data.input[input][obj][item] + ';';
+
+        csv_str = csv_str.substring(0, csv_str.length - 1);
+        csv_str += '\n';
+      }
+
+      input_files.push(csv_str);
+    }
+
+    //generate output file
+    var output_file = '';
+
+    //iterate over the fields
+    for(field in data.output[0])
+      output_file += field + ';';
+
+    output_file = output_file.substring(0, output_file.length - 1);
+    output_file += '\n';
+
+    for(obj in data.output) {
+      for(item in data.output[obj])
+        output_file += data.output[obj][item] + ';';
+
+      output_file = output_file.substring(0, output_file.length - 1);
+      output_file += '\n';
+    }
+
+    return [input_files, output_file, input_titles];
+  }
+
+  $scope.importWorkflow = function() {
+    var input_workflow = document.getElementById('input-workflow');
+
+    for(i = 0; i < input_workflow.files.length; i++) {
+      //console.log(input_workflow.files[i])
+      var zip = new JSZip();
+
+      JSZip.loadAsync(input_workflow.files[i]).then(function(zip) {
+        for(file in zip.files)
+          zip.file("data.json").async("string").then(function(data) {
+            console.log(JSON.parse(data));
+          });
+      });
+    }
   }
 
   /*** STARTUP FUNCTIONS ***/

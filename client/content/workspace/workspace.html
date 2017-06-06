@@ -62,6 +62,11 @@
     </script>
     <script type = 'text/javascript' async src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=AM_CHTML'></script>
 
+    <!-- JSZip -->
+    <script type = 'text/javascript' src = '../../js/shared/jszip.js'></script>
+
+    <!-- FileSaver -->
+    <script type = 'text/javascript' src = '../../js/shared/FileSaver.js'></script>
   </head>
 
   <body ng-app = 'decspace' ng-controller = 'WorkspaceController'>
@@ -135,19 +140,21 @@
             </button>
 
             <!-- Save Button -->
-            <button type = 'button' class = 'btn btn-primary' ng-click = 'saveData()' title = 'Save Workflow'>
+            <button type = 'button' class = 'btn btn-primary' ng-click = 'openSaveDataModal()' title = 'Save Workflow'>
               <span class = 'glyphicon glyphicon-floppy-save icon-large'></span>
             </button>
 
-            <!-- Reload Data Button -->
-            <button type = 'button' class = 'btn btn-info' ng-click = 'reloadData(true)' title = 'Reload Workflow'>
-              <span class = 'glyphicon glyphicon-refresh'></span>
-            </button>
-
             <!-- Import Button -->
-            <button type = 'button' class = 'btn btn-warning' title = 'Import Data' data-toggle = 'modal' data-target = '#import-modal'>
-              <span class = 'glyphicon glyphicon-import icon-large'></span>
-            </button>
+            <div class = 'btn-group' role = 'group'>
+              <button type = 'button' class = 'btn btn-warning dropdown-toggle' data-toggle = 'dropdown' title = 'Import Data'>
+                <span class = 'glyphicon glyphicon-import icon-large'></span>
+                <span class = 'caret'></span>
+              </button>
+              <ul class = 'dropdown-menu'>
+                <li data-toggle = 'modal' data-target = '#import-input-file-modal'><a href>Import Input File</a></li>
+                <li data-toggle = 'modal' data-target = '#import-workflow-modal'><a href>Import Workflow</a></li>
+              </ul>
+            </div>
 
             <!-- Modules List -->
             <div class = 'btn-group' role = 'group'>
@@ -163,7 +170,7 @@
             </div>
 
             <!-- Archive Button -->
-            <button type = 'button' class = 'btn btn-default' title = 'Archive'>
+            <button type = 'button' class = 'btn btn-default' title = 'Archive' data-toggle = 'modal' data-target = '#archive-modal'>
               <i class = 'fa fa-archive' aria-hidden = 'true'></i>
             </button>
           </div>
@@ -216,13 +223,41 @@
         <!-- SVG Area -->
         <svg id = 'svg'>
 
-          <!-- Import Modal -->
-          <div class = 'modal fade' id = 'import-modal' role = 'dialog'>
+          <!-- Save Modal -->
+          <div class = 'modal fade' id = 'save-modal' role = 'dialog'>
             <div class = 'modal-dialog'>
               <div class = 'modal-content'>
                 <div class = 'modal-header'>
                   <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-                  <h4 class = 'modal-title'>Import Data</h4>
+                  <h4 class = 'modal-title'>Save Data</h4>
+                </div>
+                <div class = 'modal-body'>
+
+                  <form class = 'form-inline'>
+                    <label for = 'save-comment'>Comment (Optional)</label>
+                    <input id = 'save-comment' type = 'text' class = 'form-control' ng-model = 'save_comment'>
+                  </form>
+
+                  <br>
+
+                  <div class = 'row'>
+                    <div class = 'col-md-5'></div>
+                    <button type = 'button' class = 'btn btn-primary col-md-2' ng-click = 'saveData()' data-dismiss = 'modal'>
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Import Input File Modal -->
+          <div class = 'modal fade' id = 'import-input-file-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>Import Input File</h4>
                 </div>
                 <div class = 'modal-body'>
 
@@ -242,6 +277,126 @@
 
                   <p><sub>CSV and JSON formats are accepted.</sub></p>
 
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Import Workflow Modal -->
+          <div class = 'modal fade' id = 'import-workflow-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>Import Workflow</h4>
+                </div>
+                <div class = 'modal-body'>
+
+                  <div class = 'row'>
+                    <div class = 'col-md-4'></div>
+                    <input id = 'input-workflow' type = 'file'>
+                  </div>
+
+                  <br>
+
+                  <div class = 'row'>
+                    <div class = 'col-md-5'></div>
+                    <button type = 'button' class = 'btn btn-primary col-md-2' ng-click = 'importWorkflow()' data-dismiss = 'modal'>
+                      Import
+                    </button>
+                  </div>
+
+                  <p><sub>ZIP format is accepted.</sub></p>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Archive Modal -->
+          <div class = 'modal fade' id = 'archive-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>Archive</h4>
+                </div>
+                <div class = 'modal-body'>
+
+                  <table class = 'table table-bordered table-hover'>
+                    <thead>
+                      <tr>
+                        <th class = 'text-center'>Comment</th>
+                        <th class = 'text-center'>Creation Date</th>
+                        <th class = 'col-md-4'></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat = 'workflow in archive' ng-class = '{"danger" : workflow.id == delete_workflow}'>
+                        <td>{{workflow.comment}}</td>
+                        <td>{{workflow.date}} - {{workflow.time}}</td>
+                        <td>
+                          <div ng-if = 'workflow.id != delete_workflow'>
+                            <!-- Reload Workflow Button -->
+                            <button type = 'button' class = 'btn btn-default' ng-click = 'openSaveConfirmation(workflow)' title = 'Reload Workflow' data-dismiss = 'modal'>
+                              <span class = 'glyphicon glyphicon-repeat'></span>
+                            </button>
+                            <!-- Export Workflow Button -->
+                            <button type = 'button' class = 'btn btn-default' ng-click = 'exportWorkflow(workflow)' title = 'Export Workflow'>
+                              <span class = 'glyphicon glyphicon-export'></span>
+                            </button>
+                            <!-- Delete Workflow Button -->
+                            <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteWorkflow(workflow)' title = 'Delete Workflow'>
+                              <span class = 'glyphicon glyphicon-minus'></span>
+                            </button>
+                          </div>
+
+                          <div ng-if = 'workflow.id == delete_workflow'>
+                            <!-- Confirm Workflow Deletion Button -->
+                            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteWorkflow(workflow)' title = 'Confirm Workflow Deletion'>
+                              <span class = 'glyphicon glyphicon-ok'></span>
+                            </button>
+
+                            <!-- Cancel Workflow Deletion Button -->
+                            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteWorkflow()' title = 'Cancel Workflow Deletion'>
+                              <span class = 'glyphicon glyphicon-remove'></span>
+                            </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Save Confirmation Modal -->
+          <div class = 'modal fade' id = 'save-confirmation-reload-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>Do you want to save the current workflow before reloading the new one?</h4>
+                </div>
+                <div class = 'modal-body'>
+                  <div class = 'row'>
+                    <div class = 'col-md-2'></div>
+
+                    <div class = 'col-md-4'>
+                      <button type = 'button' class = 'btn btn-primary' ng-click = 'confirmSaveReloadWorkflow()' data-dismiss = 'modal' title = 'Confirm Module Deletion'>
+                        Yes
+                      </button>
+                    </div>
+
+                    <div class = 'col-md-4'>
+                      <button type = 'button' class = 'btn btn-primary' ng-click = 'reloadData(true, reload_workflow)' data-dismiss = 'modal' title = 'Cancel Module Deletion'>
+                        No
+                      </button>
+                    </div>
+
+                    <div class = 'col-md-2'></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1345,7 +1500,7 @@
             <div id = 'inputfile' class = 'module-template module-inputfile draggable'>
               <a id = 'filename' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#inputfile-modal' ng-click = 'selectCurrentModule($event)'></a>
 
-              <a href ng-click = 'deleteModule($event)' style = 'display: block; margin-top: -13%; margin-left: 87%'>
+              <a href ng-click = 'selectDeleteModule($event)' style = 'display: block; margin-top: -13%; margin-left: 87%'>
                 <span class = 'glyphicon glyphicon-remove'></span>
               </a>
 
@@ -1359,7 +1514,7 @@
             <div id = 'orderby' class = 'module-template module-orderby draggable'>
               <a id = 'mod-name' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#orderby-modal' ng-click = 'selectCurrentModule($event)'></a>
 
-              <a href ng-click = 'deleteModule($event)' style = 'display: block; margin-top: -14.5%; margin-left: 87%'>
+              <a href ng-click = 'selectDeleteModule($event)' style = 'display: block; margin-top: -14.5%; margin-left: 87%'>
                 <span class = 'glyphicon glyphicon-remove'></span>
               </a>
 
@@ -1379,7 +1534,7 @@
             <div id = 'sort' class = 'module-template module-sort draggable'>
               <a id = 'mod-name' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#sort-modal' ng-click = 'selectCurrentModule($event)'></a>
 
-              <a href ng-click = 'deleteModule($event)' style = 'display: block; margin-top: -13.5%; margin-left: 87%'>
+              <a href ng-click = 'selectDeleteModule($event)' style = 'display: block; margin-top: -13.5%; margin-left: 87%'>
                 <span class = 'glyphicon glyphicon-remove'></span>
               </a>
 
@@ -1396,7 +1551,7 @@
             <div id = 'cat-sd' class = 'module-template module-cat-sd draggable'>
               <a id = 'mod-name' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#cat-sd-modal' ng-click = 'selectCurrentModule($event)'></a>
 
-              <a href ng-click = 'deleteModule($event)' style = 'display: block; margin-top: -11%; margin-left: 91%'>
+              <a href ng-click = 'selectDeleteModule($event)' style = 'display: block; margin-top: -11%; margin-left: 91%'>
                 <span class = 'glyphicon glyphicon-remove'></span>
               </a>
 
@@ -1431,7 +1586,7 @@
             <div id = 'delphi' class = 'module-template module-delphi draggable'>
               <a id = 'mod-name' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#delphi-modal' ng-click = 'selectCurrentModule($event)'></a>
 
-              <a href ng-click = 'deleteModule($event)' style = 'display: block; margin-top: -14%; margin-left: 87%'>
+              <a href ng-click = 'selectDeleteModule($event)' style = 'display: block; margin-top: -14%; margin-left: 87%'>
                 <span class = 'glyphicon glyphicon-remove'></span>
               </a>
 
@@ -1454,7 +1609,7 @@
             <div id = 'srf' class = 'module-template module-srf draggable'>
               <a id = 'mod-name' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#srf-modal' ng-click = 'selectCurrentModule($event)'></a>
 
-              <a href ng-click = 'deleteModule($event)' style = 'display: block; margin-top: -12%; margin-left: 89%'>
+              <a href ng-click = 'selectDeleteModule($event)' style = 'display: block; margin-top: -12%; margin-left: 89%'>
                 <span class = 'glyphicon glyphicon-remove'></span>
               </a>
 
@@ -1482,6 +1637,39 @@
           </template>
 
         </svg>
+
+        <!-- Delete Module Modal -->
+        <div class = 'modal fade' id = 'delete-module-modal' role = 'dialog'>
+          <div class = 'modal-dialog'>
+            <div class = 'modal-content'>
+              <div class = 'modal-header'>
+                <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                <h4 class = 'modal-title'>Are you sure you want to delete the module {{module_delete_name}} and its connections?</h4>
+              </div>
+              <div class = 'modal-body'>
+                <div class = 'row'>
+                  <div class = 'col-md-2'>
+                  </div>
+
+                  <div class = 'col-md-4'>
+                    <button type = 'button' class = 'btn btn-primary' ng-click = 'deleteModule()' data-dismiss = 'modal' title = 'Confirm Module Deletion'>
+                      Yes
+                    </button>
+                  </div>
+
+                  <div class = 'col-md-4'>
+                    <button type = 'button' class = 'btn btn-primary' data-dismiss = 'modal' title = 'Cancel Module Deletion'>
+                      No
+                    </button>
+                  </div>
+
+                  <div class = 'col-md-2'>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>
