@@ -92,9 +92,19 @@ app.get('/logout', function(req, res) {
 
       //remove the unregistered user from the db
       db1.accounts.remove({_id: mongojs.ObjectId(id)});
-      //reset the session
-      req.session.reset();
-      res.send(req.session);
+
+      //find and remove this unregistered user's projects
+      db2.projects.find().sort( {project_id: 1}, function (err, doc2) {
+
+        for(proj in doc2)
+          if(doc2[proj].username == req.session.user)
+            db2.projects.remove({_id: mongojs.ObjectId(doc2[proj]['_id'])});
+
+        //reset the session
+        req.session.reset();
+        res.send(req.session);
+
+      });
     });
   }
   else {
@@ -153,8 +163,8 @@ app.post('/password', function(req, res) {
   });
 });
 
-//send Delphi survey links to user
-app.post('/delphi_survey', function(req, res) {
+//send inquiry links to user
+app.post('/inquiry_survey', function(req, res) {
   var mailOptions = {
     from: 'decspace2017@gmail.com', //sender address
     to: req.body.email,             //receiver
@@ -373,54 +383,54 @@ app.delete('/projects/:id', function(req, res) {
   });
 });
 
-//delphi rounds
-var db3 = mongojs('mongodb://' + username + ':' + password + '@ds157247.mlab.com:57247/decspace_users', ['delphi_rounds']);
+//inquiry rounds
+var db3 = mongojs('mongodb://' + username + ':' + password + '@ds157247.mlab.com:57247/decspace_users', ['inquiry_rounds']);
 
-//db3 functions - delphi rounds
-//get all delphi survey rounds from db
-app.get('/delphi_rounds', function(req, res) {
-  db3.delphi_rounds.find().sort( {id: 1}, function (err, doc) {
+//db3 functions - inquiry rounds
+//get all inquiry survey rounds from db
+app.get('/inquiry_rounds', function(req, res) {
+  db3.inquiry_rounds.find().sort( {id: 1}, function (err, doc) {
     res.json(doc);
   });
 });
 
-//insert new delphi round
-app.post('/delphi_rounds', function(req, res) {
-  db3.delphi_rounds.insert(req.body, function(err, doc) {
+//insert new inquiry round
+app.post('/inquiry_rounds', function(req, res) {
+  db3.inquiry_rounds.insert(req.body, function(err, doc) {
     res.json(doc);
   });
 });
 
-//delete delphi round
-app.delete('/delphi_rounds/:id', function(req, res) {
+//delete inquiry round
+app.delete('/inquiry_rounds/:id', function(req, res) {
   var id = req.params.id;
-  db3.delphi_rounds.remove({_id: mongojs.ObjectId(id)}, function(err, doc) {
+  db3.inquiry_rounds.remove({_id: mongojs.ObjectId(id)}, function(err, doc) {
     res.json(doc);
   });
 });
 
-//delphi responses
-var db4 = mongojs('mongodb://' + username + ':' + password + '@ds157247.mlab.com:57247/decspace_users', ['delphi_responses']);
+//inquiry responses
+var db4 = mongojs('mongodb://' + username + ':' + password + '@ds157247.mlab.com:57247/decspace_users', ['inquiry_responses']);
 
-//db4 functions - delphi responses
-//get all delphi survey responses from db
-app.get('/delphi_responses', function(req, res) {
-  db4.delphi_responses.find(function (err, doc) {
+//db4 functions - inquiry responses
+//get all inquiry survey responses from db
+app.get('/inquiry_responses', function(req, res) {
+  db4.inquiry_responses.find(function (err, doc) {
     res.json(doc);
   });
 });
 
-//insert new delphi response
-app.post('/delphi_responses', function(req, res) {
-  db4.delphi_responses.insert(req.body, function(err, doc) {
+//insert new inquiry response
+app.post('/inquiry_responses', function(req, res) {
+  db4.inquiry_responses.insert(req.body, function(err, doc) {
     res.json(doc);
   });
 });
 
-//delete delphi response
-app.delete('/delphi_responses/:id', function(req, res) {
+//delete inquiry response
+app.delete('/inquiry_responses/:id', function(req, res) {
   var id = req.params.id;
-  db4.delphi_responses.remove({_id: mongojs.ObjectId(id)}, function(err, doc) {
+  db4.inquiry_responses.remove({_id: mongojs.ObjectId(id)}, function(err, doc) {
     res.json(doc);
   });
 });

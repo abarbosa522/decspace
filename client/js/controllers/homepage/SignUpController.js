@@ -76,6 +76,8 @@ app.controller('SignUpController', function($scope, $window, $http) {
           var current_date = new Date();
           $scope.signup.sign_up_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
 
+          $scope.signup.logged_in = false;
+          
           //create new account
           $http.post('/accounts', $scope.signup).then(function(response) {
             showAlert('successful-register');

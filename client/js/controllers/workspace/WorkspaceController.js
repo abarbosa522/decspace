@@ -1,4 +1,4 @@
-app.controller('WorkspaceController', function($scope, $window, $http, $compile, $q, OrderByService, CATSDService, DelphiService, SRFService) {
+app.controller('WorkspaceController', function($scope, $window, $http, $compile, $q, OrderByService, CATSDService, InquiryService, SRFService, MethodsService) {
   /*** SETUP FUNCTIONS ***/
 
   //get the id of the open project
@@ -34,7 +34,32 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   //log out current user
   $scope.logOut = function() {
     $http.get('/logout').then(function(res) {
-      $window.location.href = '../../index.html';
+      if(!$scope.username.includes('unregistered@decspace.com')) {
+        //mark the user as logged off
+        $http.get('/accounts').then(function(response) {
+          var id_doc, proj_res;
+
+          for(account in response.data)
+            if(response.data[account].email == $scope.username) {
+              response.data[account].logged_in = false;
+
+              id_doc = response.data[account]['_id'];
+              proj_res = response.data[account];
+              delete proj_res['_id'];
+              break;
+            }
+
+          //delete the previous document with the list of projects
+          $http.delete('/accounts/' + id_doc).then(function() {
+            //add the new list of projects
+            $http.post('/accounts', proj_res).then(function() {
+              $window.location.href = '../../index.html';
+            });
+          });
+        });
+      }
+      else
+        $window.location.href = '../../index.html';
     });
   }
 
@@ -96,13 +121,11 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       // call this function on every dragmove event
       onmove: dragMoveListener,
       // call this function on every dragend event
-      onend: function (event) {
-        var textEl = event.target.querySelector('p');
-
-        textEl && (textEl.textContent =
-          'moved a distance of '
-          + (Math.sqrt(event.dx * event.dx +
-                       event.dy * event.dy)|0) + 'px');
+      //save the position of the module
+      onend: function(event) {
+        for(mod in modules)
+          if(modules[mod].id == event.target.id)
+            modules[mod].position = $('#' + event.target.id).offset();
       }
   });
 
@@ -131,8 +154,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   $scope.saveData = function(callback) {
     $http.get('/projects').then(function(response) {
       //save the position of all modules
-      for(mod in modules)
-        modules[mod]['position'] = $('#' + modules[mod]['id']).offset();
+      /*for(mod in modules)
+        modules[mod]['position'] = $('#' + modules[mod]['id']).offset();*/
 
         var id_doc, proj_res;
 
@@ -354,6 +377,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         };
         //initialize the output data array
         new_mod['output'] = [];
+        //store the initial position
+        new_mod['position'] = {top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10};
         //store the new module into the modules array
         modules.push(new_mod);
         break;
@@ -374,6 +399,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         };
         //initialize the output data array
         new_mod['output'] = [];
+        //store the initial position
+        new_mod['position'] = {top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10};
         //store the new module into the modules array
         modules.push(new_mod);
         break;
@@ -397,29 +424,34 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         };
         //initialize the output data array
         new_mod['output'] = [];
+        //store the initial position
+        new_mod['position'] = {top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10};
         //store the new module into the modules array
         modules.push(new_mod);
         break;
 
-      case 'Delphi':
+      case 'Inquiry':
         var new_mod = {};
         //generate the unique id
         var unique_id = generateUniqueId(modules);
         //store the module id
-        new_mod['id'] = 'delphi-' + unique_id;
+        new_mod['id'] = 'inquiry-' + unique_id;
         //generate and store module name
-        new_mod['name_id'] = generateUniqueNameId('Delphi');
+        new_mod['name_id'] = generateUniqueNameId('Inquiry');
         //store the module type
-        new_mod['type'] = 'Delphi';
+        new_mod['type'] = 'Inquiry';
         //initialize the input data array
         new_mod['input'] = {
           'subject' : '',
           'emails' : [],
-          'questions' : []
+          'questions' : [],
+          'current_round' : 0,
+          'suggestions toggle' : ''
         };
-        new_mod['current_round'] = 1;
         //initialize the output data array
         new_mod['output'] = [];
+        //store the initial position
+        new_mod['position'] = {top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10};
         //store the new module into the modules array
         modules.push(new_mod);
         break;
@@ -445,6 +477,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         };
         //initialize the output data array
         new_mod['output'] = [];
+        //store the initial position
+        new_mod['position'] = {top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10};
         //store the new module into the modules array
         modules.push(new_mod);
         break;
@@ -464,6 +498,46 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     new_mod['name'] = name;
     //store the imported data
     new_mod['output'] = data;
+    //store the initial position
+    new_mod['position'] = {top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10};
+    //store the new module into the modules array
+    modules.push(new_mod);
+  }
+
+  //add a new output file module and corresponding data
+  function createOutputFileData(name, output_data, pos, parent_type, input_data) {
+    var new_mod = {};
+    //generate the unique id
+    var unique_id = generateUniqueId(modules);
+    new_mod.id = 'outputfile-' + unique_id;
+
+    //store the module type
+    new_mod.type = 'Output File';
+    //
+    new_mod.parent_type = parent_type;
+    //store the name of the file
+    new_mod.name = name;
+
+    //store the imported data
+    if(new_mod.parent_type != 'Inquiry')
+      new_mod.output = output_data;
+    else
+      new_mod.output = {};
+
+    new_mod.input = angular.copy(input_data);
+
+
+    new_mod.input.round_id = angular.copy(input_data.round_id);
+    //store the position
+    new_mod.position = pos;
+
+    //SPECIAL CASE - INQUIRY
+    if(new_mod.parent_type == 'Inquiry') {
+      new_mod.log = {};
+      new_mod.log.status = 'running';
+      new_mod.input.round_id = angular.copy(input_data.round_id);
+    }
+
     //store the new module into the modules array
     modules.push(new_mod);
   }
@@ -477,10 +551,10 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
     for(mod in modules)
       if(modules[mod].id == $scope.module_delete.target.parentNode.parentNode.attributes.id.value) {
-        if(modules[mod].type != 'Input File')
-          $scope.module_delete_name = modules[mod].type + modules[mod].name_id;
-        else
+        if(modules[mod].type == 'Input File' || modules[mod].type == 'Output File')
           $scope.module_delete_name = modules[mod].name;
+        else
+          $scope.module_delete_name = modules[mod].type + modules[mod].name_id;
       }
 
     $('#delete-module-modal').modal();
@@ -571,9 +645,9 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         $scope.deleteIdReferenceAction = ['', ''];
         break;
 
-      case 'Delphi':
-        $scope.new_delphi_email = {};
-        $scope.new_delphi_question = {};
+      case 'Inquiry':
+        $scope.new_inquiry_email = {};
+        $scope.new_inquiry_question = {};
         $scope.deleteIdEmail = '';
         $scope.deleteIdQuestion = '';
         break;
@@ -585,6 +659,9 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     }
 
     resetErrorClasses($scope.currentModule['type']);
+
+    if($scope.currentModule.parent_type == 'Inquiry' && $scope.currentModule.log.status == 'running')
+      aggregateInquiryResults();
   }
 
   //find the largest id on a data array and increment it
@@ -648,7 +725,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   /*** METHODS FUNCTIONS ***/
 
   //available methods
-  $scope.methods = ['CAT-SD', 'Delphi', 'OrderBy', 'Sort', 'SRF'];
+  $scope.methods = MethodsService.getMethods();
 
   //add a new method module
   $scope.createModule = function(mod) {
@@ -707,22 +784,22 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         $('#cat-sd-' + unique_id).offset({top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10});
         break;
 
-      case 'Delphi':
+      case 'Inquiry':
         //get the method's template
-        var temp = document.getElementById('delphi-temp');
+        var temp = document.getElementById('inquiry-temp');
         //clone the template
         var temp_clone = $(temp.content).clone();
         //make its id unique
         var unique_id = generateUniqueId(modules);
-        temp_clone.find('#delphi').attr('id', 'delphi-' + unique_id);
+        temp_clone.find('#inquiry').attr('id', 'inquiry-' + unique_id);
         //add the file name to the module
-        temp_clone.find('#mod-name').html('Delphi' + generateUniqueNameId('Delphi'));
+        temp_clone.find('#mod-name').html('Inquiry' + generateUniqueNameId('Inquiry'));
         //cloned elements need to be manually compiled - angularJS
         var compiled_temp = $compile(temp_clone)($scope);
         //add the new instance of the template to the document
         compiled_temp.appendTo($('#workspace'));
         //define the initial posiiton of the new module
-        $('#delphi-' + unique_id).offset({top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10});
+        $('#inquiry-' + unique_id).offset({top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10});
         break;
 
       case 'SRF':
@@ -839,15 +916,15 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         $('#' + mod['id']).offset(mod['position']);
         break;
 
-      case 'Delphi':
+      case 'Inquiry':
         //get the method's template
-        var temp = document.getElementById('delphi-temp');
+        var temp = document.getElementById('inquiry-temp');
         //clone the template
         var temp_clone = $(temp.content).clone();
         //make its id unique
-        temp_clone.find('#delphi').attr('id', mod['id']);
+        temp_clone.find('#inquiry').attr('id', mod['id']);
         //add the module name to the module
-        temp_clone.find('#mod-name').html('Delphi' + mod['name_id']);
+        temp_clone.find('#mod-name').html('Inquiry' + mod['name_id']);
         //cloned elements need to be manually compiled - angularJS
         var compiled_temp = $compile(temp_clone)($scope);
         //add the new instance of the template to the document
@@ -872,7 +949,42 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         //set position of module
         $('#' + mod['id']).offset(mod['position']);
         break;
+
+      case 'Output File':
+        //get the output file template
+        var temp = document.getElementById('outputfile-temp');
+        //clone the template
+        var temp_clone = $(temp.content).clone();
+        //make its id unique
+        temp_clone.find('#outputfile').attr('id', mod['id']);
+        //add the file name to the module
+        temp_clone.find('#filename').html(mod['name']);
+        //cloned elements need to be manually compiled by the angularJS
+        var compiled_temp = $compile(temp_clone)($scope);
+        //add the new instance of the template to the document
+        compiled_temp.appendTo($('#workspace'));
+        //set position of module
+        $('#' + mod['id']).offset(mod['position']);
+        break;
     }
+  }
+
+  function createOutputFileModule(name, pos) {
+    //get the input file template
+    var temp = document.getElementById('outputfile-temp');
+    //clone the template
+    var temp_clone = $(temp.content).clone();
+    //make its id unique
+    var unique_id = generateUniqueId(modules);
+    temp_clone.find('#outputfile').attr('id', 'outputfile-' + unique_id);
+    //add the file name to the module
+    temp_clone.find('#filename').html(name);
+    //cloned elements need to be manually compiled by the angularJS
+    var compiled_temp = $compile(temp_clone)($scope);
+    //add the new instance of the template to the document
+    compiled_temp.appendTo($('#workspace'));
+    //define the initial posiiton of the new input file
+    $('#outputfile-' + unique_id).offset(pos);
   }
 
   /*** DATA DELETION FUNCTIONS ***/
@@ -1026,47 +1138,40 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   var connections = [];
   //controls if a first point has already been clicked
   $scope.drawing_line = false;
-  //holds all the information of the first point
   var first_event;
+  //"type", module id and id of the first point
+  var first_type, first_module_id, first_point_id;
+  //"type", module id and id of the second point
+  var second_type, second_module_id, second_point_id;
 
   //draw a line connector between two different points
-  $scope.drawConnection = function(event) {
+  $scope.drawConnection = function(event, type) {
     //first a first point has not been created yet
     if(!$scope.drawing_line) {
       first_event = event;
+      first_type = type;
+      first_module_id = event.target.parentElement.attributes.id.value;
+      first_point_id = event.target.attributes.id.value;
       $scope.drawing_line = true;
     }
     //if a first point has been created already
     else {
-      //"type" of the first point
-      var first_type = first_event.target.nextElementSibling.innerHTML.toLowerCase();
-      //"type" of the second point
-      var second_type = event.target.nextElementSibling.innerHTML.toLowerCase();
-      //id of the module of the first point
-      var first_module_id = first_event.target.parentElement.attributes.id.value;
-      //id of the module of the second point
-      var second_module_id = event.target.parentElement.attributes.id.value;
-      //id of the first point
-      var first_point_id = first_event.target.attributes.id.value;
-      //id of the second point
-      var second_point_id = event.target.attributes.id.value;
+      second_type = type;
+      second_module_id = event.target.parentElement.attributes.id.value;
+      second_point_id = event.target.attributes.id.value;
 
       //unsuccessful connection - both points are of the same type or neither of them is of type "output"
-      if(first_type == second_type || (first_type != 'output' && second_type != 'output')) {
+      if(first_type == second_type || (first_type != 'output' && second_type != 'output'))
         showAlert('invalid-connection1');
-      }
       //unsuccessful connection -  both points belong to the same module
-      else if(first_module_id == second_module_id) {
+      else if(first_module_id == second_module_id)
         showAlert('invalid-connection2');
-      }
       //unsuccessful connection - connection already exists
-      else if(connectionExists(first_module_id, second_module_id, first_type, second_type)) {
+      else if(connectionExists(first_module_id, second_module_id, first_type, second_type))
         showAlert('invalid-connection3');
-      }
       //unsuccessful connection - input point is already connected
-      else if(inputConnected(first_module_id, second_module_id, first_type, second_type)) {
+      else if(inputConnected(first_module_id, second_module_id, first_type, second_type))
         showAlert('invalid-connection4');
-      }
       //successful connection
       else {
         //convert the coordinates of the first point to SVG coordinates
@@ -1171,9 +1276,12 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
                     for(reference_action in modules[modl]['input']['categories'][category]['reference_actions'])
                       modules[modl]['input']['categories'][category]['reference_actions'][reference_action]['name'] = 'b' + (Number(category) + 1) + (Number(reference_action) + 1);
                 }
-                //DELPHI - SUBJECT
-                else if(modules[modl]['type'] == 'Delphi' && input_type == 'subject')
+                //INQUIRY - SUBJECT
+                else if(modules[modl]['type'] == 'Inquiry' && input_type == 'subject')
                   modules[modl]['input']['subject'] = modules[mod]['output'][0]['subject'];
+                //INQUIRY - SUGGESTIONS TOGGLE
+                else if(modules[modl]['type'] == 'Inquiry' && input_type == 'suggestions toggle')
+                  modules[modl]['input']['suggestions toggle'] = modules[mod]['output'][0]['suggestions toggle'];
                 //SRF - RANKING
                 else if(modules[modl]['type'] == 'SRF' && input_type == 'ranking')
                   modules[modl]['input']['ranking'] = modules[mod]['output'][0]['ranking'];
@@ -1353,6 +1461,12 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
           for(category in modules[mod].input.categories)
             modules[mod].input.categories[category].reference_actions = [];
         }
+        //INQUIRY - SUBJECT
+        else if(modules[mod].type == 'Inquiry' && connection.input_type == 'subject')
+          modules[mod].input.subject = '';
+        //INQUIRY - SUGGESTIONS TOGGLE
+        else if(modules[mod].type == 'Inquiry' && connection.input_type == 'suggestions toggle')
+          modules[mod].input['suggestions toggle'] = '';
         //SRF - RANKING
         else if(modules[mod].type == 'SRF' && connection.input_type == 'ranking')
           modules[mod].input.ranking = 2;
@@ -1390,7 +1504,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         mod_exec = 0;
 
         for(mod in modules) {
-          if(modules[mod]['output'].length > 0)
+          if(modules[mod].type == 'Output File')
             mod_exec++;
           else {
             //transfer data between the connections of the current module
@@ -1405,9 +1519,12 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
             }
           }
         }
+        break;
       }
+
       //create the modules with the results of the executed methods
-      createOutputModules();
+      //createOutputModules();
+
       //show the successful execution alert
       showAlert('execution-success');
     }
@@ -1425,17 +1542,22 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
     for(mod in modules) {
       //input files do not have input points, therefore they do not need to be checked
-      if(modules[mod]['type'] != 'Input File') {
+      if(modules[mod]['type'] != 'Input File' && modules[mod]['type'] != 'Output File') {
+
         var input_data = 0;
         //check connections for each input point of the current module
         for(input in modules[mod]['input']) {
-          if(modules[mod]['input'][input].length > 0) {
+          if(modules[mod]['input'][input].length > 0)
             input_data++;
-          }
-          //SPECIAL CASE - DELPHI EMAILS
-          else if(modules[mod].type == 'Delphi' && input == 'emails') {
+          //SPECIAL CASE - INQUIRY EMAILS
+          else if(modules[mod].type == 'Inquiry' && input == 'emails')
             input_data++;
-          }
+          //SPECIAL CASE - INQUIRY CURRENT ROUND
+          else if(modules[mod].type == 'Inquiry' && input == 'current_round')
+            input_data++;
+          //SPECIAL CASE - INQUIRY ROUND ID
+          else if(modules[mod].type == 'Inquiry' && input == 'round_id')
+            input_data++;
           else {
             for(connection in connections)
               if(connections[connection]['input'] == modules[mod]['id'] && connections[connection]['input_type'] == input) {
@@ -1444,6 +1566,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
               }
           }
         }
+
         //check if all input points of the current module have a connection or already have input data
         if(input_data == Object.keys(modules[mod]['input']).length)
           modules_data++;
@@ -1457,8 +1580,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   //check if a certain module has already received all necessary data
   function checkModData(mod) {
     for(input in mod.input) {
-      //SPECIAL CASE - DELPHI EMAILS
-      if(mod.type == 'Delphi' && input == 'emails')
+      //SPECIAL CASE - INQUIRY EMAILS
+      if(mod.type == 'Inquiry' && input == 'emails')
         continue;
       else if(mod.input[input].length == 0)
         return false;
@@ -1489,11 +1612,13 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       case 'OrderBy':
         mod.output = OrderByService.getResults(mod.input.criteria, mod.input.actions);
         method_executed = true;
+        createOutputModule(mod);
         break;
 
       case 'Sort':
-        mod.output = mod.input.objects;
+        mod.output = angular.copy(mod.input.objects);
         method_executed = true;
+        createOutputModule(mod);
         break;
 
       case 'CAT-SD':
@@ -1501,23 +1626,30 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
         results.then(function(resolve) {
           mod.output = resolve;
+          createOutputModule(mod);
         });
 
         method_executed = true;
         break;
 
-      case 'Delphi':
-        var results = DelphiService.startRound($scope.username, proj_id, mod.input.subject, mod.input.emails, mod.input.questions, mod.current_round);
+      case 'Inquiry':
+        var results = InquiryService.startRound($scope.username, proj_id, mod.input.subject, mod.input.emails, mod.input.questions, mod.input.current_round, mod.input['suggestions toggle']);
 
         results.then(function(resolve) {
-          mod.round_id = resolve.id;
+          mod.input.round_id = resolve.id;
+          createOutputModule(mod);
         });
 
+        mod.input.current_round++;
+
         method_executed = true;
+
         break;
 
       case 'SRF':
         mod.output = SRFService.getResults(mod.input.criteria, mod.input['white cards'], mod.input.ranking, mod.input['ratio z'], mod.input['decimal places'], mod.input['weight type']);
+        createOutputModule(mod);
+        method_executed = true;
         break;
     }
 
@@ -1525,17 +1657,14 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   }
 
   //create the output modules for the executed methods
-  //if an output module already exists, overwrite it
-  //if the output point is connected to another module, create the output module and connect it to both modules
-  function createOutputModules() {
+  //a new output module is always created
+  function createOutputModule(mod) {
+    var mod_name = 'Output File - ' + mod.type + mod.name_id;
+    var mod_pos = {top: mod.position.top, left: mod.position.left + 160};
 
+    createOutputFileModule(mod_name, mod_pos);
+    createOutputFileData(mod_name, mod.output, mod_pos, mod.type, mod.input);
   }
-
-/*  function resetOutputFields() {
-    for(mod in modules)
-      if(modules[mod]['type'] != 'Input File')
-        modules[mod]['output'] = [];
-  }*/
 
   /*** ARCHIVE FUNCTIONS ***/
   $scope.archive = {};
@@ -1692,6 +1821,16 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     return [input_files, output_file, input_titles];
   }
 
+  $scope.selectImportWorkflow = function() {
+    $('#save-confirmation-import-modal').modal();
+  }
+
+  $scope.confirmSaveImportWorkflow = function() {
+    $scope.saveData(function() {
+      $scope.importWorkflow();
+    });
+  }
+
   $scope.importWorkflow = function() {
     var input_workflow = document.getElementById('input-workflow');
 
@@ -1739,6 +1878,22 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     });
   }
 
+  //reset current modules and connections
+  function resetCurrentData() {
+    //remove current modules
+    for(mod in modules)
+      $('#' + modules[mod]['id']).remove();
+    //reset the modules array
+    modules = [];
+
+    //remove all existant connections
+    for(connection in connections)
+      $('#' + connections[connection]['id']).remove();
+    //reset the connections array
+    connections = [];
+  }
+
+  /*** DATA TRANFORMATION FUNCTIONS ***/
   function JSONtoCSV(data) {
     //create new csv file
     var csv_str = '';
@@ -1796,19 +1951,24 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     return res_data;
   }
 
-  //reset current modules and connections
-  function resetCurrentData() {
-    //remove current modules
-    for(mod in modules)
-      $('#' + modules[mod]['id']).remove();
-    //reset the modules array
-    modules = [];
+  /*** OUTPUT FILE FUNCTIONS ***/
+  //get the results in "real-time" for Inquiry Method
+  function aggregateInquiryResults() {
+    var results = InquiryService.aggregateResults($scope.currentModule.input.round_id);
 
-    //remove all existant connections
-    for(connection in connections)
-      $('#' + connections[connection]['id']).remove();
-    //reset the connections array
-    connections = [];
+    results.then(function(resolve) {
+      //questions
+      $scope.currentModule.output = resolve[0];
+      $scope.currentModule.log.emails = resolve[1];
+      $scope.currentModule.log.suggestions = resolve[2];
+      $scope.currentModule.log.link = resolve[3];
+    });
+  }
+
+  $scope.stopInquiry = function() {
+    $scope.currentModule.log.status = 'ended';
+
+    $scope.saveData();
   }
 
   /*** STARTUP FUNCTIONS ***/

@@ -24,7 +24,7 @@
     <!-- AngularJS Controllers -->
     <script src = '../../js/controllers/workspace/WorkspaceController.js'></script>
     <script src = '../../js/controllers/workspace/CATSDController.js'></script>
-    <script src = '../../js/controllers/workspace/DelphiController.js'></script>
+    <script src = '../../js/controllers/workspace/InquiryController.js'></script>
     <script src = '../../js/controllers/workspace/OrderByController.js'></script>
     <script src = '../../js/controllers/workspace/SortController.js'></script>
     <script src = '../../js/controllers/workspace/SRFController.js'></script>
@@ -32,8 +32,9 @@
     <!-- AngularJS Services -->
     <script src = '../../js/services/OrderByService.js'></script>
     <script src = '../../js/services/CATSDService.js'></script>
-    <script src = '../../js/services/DelphiService.js'></script>
+    <script src = '../../js/services/InquiryService.js'></script>
     <script src = '../../js/services/SRFService.js'></script>
+    <script src = '../../js/services/MethodsService.js'></script>
 
     <!-- Bootstrap -->
     <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
@@ -140,7 +141,7 @@
             </button>
 
             <!-- Save Button -->
-            <button type = 'button' class = 'btn btn-primary' ng-click = 'openSaveDataModal()' title = 'Save Workflow'>
+            <button type = 'button' class = 'btn btn-success' ng-click = 'openSaveDataModal()' title = 'Save Workflow'>
               <span class = 'glyphicon glyphicon-floppy-save icon-large'></span>
             </button>
 
@@ -158,7 +159,7 @@
 
             <!-- Modules List -->
             <div class = 'btn-group' role = 'group'>
-              <button class = 'btn btn-primary dropdown-toggle' type = 'button' data-toggle = 'dropdown'>
+              <button class = 'btn btn-info dropdown-toggle' type = 'button' data-toggle = 'dropdown'>
                 Methods
                 <span class = 'caret'></span>
               </button>
@@ -170,7 +171,7 @@
             </div>
 
             <!-- Archive Button -->
-            <button type = 'button' class = 'btn btn-default' title = 'Archive' data-toggle = 'modal' data-target = '#archive-modal'>
+            <button type = 'button' class = 'btn btn-primary' title = 'Archive' data-toggle = 'modal' data-target = '#archive-modal'>
               <i class = 'fa fa-archive' aria-hidden = 'true'></i>
             </button>
           </div>
@@ -178,19 +179,19 @@
 
         <div class = 'col-md-5'>
           <!-- Alerts -->
-          <div class = 'alert alert-success custom-alert' id = 'save-success' ng-cloak>
+          <div class = 'alert alert-success custom-alert' id = 'save-success' style = 'height: 50px' ng-cloak>
             Workflow <strong>successfully</strong> saved.
           </div>
 
-          <div class = 'alert alert-success custom-alert' id = 'reload-success' ng-cloak>
+          <div class = 'alert alert-success custom-alert' id = 'reload-success' style = 'height: 50px' ng-cloak>
             Workflow <strong>successfully</strong> reloaded.
           </div>
 
-          <div class = 'alert alert-danger custom-alert' id = 'invalid-connection1' ng-cloak>
+          <div class = 'alert alert-danger custom-alert' id = 'invalid-connection1' style = 'height: 60px' ng-cloak>
             <strong>Invalid connection</strong> - Input points should be connected to Output points.
           </div>
 
-          <div class = 'alert alert-danger custom-alert' id = 'invalid-connection2' ng-cloak>
+          <div class = 'alert alert-danger custom-alert' id = 'invalid-connection2' style = 'height: 60px' ng-cloak>
             <strong>Invalid connection</strong> - Only points of different modules should be connected.
           </div>
 
@@ -301,7 +302,7 @@
 
                   <div class = 'row'>
                     <div class = 'col-md-5'></div>
-                    <button type = 'button' class = 'btn btn-primary col-md-2' ng-click = 'importWorkflow()' data-dismiss = 'modal'>
+                    <button type = 'button' class = 'btn btn-primary col-md-2' ng-click = 'selectImportWorkflow()' data-dismiss = 'modal'>
                       Import
                     </button>
                   </div>
@@ -338,11 +339,11 @@
                         <td>
                           <div ng-if = 'workflow.id != delete_workflow'>
                             <!-- Reload Workflow Button -->
-                            <button type = 'button' class = 'btn btn-default' ng-click = 'openSaveConfirmation(workflow)' title = 'Reload Workflow' data-dismiss = 'modal'>
+                            <button type = 'button' class = 'btn btn-primary' ng-click = 'openSaveConfirmation(workflow)' title = 'Reload Workflow' data-dismiss = 'modal'>
                               <span class = 'glyphicon glyphicon-repeat'></span>
                             </button>
                             <!-- Export Workflow Button -->
-                            <button type = 'button' class = 'btn btn-default' ng-click = 'exportWorkflow(workflow)' title = 'Export Workflow'>
+                            <button type = 'button' class = 'btn btn-warning' ng-click = 'exportWorkflow(workflow)' title = 'Export Workflow'>
                               <span class = 'glyphicon glyphicon-export'></span>
                             </button>
                             <!-- Delete Workflow Button -->
@@ -371,7 +372,7 @@
             </div>
           </div>
 
-          <!-- Save Confirmation Modal -->
+          <!-- Save Confirmation Modal - Reload -->
           <div class = 'modal fade' id = 'save-confirmation-reload-modal' role = 'dialog'>
             <div class = 'modal-dialog'>
               <div class = 'modal-content'>
@@ -384,13 +385,44 @@
                     <div class = 'col-md-2'></div>
 
                     <div class = 'col-md-4'>
-                      <button type = 'button' class = 'btn btn-primary' ng-click = 'confirmSaveReloadWorkflow()' data-dismiss = 'modal' title = 'Confirm Module Deletion'>
+                      <button type = 'button' class = 'btn btn-primary' ng-click = 'confirmSaveReloadWorkflow()' data-dismiss = 'modal' title = 'Confirm Workflow Save'>
                         Yes
                       </button>
                     </div>
 
                     <div class = 'col-md-4'>
-                      <button type = 'button' class = 'btn btn-primary' ng-click = 'reloadData(true, reload_workflow)' data-dismiss = 'modal' title = 'Cancel Module Deletion'>
+                      <button type = 'button' class = 'btn btn-primary' ng-click = 'reloadData(true, reload_workflow)' data-dismiss = 'modal' title = 'Cancel Workflow Save'>
+                        No
+                      </button>
+                    </div>
+
+                    <div class = 'col-md-2'></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Save Confirmation Modal - Import -->
+          <div class = 'modal fade' id = 'save-confirmation-import-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>Do you want to save the current workflow before importing the new one?</h4>
+                </div>
+                <div class = 'modal-body'>
+                  <div class = 'row'>
+                    <div class = 'col-md-2'></div>
+
+                    <div class = 'col-md-4'>
+                      <button type = 'button' class = 'btn btn-primary' ng-click = 'confirmSaveImportWorkflow()' data-dismiss = 'modal' title = 'Confirm Module Deletion'>
+                        Yes
+                      </button>
+                    </div>
+
+                    <div class = 'col-md-4'>
+                      <button type = 'button' class = 'btn btn-primary' ng-click = 'importWorkflow()' data-dismiss = 'modal' title = 'Cancel Module Deletion'>
                         No
                       </button>
                     </div>
@@ -1164,25 +1196,25 @@
             </div>
           </div>
 
-          <!-- Delphi Modal -->
-          <div id = 'delphi-modal' class = 'modal fade custom-modal'  role = 'dialog' ng-controller = 'DelphiController'>
+          <!-- Inquiry Modal -->
+          <div id = 'inquiry-modal' class = 'modal fade custom-modal'  role = 'dialog' ng-controller = 'InquiryController'>
             <div class = 'modal-dialog'>
               <div class = 'modal-content'>
 
                 <div class = 'modal-header'>
                   <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-                  <h4 class = 'modal-title'><a href = '../method-catalog/delphi.html' title = 'Method Catalog - Delphi'>Delphi{{currentModule.name_id}}</a></h4>
+                  <h4 class = 'modal-title'><a href = '../method-catalog/inquiry.html' title = 'Method Catalog - Inquiry'>Inquiry{{currentModule.name_id}}</a></h4>
                 </div>
 
                 <div class = 'modal-body'>
                   <!-- Current Round -->
-                  <p class = 'header-1'>Round {{currentModule.current_round}}</p>
+                  <p class = 'header-1'>Round {{currentModule.input.current_round + 1}}</p>
 
                   <!-- Survey Subject -->
                   <p class = 'header-1'>Survey Subject</p>
 
-                  <div id = 'delphi-subject'>
-                    <input type = 'text' class = 'form-control' ng-model = 'currentModule.input.subject' ng-blur = 'blurDelphiSubject()'>
+                  <div id = 'inquiry-subject'>
+                    <input type = 'text' class = 'form-control' ng-model = 'currentModule.input.subject' ng-blur = 'blurInquirySubject()'>
                   </div>
 
                   <br>
@@ -1201,8 +1233,8 @@
                     <tbody>
                       <tr ng-repeat = 'email in currentModule.input.emails' ng-class = '{danger: email.id == deleteIdEmail}'>
                         <td>
-                          <div id = 'delphi-email-{{email.id}}'>
-                            <input type = 'text' class = 'form-control' ng-model = 'email.address' ng-blur = 'blurDelphiEmail(email)'>
+                          <div id = 'inquiry-email-{{email.id}}'>
+                            <input type = 'text' class = 'form-control' ng-model = 'email.address' ng-blur = 'blurInquiryEmail(email)'>
                           </div>
                         </td>
                         <td ng-if = 'email.id != deleteIdEmail'>
@@ -1222,12 +1254,12 @@
                       <!-- Form to add new email -->
                       <tr class = 'active'>
                         <td>
-                          <div id = 'new-delphi-email'>
-                            <input class = 'form-control' type = 'text' ng-model = 'new_delphi_email.address'>
+                          <div id = 'new-inquiry-email'>
+                            <input class = 'form-control' type = 'text' ng-model = 'new_inquiry_email.address'>
                           </div>
                         </td>
                         <td>
-                          <button type = 'button' class = 'btn btn-success' ng-click = 'addDelphiEmail()' title = 'Add Email'>
+                          <button type = 'button' class = 'btn btn-success' ng-click = 'addInquiryEmail()' title = 'Add Email'>
                             <span class = 'glyphicon glyphicon-plus'></span>
                           </button>
                         </td>
@@ -1252,13 +1284,13 @@
                     <tbody>
                       <tr ng-repeat = 'question in currentModule.input.questions' ng-class = '{danger: question.id == deleteIdQuestion}'>
                         <td>
-                          <div id = 'delphi-question-title-{{question.id}}'>
-                            <input type = 'text' class = 'form-control' ng-model = 'question.title' ng-blur = 'blurDelphiQuestionTitle(question)'>
+                          <div id = 'inquiry-question-title-{{question.id}}'>
+                            <input type = 'text' class = 'form-control' ng-model = 'question.title' ng-blur = 'blurInquiryQuestionTitle(question)'>
                           </div>
                         </td>
                         <td>
-                          <div id = 'delphi-question-description-{{question.id}}'>
-                            <input type = 'text' class = 'form-control' ng-model = 'question.description' ng-blur = 'blurDelphiQuestionDescription(question)'>
+                          <div id = 'inquiry-question-description-{{question.id}}'>
+                            <input type = 'text' class = 'form-control' ng-model = 'question.description' ng-blur = 'blurInquiryQuestionDescription(question)'>
                           </div>
                         </td>
                         <td ng-if = 'question.id != deleteIdQuestion'>
@@ -1278,23 +1310,42 @@
                       <!-- Form to add new question -->
                       <tr class = 'active'>
                         <td>
-                          <div id = 'new-delphi-question-title'>
-                            <input class = 'form-control' type = 'text' ng-model = 'new_delphi_question.title'>
+                          <div id = 'new-inquiry-question-title'>
+                            <input class = 'form-control' type = 'text' ng-model = 'new_inquiry_question.title'>
                           </div>
                         </td>
                         <td>
-                          <div id = 'new-delphi-question-description'>
-                            <input class = 'form-control' type = 'text' ng-model = 'new_delphi_question.description'>
+                          <div id = 'new-inquiry-question-description'>
+                            <input class = 'form-control' type = 'text' ng-model = 'new_inquiry_question.description'>
                           </div>
                         </td>
                         <td>
-                          <button type = 'button' class = 'btn btn-success' ng-click = 'addDelphiQuestion()' title = 'Add Question'>
+                          <button type = 'button' class = 'btn btn-success' ng-click = 'addInquiryQuestion()' title = 'Add Question'>
                             <span class = 'glyphicon glyphicon-plus'></span>
                           </button>
                         </td>
                       </tr>
                     </tbody>
                   </table>
+
+                  <br>
+
+                  <!-- Suggestions Toggle -->
+                  <p class = 'header-1'>Suggestions Toggle</p>
+
+                  <div class = 'row'>
+                    <div class = 'col-md-5'></div>
+
+                    <div id = 'inquiry-suggestion-toggle' class = 'col-md-2'>
+                      <select class = 'form-control' ng-model = 'currentModule.input["suggestions toggle"]' ng-blur = 'blurInquirySuggestionsToggle()'>
+                        <option value = '' selected disabled>--- Please Select ---</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                      </select>
+                    </div>
+
+                    <div class = 'col-md-5'></div>
+                  </div>
 
                 </div>
               </div>
@@ -1493,6 +1544,224 @@
             </div>
           </div>
 
+          <!-- Output File Modal -->
+          <div class = 'modal fade custom-modal' id = 'outputfile-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+                <div class = 'modal-header'>
+                  <!-- Close Button -->
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <!-- Title -->
+                  <h4 class = 'modal-title'>{{currentModule.name}}</h4>
+                </div>
+
+                <div class = 'modal-body'>
+                  <div class = 'container'>
+
+                    <!-- OrderBy Module -->
+                    <div ng-if = 'currentModule.parent_type == "OrderBy"' ng-cloak>
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <th class = 'text-center'>Action Name</th>
+                          <th class = 'text-center' ng-repeat = 'criterion in currentModule.input.criteria'>{{criterion.name}}</th>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat = 'action in currentModule.output'>
+                            <td>{{action.name}}</td>
+                            <td ng-repeat = 'criterion in currentModule.input.criteria'>{{action[criterion.name]}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <!-- Sort Module -->
+                    <div ng-if = 'currentModule.parent_type == "Sort"' ng-cloak>
+                      <div class = 'row text-center'>
+                        <ul class = 'draglist'>
+                          <li class = 'drop-obj' ng-repeat = 'obj in currentModule.input.objects'>
+                            <div class = 'drag-obj' ng-class = 'obj.name'>{{obj.name}}</div>
+                            <div ng-if = 'currentModule.input.objects.length > 1'>
+                              <p ng-if = '$index == 0' style = 'margin-top: 20%'>Most Important</p>
+                              <p ng-if = '$index == currentModule.input.objects.length - 1' style = 'margin-top: 20%'>Least Important</p>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+
+                      <br><br>
+                    </div>
+
+                    <!-- CAT-SD Module -->
+                    <div ng-if = 'currentModule.parent_type == "CAT-SD"' ng-cloak>
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>Action</th>
+                            <th class = 'text-center' ng-repeat = '(key, value) in currentModule.output'>{{key}}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat = 'action in currentModule.input.actions'>
+                            <td>{{action.name}}</td>
+                            <td ng-repeat = 'result in currentModule.output'>
+                              <span class = 'glyphicon glyphicon-ok' style = 'color: green' ng-if = 'result.includes(action.name)'></span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <!-- Inquiry Module -->
+                    <div ng-if = 'currentModule.parent_type == "Inquiry"' ng-cloak>
+
+                      <p class = 'header-1'>Log</p>
+
+                      <br>
+
+                      <!-- Current Round -->
+                      <p class = 'header-1'>Round {{currentModule.input.current_round}}</p>
+
+                      <br>
+
+                      <!-- Survey Link -->
+                      <p class = 'header-1'>Survey Link</p>
+
+                      {{currentModule.log.link}}
+
+                      <br><br>
+
+                      <!-- Status -->
+                      <p class = 'header-1'>Status</p>
+
+                      <div class = 'row' ng-if = 'currentModule.log.status == "running"' ng-cloak>
+                        <div class = 'col-md-5'></div>
+                        <div class = 'col-md-1'>Running</div>
+                        <div class = 'col-md-1'>
+                          <button type = 'button' class = 'btn btn-danger' ng-click = 'stopInquiry()' title = 'Stop Inquiry'>
+                            <span class = 'glyphicon glyphicon-stop'></span>
+                          </button>
+                        </div>
+                        <div class = 'col-md-5'></div>
+                      </div>
+
+                      <div class = 'row' ng-if = 'currentModule.log.status == "ended"' ng-cloak>Ended</div>
+
+                      <br>
+
+                      <!-- Users that answered -->
+                      <p class = 'header-1'>Users that answered</p>
+
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>Email Address</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat = 'email in currentModule.log.emails'>
+                            <td>{{email}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <strong>Number Of Answers:</strong> {{currentModule.log.emails.length}}
+
+                      <div ng-if = 'currentModule.input["suggestions toggle"] == "Yes"' ng-cloak>
+                        <br><br>
+
+                        <!-- Suggestions -->
+                        <p class = 'header-1'>Suggestions</p>
+
+                        <table class = 'table table-bordered table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Title</th>
+                              <th class = 'text-center'>Description</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'suggestion in currentModule.log.suggestions'>
+                              <td>{{suggestion.title}}</td>
+                              <td>{{suggestion.description}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+
+                        <strong>Number Of Suggestions:</strong> {{currentModule.log.suggestions.length}}
+                      </div>
+
+                      <!-- Horizontal Divider -->
+                      <br><hr class = 'custom-hr'>
+
+                      <p class = 'header-1'>Output</p>
+
+                      <!-- Questions -->
+                      <p class = 'header-1'>Questions</p>
+
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>
+                              Title
+                              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeOrder("title", "descendant", currentModule.output.questions)'></span></a>
+                              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeOrder("title", "ascendant", currentModule.output.questions)'></span></a>
+                            </th>
+                            <th class = 'text-center'>
+                              Description
+                              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeOrder("description", "descendant", currentModule.output.questions)'></span></a>
+                              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeOrder("description", "ascendant", currentModule.output.questions)'></span></a>
+                            </th>
+                            <th class = 'text-center'>
+                              Total Score
+                              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeOrder("total_score", "descendant", currentModule.output.questions)'></span></a>
+                              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeOrder("total_score", "ascendant", currentModule.output.questions)'></span></a>
+                            </th>
+                            <th class = 'text-center'>
+                              Average Score
+                              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeOrder("average", "descendant", currentModule.output.questions)'></span></a>
+                              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeOrder("average", "ascendant", currentModule.output.questions)'></span></a>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat = 'question in currentModule.output'>
+                            <td>{{question.title}}</td>
+                            <td>{{question.description}}</td>
+                            <td>{{question.total_score}}</td>
+                            <td>{{question.average}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <strong>Number Of Questions:</strong> {{currentModule.output.length}}
+                    </div>
+
+                    <!-- SRF Module -->
+                    <div ng-if = 'currentModule.parent_type == "SRF"' ng-cloak>
+                      <table class = 'table table-bordered table-condensed table-striped table-hover'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>Criterion</th>
+                            <th class = 'text-center' ng-if = 'currentModule.input["weight type"] == "Non-Normalized" || currentModule.input["weight type"] == "Both"'>Non-Normalized Weight</th>
+                            <th class = 'text-center' ng-if = 'currentModule.input["weight type"] == "Normalized" || currentModule.input["weight type"] == "Both"'>Normalized Weight</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat = 'result in currentModule.output'>
+                            <td>{{result.name}}</td>
+                            <td ng-if = 'currentModule.input["weight type"] == "Non-Normalized" || currentModule.input["weight type"] == "Both"'>{{result["non-normalized weight"]}}</td>
+                            <td ng-if = 'currentModule.input["weight type"] == "Normalized" || currentModule.input["weight type"] == "Both"'>{{result["normalized weight"]}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Module Templates -->
 
           <!-- Input File Template -->
@@ -1504,7 +1773,7 @@
                 <span class = 'glyphicon glyphicon-remove'></span>
               </a>
 
-              <button id = 'inputfile-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 3%; margin-left: 39%'></button>
+              <button id = 'inputfile-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event, "output")' style = 'margin-top: 3%; margin-left: 39%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: 10%'>Output</span>
             </div>
           </template>
@@ -1518,13 +1787,13 @@
                 <span class = 'glyphicon glyphicon-remove'></span>
               </a>
 
-              <button id = 'orderby-criteria' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 3%; margin-left: -49%'></button>
+              <button id = 'orderby-criteria' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "criteria")' style = 'margin-top: 3%; margin-left: -49%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: -37%'>Criteria</span>
 
-              <button id = 'orderby-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 15%; margin-left: -49%'></button>
+              <button id = 'orderby-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "actions")' style = 'margin-top: 15%; margin-left: -49%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 13.5%; margin-left: -37%'>Actions</span>
 
-              <button id = 'orderby-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 3%; margin-left: 38%'></button>
+              <button id = 'orderby-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event, "output")' style = 'margin-top: 3%; margin-left: 38%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: 6.5%'>Output</span>
             </div>
           </template>
@@ -1538,10 +1807,10 @@
                 <span class = 'glyphicon glyphicon-remove'></span>
               </a>
 
-              <button id = 'sort-order' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 3%; margin-left: -48%'></button>
+              <button id = 'sort-order' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "objects")' style = 'margin-top: 3%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: -36%'>Objects</span>
 
-              <button id = 'sort-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 3%; margin-left: 39.5%'></button>
+              <button id = 'sort-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event, "output")' style = 'margin-top: 3%; margin-left: 39.5%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: 8%'>Output</span>
             </div>
           </template>
@@ -1555,51 +1824,54 @@
                 <span class = 'glyphicon glyphicon-remove'></span>
               </a>
 
-              <button id = 'cat-sd-criteria' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 3%; margin-left: -48%'></button>
+              <button id = 'cat-sd-criteria' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "criteria")' style = 'margin-top: 3%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: -39.5%'>Criteria</span>
 
-              <button id = 'cat-sd-interaction-effects' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 12%; margin-left: -48%'></button>
+              <button id = 'cat-sd-interaction-effects' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "interaction effects")' style = 'margin-top: 12%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 10.5%; margin-left: -39.5%'>Interaction Effects</span>
 
-              <button id = 'cat-sd-scales' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 21%; margin-left: -48%'></button>
+              <button id = 'cat-sd-scales' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "scales")' style = 'margin-top: 21%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 19.5%; margin-left: -39.5%'>Scales</span>
 
-              <button id = 'cat-sd-functions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 30%; margin-left: -48%'></button>
+              <button id = 'cat-sd-functions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "functions")' style = 'margin-top: 30%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 28.5%; margin-left: -39.5%'>Functions</span>
 
-              <button id = 'cat-sd-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 39%; margin-left: -48%'></button>
+              <button id = 'cat-sd-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "actions")' style = 'margin-top: 39%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 37.5%; margin-left: -39.5%'>Actions</span>
 
-              <button id = 'cat-sd-categories' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 48%; margin-left: -48%'></button>
+              <button id = 'cat-sd-categories' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "categories")' style = 'margin-top: 48%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 46.5%; margin-left: -40%'>Categories</span>
 
-              <button id = 'cat-sd-reference-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 57%; margin-left: -48%'></button>
+              <button id = 'cat-sd-reference-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "reference actions")' style = 'margin-top: 57%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 55.5%; margin-left: -40%'>Reference Actions</span>
 
-              <button id = 'cat-sd-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 3%; margin-left: 42%'></button>
+              <button id = 'cat-sd-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event, "output")' style = 'margin-top: 3%; margin-left: 42%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: 18.5%'>Output</span>
             </div>
           </template>
 
-          <!-- Delphi Template -->
-          <template id = 'delphi-temp'>
-            <div id = 'delphi' class = 'module-template module-delphi draggable'>
-              <a id = 'mod-name' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#delphi-modal' ng-click = 'selectCurrentModule($event)'></a>
+          <!-- Inquiry Template -->
+          <template id = 'inquiry-temp'>
+            <div id = 'inquiry' class = 'module-template module-inquiry draggable'>
+              <a id = 'mod-name' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#inquiry-modal' ng-click = 'selectCurrentModule($event)'></a>
 
               <a href ng-click = 'selectDeleteModule($event)' style = 'display: block; margin-top: -14%; margin-left: 87%'>
                 <span class = 'glyphicon glyphicon-remove'></span>
               </a>
 
-              <button id = 'delphi-subject' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 3%; margin-left: -48%'></button>
+              <button id = 'inquiry-subject' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "subject")' style = 'margin-top: 3%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: -36%'>Subject</span>
 
-              <button id = 'delphi-emails' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 15%; margin-left: -48%'></button>
+              <button id = 'inquiry-emails' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "emails")' style = 'margin-top: 15%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 13.5%; margin-left: -36%'>Emails</span>
 
-              <button id = 'delphi-questions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 27%; margin-left: -48%'></button>
+              <button id = 'inquiry-questions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "questions")' style = 'margin-top: 27%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 25.5%; margin-left: -36%'>Questions</span>
 
-              <button id = 'delphi-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 3%; margin-left: 38.5%'></button>
+              <button id = 'inquiry-suggestions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "suggestions toggle")' style = 'margin-top: 39%; margin-left: -48%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 37.5%; margin-left: -36%'>Suggestions Toggle</span>
+
+              <button id = 'inquiry-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event, "output")' style = 'margin-top: 3%; margin-left: 38.5%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: 7%'>Output</span>
             </div>
           </template>
@@ -1613,29 +1885,42 @@
                 <span class = 'glyphicon glyphicon-remove'></span>
               </a>
 
-              <button id = 'srf-criteria' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 3%; margin-left: -48%'></button>
+              <button id = 'srf-criteria' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "criteria")' style = 'margin-top: 3%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: -39%'>Criteria</span>
 
-              <button id = 'srf-white-cards' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 13%; margin-left: -48%'></button>
+              <button id = 'srf-white-cards' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "white cards")' style = 'margin-top: 13%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 11.5%; margin-left: -39%'>White Cards</span>
 
-              <button id = 'srf-ranking' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 23%; margin-left: -48%'></button>
+              <button id = 'srf-ranking' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "ranking")' style = 'margin-top: 23%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 21.5%; margin-left: -39%'>Ranking</span>
 
-              <button id = 'srf-ratio-z' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 33%; margin-left: -48%'></button>
+              <button id = 'srf-ratio-z' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "ratio z")' style = 'margin-top: 33%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 31.5%; margin-left: -39%'>Ratio Z</span>
 
-              <button id = 'srf-decimal-places' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 43%; margin-left: -48%'></button>
+              <button id = 'srf-decimal-places' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "decimal places")' style = 'margin-top: 43%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 41.5%; margin-left: -39%'>Decimal Places</span>
 
-              <button id = 'srf-weight-type' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event)' style = 'margin-top: 53%; margin-left: -48%'></button>
+              <button id = 'srf-weight-type' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "weight type")' style = 'margin-top: 53%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 51.5%; margin-left: -39%'>Weight Type</span>
 
-              <button id = 'srf-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event)' style = 'margin-top: 3%; margin-left: 41%'></button>
+              <button id = 'srf-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event, "output")' style = 'margin-top: 3%; margin-left: 41%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: 15.5%'>Output</span>
             </div>
           </template>
 
+          <!-- Output Template -->
+          <template id = 'outputfile-temp'>
+            <div id = 'outputfile' class = 'module-template module-outputfile draggable'>
+              <a id = 'filename' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#outputfile-modal' ng-click = 'selectCurrentModule($event)'></a>
+
+              <a href ng-click = 'selectDeleteModule($event)' style = 'display: block; margin-top: -11.5%; margin-left: 88%'>
+                <span class = 'glyphicon glyphicon-remove'></span>
+              </a>
+
+              <button id = 'outputfile-input' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event, "output")' style = 'margin-top: 2.5%; margin-left: 39%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 1%; margin-left: 13%'>Output</span>
+            </div>
+          </template>
         </svg>
 
         <!-- Delete Module Modal -->
@@ -1648,8 +1933,7 @@
               </div>
               <div class = 'modal-body'>
                 <div class = 'row'>
-                  <div class = 'col-md-2'>
-                  </div>
+                  <div class = 'col-md-2'></div>
 
                   <div class = 'col-md-4'>
                     <button type = 'button' class = 'btn btn-primary' ng-click = 'deleteModule()' data-dismiss = 'modal' title = 'Confirm Module Deletion'>
@@ -1663,8 +1947,7 @@
                     </button>
                   </div>
 
-                  <div class = 'col-md-2'>
-                  </div>
+                  <div class = 'col-md-2'></div>
                 </div>
               </div>
             </div>

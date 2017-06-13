@@ -117,7 +117,12 @@
               <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'newSortUsers("sign_up_date", "descendant")' title = "Sort 'Sign Up Date' Downwards"></span></a>
               <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'newSortUsers("sign_up_date", "ascendant")' title = "Sort 'Sign Up Date' Upwards"></span></a>
             </th>
-            <th class = 'col-md-2'></th>
+            <th class = 'text-center'>
+              Logged In?
+              <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'newSortUsers("logged_in", "descendant")' title = "Sort 'Logged In' Downwards"></span></a>
+              <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'newSortUsers("logged_in", "ascendant")' title = "Sort 'Logged In' Upwards"></span></a>
+            </th>
+            <th class = 'col-md-1'></th>
           </tr>
         </thead>
         <tbody>
@@ -136,6 +141,12 @@
 
             <!-- Sign Up Date -->
             <td>{{user.sign_up_date}}</td>
+
+            <!-- Logged In -->
+            <td>
+              <span class = 'glyphicon glyphicon-ok' style = 'color: green' ng-if = 'user.logged_in == true' ng-cloak></span>
+              <span class = 'glyphicon glyphicon-remove' style = 'color: red' ng-if = 'user.logged_in == false' ng-cloak></span>
+            </td>
 
             <!-- Delete User Button -->
             <td ng-if = 'delete_id_user != user.email'>

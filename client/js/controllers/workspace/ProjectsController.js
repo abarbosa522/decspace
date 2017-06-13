@@ -30,7 +30,32 @@ app.controller('ProjectsController', function($scope, $window, $http, SortDataSe
   //user log out
   $scope.logOut = function() {
     $http.get('/logout').then(function(res) {
-      $window.location.href = '../../index.html';
+      if(!$scope.username.includes('unregistered@decspace.com')) {
+        //mark the user as logged off
+        $http.get('/accounts').then(function(response) {
+          var id_doc, proj_res;
+
+          for(account in response.data)
+            if(response.data[account].email == $scope.username) {
+              response.data[account].logged_in = false;
+
+              id_doc = response.data[account]['_id'];
+              proj_res = response.data[account];
+              delete proj_res['_id'];
+              break;
+            }
+
+          //delete the previous document with the list of projects
+          $http.delete('/accounts/' + id_doc).then(function() {
+            //add the new list of projects
+            $http.post('/accounts', proj_res).then(function() {
+              $window.location.href = '../../index.html';
+            });
+          });
+        });
+      }
+      else
+        $window.location.href = '../../index.html';
     });
   }
 

@@ -29,7 +29,32 @@ app.controller('MethodController', function($scope, $window, $http) {
 
   $scope.logOut = function() {
     $http.get('/logout').then(function(res) {
-      $window.location.reload();
+      if(!$scope.username.includes('unregistered@decspace.com')) {
+        //mark the user as logged off
+        $http.get('/accounts').then(function(response) {
+          var id_doc, proj_res;
+
+          for(account in response.data)
+            if(response.data[account].email == $scope.username) {
+              response.data[account].logged_in = false;
+
+              id_doc = response.data[account]['_id'];
+              proj_res = response.data[account];
+              delete proj_res['_id'];
+              break;
+            }
+
+          //delete the previous document with the list of projects
+          $http.delete('/accounts/' + id_doc).then(function() {
+            //add the new list of projects
+            $http.post('/accounts', proj_res).then(function() {
+              $window.location.reload();
+            });
+          });
+        });
+      }
+      else
+        $window.location.reload();
     });
   }
 
@@ -43,8 +68,8 @@ app.controller('MethodController', function($scope, $window, $http) {
 
   /*** EXPORT FUNCTION ***/
   $scope.exportExampleData = function(method_name) {
-    var zip_file_path = '../../../content/method-catalog/examples/' + method_name + '/' + method_name + '.rar';
-    var zip_file_name = method_name + '.rar';
+    var zip_file_path = '../../../content/method-catalog/examples/' + method_name + '/' + method_name + '.zip';
+    var zip_file_name = method_name + '.zip';
     var a = document.createElement('a');
     document.body.appendChild(a);
     a.href = zip_file_path;

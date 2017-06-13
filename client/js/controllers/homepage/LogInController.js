@@ -24,6 +24,9 @@ app.controller('LogInController', function($scope, $window, $http) {
               var current_date = new Date();
               var last_login = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
               response.data[account].last_login = last_login;
+
+              response.data[account].logged_in = true;
+
               id_doc = response.data[account]['_id'];
               proj_res = response.data[account];
               delete proj_res['_id'];

@@ -22,7 +22,28 @@ app.controller('AdministratorController', function($scope, $window, $http) {
 
   $scope.logOut = function() {
     $http.get('/logout').then(function(res) {
-      $window.location.href = '../../index.html';
+      //mark the user as logged off
+      $http.get('/accounts').then(function(response) {
+        var id_doc, proj_res;
+
+        for(account in response.data)
+          if(response.data[account].email == $scope.username) {
+            response.data[account].logged_in = false;
+
+            id_doc = response.data[account]['_id'];
+            proj_res = response.data[account];
+            delete proj_res['_id'];
+            break;
+          }
+
+        //delete the previous document with the list of projects
+        $http.delete('/accounts/' + id_doc).then(function() {
+          //add the new list of projects
+          $http.post('/accounts', proj_res).then(function() {
+            $window.location.href = '../../index.html';
+          });
+        });
+      });
     });
   }
 
@@ -174,11 +195,15 @@ app.controller('AdministratorController', function($scope, $window, $http) {
 
       if(typeof a[order] == 'string')
         var1 = a[order].toLowerCase();
+      else if(typeof a[order] == 'boolean')
+        var1 = a[order].toString();
       else
         var1 = a[order];
 
       if(typeof b[order] == 'string')
         var2 = b[order].toLowerCase();
+      else if(typeof b[order] == 'boolean')
+        var2 = b[order].toString();
       else
         var2 = b[order];
 
