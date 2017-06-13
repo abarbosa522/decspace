@@ -143,7 +143,7 @@
 
       <!-- Suggestions -->
       <div ng-if = 'suggestions_toggle == "Yes"' ng-cloak>
-        <h2 class = 'header-8'>Any suggestions for other questions?</h2>
+        <h2 class = 'header-8'>Any suggestions of other questions?</h2>
 
         <table class = 'table table-bordered table-hover'>
           <thead>
@@ -153,8 +153,16 @@
           </thead>
           <tbody>
             <tr ng-repeat = 'suggestion in suggestions' ng-class = '{danger: suggestion.id == delete_suggestion}'>
-              <td><input class = 'form-control' type = 'text' ng-model = 'suggestion.title'></td>
-              <td><input class = 'form-control' type = 'text' ng-model = 'suggestion.description'></td>
+              <td>
+                <div id = 'suggestion-title-{{suggestion.id}}'>
+                  <input class = 'form-control' type = 'text' ng-model = 'suggestion.title' ng-blur = 'blurSuggestionTitle(suggestion)'>
+                </div>
+              </td>
+              <td>
+                <div id = 'suggestion-description-{{suggestion.id}}'>
+                  <input class = 'form-control' type = 'text' ng-model = 'suggestion.description' ng-blur = 'blurSuggestionDescription(suggestion)'>
+                </div>
+              </td>
               <td ng-if = 'suggestion.id != delete_suggestion'>
                 <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteSuggestion(suggestion)' title = 'Delete Suggestion'>
                   <span class = 'glyphicon glyphicon-minus'></span>
@@ -171,10 +179,14 @@
             </tr>
             <tr class = 'active'>
               <td>
-                <input class = 'form-control' type = 'text' ng-model = 'new_suggestion.title'>
+                <div id = 'new-suggestion-title'>
+                  <input class = 'form-control' type = 'text' ng-model = 'new_suggestion.title'>
+                </div>
               </td>
               <td>
-                <input class = 'form-control' type = 'text' ng-model = 'new_suggestion.description'>
+                <div id = 'new-suggestion-description'>
+                  <input class = 'form-control' type = 'text' ng-model = 'new_suggestion.description'>
+                </div>
               </td>
               <td>
                 <button type = 'button' class = 'btn btn-success' ng-click = 'addSuggestion()' title = 'Add Suggestion'>

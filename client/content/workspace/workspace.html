@@ -195,19 +195,19 @@
             <strong>Invalid connection</strong> - Only points of different modules should be connected.
           </div>
 
-          <div class = 'alert alert-danger custom-alert' id = 'invalid-connection3' ng-cloak>
+          <div class = 'alert alert-danger custom-alert' id = 'invalid-connection3' style = 'height: 50px' ng-cloak>
             <strong>Invalid connection</strong> - That connection already exists.
           </div>
 
-          <div class = 'alert alert-danger custom-alert' id = 'invalid-connection4' ng-cloak>
+          <div class = 'alert alert-danger custom-alert' id = 'invalid-connection4' style = 'height: 50px' ng-cloak>
             <strong>Invalid connection</strong> - Input points can only be connected once.
           </div>
 
-          <div class = 'alert alert-success custom-alert' id = 'execution-success' ng-cloak>
+          <div class = 'alert alert-success custom-alert' id = 'execution-success' style = 'height: 50px' ng-cloak>
             Workflow <strong>successfully</strong> executed.
           </div>
 
-          <div class = 'alert alert-danger custom-alert' id = 'execution-error' ng-cloak>
+          <div class = 'alert alert-danger custom-alert' id = 'execution-error' style = 'height: 60px' ng-cloak>
             <strong>Execution error</strong> - One or more modules do not have input data or any connection.
           </div>
         </div>
@@ -1655,11 +1655,13 @@
                         <thead>
                           <tr>
                             <th class = 'text-center'>Email Address</th>
+                            <th class = 'text-center'>Answer Submission Date</th>
                           </tr>
                         </thead>
                         <tbody>
-                          <tr ng-repeat = 'email in currentModule.log.emails'>
-                            <td>{{email}}</td>
+                          <tr ng-repeat = 'user in currentModule.log.emails'>
+                            <td>{{user.email}}</td>
+                            <td>{{user.answer_submission_date}}</td>
                           </tr>
                         </tbody>
                       </table>

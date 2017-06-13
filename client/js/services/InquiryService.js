@@ -149,7 +149,7 @@ app.service('InquiryService', function($http, $q) {
         //calculate the total score of each question, as well as the total number of answers
         for(answer in response2.data)
           if(response2.data[answer]['round_id'] == round_id && response2.data[answer]['questions_answered'].length == questions.length) {
-            answer_emails.push(response2.data[answer]['user']);
+            answer_emails.push({'email' : response2.data[answer]['user'], 'answer_submission_date' : response2.data[answer].usability_metrics.answer_submission_date});
 
             for(suggestion in response2.data[answer]['suggestions'])
               suggestions.push(response2.data[answer]['suggestions'][suggestion]);
@@ -162,7 +162,7 @@ app.service('InquiryService', function($http, $q) {
                 }
           }
 
-        //calculare the average score of each question
+        //calculate the average score of each question
         for(question in questions) {
           if(answer_emails.length > 0)
             questions[question]['average'] = questions[question]['total_score'] / answer_emails.length;

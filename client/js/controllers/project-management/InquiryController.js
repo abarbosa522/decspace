@@ -40,6 +40,8 @@ app.controller('InquiryController', function($scope, $window, $http) {
 
           //get survey usability metrics
           log_ins = response.data[answer].usability_metrics.log_ins;
+          log_in_date_string = response.data[answer].usability_metrics.log_in_date;
+          answer_submission_date = response.data[answer].usability_metrics.answer_submission_date;
           task_duration = response.data[answer].usability_metrics.task_duration;
           drag_and_drops = response.data[answer].usability_metrics.drag_and_drops;
           added_suggestions = response.data[answer].usability_metrics.added_suggestions;
@@ -55,53 +57,6 @@ app.controller('InquiryController', function($scope, $window, $http) {
 
           break;
         }
-      }
-
-      //if answer was not found, i.e. user has not answered before
-      if($scope.questions_answered.length == 0 && $scope.questions_unanswered.length == 0 && $scope.subject == '') {
-        $http.get('/inquiry_rounds').then(function(response) {
-          for(round in response.data) {
-            if(response.data[round].id == round_id) {
-              $scope.questions_unanswered = angular.copy(response.data[round].questions);
-
-              for(question in $scope.questions_unanswered) {
-                $scope.questions_unanswered[question].position = -1;
-                $scope.questions_unanswered[question].score = 'null';
-              }
-
-              $scope.subject = angular.copy(response.data[round].subject);
-
-              //get the suggestions toggle
-              $scope.suggestions_toggle = response.data[round]['suggestions toggle'];
-
-              //create new document
-              var new_answer = {};
-              new_answer['round_id'] = round_id;
-              new_answer['user'] = $scope.user_id;
-              new_answer['subject'] = $scope.subject;
-              new_answer['questions_answered'] = $scope.questions_answered;
-              new_answer['questions_unanswered'] = $scope.questions_unanswered;
-              new_answer['suggestions'] = [];
-              new_answer['suggestions toggle'] = $scope.suggestions_toggle;
-              new_answer['usability_metrics'] = {};
-              new_answer['usability_metrics']['log_ins'] = log_ins;
-              new_answer['usability_metrics']['task_duration'] = task_duration;
-              new_answer['usability_metrics']['drag_and_drops'] = drag_and_drops;
-              new_answer['usability_metrics']['added_suggestions'] = added_suggestions;
-              new_answer['usability_metrics']['confirmed_deletion_suggestion'] = confirmed_deletion_suggestion;
-              new_answer['usability_metrics']['canceled_deletion_suggestion'] = canceled_deletion_suggestion;
-              new_answer['usability_metrics']['data_saves'] = data_saves;
-              new_answer['usability_metrics']['help_modal_open'] = help_modal_open;
-              new_answer['usability_metrics']['task_complete'] = task_complete;
-              new_answer['usability_metrics']['incomplete_saves'] = incomplete_saves;
-
-              //insert the initial document without any answers, so that it can be modified later
-              $http.post('/inquiry_responses', new_answer).then(function() {
-                buildMatrix();
-              });
-            }
-          }
-        });
       }
 
       //build the q-sort matrix
@@ -185,6 +140,8 @@ app.controller('InquiryController', function($scope, $window, $http) {
           response.data[answer]['suggestions'] = $scope.suggestions;
           //store usability metrics
           response.data[answer]['usability_metrics']['log_ins'] = log_ins;
+          response.data[answer]['usability_metrics']['log_in_date'] = log_in_date_string;
+          response.data[answer]['usability_metrics']['answer_submission_date'] = answer_submission_date;
           response.data[answer]['usability_metrics']['task_duration'] = task_duration;
           response.data[answer]['usability_metrics']['drag_and_drops'] = drag_and_drops;
           response.data[answer]['usability_metrics']['added_suggestions'] = added_suggestions;
@@ -194,7 +151,7 @@ app.controller('InquiryController', function($scope, $window, $http) {
           response.data[answer]['usability_metrics']['help_modal_open'] = help_modal_open;
           response.data[answer]['usability_metrics']['task_complete'] = task_complete;
           response.data[answer]['usability_metrics']['incomplete_saves'] = incomplete_saves;
-
+          console.log(response.data[answer])
           //get the id of the document
           id_doc = response.data[answer]['_id'];
           //answer to store in the database
@@ -313,20 +270,46 @@ app.controller('InquiryController', function($scope, $window, $http) {
   //variable that holds the suggestion that is selected to be deleted
   $scope.delete_suggestion = '';
 
+  $scope.new_suggestion = {};
+
   //add a new suggestion
   $scope.addSuggestion = function() {
-    if($scope.suggestions.length == 0)
-      $scope.new_suggestion.id = 1;
+    var can_add_question = true;
+
+    //if a title was not assigned to the new suggestion
+    if($scope.new_suggestion.title == undefined || $scope.new_suggestion.title == '') {
+      $('#new-suggestion-title').addClass('has-error');
+      can_add_question = false;
+    }
     else
-      $scope.new_suggestion.id = $scope.suggestions[$scope.suggestions.length - 1]['id'] + 1;
+      $('#new-suggestion-title').removeClass('has-error');
 
-    $scope.suggestions.push(angular.copy($scope.new_suggestion));
+    //if a description was not assigned to the new suggestion
+    if($scope.new_suggestion.description == undefined || $scope.new_suggestion.description == '') {
+      $('#new-suggestion-description').addClass('has-error');
+      can_add_question = false;
+    }
+    else
+      $('#new-suggestion-description').removeClass('has-error');
 
-    $scope.new_suggestion.title = '';
-    $scope.new_suggestion.description = '';
+    if(can_add_question) {
+      if($scope.suggestions.length == 0)
+        $scope.new_suggestion.id = 1;
+      else
+        $scope.new_suggestion.id = $scope.suggestions[$scope.suggestions.length - 1]['id'] + 1;
 
-    //increment the counter of added suggestions - usability metrics
-    added_suggestions++;
+      $scope.suggestions.push(angular.copy($scope.new_suggestion));
+
+      $scope.new_suggestion.title = '';
+      $scope.new_suggestion.description = '';
+
+      //remove all error classes - just be sure
+      $('#new-suggestion-title').removeClass('has-error');
+      $('#new-suggestion-description').removeClass('has-error');
+
+      //increment the counter of added suggestions - usability metrics
+      added_suggestions++;
+    }
   }
 
   //delete a certain suggestion
@@ -351,46 +334,65 @@ app.controller('InquiryController', function($scope, $window, $http) {
     canceled_deletion_suggestion++;
   }
 
+  $scope.blurSuggestionTitle = function(suggestion) {
+    if(suggestion.title == undefined || suggestion.title == '')
+      $('#suggestion-title-' + suggestion.id).addClass('has-error');
+    else
+      $('#suggestion-title-' + suggestion.id).removeClass('has-error');
+  }
+
+  $scope.blurSuggestionDescription = function(suggestion) {
+    if(suggestion.description == undefined || suggestion.description == '')
+      $('#suggestion-description-' + suggestion.id).addClass('has-error');
+    else
+      $('#suggestion-description-' + suggestion.id).removeClass('has-error');
+  }
+
   /*** USABILITY METRICS ***/
 
   //number of times the user logged in
-  var log_ins = 1;
+  var log_ins;
   //date of current log in
-  var log_in_date = '';
+  var log_in_date_string, log_in_date_time;
+  //date of the submission
+  var answer_submission_date;
   //time the user took from logging in to last save
-  var task_duration = '';
+  var task_duration;
   //number of times the user dragged and dropped
-  var drag_and_drops = 0;
+  var drag_and_drops;
   //number of added suggestions
-  var added_suggestions = 0;
+  var added_suggestions;
   //confirmed suggestion deletions
-  var confirmed_deletion_suggestion = 0;
+  var confirmed_deletion_suggestion;
   //canceled suggestion deletions
-  var canceled_deletion_suggestion = 0;
+  var canceled_deletion_suggestion;
   //number of data saves
-  var data_saves = 0;
+  var data_saves;
   //number of times the user used the help modal
-  var help_modal_open = 0;
+  var help_modal_open;
   //was the user able to complete the task
-  var task_complete = false;
+  var task_complete;
   //how many saves had complete answers
-  var incomplete_saves = 0;
+  var incomplete_saves;
 
   function registerLogIn() {
     //increment log_ins variable to count the current log in
     log_ins++;
     //get current date
     var current_date = new Date();
-    log_in_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
-    log_in_date += ' ' + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
+    log_in_date_string = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
+    log_in_date_string += ' ' + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
+
+    log_in_date_time = current_date;
   }
 
   function registerTaskDuration() {
     var current_date = new Date();
-    var log_date = new Date(log_in_date);
+    answer_submission_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
+    answer_submission_date += ' ' + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
 
     //convert difference to minutes
-    task_duration = Math.round((((current_date - log_date) % 86400000) % 3600000) / 60000);
+    task_duration = Math.round((((current_date -  log_in_date_time) % 86400000) % 3600000) / 60000);
   }
 
   $scope.registerHelpModalOpen = function() {
