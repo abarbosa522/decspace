@@ -151,7 +151,6 @@ app.controller('InquiryController', function($scope, $window, $http) {
           response.data[answer]['usability_metrics']['help_modal_open'] = help_modal_open;
           response.data[answer]['usability_metrics']['task_complete'] = task_complete;
           response.data[answer]['usability_metrics']['incomplete_saves'] = incomplete_saves;
-          console.log(response.data[answer])
           //get the id of the document
           id_doc = response.data[answer]['_id'];
           //answer to store in the database

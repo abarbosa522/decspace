@@ -367,6 +367,14 @@
                     </tbody>
                   </table>
 
+                  <div class = 'row'>
+                    <div class = 'col-md-4'></div>
+                    <div class = 'col-md-4'></div>
+                    <div class = 'col-md-4'>
+                      <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteAllWorkflows()'>Delete All</button>
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -423,6 +431,37 @@
 
                     <div class = 'col-md-4'>
                       <button type = 'button' class = 'btn btn-primary' ng-click = 'importWorkflow()' data-dismiss = 'modal' title = 'Cancel Module Deletion'>
+                        No
+                      </button>
+                    </div>
+
+                    <div class = 'col-md-2'></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delete All Workflows Modal -->
+          <div class = 'modal fade' id = 'delete-all-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>Are you sure you want to delete all workflows?</h4>
+                </div>
+                <div class = 'modal-body'>
+                  <div class = 'row'>
+                    <div class = 'col-md-2'></div>
+
+                    <div class = 'col-md-4'>
+                      <button type = 'button' class = 'btn btn-primary' ng-click = 'confirmDeleteAllWorkflows()' title = 'Confirm Workflows Deletion'>
+                        Yes
+                      </button>
+                    </div>
+
+                    <div class = 'col-md-4'>
+                      <button type = 'button' class = 'btn btn-primary' ng-click = 'cancelDeleteAllWorkflows()' title = 'Cancel Workflows Deletion'>
                         No
                       </button>
                     </div>
@@ -1635,9 +1674,9 @@
 
                       <div class = 'row' ng-if = 'currentModule.log.status == "running"' ng-cloak>
                         <div class = 'col-md-5'></div>
-                        <div class = 'col-md-1'>Running</div>
-                        <div class = 'col-md-1'>
-                          <button type = 'button' class = 'btn btn-danger' ng-click = 'stopInquiry()' title = 'Stop Inquiry'>
+                        <div class = 'col-md-2'>
+                          Running
+                          <button type = 'button' class = 'btn btn-danger' ng-click = 'stopInquiry()' title = 'Stop Inquiry' style = 'float: right'>
                             <span class = 'glyphicon glyphicon-stop'></span>
                           </button>
                         </div>
@@ -1648,8 +1687,8 @@
 
                       <br>
 
-                      <!-- Users that answered -->
-                      <p class = 'header-1'>Users that answered</p>
+                      <!-- Specialists that answered -->
+                      <p class = 'header-1'>Specialists that answered</p>
 
                       <table class = 'table table-bordered table-hover'>
                         <thead>

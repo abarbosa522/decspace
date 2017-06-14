@@ -71,7 +71,7 @@
             <li ng-if = 'loggedIn'><a href = '../settings/settings.html'>Settings</a></li>
 
             <li><a href = '../administrator/administrator.html' ng-if = 'username == "admin@admin"' ng-cloak>Administrator</a></li>
-            
+
             <li ng-if = '!loggedIn' ng-cloak>
               <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'toSignUp()'>
                 <span class = 'glyphicon glyphicon-user'></span>
@@ -111,8 +111,8 @@
           <label for = 'input-name' class = 'col-sm-4 control-label'>
             <span class = 'glyphicon glyphicon-user'></span>
           </label>
-          <div class = 'col-sm-4'>
-            <input id = 'input-name' type = 'text' class = 'form-control' placeholder = 'Your name' ng-model = 'contact.name'>
+          <div id = 'input-name' class = 'col-sm-4'>
+            <input type = 'text' class = 'form-control' placeholder = 'Your Name' ng-model = 'contact.name' ng-blur = 'blurContactName()'>
           </div>
         </div>
 
@@ -121,8 +121,8 @@
           <label for = 'input-email' class = 'col-sm-4 control-label'>
             <span class = 'glyphicon glyphicon-envelope'></span>
           </label>
-          <div class = 'col-sm-4'>
-            <input id = 'input-email' type = 'email' class = 'form-control' placeholder = 'Your email address' ng-model = 'contact.email'>
+          <div id = 'input-email' class = 'col-sm-4'>
+            <input type = 'email' class = 'form-control' placeholder = 'Your email address' ng-model = 'contact.email' ng-blur = 'blurContactEmail()'>
           </div>
         </div>
 
@@ -130,8 +130,8 @@
           <label for = 'input-message' class = 'col-sm-4 control-label'>
             <span class = 'glyphicon glyphicon-pencil'></span>
           </label>
-          <div class = 'col-sm-4'>
-            <textarea id = 'input-message' class = 'form-control' rows = '5' placeholder = 'Your message' ng-model = 'contact.message'></textarea>
+          <div id = 'input-message' class = 'col-sm-4'>
+            <textarea class = 'form-control' rows = '5' placeholder = 'Your message' ng-model = 'contact.message' ng-blur = 'blurContactMessage()'></textarea>
           </div>
         </div>
 
@@ -140,11 +140,11 @@
 
       <br>
 
-      <div class = 'alert alert-success' role = 'alert' ng-if = 'showSuccessAlert' ng-cloak>
+      <div id = 'success-alert' class = 'alert alert-success' role = 'alert' ng-cloak>
         Message sent <strong>successfully!</strong>
       </div>
 
-      <div class = 'alert alert-danger' role = 'alert' ng-if = 'showErrorAlert' ng-cloak>
+      <div id = 'error-alert' class = 'alert alert-danger' role = 'alert' ng-cloak>
         <strong>Oops!</strong> Something went wrong.. Please, try again later.
       </div>
     </div>

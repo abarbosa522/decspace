@@ -1497,34 +1497,14 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
     //verify if every module is eligible to receive data
     if(checkModulesData()) {
-      //count the number of executed modules
-      var mod_exec = 0;
+      //copy current list of modules
+      var mod_aux = angular.copy(modules);
+      var execution_complete = false;
 
-      while(mod_exec < modules.length) {
-        mod_exec = 0;
-
-        for(mod in modules) {
-          if(modules[mod].type == 'Output File')
-            mod_exec++;
-          else {
-            //transfer data between the connections of the current module
-            transferData(modules[mod]);
-
-            //check if current module received all necessary data
-            //or another module needs to executed first
-            if(checkModData(modules[mod])) {
-              //try to execute method
-              if(executeMethod(modules[mod]))
-                mod_exec++;
-            }
-          }
-        }
-        break;
+      while(!execution_complete) {
+        mod_aux = executeModules(mod_aux);
+        execution_complete = verifyModules(mod_aux);
       }
-
-      //create the modules with the results of the executed methods
-      //createOutputModules();
-
       //show the successful execution alert
       showAlert('execution-success');
     }
@@ -1575,6 +1555,35 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         modules_data++;
     }
     return modules_data == modules.length;
+  }
+
+  function executeModules(mod_aux) {
+    for(mod in mod_aux) {
+      if(mod_aux[mod].type == 'Output File' || mod_aux[mod].type == 'Input File')
+        mod_aux[mod].executed = true;
+      else {
+        //transfer data between the connections of the current module
+        transferData(modules[mod]);
+
+        //check if current module received all necessary data
+        //or another module needs to executed first
+        if(checkModData(modules[mod])) {
+          //try to execute method
+          if(executeMethod(modules[mod]))
+            mod_aux[mod].executed = true;
+        }
+      }
+    }
+
+    return mod_aux;
+  }
+
+  function verifyModules(mod_aux) {
+    for(mod in mod_aux)
+      if(mod_aux[mod].executed != true)
+        return false;
+
+    return true;
   }
 
   //check if a certain module has already received all necessary data
@@ -1730,6 +1739,46 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   //cancel the deletion of a workflow
   $scope.cancelDeleteWorkflow = function() {
     $scope.delete_workflow = '';
+  }
+
+  $scope.deleteAllWorkflows = function() {
+    $('#archive-modal').modal('hide');
+    $('#delete-all-modal').modal();
+  }
+
+  $scope.confirmDeleteAllWorkflows = function() {
+    $http.get('/projects').then(function(response) {
+      var proj_res, id_doc;
+
+      //get the current project
+      for(proj in response.data)
+        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
+          response.data[proj].archive = [];
+          //get the id of the document, so that it can be removed from the db
+          id_doc = response.data[proj]['_id'];
+          //project to store in the db and remove the id of the document
+          proj_res = response.data[proj];
+          delete proj_res['_id'];
+
+          break;
+        }
+
+      //delete the previous document with the list of projects
+      $http.delete('/projects/' + id_doc).then(function() {
+        //add the new list of projects
+        $http.post('/projects', proj_res).then(function() {
+          //update the list of executions
+          getArchive();
+          $('#delete-all-modal').modal('hide');
+          $('#archive-modal').modal();
+        });
+      });
+    });
+  }
+
+  $scope.cancelDeleteAllWorkflows = function() {
+    $('#delete-all-modal').modal('hide');
+    $('#archive-modal').modal();
   }
 
   //workflow selected to be reloaded

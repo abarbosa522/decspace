@@ -1,6 +1,8 @@
 app.controller('ContactUsController', function($scope, $http, $window) {
   var message_template = 'Message sent!';
 
+  $scope.contact = {};
+
   $scope.toSignUp = function() {
     $window.location.href = 'signup.html';
   }
@@ -10,16 +12,37 @@ app.controller('ContactUsController', function($scope, $http, $window) {
   }
 
   $scope.sendEmail = function() {
-    $http.post('/contactus', $scope.contact).then(function(response) {
-      if(response.data == message_template) {
-        $scope.showSuccessAlert = true;
-        $scope.showErrorAlert = false;
-      }
-      else {
-        $scope.showSuccessAlert = false;
-        $scope.showErrorAlert = true;
-      }
-    });
+    var can_send_email = true;
+
+    if($scope.contact.name == undefined || $scope.contact.name == '') {
+      $('#input-name').addClass('has-error');
+      can_send_email = false;
+    }
+    else
+      $('#input-name').removeClass('has-error');
+
+    if($scope.contact.email == undefined || $scope.contact.email == '') {
+      $('#input-email').addClass('has-error');
+      can_send_email = false;
+    }
+    else
+      $('#input-email').removeClass('has-error');
+
+    if($scope.contact.message == undefined || $scope.contact.message == '') {
+      $('#input-message').addClass('has-error');
+      can_send_email = false;
+    }
+    else
+      $('#input-message').removeClass('has-error');
+
+    if(can_send_email) {
+      $http.post('/contactus', $scope.contact).then(function(response) {
+        if(response.data == message_template)
+          showAlert('success-alert');
+        else
+          showAlert('error-alert');
+      });
+    }
   }
 
   function requestLogIn() {
@@ -73,5 +96,43 @@ app.controller('ContactUsController', function($scope, $http, $window) {
     });
   }
 
+  $scope.blurContactName = function() {
+    if($scope.contact.name == undefined || $scope.contact.name == '')
+      $('#input-name').addClass('has-error');
+    else
+      $('#input-name').removeClass('has-error');
+  }
+
+  $scope.blurContactEmail = function() {
+    if($scope.contact.email == undefined || $scope.contact.email == '')
+      $('#input-email').addClass('has-error');
+    else
+      $('#input-email').removeClass('has-error');
+  }
+
+  $scope.blurContactMessage = function() {
+    if($scope.contact.message == undefined || $scope.contact.message == '')
+      $('#input-message').addClass('has-error');
+    else
+      $('#input-message').removeClass('has-error');
+  }
+
+  //hide all alerts
+  function hideAlerts() {
+    $('#success-alert').hide();
+    $('#error-alert').hide();
+  }
+
+  //show certain alert and hide it smoothly
+  function showAlert(alert_id) {
+    //show alert
+    angular.element(document.querySelector('#' + alert_id)).alert();
+    //hide alert
+    angular.element(document.querySelector('#' + alert_id)).fadeTo(3000, 500).slideUp(500, function(){
+      angular.element(document.querySelector('#' + alert_id)).slideUp(500);
+    });
+  }
+
   requestLogIn();
+  hideAlerts();
 });
