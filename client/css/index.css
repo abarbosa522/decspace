@@ -1,6 +1,6 @@
 /* Navigation Bar */
 .navbar-custom {
-  background-color: #212e96;
+  background-color: #de7a22;
   border-color: #191461;
 }
 .navbar-custom .navbar-brand {
@@ -18,26 +18,26 @@
 }
 .navbar-custom .navbar-nav > li > a:hover,
 .navbar-custom .navbar-nav > li > a:focus {
-  color: #212e96;
+  color: #993d00;
 }
 .navbar-custom .navbar-nav > .active > a,
 .navbar-custom .navbar-nav > .active > a:hover,
 .navbar-custom .navbar-nav > .active > a:focus {
   color: #ecf0f1;
-  background-color: #191461;
+  background-color: #993d00;
 }
 .navbar-custom .navbar-nav > .open > a,
 .navbar-custom .navbar-nav > .open > a:hover,
 .navbar-custom .navbar-nav > .open > a:focus {
   color: #ecf0f1;
-  background-color: #191461;
+  background-color: #993d00;
 }
 .navbar-custom .navbar-toggle {
-  border-color: #191461;
+  border-color: #993d00;
 }
 .navbar-custom .navbar-toggle:hover,
 .navbar-custom .navbar-toggle:focus {
-  background-color: #191461;
+  background-color: #993d00;
 }
 .navbar-custom .navbar-toggle .icon-bar {
   background-color: #ecf0f1;

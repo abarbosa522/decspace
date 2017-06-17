@@ -35,6 +35,7 @@
     <script src = '../../js/services/InquiryService.js'></script>
     <script src = '../../js/services/SRFService.js'></script>
     <script src = '../../js/services/MethodsService.js'></script>
+    <script src = '../../js/services/SortDataService.js'></script>
 
     <!-- Bootstrap -->
     <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
@@ -1252,8 +1253,14 @@
                   <!-- Survey Subject -->
                   <p class = 'header-1'>Survey Subject</p>
 
-                  <div id = 'inquiry-subject'>
-                    <input type = 'text' class = 'form-control' ng-model = 'currentModule.input.subject' ng-blur = 'blurInquirySubject()'>
+                  <div class = 'row'>
+                    <div class = 'col-md-4'></div>
+
+                    <div id = 'inquiry-subject' class = 'col-md-4'>
+                      <input type = 'text' class = 'form-control' ng-model = 'currentModule.input.subject' ng-blur = 'blurInquirySubject()'>
+                    </div>
+
+                    <div class = 'col-md-4'></div>
                   </div>
 
                   <br>
@@ -1373,9 +1380,9 @@
                   <p class = 'header-1'>Suggestions Toggle</p>
 
                   <div class = 'row'>
-                    <div class = 'col-md-5'></div>
+                    <div class = 'col-md-4'></div>
 
-                    <div id = 'inquiry-suggestion-toggle' class = 'col-md-2'>
+                    <div id = 'inquiry-suggestion-toggle' class = 'col-md-4'>
                       <select class = 'form-control' ng-model = 'currentModule.input["suggestions toggle"]' ng-blur = 'blurInquirySuggestionsToggle()'>
                         <option value = '' selected disabled>--- Please Select ---</option>
                         <option>Yes</option>
@@ -1383,7 +1390,7 @@
                       </select>
                     </div>
 
-                    <div class = 'col-md-5'></div>
+                    <div class = 'col-md-4'></div>
                   </div>
 
                 </div>
@@ -1744,23 +1751,23 @@
                           <tr>
                             <th class = 'text-center'>
                               Title
-                              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeOrder("title", "descendant", currentModule.output.questions)'></span></a>
-                              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeOrder("title", "ascendant", currentModule.output.questions)'></span></a>
+                              <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'sortData("title", "descendant", currentModule.output)'></span></a>
+                              <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'sortData("title", "ascendant", currentModule.output)'></span></a>
                             </th>
                             <th class = 'text-center'>
                               Description
-                              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeOrder("description", "descendant", currentModule.output.questions)'></span></a>
-                              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeOrder("description", "ascendant", currentModule.output.questions)'></span></a>
+                              <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'sortData("description", "descendant", currentModule.output)'></span></a>
+                              <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'sortData("description", "ascendant", currentModule.output)'></span></a>
                             </th>
                             <th class = 'text-center'>
                               Total Score
-                              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeOrder("total_score", "descendant", currentModule.output.questions)'></span></a>
-                              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeOrder("total_score", "ascendant", currentModule.output.questions)'></span></a>
+                              <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'sortData("total_score", "descendant", currentModule.output)'></span></a>
+                              <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'sortData("total_score", "ascendant", currentModule.output)'></span></a>
                             </th>
                             <th class = 'text-center'>
                               Average Score
-                              <a href = ''><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeOrder("average", "descendant", currentModule.output.questions)'></span></a>
-                              <a href = ''><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeOrder("average", "ascendant", currentModule.output.questions)'></span></a>
+                              <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'sortData("average", "descendant", currentModule.output)'></span></a>
+                              <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'sortData("average", "ascendant", currentModule.output)'></span></a>
                             </th>
                           </tr>
                         </thead>
