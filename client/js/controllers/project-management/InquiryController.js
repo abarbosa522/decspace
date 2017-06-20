@@ -37,6 +37,8 @@ app.controller('InquiryController', function($scope, $window, $http) {
           $scope.suggestions = response.data[answer].suggestions;
           //get the suggestions toggle
           $scope.suggestions_toggle = response.data[answer]['suggestions toggle'];
+          //get open answer questions
+          $scope.open_answer_questions = response.data[answer].open_answer_questions;
 
           //get survey usability metrics
           log_ins = response.data[answer].usability_metrics.log_ins;
@@ -138,6 +140,8 @@ app.controller('InquiryController', function($scope, $window, $http) {
           response.data[answer]['questions_unanswered'] = $scope.questions_unanswered;
           //store suggestions
           response.data[answer]['suggestions'] = $scope.suggestions;
+          //store open answer questions
+          response.data[answer]['open_answer_questions'] = $scope.open_answer_questions;
           //store usability metrics
           response.data[answer]['usability_metrics']['log_ins'] = log_ins;
           response.data[answer]['usability_metrics']['log_in_date'] = log_in_date_string;
@@ -345,6 +349,13 @@ app.controller('InquiryController', function($scope, $window, $http) {
       $('#suggestion-description-' + suggestion.id).addClass('has-error');
     else
       $('#suggestion-description-' + suggestion.id).removeClass('has-error');
+  }
+
+  $scope.blurOpenAnswerQuestion = function(quest) {
+    if(quest.answer == undefined || quest.answer == '')
+      $('#open-answer-question-' + quest.id).addClass('has-error');
+    else
+      $('#open-answer-question-' + quest.id).removeClass('has-error');
   }
 
   /*** USABILITY METRICS ***/

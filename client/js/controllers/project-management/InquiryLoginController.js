@@ -44,6 +44,12 @@ app.controller('InquiryLoginController', function($scope, $window, $http) {
                 new_answer.questions_unanswered.push(new_question);
               }
 
+              //open answer questions
+              new_answer.open_answer_questions = angular.copy(response.data[round].open_answer_questions);
+
+              for(quest in new_answer.open_answer_questions)
+                new_answer.open_answer_questions[quest].answer = '';
+
               new_answer.suggestions = [];
               new_answer['suggestions toggle'] = angular.copy(response.data[round]['suggestions toggle']);
 

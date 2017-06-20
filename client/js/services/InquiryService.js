@@ -1,6 +1,6 @@
 app.service('InquiryService', function($http, $q) {
 
-  this.startRound = function(username, proj_id, subject, emails, questions, current_round, suggestions_toggle) {
+  this.startRound = function(username, proj_id, subject, emails, open_answer_questions, questions, current_round, suggestions_toggle) {
     var deferred = $q.defer();
 
     $http.get('/inquiry_rounds').then(function(response) {
@@ -25,6 +25,8 @@ app.service('InquiryService', function($http, $q) {
       new_round.username = username;
       //list of emails
       new_round.emails = emails;
+      //list of open answer questions
+      new_round.open_answer_questions = open_answer_questions;
       //list of questions
       new_round.questions = questions;
       //survey subject
@@ -37,7 +39,7 @@ app.service('InquiryService', function($http, $q) {
       //add the new list of projects
       $http.post('/inquiry_rounds', new_round).then(function() {
         //create the answer documents
-        createAnswerDocs(new_round, questions);
+        createAnswerDocs(new_round, questions, open_answer_questions);
 
         //send the emails with links to the surveys
         sendSurveyLinks(new_round);
@@ -49,7 +51,7 @@ app.service('InquiryService', function($http, $q) {
     return deferred.promise;
   }
 
-  function createAnswerDocs(new_round, questions) {
+  function createAnswerDocs(new_round, questions, open_answer_questions) {
     for(email in new_round['emails']) {
       //create a new answer document
       var new_answer = {};
@@ -80,6 +82,12 @@ app.service('InquiryService', function($http, $q) {
         new_question.position = -1;
         new_question.score = 'null';
         new_answer.questions_unanswered.push(new_question);
+      }
+
+      new_answer.open_answer_questions = open_answer_questions;
+      //open answer questions
+      for(quest in new_answer.open_answer_questions) {
+        new_answer.open_answer_questions[quest].answer = '';
       }
 
       //usability metrics
@@ -126,6 +134,8 @@ app.service('InquiryService', function($http, $q) {
     var suggestions = [];
     //survey link
     var link = '';
+    //aggregation of open answer questions
+    var open_answer_questions = [];
 
     $http.get('/inquiry_rounds').then(function(response) {
       for(round in response.data) {
@@ -139,6 +149,12 @@ app.service('InquiryService', function($http, $q) {
             new_question['total_score'] = 0;
             new_question['average'] = 0;
             questions.push(new_question);
+          }
+
+          for(quest in response.data[round].open_answer_questions) {
+            var new_quest = {};
+            new_quest.question = response.data[round].open_answer_questions[quest].question;
+            open_answer_questions.push(new_quest);
           }
 
           break;
@@ -160,6 +176,11 @@ app.service('InquiryService', function($http, $q) {
                   questions[question2]['total_score'] += response2.data[answer]['questions_answered'][question]['score'];
                   break;
                 }
+
+            for(quest in response2.data[answer].open_answer_questions)
+              for(quest2 in open_answer_questions)
+                if(response2.data[answer].open_answer_questions[quest].question == open_answer_questions[quest2].question)
+                  open_answer_questions[quest2][response2.data[answer].user] = response2.data[answer].open_answer_questions[quest].answer;
           }
 
         //calculate the average score of each question
@@ -170,7 +191,7 @@ app.service('InquiryService', function($http, $q) {
             questions[question]['average'] = 0;
         }
 
-        deferred.resolve([questions, answer_emails, suggestions, link]);
+        deferred.resolve([questions, answer_emails, suggestions, link, open_answer_questions]);
       });
     });
 

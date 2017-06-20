@@ -93,4 +93,31 @@ app.controller('InquiryController', function($scope) {
     else
       $('#inquiry-suggestions-toggle').removeClass('has-error');
   }
+
+  $scope.addInquiryOpenAnswerQuestion = function() {
+    //if a title was not assigned to the new question
+    if($scope.new_inquiry_open_answer_question.question == undefined || $scope.new_inquiry_open_answer_question.question == '')
+      $('#new-inquiry-open-answer-question').addClass('has-error');
+    else {
+      //assign an unique id to the new email
+      if($scope.currentModule.input.open_answer_questions.length == 0)
+        $scope.new_inquiry_open_answer_question.id = 1;
+      else
+        $scope.new_inquiry_open_answer_question.id = $scope.currentModule.input.open_answer_questions[$scope.currentModule.input.open_answer_questions.length - 1].id + 1;
+
+      $scope.currentModule.input.open_answer_questions.push(angular.copy($scope.new_inquiry_open_answer_question));
+
+      $scope.new_inquiry_open_answer_question.question = '';
+
+      //remove all error classes - just be sure
+      $('#new-inquiry-open-answer-question').removeClass('has-error');
+    }
+  }
+
+  $scope.blurInquiryOpenAnswerQuestion = function(open_answer_question) {
+    if(open_answer_question.question == undefined || open_answer_question.question == '')
+      $('#inquiry-open-answer-question-' + open_answer_question.id).addClass('has-error');
+    else
+      $('#inquiry-open-answer-question-' + open_answer_question.id).removeClass('has-error');
+  }
 });

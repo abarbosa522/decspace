@@ -110,6 +110,25 @@
 
       <br>
 
+      <!-- List of Open Answer Questions -->
+      <div ng-repeat = 'quest in open_answer_questions'>
+        <p class = 'header-2'>{{quest.question}}</p>
+
+        <div class = 'row'>
+          <div class = 'col-md-4'></div>
+
+          <div class = 'col-md-4' id = 'open-answer-question-{{quest.id}}'>
+            <input class = 'form-control' type = 'text' ng-model = 'quest.answer' ng-blur = 'blurOpenAnswerQuestion(quest)'>
+          </div>
+
+          <div class = 'col-md-4'></div>
+        </div>
+        
+        <br>
+      </div>
+
+      <br>
+
       <!-- List of Questions -->
       <ul class = 'draggable-objects'>
         <li ng-repeat = 'question in questions_unanswered' style = 'display: inline-block; margin-left: 1%'>

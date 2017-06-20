@@ -1315,8 +1315,58 @@
 
                   <br>
 
+                  <!-- Open Answer Questions -->
+                  <p class = 'header-1'>Open Answer Questions</p>
+
+                  <table class = 'table table-bordered table-hover'>
+                    <thead>
+                      <tr>
+                        <th class = 'text-center'>Question</th>
+                        <th class = 'col-md-2'></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Added Open Answer Questions -->
+                      <tr ng-repeat = 'open_answer_question in currentModule.input.open_answer_questions' ng-class = '{danger: open_answer_question.id == deleteIdOpenAnswerQuestion}'>
+                        <td>
+                          <div id = 'inquiry-open-answer-question-{{open_answer_question.id}}'>
+                            <input type = 'text' class = 'form-control' ng-model = 'open_answer_question.question' ng-blur = 'blurInquiryOpenAnswerQuestion(open_answer_question)'>
+                          </div>
+                        </td>
+                        <td ng-if = 'open_answer_question.id != deleteIdOpenAnswerQuestion'>
+                          <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(open_answer_question, "Open Answer Questions")' title = 'Delete Open Answer Question'>
+                            <span class = 'glyphicon glyphicon-minus'></span>
+                          </button>
+                        </td>
+                        <td ng-if = 'open_answer_question.id == deleteIdOpenAnswerQuestion'>
+                          <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(open_answer_question, "Open Answer Questions")' title = 'Confirm Delete Open Answer Question'>
+                            <span class = 'glyphicon glyphicon-ok'></span>
+                          </button>
+                          <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Open Answer Questions")' title = 'Cancel Delete Open Answer Question'>
+                            <span class = 'glyphicon glyphicon-remove'></span>
+                          </button>
+                        </td>
+                      </tr>
+                      <!-- Form to add new open answer question -->
+                      <tr class = 'active'>
+                        <td>
+                          <div id = 'new-inquiry-open-answer-question'>
+                            <input class = 'form-control' type = 'text' ng-model = 'new_inquiry_open_answer_question.question'>
+                          </div>
+                        </td>
+                        <td>
+                          <button type = 'button' class = 'btn btn-success' ng-click = 'addInquiryOpenAnswerQuestion()' title = 'Add Open Answer Question'>
+                            <span class = 'glyphicon glyphicon-plus'></span>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <br>
+
                   <!-- Questions -->
-                  <p class = 'header-1'>Questions</p>
+                  <p class = 'header-1'>Q-Sort Questions</p>
 
                   <table class = 'table table-bordered table-hover'>
                     <thead>
@@ -1714,17 +1764,37 @@
 
                       <strong>Number Of Answers:</strong> {{currentModule.log.emails.length}}
 
-                      <div ng-if = 'currentModule.input["suggestions toggle"] == "Yes"' ng-cloak>
-                        <br><br>
+                      <br><br>
 
+                      <!-- Open Answer Questions -->
+                      <p class = 'header-1'>Open Answer Questions</p>
+
+                      <div ng-repeat = 'quest in currentModule.log.open_answer_questions'>
+                        <table class = 'table table-bordered table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center' colspan = '2'>{{quest.question}}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'user in currentModule.log.emails'>
+                              <td class = 'col-md-6'>{{user.email}}</td>
+                              <td class = 'col-md-6'>{{quest[user.email]}}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div ng-if = 'currentModule.input["suggestions toggle"] == "Yes"' ng-cloak>
+                        <br>
                         <!-- Suggestions -->
                         <p class = 'header-1'>Suggestions</p>
 
                         <table class = 'table table-bordered table-hover'>
                           <thead>
                             <tr>
-                              <th class = 'text-center'>Title</th>
-                              <th class = 'text-center'>Description</th>
+                              <th class = 'text-center col-md-4'>Title</th>
+                              <th class = 'text-center col-md-8'>Description</th>
                             </tr>
                           </thead>
                           <tbody>

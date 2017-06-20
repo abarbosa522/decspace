@@ -153,10 +153,6 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   //save the current data
   $scope.saveData = function(callback) {
     $http.get('/projects').then(function(response) {
-      //save the position of all modules
-      /*for(mod in modules)
-        modules[mod]['position'] = $('#' + modules[mod]['id']).offset();*/
-
         var id_doc, proj_res;
 
         //get the current project
@@ -445,6 +441,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
           'subject' : '',
           'emails' : [],
           'questions' : [],
+          'open_answer_questions' : [],
           'current_round' : 0,
           'suggestions toggle' : ''
         };
@@ -648,8 +645,10 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       case 'Inquiry':
         $scope.new_inquiry_email = {};
         $scope.new_inquiry_question = {};
+        $scope.new_inquiry_open_answer_question = {};
         $scope.deleteIdEmail = '';
         $scope.deleteIdQuestion = '';
+        $scope.deleteIdOpenAnswerQuestion = '';
         break;
 
       case 'SRF':
@@ -999,6 +998,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   $scope.deleteIdReferenceAction = ['', ''];
   $scope.deleteIdEmail = '';
   $scope.deleteIdQuestion = '';
+  $scope.deleteIdOpenAnswerQuestion = '';
 
   //select a certain input to be deleted
   $scope.deleteInput = function(input, type) {
@@ -1037,6 +1037,10 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
       case 'Questions':
         $scope.deleteIdQuestion = input.id;
+        break;
+
+      case 'Open Answer Questions':
+        $scope.deleteIdOpenAnswerQuestion = input.id;
         break;
     }
   }
@@ -1088,6 +1092,11 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         $scope.currentModule.input.questions.splice($scope.currentModule.input.questions.indexOf(input), 1);
         $scope.deleteIdQuestion = '';
         break;
+
+      case 'Open Answer Questions':
+        $scope.currentModule.input.open_answer_questions.splice($scope.currentModule.input.open_answer_questions.indexOf(input), 1);
+        $scope.deleteIdOpenAnswerQuestion = '';
+        break;
     }
   }
 
@@ -1128,6 +1137,10 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
       case 'Questions':
         $scope.deleteIdQuestion = '';
+        break;
+
+      case 'Open Answer Questions':
+        $scope.deleteIdOpenAnswerQuestion = '';
         break;
     }
   }
@@ -1642,7 +1655,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         break;
 
       case 'Inquiry':
-        var results = InquiryService.startRound($scope.username, proj_id, mod.input.subject, mod.input.emails, mod.input.questions, mod.input.current_round, mod.input['suggestions toggle']);
+        var results = InquiryService.startRound($scope.username, proj_id, mod.input.subject, mod.input.emails, mod.input.open_answer_questions, mod.input.questions, mod.input.current_round, mod.input['suggestions toggle']);
 
         results.then(function(resolve) {
           mod.input.round_id = resolve.id;
@@ -2047,6 +2060,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       $scope.currentModule.log.emails = resolve[1];
       $scope.currentModule.log.suggestions = resolve[2];
       $scope.currentModule.log.link = resolve[3];
+      $scope.currentModule.log.open_answer_questions = resolve[4];
     });
   }
 
