@@ -231,7 +231,7 @@
               <div class = 'modal-content'>
                 <div class = 'modal-header'>
                   <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-                  <h4 class = 'modal-title'>Save Data</h4>
+                  <h4 class = 'modal-title'>Save Workflow</h4>
                 </div>
                 <div class = 'modal-body'>
 
@@ -1825,11 +1825,6 @@
                               <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'sortData("title", "ascendant", currentModule.output)'></span></a>
                             </th>
                             <th class = 'text-center'>
-                              Description
-                              <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'sortData("description", "descendant", currentModule.output)'></span></a>
-                              <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'sortData("description", "ascendant", currentModule.output)'></span></a>
-                            </th>
-                            <th class = 'text-center'>
                               Total Score
                               <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'sortData("total_score", "descendant", currentModule.output)'></span></a>
                               <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'sortData("total_score", "ascendant", currentModule.output)'></span></a>
@@ -1839,14 +1834,19 @@
                               <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'sortData("average", "descendant", currentModule.output)'></span></a>
                               <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'sortData("average", "ascendant", currentModule.output)'></span></a>
                             </th>
+                            <th class = 'text-center'>
+                              Standard Deviation
+                              <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'sortData("standard_deviation", "descendant", currentModule.output)'></span></a>
+                              <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'sortData("standard_deviation", "ascendant", currentModule.output)'></span></a>
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr ng-repeat = 'question in currentModule.output'>
                             <td>{{question.title}}</td>
-                            <td>{{question.description}}</td>
                             <td>{{question.total_score}}</td>
                             <td>{{question.average}}</td>
+                            <td>{{question.standard_deviation}}</td>
                           </tr>
                         </tbody>
                       </table>

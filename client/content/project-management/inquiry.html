@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Inquiry</title>
+    <title>DecSpace Inquiry</title>
 
     <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
 
@@ -123,7 +123,7 @@
 
           <div class = 'col-md-4'></div>
         </div>
-        
+
         <br>
       </div>
 
@@ -151,7 +151,7 @@
 
         <div ng-repeat = 'row in matrix'>
           <div ng-drop = 'true' ng-drop-success = 'onDropComplete($data, row , $index)' ng-repeat = 'position in row track by $index' ng-center-anchor = '{{centerAnchor}}' ng-if = 'position != "null"' ng-class = '{"green_drop" : position > 0, "red_drop" : position < 0, "grey_drop" : position == 0}'>
-            <div ng-repeat = 'question in questions_answered' ng-drag = 'true' ng-drag-data = 'question' ng-center-anchor = '{{centerAnchor}}' ng-if = 'checkQuestionPosition(question, row, $parent.$index)' title = '{{question.description}}'>
+            <div ng-repeat = 'question in questions_answered' ng-drag = 'true' ng-drag-data = 'question' ng-center-anchor = '{{centerAnchor}}' ng-if = 'checkQuestionPosition(question, row, $parent.$index)' title = '{{question.description}}' style = 'display: inline-block'>
               {{question.title}}
             </div>
           </div>

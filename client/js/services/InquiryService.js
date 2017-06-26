@@ -148,6 +148,7 @@ app.service('InquiryService', function($http, $q) {
             new_question['description'] = response.data[round]['questions'][question]['description'];
             new_question['total_score'] = 0;
             new_question['average'] = 0;
+            new_question['individual_scores'] = [];
             questions.push(new_question);
           }
 
@@ -174,6 +175,7 @@ app.service('InquiryService', function($http, $q) {
               for(question2 in questions)
                 if(questions[question2]['id'] == response2.data[answer]['questions_answered'][question]['id']) {
                   questions[question2]['total_score'] += response2.data[answer]['questions_answered'][question]['score'];
+                  questions[question2]['individual_scores'].push(response2.data[answer]['questions_answered'][question]['score']);
                   break;
                 }
 
@@ -183,12 +185,16 @@ app.service('InquiryService', function($http, $q) {
                   open_answer_questions[quest2][response2.data[answer].user] = response2.data[answer].open_answer_questions[quest].answer;
           }
 
-        //calculate the average score of each question
+        //calculate the average score and standard deviation of each question
         for(question in questions) {
-          if(answer_emails.length > 0)
+          if(answer_emails.length > 0) {
             questions[question]['average'] = questions[question]['total_score'] / answer_emails.length;
-          else
+            questions[question]['standard_deviation'] = calculateStandardDeviation(questions[question], answer_emails.length);
+          }
+          else {
             questions[question]['average'] = 0;
+            questions[question]['standard_deviation'] = 0;
+          }
         }
 
         deferred.resolve([questions, answer_emails, suggestions, link, open_answer_questions]);
@@ -198,4 +204,15 @@ app.service('InquiryService', function($http, $q) {
     return deferred.promise;
   }
 
+
+  function calculateStandardDeviation(question, answer_emails_length) {
+    var sum_deviations = 0;
+
+    for(score in question['individual_scores'])
+      sum_deviations += Math.pow(question['individual_scores'][score] - question['average'], 2);
+
+    sum_deviations = sum_deviations / question['individual_scores'].length;
+
+    return Math.sqrt(sum_deviations);
+  }
 });

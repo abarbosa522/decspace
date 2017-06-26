@@ -43,10 +43,6 @@ ul.draggable-objects:after {
   border: solid 3px black;
 }
 
-[ng-drop] div {
-  z-index: 2;
-}
-
 .div_pos {
   width: 130px;
   margin: 10px;
