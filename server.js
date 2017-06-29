@@ -164,7 +164,7 @@ app.post('/password', function(req, res) {
 });
 
 //send inquiry links to user
-app.post('/inquiry_survey', function(req, res) {
+app.post('/default_inquiry_survey', function(req, res) {
   var mailOptions = {
     from: 'decspace2017@gmail.com', //sender address
     to: req.body.email,             //receiver
@@ -173,12 +173,33 @@ app.post('/inquiry_survey', function(req, res) {
   };
 
   transporter.sendMail(mailOptions, function(error, info) {
-    if(error) {
+    if(error)
       res.json(error);
-    }
-    else {
+    else
       res.json('Message sent!');
-    }
+  });
+});
+
+//send personalized inquiry email
+app.post('/personalized_inquiry_survey', function(req, res) {
+  var mailOptions = {
+    from: 'decspace2017@gmail.com', //sender address
+    to: req.body.email,             //receiver
+    subject: req.body.subject,          //Subject Title
+    text: req.body.text + '\nThe link to your survey is ' + req.body.link,
+    attachments: [
+      {
+        filename: req.body.attachment_name,
+        content: req.body.attachment
+      }
+    ]
+  };
+
+  transporter.sendMail(mailOptions, function(error, info) {
+    if(error)
+      res.json(error);
+    else
+      res.json('Message sent!');
   });
 });
 

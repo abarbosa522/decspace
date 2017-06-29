@@ -1443,6 +1443,45 @@
                     <div class = 'col-md-4'></div>
                   </div>
 
+                  <hr>
+
+                  <!-- Personalized Email -->
+                  <p class = 'header-1'>Personalized Email</p>
+
+                  <label for = 'email-check'>Personalize Email?</label>
+                  <input id = 'email-check' type = 'checkbox' ng-model = 'currentModule.input.personalized_email'>
+
+                  <form class = 'form-horizontal' ng-if = 'currentModule.input.personalized_email'>
+                    <div class = 'form-group'>
+                      <label for = 'email-subject' class = 'col-md-2 control-label'>Email Subject</label>
+                      <div class = 'col-md-10'>
+                        <input id = 'email-subject' class = 'form-control' ng-model = 'currentModule.input.email.subject'>
+                      </div>
+                    </div>
+
+                    <div class = 'form-group'>
+                      <label for = 'email-text' class = 'col-md-2 control-label'>Email Text</label>
+                      <div class = 'col-md-10'>
+                        <textarea id = 'email-text' rows = '3' class = 'form-control' ng-model = 'currentModule.input.email.text'></textarea>
+                      </div>
+                    </div>
+
+                    <div class = 'form-group'>
+                      <label for = 'email-attachments' class = 'col-md-2 control-label'>Email Attachment</label>
+                      <div class = 'col-md-10'>
+                        <input id = 'email-attachments' type = 'file' style = 'margin-top: 1%'>
+                      </div>
+                    </div>
+                    <div class = 'form-group'>
+                      <div class = 'col-sm-offset-2 col-sm-1'>
+                        <button type = 'button' class = 'btn btn-primary' ng-click = 'importEmailAttachment()' title = 'Upload File'>Upload File</button>
+                      </div>
+                      <div class = 'alert alert-success col-sm-offset-1 col-sm-6' ng-cloak>
+                        File <strong>successfully</strong> uploaded.
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -1819,7 +1858,7 @@
                       <table class = 'table table-bordered table-hover'>
                         <thead>
                           <tr>
-                            <th class = 'text-center'>
+                            <th class = 'text-center col-md-4'>
                               Title
                               <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'sortData("title", "descendant", currentModule.output)'></span></a>
                               <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'sortData("title", "ascendant", currentModule.output)'></span></a>

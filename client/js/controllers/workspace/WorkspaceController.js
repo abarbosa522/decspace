@@ -443,7 +443,15 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
           'questions' : [],
           'open_answer_questions' : [],
           'current_round' : 0,
-          'suggestions toggle' : ''
+          'suggestions toggle' : '',
+          'personalized_email' : false,
+          'email' : {
+            'subject' : '',
+            'text' : '',
+            'attachment' : '',
+            'attachment_name' : '',
+            'attachment_type' : ''
+          }
         };
         //initialize the output data array
         new_mod['output'] = [];
@@ -1551,6 +1559,11 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
           //SPECIAL CASE - INQUIRY ROUND ID
           else if(modules[mod].type == 'Inquiry' && input == 'round_id')
             input_data++;
+          //SPECIAL CASE - INQUIRY PERSONALIZED EMAIL
+          else if(modules[mod].type == 'Inquiry' && input == 'personalized_email')
+            input_data++;
+          else if(modules[mod].type == 'Inquiry' && input == 'email')
+            input_data++;
           else {
             for(connection in connections)
               if(connections[connection]['input'] == modules[mod]['id'] && connections[connection]['input_type'] == input) {
@@ -1655,7 +1668,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         break;
 
       case 'Inquiry':
-        var results = InquiryService.startRound($scope.username, proj_id, mod.input.subject, mod.input.emails, mod.input.open_answer_questions, mod.input.questions, mod.input.current_round, mod.input['suggestions toggle']);
+        var results = InquiryService.startRound($scope.username, proj_id, mod.input.subject, mod.input.emails, mod.input.open_answer_questions, mod.input.questions, mod.input.current_round, mod.input['suggestions toggle'], mod.input.personalized_email, mod.input.email);
 
         results.then(function(resolve) {
           mod.input.round_id = resolve.id;
@@ -1880,8 +1893,6 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
     //iterate over input data (e.g, criteria and actions)
     for(input in data.input) {
-      /*console.log(data.input[input])
-      data.input[input].format = typeof data.input[data];*/
       //store title
       input_titles.push(input);
       //transform json data into csv
@@ -1977,7 +1988,6 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         if((typeof data[0][field] != 'object' && data[0][field] != null) || (typeof data[0][field] == 'object' && data[0][field] != null && Object.keys(deleteNullAttributes(data[0][field])).length > 0))
           csv_str += field + ';';
 
-      //console.log(csv_str)
       csv_str = csv_str.substring(0, csv_str.length - 1);
       csv_str += '\n';
 

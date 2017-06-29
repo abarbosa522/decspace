@@ -421,6 +421,17 @@ app.controller('InquiryController', function($scope, $window, $http) {
       incomplete_saves++;
   }
 
+  $scope.setFontSize = function(string) {
+    if(string.length <= 25)
+      return 'very_large_font';
+    if(string.length > 25 && string.length <= 55)
+      return 'large_font';
+    else if(string.length > 55 && string.length <= 75)
+      return 'medium_font';
+    else if(string.length > 75)
+      return 'small_font';
+  }
+
   /*** STARTUP FUNCTIONS ***/
   getData();
   hideAlert();

@@ -1,6 +1,6 @@
 app.service('InquiryService', function($http, $q) {
 
-  this.startRound = function(username, proj_id, subject, emails, open_answer_questions, questions, current_round, suggestions_toggle) {
+  this.startRound = function(username, proj_id, subject, emails, open_answer_questions, questions, current_round, suggestions_toggle, personalized_email, email_content) {
     var deferred = $q.defer();
 
     $http.get('/inquiry_rounds').then(function(response) {
@@ -42,7 +42,7 @@ app.service('InquiryService', function($http, $q) {
         createAnswerDocs(new_round, questions, open_answer_questions);
 
         //send the emails with links to the surveys
-        sendSurveyLinks(new_round);
+        sendSurveyLinks(new_round, personalized_email, email_content);
 
         deferred.resolve(new_round);
       });
@@ -106,20 +106,28 @@ app.service('InquiryService', function($http, $q) {
       new_answer['usability_metrics']['task_complete'] = '';
       new_answer['usability_metrics']['incomplete_saves'] = 0;
 
-      //add the new list of projects
-      $http.post('/inquiry_responses', new_answer).then(function() {
-      });
+      //add the new answer document
+      $http.post('/inquiry_responses', new_answer).then(function() {});
     }
   }
 
-  function sendSurveyLinks(new_round) {
+  function sendSurveyLinks(new_round, personalized_email, email_content) {
     for(email in new_round['emails']) {
       var send_email = {};
       send_email.email = new_round['emails'][email]['address'];
       send_email.link = 'http://decspace.sysresearch.org/content/project-management/inquiry.html?round=' + new_round['id'] + '&user=' + new_round['emails'][email]['address'];
 
-      $http.post('/inquiry_survey', send_email).then(function(response) {
-      });
+      if(!personalized_email)
+        $http.post('/default_inquiry_survey', send_email).then(function(response) {});
+      else {
+        send_email.subject = email_content.subject;
+        send_email.text = email_content.text;
+        send_email.attachment = email_content.attachment;
+        send_email.attachment_name = email_content.attachment_name;
+        send_email.attachment_type = email_content.attachment_type;
+
+        $http.post('/personalized_inquiry_survey', send_email).then(function(response) {});
+      }
     }
   }
 

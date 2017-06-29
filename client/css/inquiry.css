@@ -13,7 +13,7 @@
 }
 
 [ng-drag] {
-  width: 130px;
+  width: 110px;
   height: 50px;
   color: black;
   cursor: move;
@@ -32,10 +32,10 @@ ul.draggable-objects:after {
 }
 
 [ng-drop] {
-  width: 130px;
+  width: 110px;
   height: 50px;
   display: inline-block;
-  margin: 10px;
+  margin: 5px;
   overflow: hidden;
 }
 
@@ -44,12 +44,13 @@ ul.draggable-objects:after {
 }
 
 .div_pos {
-  width: 130px;
-  margin: 10px;
+  width: 110px;
+  margin: 5px;
   display: inline-block;
   text-align: center;
 }
 
+/*COLORS OF NG-DROP*/
 .green_drop {
   background: rgba(0, 255, 0, 0.5);
 }
@@ -60,4 +61,21 @@ ul.draggable-objects:after {
 
 .grey_drop {
   background: rgba(208, 208, 208, 0.5);
+}
+
+/*FONT SIZES OF Q-SORT CARDS TITLES*/
+.very_large_font {
+  font-size: 15px;
+}
+
+.large_font {
+  font-size: 10px;
+}
+
+.medium_font {
+  font-size: 9px;
+}
+
+.small_font {
+  font-size: 8px;
 }
