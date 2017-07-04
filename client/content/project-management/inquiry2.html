@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DecSpace - Inquiry</title>
+
+    <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
+
+    <!-- CSS Stylesheet -->
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css'/>
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/inquiry.css'/>
+
+    <!-- jQuery -->
+    <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
+    <script type = 'text/javascript' src = '../../js/shared/jquery-ui-1.12.0/jquery-ui.js'></script>
+
+    <!-- AngularJS -->
+    <script src = '../../js/shared/angular.min.js'></script>
+
+    <!-- AngularJS Modules -->
+    <script src = '../../js/app.js'></script>
+
+    <!-- AngularJS Controllers -->
+    <script src = '../../js/controllers/project-management/InquiryStep2Controller.js'></script>
+
+    <!-- Bootstrap -->
+    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
+    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.js'></script>
+
+    <!-- Google Web Fonts -->
+    <link href = 'https://fonts.googleapis.com/css?family=Open+Sans:400,600i' rel = 'stylesheet'>
+
+    <!-- ng-draggable module -->
+    <script src = '../../js/shared/ng-draggable/ngDraggable.js'></script>
+  </head>
+
+  <body ng-app = 'decspace' ng-controller = 'InquiryStep2Controller'>
+    <!-- Navigation Bar -->
+    <nav class = 'navbar navbar-custom navbar-fixed-top'>
+      <div class = 'container'>
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class = 'navbar-header'>
+          <button type = 'button' class = 'navbar-toggle collapsed' data-toggle = 'collapse' data-target = '#top-navbar' aria-expanded = 'false'>
+            <span class = 'sr-only'>Toggle navigation</span>
+            <span class = 'icon-bar'></span>
+            <span class = 'icon-bar'></span>
+            <span class = 'icon-bar'></span>
+          </button>
+          <!-- Title -->
+          <a class = 'navbar-brand' href = '../../index.html'>DecSpace</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class = 'collapse navbar-collapse' id = 'top-navbar'>
+          <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
+          <ul class = 'nav navbar-nav navbar-right'>
+            <li>
+              <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic'>Welcome, {{user_id}}!</p>
+            </li>
+
+            <li><a href = '../homepage/about.html'>About</a></li>
+
+            <li><a href = '../method-catalog/method-catalog.html'>Method Catalog</a></li>
+
+            <li><a href = '../homepage/faq.html'>FAQ</a></li>
+
+            <li><a href = '../homepage/contactus.html'>Contact Us</a></li>
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div id = 'main-content' class = 'container'>
+
+      <!-- Survey Subject -->
+      <div class = 'row'>
+        <div class = 'col-md-11'>
+          <!-- Inquiry Subject -->
+          <span class = 'header-7' style = 'margin-left: 8%'>{{subject}}</span>
+        </div>
+
+        <div class = 'col-md-1'>
+          <!-- Help Anchor - All in one line of code, so that a little space does not appear -->
+          <a href data-toggle = 'modal' data-target = '#help-modal' ng-click = 'registerHelpModalOpen()'>
+            <span class = 'glyphicon glyphicon-question-sign' style = 'font-size: 25px; margin-top: 6%'></span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Help Modal -->
+      <div class = 'modal fade' id = 'help-modal' role = 'dialog'>
+        <div class = 'modal-dialog'>
+          <div class = 'modal-content'>
+
+            <div class = 'modal-header'>
+              <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+              <h4 class = 'modal-title'>Inquiry Help</h4>
+            </div>
+
+            <div class = 'modal-body'>
+              <p>To answer this survey, just drag the concepts/questions on the top of the screen to the boxes on the middle of screen, so that they are assigned the score displayed over the column of the box.</p>
+              <p>The concepts/questions you find most relevant should be assigned a higher score than the ones that you do not consider relevant.</p>
+              <p>To read the description of a certain question, just hover it with the cursor.</p>
+              <p>You can also add any suggestions of questions/concepts that you think that makes sense in this survey's context.</p>
+              <p>In the end, just click the "Submit" button to save your answer.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <br>
+
+      <!-- List of Questions -->
+      <ul id = 'list-questions' class = 'draggable-objects'>
+        <li ng-repeat = 'question in questions' style = 'display: inline-block; margin-left: 1%'>
+          <div ng-if = 'question.score == "null"' ng-drag = 'true' ng-drag-data = 'question' data-allow-transform = 'true' title = '{{question.description}}' ng-class = 'setFontSize(question.title)'>
+            {{question.title}}
+          </div>
+
+          <div ng-if = 'question.score != "null"' ng-drop = 'true' ng-drop-success = 'resetDrop(question, $data)' ng-class = '[setFontSize(question.title), {"green_drop" : question.score > 0, "red_drop" : question.score < 0, "grey_drop" : question.score == 0}]'>{{question.title}}</div>
+        </li>
+      </ul>
+
+      <!-- Drop Areas -->
+      <div id = 'drop-areas'>
+        <div ng-repeat = 'row in matrix'>
+          <div class = 'div_pos' ng-if = '$parent.$index == 0' ng-repeat = 'pos in row track by $index'>
+            <div ng-if = '$index == 0'>Least Important</div>
+            <div ng-if = 'pos == 0'>Neutral</div>
+            <div ng-if = '$index == row.length - 1'>Most Important</div>
+            {{pos}}
+          </div>
+        </div>
+
+        <div ng-repeat = 'row in matrix'>
+          <div ng-drop = 'true' ng-drop-success = 'onDropComplete($data, row , $index)' ng-repeat = 'position in row track by $index' ng-center-anchor = '{{centerAnchor}}' ng-if = 'position != "null"' ng-class = '{"green_drop" : position > 0, "red_drop" : position < 0, "grey_drop" : position == 0}' style = 'margin: 5px'>
+            <div ng-repeat = 'question in questions' ng-drag = 'true' ng-drag-data = 'question' ng-center-anchor = '{{centerAnchor}}' ng-if = 'checkQuestionPosition(question, row, $parent.$index)' title = '{{question.description}}' style = 'display: inline-block' ng-class = 'setFontSize(question.title)'>
+              {{question.title}}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <br>
+
+      <!-- Suggestions -->
+      <div ng-if = 'suggestions_toggle == "Yes"' ng-cloak>
+        <h2 class = 'header-8'>Any suggestions of other questions?</h2>
+
+        <table class = 'table table-bordered table-hover'>
+          <thead>
+            <th class = 'text-center'>Title</th>
+            <th class = 'text-center'>Description</th>
+            <th class = 'col-md-2'></th>
+          </thead>
+          <tbody>
+            <tr ng-repeat = 'suggestion in suggestions' ng-class = '{danger: suggestion.id == delete_suggestion}'>
+              <td>
+                <div id = 'suggestion-title-{{suggestion.id}}'>
+                  <input class = 'form-control' type = 'text' ng-model = 'suggestion.title' ng-blur = 'blurSuggestionTitle(suggestion)'>
+                </div>
+              </td>
+              <td>
+                <div id = 'suggestion-description-{{suggestion.id}}'>
+                  <input class = 'form-control' type = 'text' ng-model = 'suggestion.description' ng-blur = 'blurSuggestionDescription(suggestion)'>
+                </div>
+              </td>
+              <td ng-if = 'suggestion.id != delete_suggestion'>
+                <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteSuggestion(suggestion)' title = 'Delete Suggestion'>
+                  <span class = 'glyphicon glyphicon-minus'></span>
+                </button>
+              </td>
+              <td ng-if = 'suggestion.id == delete_suggestion'>
+                <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteSuggestion(suggestion)' title = 'Confirm Delete Suggestion'>
+                  <span class = 'glyphicon glyphicon-ok'></span>
+                </button>
+                <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteSuggestion()' title = 'Cancel Delete Suggestion'>
+                  <span class = 'glyphicon glyphicon-remove'></span>
+                </button>
+              </td>
+            </tr>
+            <tr class = 'active'>
+              <td>
+                <div id = 'new-suggestion-title'>
+                  <input class = 'form-control' type = 'text' ng-model = 'new_suggestion.title'>
+                </div>
+              </td>
+              <td>
+                <div id = 'new-suggestion-description'>
+                  <input class = 'form-control' type = 'text' ng-model = 'new_suggestion.description'>
+                </div>
+              </td>
+              <td>
+                <button type = 'button' class = 'btn btn-success' ng-click = 'addSuggestion()' title = 'Add Suggestion'>
+                  <span class = 'glyphicon glyphicon-plus'></span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Data Saved Alert -->
+      <div class = 'alert alert-success' id = 'save-success' ng-cloak>
+        Answer <strong>successfully</strong> saved.
+      </div>
+
+      <!-- Submit Button -->
+      <button type = 'button' class = 'btn btn-success' ng-click = 'saveData()' title = 'Submit Answer'>
+        Submit
+      </button>
+
+    </div>
+  </body>
+</html>

@@ -1757,6 +1757,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         $http.post('/projects', proj_res).then(function() {
           //update the list of executions
           getArchive();
+          $scope.delete_workflow = '';
         });
       });
     });
@@ -1797,6 +1798,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
           getArchive();
           $('#delete-all-modal').modal('hide');
           $('#archive-modal').modal();
+          $scope.delete_workflow = '';
         });
       });
     });

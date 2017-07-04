@@ -61,16 +61,15 @@ app.service('InquiryService', function($http, $q) {
       new_answer.user_creator = new_round.username;
       //define the user that will answer the survey
       new_answer.user = new_round.emails[email].address;
-      //define the empty set of answers
-      new_answer.questions_answered = [];
       //define the subject survey
       new_answer.subject = new_round.subject;
       //define the suggestions
       new_answer.suggestions = [];
-      //define the set of unanswered question
-      new_answer.questions_unanswered = [];
       //define the suggestions toggle
       new_answer['suggestions toggle'] = new_round['suggestions toggle'];
+
+      //define the set of questions
+      new_answer.questions = [];
 
       //add the position to the questions - corresponding to the drop box they are in
       //-1 means that the question has not been assigned a drop box
@@ -81,7 +80,7 @@ app.service('InquiryService', function($http, $q) {
         new_question.id = questions[question].id;
         new_question.position = -1;
         new_question.score = 'null';
-        new_answer.questions_unanswered.push(new_question);
+        new_answer.questions.push(new_question);
       }
 
       new_answer.open_answer_questions = open_answer_questions;

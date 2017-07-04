@@ -35,7 +35,6 @@ ul.draggable-objects:after {
   width: 110px;
   height: 50px;
   display: inline-block;
-  margin: 5px;
   overflow: hidden;
 }
 
@@ -48,6 +47,11 @@ ul.draggable-objects:after {
   margin: 5px;
   display: inline-block;
   text-align: center;
+}
+
+#drop-areas, #list-questions {
+  width: 1100px;
+  max-width: 1100px;
 }
 
 /*COLORS OF NG-DROP*/
@@ -64,8 +68,16 @@ ul.draggable-objects:after {
 }
 
 /*FONT SIZES OF Q-SORT CARDS TITLES*/
+.jumbo_large_font {
+  font-size: 16px;
+}
+
+.extremely_large_font {
+  font-size: 13px;
+}
+
 .very_large_font {
-  font-size: 15px;
+  font-size: 12px;
 }
 
 .large_font {
