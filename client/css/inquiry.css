@@ -54,19 +54,6 @@ ul.draggable-objects:after {
   max-width: 1100px;
 }
 
-/*COLORS OF NG-DROP*/
-.green_drop {
-  background: rgba(0, 255, 0, 0.5);
-}
-
-.red_drop {
-  background: rgba(255, 0, 0, 0.5);
-}
-
-.grey_drop {
-  background: rgba(208, 208, 208, 0.5);
-}
-
 /*FONT SIZES OF Q-SORT CARDS TITLES*/
 .jumbo_large_font {
   font-size: 16px;

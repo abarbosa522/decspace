@@ -86,13 +86,6 @@ app.controller('InquiryController', function($scope) {
       $('#inquiry-question-description-' + question.id).removeClass('has-error');
   }
 
-  $scope.blurInquirySuggestionsToggle = function() {
-    if($scope.currentModule.input['suggestions toggle'] == undefined || $scope.currentModule.input['suggestions toggle'] == '')
-      $('#inquiry-suggestions-toggle').addClass('has-error');
-    else
-      $('#inquiry-suggestions-toggle').removeClass('has-error');
-  }
-
   $scope.addInquiryOpenAnswerQuestion = function() {
     //if a title was not assigned to the new question
     if($scope.new_inquiry_open_answer_question.question == undefined || $scope.new_inquiry_open_answer_question.question == '')
@@ -118,6 +111,64 @@ app.controller('InquiryController', function($scope) {
       $('#inquiry-open-answer-question-' + open_answer_question.id).addClass('has-error');
     else
       $('#inquiry-open-answer-question-' + open_answer_question.id).removeClass('has-error');
+  }
+
+  $scope.addInquiryGlossary = function() {
+    var can_add_question = true;
+
+    //if a name was not assigned to the new glossary concept
+    if($scope.new_inquiry_glossary.name == undefined || $scope.new_inquiry_glossary.name == '') {
+      $('#new-inquiry-glossary-name').addClass('has-error');
+      can_add_question = false;
+    }
+    else
+      $('#new-inquiry-glossary-name').removeClass('has-error');
+
+    //if a description was not assigned to the new glossary concept
+    if($scope.new_inquiry_glossary.description == undefined || $scope.new_inquiry_glossary.description == '') {
+      $('#new-inquiry-glossary-description').addClass('has-error');
+      can_add_question = false;
+    }
+    else
+      $('#new-inquiry-glossary-description').removeClass('has-error');
+
+    if(can_add_question) {
+      //assign an unique id to the new email
+      if($scope.currentModule.input.glossary.length == 0)
+        $scope.new_inquiry_glossary.id = 1;
+      else
+        $scope.new_inquiry_glossary.id = $scope.currentModule.input.glossary[$scope.currentModule.input.glossary.length - 1].id + 1;
+
+      $scope.currentModule.input.glossary.push(angular.copy($scope.new_inquiry_glossary));
+
+      $scope.new_inquiry_glossary.name = '';
+      $scope.new_inquiry_glossary.description = '';
+
+      //remove all error classes - just be sure
+      $('#new-inquiry-glossary-name').removeClass('has-error');
+      $('#new-inquiry-glossary-description').removeClass('has-error');
+    }
+  }
+
+  $scope.blurInquiryGlossaryName = function(concept) {
+    if(concept.name == undefined || concept.name == '')
+      $('#inquiry-glossary-name-' + concept.id).addClass('has-error');
+    else
+      $('#inquiry-glossary-name-' + concept.id).removeClass('has-error');
+  }
+
+  $scope.blurInquiryGlossaryDescription = function(concept) {
+    if(concept.description == undefined || concept.description == '')
+      $('#inquiry-glossary-description-' + concept.id).addClass('has-error');
+    else
+      $('#inquiry-glossary-description-' + concept.id).removeClass('has-error');
+  }
+
+  $scope.blurInquiryScale = function() {
+    if($scope.currentModule.input.scale == undefined || $scope.currentModule.input.scale == '')
+      $('#inquiry-scale').addClass('has-error');
+    else
+      $('#inquiry-scale').removeClass('has-error');
   }
 
   $scope.importEmailAttachment = function() {

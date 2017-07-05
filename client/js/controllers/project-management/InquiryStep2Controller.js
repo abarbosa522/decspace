@@ -24,6 +24,7 @@ app.controller('InquiryStep2Controller', function($scope, $window, $http) {
       //get the current answer
       for(answer in response.data) {
         if(response.data[answer].user == $scope.user_id && response.data[answer].round_id == round_id) {
+
           //get the list of questions
           $scope.questions = response.data[answer].questions;
           //get the survey subject
@@ -31,7 +32,13 @@ app.controller('InquiryStep2Controller', function($scope, $window, $http) {
           //get the stored suggestions
           $scope.suggestions = response.data[answer].suggestions;
           //get the suggestions toggle
-          $scope.suggestions_toggle = response.data[answer]['suggestions toggle'];
+          $scope.suggestions_toggle = response.data[answer].suggestions_toggle;
+          //get the user-defined color scheme
+          $scope.color_scheme = response.data[answer].color_scheme;
+          //glossary
+          $scope.glossary = response.data[answer].glossary;
+          //scale
+          $scope.scale = response.data[answer].scale;
 
           //get survey usability metrics
           log_ins = response.data[answer].usability_metrics.log_ins;
@@ -50,6 +57,8 @@ app.controller('InquiryStep2Controller', function($scope, $window, $http) {
           //count current log in
           registerLogIn();
 
+          //define the color scheme
+          defineColorScheme();
           break;
         }
       }
@@ -379,10 +388,14 @@ app.controller('InquiryStep2Controller', function($scope, $window, $http) {
   }
 
   function registerTaskComplete() {
-    if($scope.questions_unanswered.length == 0)
-      task_complete = true;
-    else
-      task_complete = false;
+    task_complete = true;
+
+    for(question in $scope.questions) {
+      if($scope.questions[question].position == -1 && $scope.questions[question].score == 'null') {
+        task_complete = false;
+        break;
+      }
+    }
   }
 
   function registerIncompleteSave() {
@@ -403,6 +416,45 @@ app.controller('InquiryStep2Controller', function($scope, $window, $http) {
       return 'medium_font';
     else if(string.length > 75)
       return 'small_font';
+  }
+
+  //define the classes of the rectangles
+  function defineColorScheme() {
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    style.innerHTML = '.most_important_drop {background : ' + hexToRgbA($scope.color_scheme.most_important) + '}'
+    + '.neutral_drop {background : ' + hexToRgbA($scope.color_scheme.neutral) + '}'
+    + '.least_important_drop {background : ' + hexToRgbA($scope.color_scheme.least_important) + '}';
+
+    document.getElementsByTagName('head')[0].appendChild(style);
+  }
+
+  function hexToRgbA(hex) {
+    var c = hex.substring(1).split('');
+
+    if(c.length == 3) {
+      c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+    }
+
+    c = '0x' + c.join('');
+
+    return 'rgba(' + [(c>>16)&255, (c>>8)&255, c&255].join(',') + ', 0.5)';
+  }
+
+  //redirect to the previous step
+  $scope.previousStep = function() {
+    $window.location.href = 'inquiry.html?round=' + round_id + '&user=' + $scope.user_id;
+  }
+
+  $scope.scaleCheck = function(pos) {
+    if($scope.scale == 'Default')
+      return true;
+    else if($scope.scale == '3 values') {
+      if(Math.abs(pos) <= 1)
+        return true;
+      else
+        return false;
+    }
   }
 
   /*** STARTUP FUNCTIONS ***/

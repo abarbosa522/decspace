@@ -152,6 +152,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   //save the current data
   $scope.saveData = function(callback) {
+
     $http.get('/projects').then(function(response) {
         var id_doc, proj_res;
 
@@ -443,7 +444,11 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
           'questions' : [],
           'open_answer_questions' : [],
           'current_round' : 0,
-          'suggestions toggle' : '',
+          'suggestions' : {
+            'toggle' : false,
+            'question' : '',
+            'title' : ''
+          },
           'personalized_email' : false,
           'email' : {
             'subject' : '',
@@ -451,7 +456,14 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
             'attachment' : '',
             'attachment_name' : '',
             'attachment_type' : ''
-          }
+          },
+          'color_scheme' : {
+            'most_important' : '#00ff00',
+            'neutral' : '#d0d0d0',
+            'least_important' : '#ff0000'
+          },
+          'glossary' : [],
+          'scale' : ''
         };
         //initialize the output data array
         new_mod['output'] = [];
@@ -531,7 +543,6 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
     new_mod.input = angular.copy(input_data);
 
-
     new_mod.input.round_id = angular.copy(input_data.round_id);
     //store the position
     new_mod.position = pos;
@@ -607,6 +618,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   //select the current module
   $scope.selectCurrentModule = function(event) {
+
     var parent_id = event.target.parentNode.id;
 
     for(mod in modules)
@@ -654,9 +666,11 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         $scope.new_inquiry_email = {};
         $scope.new_inquiry_question = {};
         $scope.new_inquiry_open_answer_question = {};
+        $scope.new_inquiry_glossary = {};
         $scope.deleteIdEmail = '';
         $scope.deleteIdQuestion = '';
         $scope.deleteIdOpenAnswerQuestion = '';
+        $scope.deleteIdGlossaryConcept = '';
         break;
 
       case 'SRF':
@@ -1007,6 +1021,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   $scope.deleteIdEmail = '';
   $scope.deleteIdQuestion = '';
   $scope.deleteIdOpenAnswerQuestion = '';
+  $scope.deleteIdGlossaryConcept = '';
 
   //select a certain input to be deleted
   $scope.deleteInput = function(input, type) {
@@ -1049,6 +1064,10 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
       case 'Open Answer Questions':
         $scope.deleteIdOpenAnswerQuestion = input.id;
+        break;
+
+      case 'Glossary':
+        $scope.deleteIdGlossaryConcept = input.id;
         break;
     }
   }
@@ -1105,6 +1124,11 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         $scope.currentModule.input.open_answer_questions.splice($scope.currentModule.input.open_answer_questions.indexOf(input), 1);
         $scope.deleteIdOpenAnswerQuestion = '';
         break;
+
+      case 'Glossary':
+        $scope.currentModule.input.glossary.splice($scope.currentModule.input.glossary.indexOf(input), 1);
+        $scope.deleteIdGlossaryConcept = '';
+        break;
     }
   }
 
@@ -1149,6 +1173,10 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
       case 'Open Answer Questions':
         $scope.deleteIdOpenAnswerQuestion = '';
+        break;
+
+      case 'Glossary':
+        $scope.deleteIdGlossaryConcept = '';
         break;
     }
   }
@@ -1487,7 +1515,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
           modules[mod].input.subject = '';
         //INQUIRY - SUGGESTIONS TOGGLE
         else if(modules[mod].type == 'Inquiry' && connection.input_type == 'suggestions toggle')
-          modules[mod].input['suggestions toggle'] = '';
+          modules[mod].input['suggestions toggle'] = false;
         //SRF - RANKING
         else if(modules[mod].type == 'SRF' && connection.input_type == 'ranking')
           modules[mod].input.ranking = 2;
@@ -1550,19 +1578,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         for(input in modules[mod]['input']) {
           if(modules[mod]['input'][input].length > 0)
             input_data++;
-          //SPECIAL CASE - INQUIRY EMAILS
-          else if(modules[mod].type == 'Inquiry' && input == 'emails')
-            input_data++;
-          //SPECIAL CASE - INQUIRY CURRENT ROUND
-          else if(modules[mod].type == 'Inquiry' && input == 'current_round')
-            input_data++;
-          //SPECIAL CASE - INQUIRY ROUND ID
-          else if(modules[mod].type == 'Inquiry' && input == 'round_id')
-            input_data++;
-          //SPECIAL CASE - INQUIRY PERSONALIZED EMAIL
-          else if(modules[mod].type == 'Inquiry' && input == 'personalized_email')
-            input_data++;
-          else if(modules[mod].type == 'Inquiry' && input == 'email')
+          //SPECIAL CASE - INQUIRY (EMAILS, CURRENT ROUND, ROUND ID, PERSONALIZED EMAIL, EMAIL, COLOR SCHEME, SUGGESTIONS)
+          else if(modules[mod].type == 'Inquiry' && (input == 'emails' || input == 'current_round' || input == 'round_id' || input == 'personalized_email' || input == 'email' || input == 'color_scheme' || input == 'suggestions'))
             input_data++;
           else {
             for(connection in connections)
@@ -1668,7 +1685,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         break;
 
       case 'Inquiry':
-        var results = InquiryService.startRound($scope.username, proj_id, mod.input.subject, mod.input.emails, mod.input.open_answer_questions, mod.input.questions, mod.input.current_round, mod.input['suggestions toggle'], mod.input.personalized_email, mod.input.email);
+        var results = InquiryService.startRound($scope.username, proj_id, mod.input.subject, mod.input.emails, mod.input.open_answer_questions, mod.input.questions, mod.input.current_round, mod.input.suggestions, mod.input.personalized_email, mod.input.email, mod.input.color_scheme, mod.input.glossary, mod.input.scale);
 
         results.then(function(resolve) {
           mod.input.round_id = resolve.id;

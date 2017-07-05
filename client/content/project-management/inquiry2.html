@@ -74,12 +74,16 @@
 
       <!-- Survey Subject -->
       <div class = 'row'>
-        <div class = 'col-md-11'>
+        <div class = 'col-md-10'>
           <!-- Inquiry Subject -->
-          <span class = 'header-7' style = 'margin-left: 8%'>{{subject}}</span>
+          <span class = 'header-7' style = 'margin-left: 18%'>{{subject}}</span>
         </div>
 
-        <div class = 'col-md-1'>
+        <div class = 'col-md-2'>
+          <!-- Glossary -->
+          <a href data-toggle = 'modal' data-target = '#glossary-modal'>
+            <span class = 'glyphicon glyphicon-info-sign' style = 'font-size: 25px; margin-top: 6%'></span>
+          </a>
           <!-- Help Anchor - All in one line of code, so that a little space does not appear -->
           <a href data-toggle = 'modal' data-target = '#help-modal' ng-click = 'registerHelpModalOpen()'>
             <span class = 'glyphicon glyphicon-question-sign' style = 'font-size: 25px; margin-top: 6%'></span>
@@ -108,6 +112,56 @@
         </div>
       </div>
 
+      <!-- Glossary Modal -->
+      <div class = 'modal fade' id = 'glossary-modal' role = 'dialog'>
+        <div class = 'modal-dialog'>
+          <div class = 'modal-content'>
+
+            <div class = 'modal-header'>
+              <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+              <h4 class = 'modal-title'>Glossary</h4>
+            </div>
+
+            <div class = 'modal-body'>
+              <p class = 'header-1'>Inquiry Subject</p>
+              {{subject}}
+
+              <p class = 'header-1'>Questions</p>
+              <table class = 'table table-bordered table-hover'>
+                <thead>
+                  <tr>
+                    <th class = 'text-center'>{{suggestions_toggle.title}}</th>
+                    <th class = 'text-center'>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat = 'question in questions'>
+                    <td>{{question.title}}</td>
+                    <td>{{question.description}}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <p class = 'header-1'>Glossary</p>
+              <table class = 'table table-bordered table-hover'>
+                <thead>
+                  <tr>
+                    <th class = 'text-center'>Name</th>
+                    <th class = 'text-center'>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat = 'concept in glossary'>
+                    <td>{{concept.name}}</td>
+                    <td>{{concept.description}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <br>
 
       <!-- List of Questions -->
@@ -117,7 +171,7 @@
             {{question.title}}
           </div>
 
-          <div ng-if = 'question.score != "null"' ng-drop = 'true' ng-drop-success = 'resetDrop(question, $data)' ng-class = '[setFontSize(question.title), {"green_drop" : question.score > 0, "red_drop" : question.score < 0, "grey_drop" : question.score == 0}]'>{{question.title}}</div>
+          <div ng-if = 'question.score != "null"' ng-drop = 'true' ng-drop-success = 'resetDrop(question, $data)' ng-class = '[setFontSize(question.title), {"most_important_drop" : question.score > 0, "least_important_drop" : question.score < 0, "neutral_drop" : question.score == 0}]'>{{question.title}}</div>
         </li>
       </ul>
 
@@ -128,12 +182,14 @@
             <div ng-if = '$index == 0'>Least Important</div>
             <div ng-if = 'pos == 0'>Neutral</div>
             <div ng-if = '$index == row.length - 1'>Most Important</div>
-            {{pos}}
+
+            <div ng-if = 'scaleCheck(pos)'>{{pos}}</div>
+
           </div>
         </div>
 
         <div ng-repeat = 'row in matrix'>
-          <div ng-drop = 'true' ng-drop-success = 'onDropComplete($data, row , $index)' ng-repeat = 'position in row track by $index' ng-center-anchor = '{{centerAnchor}}' ng-if = 'position != "null"' ng-class = '{"green_drop" : position > 0, "red_drop" : position < 0, "grey_drop" : position == 0}' style = 'margin: 5px'>
+          <div ng-drop = 'true' ng-drop-success = 'onDropComplete($data, row , $index)' ng-repeat = 'position in row track by $index' ng-center-anchor = '{{centerAnchor}}' ng-if = 'position != "null"' ng-class = '{"most_important_drop" : position > 0, "least_important_drop" : position < 0, "neutral_drop" : position == 0}' style = 'margin: 5px'>
             <div ng-repeat = 'question in questions' ng-drag = 'true' ng-drag-data = 'question' ng-center-anchor = '{{centerAnchor}}' ng-if = 'checkQuestionPosition(question, row, $parent.$index)' title = '{{question.description}}' style = 'display: inline-block' ng-class = 'setFontSize(question.title)'>
               {{question.title}}
             </div>
@@ -144,12 +200,12 @@
       <br>
 
       <!-- Suggestions -->
-      <div ng-if = 'suggestions_toggle == "Yes"' ng-cloak>
-        <h2 class = 'header-8'>Any suggestions of other questions?</h2>
+      <div ng-if = 'suggestions_toggle.toggle == true' ng-cloak>
+        <h2 class = 'header-8'>{{suggestions_toggle.question}}</h2>
 
         <table class = 'table table-bordered table-hover'>
           <thead>
-            <th class = 'text-center'>Title</th>
+            <th class = 'text-center'>{{suggestions_toggle.title}}</th>
             <th class = 'text-center'>Description</th>
             <th class = 'col-md-2'></th>
           </thead>
@@ -205,10 +261,17 @@
         Answer <strong>successfully</strong> saved.
       </div>
 
+      <!-- Previous Step Button -->
+      <button type = 'button' class = 'btn btn-primary' ng-click = 'previousStep()' title = 'Previous Step'>
+        Previous Step
+      </button>
+
       <!-- Submit Button -->
       <button type = 'button' class = 'btn btn-success' ng-click = 'saveData()' title = 'Submit Answer'>
         Submit
       </button>
+
+      <br><br>
 
     </div>
   </body>

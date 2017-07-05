@@ -94,10 +94,17 @@
         <br>
       </div>
 
-      <!-- Submit Button -->
-      <button type = 'button' class = 'btn btn-success' ng-click = 'nextStep()' title = 'Next Step'>
+      <!-- Next Step Button -->
+      <button type = 'button' class = 'btn btn-primary' ng-click = 'nextStep()' title = 'Next Step'>
         Next Step
       </button>
+
+      <br><br>
+
+      <!-- Open Answer Alert -->
+      <div class = 'alert alert-danger' id = 'open-answer-error' ng-cloak>
+        Please answer <strong>all</strong> questions.
+      </div>
 
     </div>
   </body>

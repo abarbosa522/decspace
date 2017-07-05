@@ -1426,22 +1426,125 @@
 
                   <br>
 
-                  <!-- Suggestions Toggle -->
-                  <p class = 'header-1'>Suggestions Toggle</p>
+                  <!-- Q-Sort Colors -->
+                  <p class = 'header-1'>Q-Sort Color Scheme</p>
 
-                  <div class = 'row'>
-                    <div class = 'col-md-4'></div>
-
-                    <div id = 'inquiry-suggestion-toggle' class = 'col-md-4'>
-                      <select class = 'form-control' ng-model = 'currentModule.input["suggestions toggle"]' ng-blur = 'blurInquirySuggestionsToggle()'>
-                        <option value = '' selected disabled>--- Please Select ---</option>
-                        <option>Yes</option>
-                        <option>No</option>
-                      </select>
+                  <form class = 'form-horizontal'>
+                    <div class = 'form-group'>
+                      <label for = 'most-important' class = 'control-label col-md-6'>Most Important Questions</label>
+                      <input type = 'color' class = 'col-md-1' ng-model = 'currentModule.input.color_scheme.most_important' style = 'margin-top: 0.5%'>
                     </div>
 
-                    <div class = 'col-md-4'></div>
+                    <div class = 'form-group'>
+                      <label for = 'neutral' class = 'control-label col-md-6'>Neutral Questions</label>
+                      <input type = 'color' class = 'col-md-1' ng-model = 'currentModule.input.color_scheme.neutral' style = 'margin-top: 0.5%'>
+                    </div>
+
+                    <div class = 'form-group'>
+                      <label for = 'least-important' class = 'control-label col-md-6'>Least Important Questions</label>
+                      <input type = 'color' class = 'col-md-1' ng-model = 'currentModule.input.color_scheme.least_important' style = 'margin-top: 0.5%'>
+                    </div>
+                  </form>
+
+                  <br>
+
+                  <!-- Q-Sort Scale -->
+                  <p class = 'header-1'>Q-Sort Scale</p>
+
+                  <div id = 'inquiry-scale' class = 'row'>
+                    <div class = 'row col-md-offset-4 col-md-4 col-md-offset-4'>
+                      <select class = 'form-control' ng-model = 'currentModule.input.scale' ng-blur = 'blurInquiryScale(currentModule.input.scale)'>
+                        <option value = '' selected disabled>--- Please Select ---</option>
+                        <option>Default</option>
+                        <option>3 values</option>
+                      </select>
+                    </div>
                   </div>
+
+                  <hr>
+
+                  <!-- Glossary -->
+                  <p class = 'header-1'>Glossary</p>
+
+                  <table class = 'table table-bordered table-hover'>
+                    <thead>
+                      <tr>
+                        <th class = 'text-center'>Name</th>
+                        <th class = 'text-center'>Description</th>
+                        <th class = 'col-md-2'></th>
+                      </tr>
+                    </thead>
+                    <!-- Added Concepts -->
+                    <tbody>
+                      <tr ng-repeat = 'gloss in currentModule.input.glossary' ng-class = '{danger: gloss.id == deleteIdGlossaryConcept}'>
+                        <td>
+                          <div id = 'inquiry-glossary-name-{{gloss.id}}'>
+                            <input type = 'text' class = 'form-control' ng-model = 'gloss.name' ng-blur = 'blurInquiryGlossaryName(gloss)'>
+                          </div>
+                        </td>
+                        <td>
+                          <div id = 'inquiry-glossary-description-{{gloss.id}}'>
+                            <input type = 'text' class = 'form-control' ng-model = 'gloss.description' ng-blur = 'blurInquiryGlossaryDescription(gloss)'>
+                          </div>
+                        </td>
+                        <td ng-if = 'gloss.id != deleteIdGlossaryConcept'>
+                          <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(gloss, "Glossary")' title = 'Delete Glossary Concept'>
+                            <span class = 'glyphicon glyphicon-minus'></span>
+                          </button>
+                        </td>
+                        <td ng-if = 'gloss.id == deleteIdGlossaryConcept'>
+                          <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(gloss, "Glossary")' title = 'Confirm Delete Glossary Concept'>
+                            <span class = 'glyphicon glyphicon-ok'></span>
+                          </button>
+                          <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Glossary")' title = 'Cancel Delete Glossary Concept'>
+                            <span class = 'glyphicon glyphicon-remove'></span>
+                          </button>
+                        </td>
+                      </tr>
+                      <!-- Form to add new question -->
+                      <tr class = 'active'>
+                        <td>
+                          <div id = 'new-inquiry-glossary-name'>
+                            <input class = 'form-control' type = 'text' ng-model = 'new_inquiry_glossary.name'>
+                          </div>
+                        </td>
+                        <td>
+                          <div id = 'new-inquiry-glossary-description'>
+                            <input class = 'form-control' type = 'text' ng-model = 'new_inquiry_glossary.description'>
+                          </div>
+                        </td>
+                        <td>
+                          <button type = 'button' class = 'btn btn-success' ng-click = 'addInquiryGlossary()' title = 'Add Glossary Concept'>
+                            <span class = 'glyphicon glyphicon-plus'></span>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <hr>
+
+                  <!-- Suggestions Toggle -->
+                  <p class = 'header-1'>Suggestions</p>
+
+                  <label for = 'suggestions-check'>Ask for suggestions?</label>
+                  <input id = 'suggestions-check' type = 'checkbox' ng-model = 'currentModule.input.suggestions.toggle'>
+
+                  <form class = 'form-horizontal' ng-if = 'currentModule.input.suggestions.toggle'>
+                    <div class = 'form-group'>
+                      <label for = 'suggestions-question' class = 'col-md-3 control-label'>How to ask for the suggestions?</label>
+                      <div class = 'col-md-9'>
+                        <input id = 'suggestions-question' class = 'form-control' ng-model = 'currentModule.input.suggestions.question'>
+                      </div>
+                    </div>
+
+                    <div class = 'form-group'>
+                      <label for = 'suggestions-title' class = 'col-md-3 control-label'>Name of the suggestions' titles</label>
+                      <div class = 'col-md-9'>
+                        <input id = 'suggestions-question' class = 'form-control' ng-model = 'currentModule.input.suggestions.title'>
+                      </div>
+                    </div>
+                  </form>
 
                   <hr>
 
@@ -1824,7 +1927,7 @@
                         </table>
                       </div>
 
-                      <div ng-if = 'currentModule.input["suggestions toggle"] == "Yes"' ng-cloak>
+                      <div ng-if = 'currentModule.input.suggestions.toggle' ng-cloak>
                         <br>
                         <!-- Suggestions -->
                         <p class = 'header-1'>Suggestions</p>
@@ -1832,8 +1935,8 @@
                         <table class = 'table table-bordered table-hover'>
                           <thead>
                             <tr>
-                              <th class = 'text-center col-md-4'>Title</th>
-                              <th class = 'text-center col-md-8'>Description</th>
+                              <th class = 'text-center col-md-6'>{{currentModule.input.suggestions.title}}</th>
+                              <th class = 'text-center col-md-6'>Description</th>
                             </tr>
                           </thead>
                           <tbody>
