@@ -186,13 +186,7 @@ app.post('/personalized_inquiry_survey', function(req, res) {
     from: 'decspace2017@gmail.com', //sender address
     to: req.body.email,             //receiver
     subject: req.body.subject,          //Subject Title
-    text: req.body.text + '\nThe link to your survey is ' + req.body.link,
-    attachments: [
-      {
-        filename: req.body.attachment_name,
-        content: req.body.attachment
-      }
-    ]
+    text: req.body.text + '\nThe link to your survey is ' + req.body.link
   };
 
   transporter.sendMail(mailOptions, function(error, info) {

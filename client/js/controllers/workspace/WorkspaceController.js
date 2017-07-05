@@ -452,10 +452,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
           'personalized_email' : false,
           'email' : {
             'subject' : '',
-            'text' : '',
-            'attachment' : '',
-            'attachment_name' : '',
-            'attachment_type' : ''
+            'text' : ''
           },
           'color_scheme' : {
             'most_important' : '#00ff00',

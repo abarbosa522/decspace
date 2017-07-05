@@ -139,9 +139,6 @@ app.service('InquiryService', function($http, $q) {
       else {
         send_email.subject = email_content.subject;
         send_email.text = email_content.text;
-        send_email.attachment = email_content.attachment;
-        send_email.attachment_name = email_content.attachment_name;
-        send_email.attachment_type = email_content.attachment_type;
 
         $http.post('/personalized_inquiry_survey', send_email).then(function(response) {});
       }

@@ -190,7 +190,7 @@ app.controller('InquiryStep2Controller', function($scope, $window, $http) {
     if(data.position == -1 && !filled_pos) {
       //add position and score to the question
       $scope.questions[$scope.questions.indexOf(data)].position = $scope.matrix.indexOf(row) + '-' + index;
-      $scope.questions[$scope.questions.indexOf(data)].score = $scope.matrix[$scope.matrix.indexOf(row)][index];
+      $scope.questions[$scope.questions.indexOf(data)].score = convertToScale($scope.matrix[$scope.matrix.indexOf(row)][index]);
     }
     //if dragged question is unanswered and position is filled
     else if(data.position == -1 && filled_pos) {
@@ -202,12 +202,12 @@ app.controller('InquiryStep2Controller', function($scope, $window, $http) {
 
       //add position and score to the question
       $scope.questions[$scope.questions.indexOf(data)].position = $scope.matrix.indexOf(row) + '-' + index;
-      $scope.questions[$scope.questions.indexOf(data)].score = $scope.matrix[$scope.matrix.indexOf(row)][index];
+      $scope.questions[$scope.questions.indexOf(data)].score = convertToScale($scope.matrix[$scope.matrix.indexOf(row)][index]);
     }
     else if(data.position != -1 && !filled_pos) {
       //change the answered question's position and score
       $scope.questions[$scope.questions.indexOf(data)].position = $scope.matrix.indexOf(row) + '-' + index;
-      $scope.questions[$scope.questions.indexOf(data)].score = $scope.matrix[$scope.matrix.indexOf(row)][index];
+      $scope.questions[$scope.questions.indexOf(data)].score = convertToScale($scope.matrix[$scope.matrix.indexOf(row)][index]);
     }
     else if(data.position != -1 && filled_pos) {
       //save and switch the answered questions' positions and scores with each other
@@ -454,6 +454,20 @@ app.controller('InquiryStep2Controller', function($scope, $window, $http) {
         return true;
       else
         return false;
+    }
+  }
+
+  //convert matrix score to current scale
+  function convertToScale(score) {
+    if($scope.scale == 'Default')
+      return score;
+    else if($scope.scale == '3 values') {
+      if(score >= 1)
+        return 1;
+      else if(score == 0)
+        return 0;
+      else if(score <= -1)
+        return -1;
     }
   }
 

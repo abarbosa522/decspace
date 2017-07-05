@@ -170,26 +170,4 @@ app.controller('InquiryController', function($scope) {
     else
       $('#inquiry-scale').removeClass('has-error');
   }
-
-  $scope.importEmailAttachment = function() {
-    var input_file = document.getElementById('email-attachments');
-
-    for(i = 0; i < input_file.files.length; i++) {
-      var reader = new FileReader();
-
-      //called when readAsText is performed
-      reader.onload = (function(file) {
-        return function(e) {
-          $scope.currentModule.input.email.attachment = e.target.result;
-          $scope.currentModule.input.email.attachment_name = file.name;
-          $scope.currentModule.input.email.attachment_type = file.type;
-
-          $scope.file_uploaded = true;
-        }
-      })(input_file.files[i]);
-
-      //get the data from the file
-      reader.readAsText(input_file.files[i]);
-    }
-  }
 });
