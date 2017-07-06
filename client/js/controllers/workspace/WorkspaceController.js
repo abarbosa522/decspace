@@ -1578,6 +1578,9 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
           //SPECIAL CASE - INQUIRY (EMAILS, CURRENT ROUND, ROUND ID, PERSONALIZED EMAIL, EMAIL, COLOR SCHEME, SUGGESTIONS)
           else if(modules[mod].type == 'Inquiry' && (input == 'emails' || input == 'current_round' || input == 'round_id' || input == 'personalized_email' || input == 'email' || input == 'color_scheme' || input == 'suggestions'))
             input_data++;
+          //SPECIAL CASE - SRF
+          else if(modules[mod].type == 'SRF' && (input == 'ranking' || input == 'ratio z' || input == 'decimal places' || input == 'weight type'))
+            input_data++;
           else {
             for(connection in connections)
               if(connections[connection]['input'] == modules[mod]['id'] && connections[connection]['input_type'] == input) {
