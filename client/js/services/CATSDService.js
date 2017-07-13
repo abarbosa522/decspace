@@ -37,9 +37,8 @@ app.service('CATSDService', function($http, $q) {
     //calculate the sets of the interaction effects
     interactionEffectsSets();
 
-    if(!nonNegativityCondition()) {
+    if(!nonNegativityCondition())
       deferred.resolve(false);
-    }
 
     var result = applyCriterionFunction();
 
@@ -47,7 +46,7 @@ app.service('CATSDService', function($http, $q) {
       similarityValues = resolve;
 
       assignActions();
-      
+
       deferred.resolve(assignedActions);
     });
 
@@ -170,43 +169,47 @@ app.service('CATSDService', function($http, $q) {
 
     var kij = 0;
     for(pair in mutualSet) {
-      var f_value1, f_value2;
+      if(category.name == mutualSet[pair].category) {
+        var f_value1, f_value2;
 
-      for(item in similarityValues) {
-        if(similarityValues[item]['criterion'] == mutualSet[pair]['criterion1'] && similarityValues[item]['action'] == action['name'] && similarityValues[item]['reference_action'] == reference_action['name']) {
-          f_value1 = similarityValues[item]['result'];
+        for(item in similarityValues) {
+          if(similarityValues[item]['criterion'] == mutualSet[pair]['criterion1'] && similarityValues[item]['action'] == action['name'] && similarityValues[item]['reference_action'] == reference_action['name']) {
+            f_value1 = similarityValues[item]['result'];
+          }
+          else if(similarityValues[item]['criterion'] == mutualSet[pair]['criterion2'] && similarityValues[item]['action'] == action['name'] && similarityValues[item]['reference_action'] == reference_action['name']){
+            f_value2 = similarityValues[item]['result'];
+          }
         }
-        else if(similarityValues[item]['criterion'] == mutualSet[pair]['criterion2'] && similarityValues[item]['action'] == action['name'] && similarityValues[item]['reference_action'] == reference_action['name']){
-          f_value2 = similarityValues[item]['result'];
+
+        if(f_value1 > 0  && f_value2 > 0) {
+          var s1 = sj(mutualSet[pair]['criterion1'], action['name'], reference_action['name']);
+          var s2 = sj(mutualSet[pair]['criterion2'], action['name'], reference_action['name']);
+
+          kij += z(s1, s2) * mutualSet[pair]['value'];
         }
-      }
-
-      if(f_value1 > 0  && f_value2 > 0) {
-        var s1 = sj(mutualSet[pair]['criterion1'], action['name'], reference_action['name']);
-        var s2 = sj(mutualSet[pair]['criterion2'], action['name'], reference_action['name']);
-
-        kij += z(s1, s2) * mutualSet[pair]['value'];
       }
     }
 
     var kih = 0;
     for(pair2 in antagonisticSet) {
-      var f_value3, f_value4;
+      if(category.name == antagonisticSet[pair2].category) {
+        var f_value3, f_value4;
 
-      for(item in similarityValues) {
-        if(similarityValues[item]['criterion'] == antagonisticSet[pair2]['criterion1'] && similarityValues[item]['action'] == action['name'] && similarityValues[item]['reference_action'] == reference_action['name']) {
-          f_value3 = similarityValues[item]['result'];
+        for(item in similarityValues) {
+          if(similarityValues[item]['criterion'] == antagonisticSet[pair2]['criterion1'] && similarityValues[item]['action'] == action['name'] && similarityValues[item]['reference_action'] == reference_action['name']) {
+            f_value3 = similarityValues[item]['result'];
+          }
+          else if(similarityValues[item]['criterion'] == antagonisticSet[pair2]['criterion2'] && similarityValues[item]['action'] == action['name'] && similarityValues[item]['reference_action'] == reference_action['name']){
+            f_value4 = similarityValues[item]['result'];
+          }
         }
-        else if(similarityValues[item]['criterion'] == antagonisticSet[pair2]['criterion2'] && similarityValues[item]['action'] == action['name'] && similarityValues[item]['reference_action'] == reference_action['name']){
-          f_value4 = similarityValues[item]['result'];
+
+        if(f_value3 > 0 && f_value4 < 0) {
+          var s3 = sj(antagonisticSet[pair2]['criterion1'], action['name'], reference_action['name']);
+          var s4 = dj(antagonisticSet[pair2]['criterion2'], action['name'], reference_action['name']);
+
+          kih += z(s3, s4) * antagonisticSet[pair2]['value'];
         }
-      }
-
-      if(f_value3 > 0 && f_value4 < 0) {
-        var s3 = sj(antagonisticSet[pair2]['criterion1'], action['name'], reference_action['name']);
-        var s4 = dj(antagonisticSet[pair2]['criterion2'], action['name'], reference_action['name']);
-
-        kih += z(s3, s4) * antagonisticSet[pair2]['value'];
       }
     }
 
@@ -221,45 +224,43 @@ app.service('CATSDService', function($http, $q) {
     for(criterion in criteria)
       result += category[criteria[criterion]['name']] * sj(criteria[criterion]['name'], action['name'], reference_action['name']);
 
-
     for(pair in mutualSet) {
-      var f_value1, f_value2;
+      if(category.name == mutualSet[pair].category) {
+        var f_value1, f_value2;
 
-      for(item in similarityValues) {
-        if(similarityValues[item]['criterion'] == mutualSet[pair]['criterion1'] && similarityValues[item]['action'] == action['name'] && similarityValues[item]['reference_action'] == reference_action['name']) {
-          f_value1 = similarityValues[item]['result'];
+        for(item in similarityValues) {
+          if(similarityValues[item]['criterion'] == mutualSet[pair]['criterion1'] && similarityValues[item]['action'] == action['name'] && similarityValues[item]['reference_action'] == reference_action['name'])
+            f_value1 = similarityValues[item]['result'];
+          else if(similarityValues[item]['criterion'] == mutualSet[pair]['criterion2'] && similarityValues[item]['action'] == action['name'] && similarityValues[item]['reference_action'] == reference_action['name'])
+            f_value2 = similarityValues[item]['result'];
         }
-        else if(similarityValues[item]['criterion'] == mutualSet[pair]['criterion2'] && similarityValues[item]['action'] == action['name'] && similarityValues[item]['reference_action'] == reference_action['name']){
-          f_value2 = similarityValues[item]['result'];
+
+        if(f_value1 > 0  && f_value2 > 0) {
+          var s1 = sj(mutualSet[pair]['criterion1'], action['name'], reference_action['name']);
+          var s2 = sj(mutualSet[pair]['criterion2'], action['name'], reference_action['name']);
+
+          result += z(s1, s2) * mutualSet[pair]['value'];
         }
-      }
-
-      if(f_value1 > 0  && f_value2 > 0) {
-        var s1 = sj(mutualSet[pair]['criterion1'], action['name'], reference_action['name']);
-        var s2 = sj(mutualSet[pair]['criterion2'], action['name'], reference_action['name']);
-
-        result += z(s1, s2) * mutualSet[pair]['value'];
       }
     }
 
     for(pair2 in antagonisticSet) {
-      var f_value3, f_value4;
+      if(category.name == antagonisticSet[pair2].category) {
+        var f_value3, f_value4;
 
-      for(item in similarityValues) {
-        if(similarityValues[item]['criterion'] == antagonisticSet[pair2]['criterion1'] && similarityValues[item]['action'] == action['name'] && similarityValues[item]['reference_action'] == reference_action['name']) {
-          f_value3 = similarityValues[item]['result'];
+        for(item in similarityValues) {
+          if(similarityValues[item]['criterion'] == antagonisticSet[pair2]['criterion1'] && similarityValues[item]['action'] == action['name'] && similarityValues[item]['reference_action'] == reference_action['name'])
+            f_value3 = similarityValues[item]['result'];
+          else if(similarityValues[item]['criterion'] == antagonisticSet[pair2]['criterion2'] && similarityValues[item]['action'] == action['name'] && similarityValues[item]['reference_action'] == reference_action['name'])
+            f_value4 = similarityValues[item]['result'];
         }
-        else if(similarityValues[item]['criterion'] == antagonisticSet[pair2]['criterion2'] && similarityValues[item]['action'] == action['name'] && similarityValues[item]['reference_action'] == reference_action['name']){
-          f_value4 = similarityValues[item]['result'];
+
+        if(f_value3 > 0 && f_value4 < 0) {
+          var s3 = sj(antagonisticSet[pair2]['criterion1'], action['name'], reference_action['name']);
+          var s4 = dj(antagonisticSet[pair2]['criterion2'], action['name'], reference_action['name']);
+
+          result -= z(s3, s4) * antagonisticSet[pair2]['value'];
         }
-      }
-
-      if(f_value3 > 0 && f_value4 < 0) {
-
-        var s3 = sj(antagonisticSet[pair2]['criterion1'], action['name'], reference_action['name']);
-        var s4 = dj(antagonisticSet[pair2]['criterion2'], action['name'], reference_action['name']);
-
-        result -= z(s3, s4) * antagonisticSet[pair2]['value'];
       }
     }
 

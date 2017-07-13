@@ -76,6 +76,14 @@ app.controller('CATSDController', function($scope) {
     else
       $('#new-cat-interaction-criterion2').removeClass('has-error');
 
+    //if the category was not assigned to the new interaction - add error class
+    if($scope.new_interaction_effect.category == undefined) {
+      $('#new-cat-interaction-category').addClass('has-error');
+      can_add_interaction = false;
+    }
+    else
+      $('#new-cat-interaction-category').removeClass('has-error');
+
     //if a value was not correctly assigned to the new interaction - add error class
     if(($scope.new_interaction_effect.value == undefined || $scope.new_interaction_effect.value == '')
     || (($scope.new_interaction_effect.type == 'Mutual-Strengthening Effect' && $scope.new_interaction_effect.value <= 0)
@@ -98,12 +106,14 @@ app.controller('CATSDController', function($scope) {
       $scope.new_interaction_effect.type = '';
       $scope.new_interaction_effect.criterion1 = '';
       $scope.new_interaction_effect.criterion2 = '';
+      $scope.new_interaction_effect.category = '';
       $scope.new_interaction_effect.value = '';
 
       //remove all error classes
       $('#new-cat-interaction-type').removeClass('has-error');
       $('#new-cat-interaction-criterion1').removeClass('has-error');
       $('#new-cat-interaction-criterion2').removeClass('has-error');
+      $('#new-cat-interaction-category').removeClass('has-error');
       $('#new-cat-interaction-value').removeClass('has-error');
     }
   }

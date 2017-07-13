@@ -830,103 +830,6 @@
 
                   <br>
 
-                  <!-- Interaction Effects -->
-                  <p class = 'header-1'>Interaction Effects</p>
-
-                  <table class = 'table table-bordered table-hover'>
-                    <thead>
-                      <th class = 'text-center'>Type Of Effect</th>
-                      <th class = 'text-center'>Criterion 1</th>
-                      <th class = 'text-center'>Criterion 2</th>
-                      <th class = 'text-center'>Value</th>
-                      <th class = 'col-md-2'></th>
-                    </thead>
-                    <tbody>
-                      <!-- Added Interaction Effects -->
-                      <tr ng-repeat = 'interaction in currentModule.input["interaction effects"]' ng-class = '{danger: interaction.id == deleteIdInteractionEffect}'>
-                        <td>
-                          <select class = 'form-control' ng-model = 'interaction.type' ng-blur = 'blurCATInteractionValue(interaction)'>
-                            <option disabled>--- Please Select ---</option>
-                            <option>Mutual-Strengthening Effect</option>
-                            <option>Mutual-Weakening Effect</option>
-                            <option>Antagonistic Effect</option>
-                          </select>
-                        </td>
-                        <td>
-                          <select class = 'form-control' ng-model = 'interaction.criterion1'>
-                            <option disabled>--- Please Select ---</option>
-                            <option ng-repeat = 'criterion in currentModule.input.criteria' ng-if = 'criterion.name != interaction.criterion2'>{{criterion.name}}</option>
-                          </select>
-                        </td>
-                        <td>
-                          <select class = 'form-control' ng-model = 'interaction.criterion2'>
-                            <option disabled>--- Please Select ---</option>
-                            <option ng-repeat = 'criterion in currentModule.input.criteria' ng-if = 'criterion.name != interaction.criterion1'>{{criterion.name}}</option>
-                          </select>
-                        </td>
-                        <td>
-                          <div id = 'cat-interaction-{{interaction.id}}-value'>
-                            <input class = 'form-control' type = 'number' ng-model = 'interaction.value' ng-blur = 'blurCATInteractionValue(interaction)'>
-                          </div>
-                        </td>
-                        <td ng-if = 'interaction.id != deleteIdInteractionEffect'>
-                          <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(interaction, "Interaction Effects")' title = 'Delete Interaction Effect'>
-                            <span class = 'glyphicon glyphicon-minus'></span>
-                          </button>
-                        </td>
-                        <td ng-if = 'interaction.id == deleteIdInteractionEffect'>
-                          <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(interaction, "Interaction Effects")' title = 'Confirm Delete Interaction Effect'>
-                            <span class = 'glyphicon glyphicon-ok'></span>
-                          </button>
-                          <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Interaction Effects")' title = 'Cancel Delete Interaction Effect'>
-                            <span class = 'glyphicon glyphicon-remove'></span>
-                          </button>
-                        </td>
-                      </tr>
-                      <!-- Form to add interaction -->
-                      <tr class = 'active'>
-                        <td>
-                          <div id = 'new-cat-interaction-type' class = 'form-group'>
-                            <select class = 'form-control' ng-model = 'new_interaction_effect.type'>
-                              <option value = '' disabled>--- Please Select ---</option>
-                              <option>Mutual-Strengthening Effect</option>
-                              <option>Mutual-Weakening Effect</option>
-                              <option>Antagonistic Effect</option>
-                            </select>
-                          </div>
-                        </td>
-                        <td>
-                          <div id = 'new-cat-interaction-criterion1'>
-                            <select class = 'form-control' ng-model = 'new_interaction_effect.criterion1'>
-                              <option value = '' disabled>--- Please Select ---</option>
-                              <option ng-repeat = 'criterion in currentModule.input.criteria' ng-if = 'criterion.name != new_interaction_effect.criterion2'>{{criterion.name}}</option>
-                            </select>
-                          </div>
-                        </td>
-                        <td>
-                          <div id = 'new-cat-interaction-criterion2'>
-                            <select class = 'form-control' ng-model = 'new_interaction_effect.criterion2'>
-                              <option value = '' disabled>--- Please Select ---</option>
-                              <option ng-repeat = 'criterion in currentModule.input.criteria' ng-if = 'criterion.name != new_interaction_effect.criterion1'>{{criterion.name}}</option>
-                            </select>
-                          </div>
-                        </td>
-                        <td>
-                          <div id = 'new-cat-interaction-value'>
-                            <input class = 'form-control' type = 'number' ng-model = 'new_interaction_effect.value'>
-                          </div>
-                        </td>
-                        <td class = 'col-md-2'>
-                          <button type = 'button' class = 'btn btn-success' ng-click = 'addCATInteractionEffect()' title = 'Add Interaction Effect'>
-                            <span class = 'glyphicon glyphicon-plus'></span>
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                  <br>
-
                   <!-- Scales And Functions -->
                   <p class = 'header-1'>Scales and Functions</p>
 
@@ -1173,6 +1076,118 @@
                         <td ng-if = 'currentModule.input.criteria.length == 0'></td>
                         <td>
                           <button type = 'button' class = 'btn btn-success' ng-click = 'addCATCategory()' title = 'Add Category'>
+                            <span class = 'glyphicon glyphicon-plus'></span>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <br>
+
+                  <!-- Interaction Effects -->
+                  <p class = 'header-1'>Interaction Effects</p>
+
+                  <table class = 'table table-bordered table-hover'>
+                    <thead>
+                      <th class = 'text-center'>Type Of Effect</th>
+                      <th class = 'text-center'>Criterion 1</th>
+                      <th class = 'text-center'>Criterion 2</th>
+                      <th class = 'text-center'>Category</th>
+                      <th class = 'text-center'>Value</th>
+                      <th class = 'col-md-2'></th>
+                    </thead>
+                    <tbody>
+                      <!-- Added Interaction Effects -->
+                      <tr ng-repeat = 'interaction in currentModule.input["interaction effects"]' ng-class = '{danger: interaction.id == deleteIdInteractionEffect}'>
+                        <td>
+                          <select class = 'form-control' ng-model = 'interaction.type' ng-blur = 'blurCATInteractionValue(interaction)'>
+                            <option disabled>--- Please Select ---</option>
+                            <option>Mutual-Strengthening Effect</option>
+                            <option>Mutual-Weakening Effect</option>
+                            <option>Antagonistic Effect</option>
+                          </select>
+                        </td>
+                        <td>
+                          <select class = 'form-control' ng-model = 'interaction.criterion1'>
+                            <option disabled>--- Please Select ---</option>
+                            <option ng-repeat = 'criterion in currentModule.input.criteria' ng-if = 'criterion.name != interaction.criterion2'>{{criterion.name}}</option>
+                          </select>
+                        </td>
+                        <td>
+                          <select class = 'form-control' ng-model = 'interaction.criterion2'>
+                            <option disabled>--- Please Select ---</option>
+                            <option ng-repeat = 'criterion in currentModule.input.criteria' ng-if = 'criterion.name != interaction.criterion1'>{{criterion.name}}</option>
+                          </select>
+                        </td>
+                        <td>
+                          <select class = 'form-control' ng-model = 'interaction.category'>
+                            <option disabled>--- Please Select ---</option>
+                            <option ng-repeat = 'category in currentModule.input.categories'>{{category.name}}</option>
+                          </select>
+                        </td>
+                        <td>
+                          <div id = 'cat-interaction-{{interaction.id}}-value'>
+                            <input class = 'form-control' type = 'number' ng-model = 'interaction.value' ng-blur = 'blurCATInteractionValue(interaction)'>
+                          </div>
+                        </td>
+                        <td ng-if = 'interaction.id != deleteIdInteractionEffect'>
+                          <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(interaction, "Interaction Effects")' title = 'Delete Interaction Effect'>
+                            <span class = 'glyphicon glyphicon-minus'></span>
+                          </button>
+                        </td>
+                        <td ng-if = 'interaction.id == deleteIdInteractionEffect'>
+                          <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(interaction, "Interaction Effects")' title = 'Confirm Delete Interaction Effect'>
+                            <span class = 'glyphicon glyphicon-ok'></span>
+                          </button>
+                          <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Interaction Effects")' title = 'Cancel Delete Interaction Effect'>
+                            <span class = 'glyphicon glyphicon-remove'></span>
+                          </button>
+                        </td>
+                      </tr>
+                      <!-- Form to add interaction -->
+                      <tr class = 'active'>
+                        <td>
+                          <div id = 'new-cat-interaction-type' class = 'form-group'>
+                            <select class = 'form-control' ng-model = 'new_interaction_effect.type'>
+                              <option value = '' disabled>--- Please Select ---</option>
+                              <option>Mutual-Strengthening Effect</option>
+                              <option>Mutual-Weakening Effect</option>
+                              <option>Antagonistic Effect</option>
+                            </select>
+                          </div>
+                        </td>
+                        <td>
+                          <div id = 'new-cat-interaction-criterion1'>
+                            <select class = 'form-control' ng-model = 'new_interaction_effect.criterion1'>
+                              <option value = '' disabled>--- Please Select ---</option>
+                              <option ng-repeat = 'criterion in currentModule.input.criteria' ng-if = 'criterion.name != new_interaction_effect.criterion2'>{{criterion.name}}</option>
+                            </select>
+                          </div>
+                        </td>
+                        <td>
+                          <div id = 'new-cat-interaction-criterion2'>
+                            <select class = 'form-control' ng-model = 'new_interaction_effect.criterion2'>
+                              <option value = '' disabled>--- Please Select ---</option>
+                              <option ng-repeat = 'criterion in currentModule.input.criteria' ng-if = 'criterion.name != new_interaction_effect.criterion1'>{{criterion.name}}</option>
+                            </select>
+                          </div>
+                        </td>
+                        <td>
+                          <div id = 'new-cat-interaction-category'>
+                            <select class = 'form-control' ng-model = 'new_interaction_effect.category'>
+                              <option value = '' disabled>--- Please Select ---</option>
+                              <option ng-repeat = 'category in currentModule.input.categories'>{{category.name}}</option>
+                            </select>
+                          </div>
+                        </td>
+                        <td>
+                          <div id = 'new-cat-interaction-value'>
+                            <input class = 'form-control' type = 'number' ng-model = 'new_interaction_effect.value'>
+                          </div>
+                        </td>
+                        <td class = 'col-md-2'>
+                          <button type = 'button' class = 'btn btn-success' ng-click = 'addCATInteractionEffect()' title = 'Add Interaction Effect'>
                             <span class = 'glyphicon glyphicon-plus'></span>
                           </button>
                         </td>
