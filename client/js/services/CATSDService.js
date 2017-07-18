@@ -26,10 +26,13 @@ app.service('CATSDService', function($http, $q) {
     assignedActions = {};
     similarityValues = [];
 
-    for(category in categories) {
+    for(category in categories)
       assignedActions[categories[category]['name']] = [];
-    }
+
     assignedActions['Not Assigned'] = [];
+
+    //transform the functions' conditions to string
+    conditionsToString();
 
     //invert the values of criteria to minimize
     minimizeCriteria();
@@ -37,9 +40,8 @@ app.service('CATSDService', function($http, $q) {
     //calculate the sets of the interaction effects
     interactionEffectsSets();
 
-    if(!nonNegativityCondition()) {
+    if(!nonNegativityCondition())
       deferred.resolve(false);
-    }
 
     var result = applyCriterionFunction().then(function(resolve) {
       similarityValues = resolve;
@@ -50,6 +52,13 @@ app.service('CATSDService', function($http, $q) {
     });
 
     return deferred.promise;
+  }
+
+  function conditionsToString() {
+    for(criterion in criteria)
+      for(branch in criteria[criterion].branches)
+        if(!isNaN(criteria[criterion].branches[branch].function))
+          criteria[criterion].branches[branch].function = criteria[criterion].branches[branch].function.toString();
   }
 
   function minimizeCriteria() {

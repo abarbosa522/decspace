@@ -302,7 +302,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
               if(!angular.equals(element, {}))
                 data.push(element);
             }
-
+            console.log(data)
             $scope.createInputFileModule(file.name, data);
           };
         }
@@ -316,7 +316,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
               element['id'] = Number(row) + 1;
               data.push(element);
             }
-
+            console.log(data)
             $scope.createInputFileModule(file.name, data);
           }
         }
@@ -606,6 +606,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       for(connect in connections)
         if(connections[connect]['id'] == connections_ids[id]) {
           deleteConnectionData(connections[connect]);
+          //remove connection from the list of connections
+          connections.splice(connect, 1);
           break;
         }
   }
