@@ -203,46 +203,12 @@ var Parser = require('expr-eval').Parser;
 var parser = new Parser();
 
 //evaluate expression
-app.get('/expr-eval', function(req, res) {
-  var criteria = [];
-
-  if(typeof req.query.criteria == 'string') {
-    criteria = JSON.parse(req.query.criteria);
-  }
-  else {
-    for(criterion in req.query.criteria)
-      criteria.push(JSON.parse(req.query.criteria[criterion]));
-  }
-
-  var actions = [];
-
-  if(typeof req.query.actions == 'string') {
-    actions = JSON.parse(req.query.actions);
-  }
-  else {
-    for(action in req.query.actions)
-      actions.push(JSON.parse(req.query.actions[action]));
-  }
-
-  var categories = [];
-
-  if(typeof req.query.categories == 'string') {
-    categories = JSON.parse(req.query.categories);
-  }
-  else {
-    for(category in req.query.categories)
-      categories.push(JSON.parse(req.query.categories[category]));
-  }
-
-  var antagonisticSet = [];
-
-  if(typeof req.query.antagonisticSet == 'string') {
-    antagonisticSet = JSON.parse(req.query.antagonisticSet);
-  }
-  else {
-    for(item in req.query.antagonisticSet)
-      antagonisticSet.push(JSON.parse(req.query.antagonisticSet[item]));
-  }
+app.post('/expr-eval', function(req, res) {
+  
+  var criteria = req.body.criteria;
+  var actions = req.body.actions;
+  var categories = req.body.categories;
+  var antagonisticSet = req.body.antagonisticSet;
 
   var similarityValues = [];
 

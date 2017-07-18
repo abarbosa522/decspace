@@ -1,4 +1,4 @@
 name;type;direction;selected
-Age;Number;Descendant;false
-Favorite Color;Text;Ascendant;true
-Favorite Song;Text;Descendant;false
+Number Of Albums;Number;Descendant;false
+Genre;Text;Ascendant;true
+Best Song;Text;Descendant;false

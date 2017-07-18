@@ -37,12 +37,11 @@ app.service('CATSDService', function($http, $q) {
     //calculate the sets of the interaction effects
     interactionEffectsSets();
 
-    if(!nonNegativityCondition())
+    if(!nonNegativityCondition()) {
       deferred.resolve(false);
+    }
 
-    var result = applyCriterionFunction();
-
-    result.then(function(resolve) {
+    var result = applyCriterionFunction().then(function(resolve) {
       similarityValues = resolve;
 
       assignActions();
@@ -90,16 +89,20 @@ app.service('CATSDService', function($http, $q) {
 
         var kjl = 0;
         for(pair in mutualSet) {
-          if(mutualSet[pair]['criterion1'] == name || mutualSet[pair]['criterion2'] == name) {
-            if(mutualSet[pair]['value'] < 0)
-              kjl += Math.abs(mutualSet[pair]['value']);
+          if(categories[category].name == mutualSet[pair].category) {
+            if(mutualSet[pair]['criterion1'] == name || mutualSet[pair]['criterion2'] == name) {
+              if(mutualSet[pair]['value'] < 0)
+                kjl += Math.abs(mutualSet[pair]['value']);
+            }
           }
         }
 
         var kjp = 0;
         for(pair2 in antagonisticSet) {
-          if(antagonisticSet[pair2]['criterion1'] == name) {
-            kjp += Math.abs(antagonisticSet[pair2]['value']);
+          if(categories[category].name == antagonisticSet[pair2].category) {
+            if(antagonisticSet[pair2]['criterion1'] == name) {
+              kjp += Math.abs(antagonisticSet[pair2]['value']);
+            }
           }
         }
 
@@ -113,7 +116,13 @@ app.service('CATSDService', function($http, $q) {
   function applyCriterionFunction() {
     var deferred = $q.defer();
 
-    $http.get('/expr-eval', {params: {'criteria':criteria, 'actions':actions, 'categories':categories, 'antagonisticSet':[antagonisticSet]}}).then(function(res) {
+    var post_obj = {};
+    post_obj.criteria = criteria;
+    post_obj.actions = actions;
+    post_obj.categories = categories;
+    post_obj.antagonisticSet = [antagonisticSet];
+
+    $http.post('/expr-eval', post_obj).then(function(res) {
       deferred.resolve(res.data);
     });
 

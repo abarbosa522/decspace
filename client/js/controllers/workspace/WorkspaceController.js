@@ -1674,10 +1674,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         break;
 
       case 'CAT-SD':
-        var results = CATSDService.getResults(mod.input.criteria, mod.input['interaction effects'], mod.input.actions, mod.input.categories);
-
-        results.then(function(resolve) {
-          mod.output = resolve;
+        CATSDService.getResults(mod.input.criteria, mod.input['interaction effects'], mod.input.actions, mod.input.categories).then(function(data) {
+          mod.output = data;
           createOutputModule(mod);
         });
 
@@ -1711,7 +1709,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   //create the output modules for the executed methods
   //a new output module is always created
   function createOutputModule(mod) {
-    var mod_name = 'Output File - ' + mod.type + mod.name_id;
+    console.log(mod)
+    var mod_name = 'Output - ' + mod.type + mod.name_id;
     var mod_pos = {top: mod.position.top, left: mod.position.left + 160};
 
     createOutputFileModule(mod_name, mod_pos);
