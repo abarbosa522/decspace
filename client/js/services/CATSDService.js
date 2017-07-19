@@ -13,6 +13,9 @@ app.service('CATSDService', function($http, $q) {
 
   //all the values of delta max
   var deltaMaxValues = {};
+  var deltaValues = {};
+
+  var reference_actions_list = [];
 
   this.getResults = function(crt, inter_eff, acts, cats) {
     var deferred = $q.defer();
@@ -35,8 +38,12 @@ app.service('CATSDService', function($http, $q) {
     assignedActions['Not Assigned'] = [];
 
     //construct the delta max object containing all the actions and categories
-    for(action in actions)
+    for(action in actions) {
       deltaMaxValues[actions[action].name] = {};
+      deltaValues[actions[action].name] = {};
+    }
+
+    createReferenceActionsList();
 
     //transform the functions' conditions to string
     conditionsToString();
@@ -55,10 +62,16 @@ app.service('CATSDService', function($http, $q) {
 
       assignActions();
 
-      deferred.resolve([assignedActions, deltaMaxValues]);
+      deferred.resolve([assignedActions, deltaMaxValues, deltaValues, reference_actions_list]);
     });
 
     return deferred.promise;
+  }
+
+  function createReferenceActionsList() {
+    for(category in categories)
+      for(reference_action in categories[category].reference_actions)
+        reference_actions_list.push(categories[category].reference_actions[reference_action].name);
   }
 
   function conditionsToString() {
@@ -74,11 +87,9 @@ app.service('CATSDService', function($http, $q) {
         for(action in actions)
           actions[action][criteria[criterion]['name']] = - actions[action][criteria[criterion]['name']];
 
-        for(category in categories) {
-          for(reference_action in categories[category]['reference_actions']) {
+        for(category in categories)
+          for(reference_action in categories[category]['reference_actions'])
             categories[category]['reference_actions'][reference_action][criteria[criterion]['name']] = - categories[category]['reference_actions'][reference_action][criteria[criterion]['name']];
-          }
-        }
       }
     }
   }
@@ -319,7 +330,12 @@ app.service('CATSDService', function($http, $q) {
 
   //a multiplicative comprehensive similarity function
   function delta(action, reference_action, category) {
-    return s(action, reference_action, category) * (1 + dPlus(action, reference_action)) * (1 + dMinus(action, reference_action));
+    var result = s(action, reference_action, category) * (1 + dPlus(action, reference_action)) * (1 + dMinus(action, reference_action));
+
+    //create and store an object with the action, reference action and value of the delta function
+    deltaValues[action.name][reference_action.name] = result;
+
+    return result;
   }
 
   function deltaMax(action, category) {

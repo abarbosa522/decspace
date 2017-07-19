@@ -1856,9 +1856,29 @@
                           </tbody>
                         </table>
 
+                        <!-- Delta Values -->
+                        <p class = 'header-2'>Similarity Values Per Reference Action</p>
+
+                        <table class = 'table table-bordered table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Action</th>
+                              <th class = 'text-center' ng-repeat = 'ref_action in currentModule.output[3]'>{{ref_action}}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'action in currentModule.input.actions'>
+                              <td>{{action.name}}</td>
+                              <td ng-repeat = 'ref_action in currentModule.output[3]'>
+                                {{currentModule.output[2][action.name][ref_action]}}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+
                         <!-- Delta Max Values -->
-                        <p class = 'header-2'>Delta Max Values</p>
-                        
+                        <p class = 'header-2'>Maximum Similarity Values Per Category</p>
+
                         <table class = 'table table-bordered table-hover'>
                           <thead>
                             <tr>
