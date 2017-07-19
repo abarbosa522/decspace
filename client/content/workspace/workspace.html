@@ -1831,22 +1831,52 @@
 
                     <!-- CAT-SD Module -->
                     <div ng-if = 'currentModule.parent_type == "CAT-SD"' ng-cloak>
-                      <table class = 'table table-bordered table-hover'>
-                        <thead>
-                          <tr>
-                            <th class = 'text-center'>Action</th>
-                            <th class = 'text-center' ng-repeat = '(key, value) in currentModule.output'>{{key}}</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr ng-repeat = 'action in currentModule.input.actions'>
-                            <td>{{action.name}}</td>
-                            <td ng-repeat = 'result in currentModule.output'>
-                              <span class = 'glyphicon glyphicon-ok' style = 'color: green' ng-if = 'result.includes(action.name)'></span>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
+                      <div ng-if = 'currentModule.output == false'>
+                        The Non-Negativity Condition was not satisfied.
+                      </div>
+
+                      <div ng-if = 'currentModule.output != false'>
+                        <!-- Categories assigned to each action -->
+                        <p class = 'header-2'>Assigned Categories</p>
+
+                        <table class = 'table table-bordered table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Action</th>
+                              <th class = 'text-center' ng-repeat = '(key, value) in currentModule.output[0]'>{{key}}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'action in currentModule.input.actions'>
+                              <td>{{action.name}}</td>
+                              <td ng-repeat = 'result in currentModule.output[0]'>
+                                <span class = 'glyphicon glyphicon-ok' style = 'color: green' ng-if = 'result.includes(action.name)'></span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+
+                        <!-- Delta Max Values -->
+                        <p class = 'header-2'>Delta Max Values</p>
+                        
+                        <table class = 'table table-bordered table-hover'>
+                          <thead>
+                            <tr>
+                              <th class = 'text-center'>Action</th>
+                              <th class = 'text-center' ng-repeat = 'category in currentModule.input.categories'>{{category.name}}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat = 'action in currentModule.input.actions'>
+                              <td>{{action.name}}</td>
+                              <td ng-repeat = 'category in currentModule.input.categories'>
+                                {{currentModule.output[1][action.name][category.name]}}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+
+                      </div>
                     </div>
 
                     <!-- Inquiry Module -->

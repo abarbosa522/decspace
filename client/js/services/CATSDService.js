@@ -11,6 +11,9 @@ app.service('CATSDService', function($http, $q) {
   //similarity array
   var similarityValues = [];
 
+  //all the values of delta max
+  var deltaMaxValues = {};
+
   this.getResults = function(crt, inter_eff, acts, cats) {
     var deferred = $q.defer();
 
@@ -31,6 +34,10 @@ app.service('CATSDService', function($http, $q) {
 
     assignedActions['Not Assigned'] = [];
 
+    //construct the delta max object containing all the actions and categories
+    for(action in actions)
+      deltaMaxValues[actions[action].name] = {};
+
     //transform the functions' conditions to string
     conditionsToString();
 
@@ -48,7 +55,7 @@ app.service('CATSDService', function($http, $q) {
 
       assignActions();
 
-      deferred.resolve(assignedActions);
+      deferred.resolve([assignedActions, deltaMaxValues]);
     });
 
     return deferred.promise;
@@ -333,22 +340,24 @@ app.service('CATSDService', function($http, $q) {
     for(action in actions) {
       //set K - categories to assign action to
       var k_set = [];
+
       //compare action with set B of category
       for(category in categories) {
         var result = deltaMax(actions[action], categories[category]);
 
         if(result >= categories[category]['membership_degree'])
           k_set.push(categories[category]['name']);
+
+        //create and store an object with the action, category and value of the delta max function
+        deltaMaxValues[actions[action].name][categories[category].name] = result;
       }
 
-      if(k_set.length == 0) {
+      //if the action was not assigned to any category, assign it to the "Not Assigned" category
+      if(k_set.length == 0)
         assignedActions['Not Assigned'].push(actions[action]['name']);
-      }
-      else {
-        for(cat in k_set) {
+      else
+        for(cat in k_set)
           assignedActions[k_set[cat]].push(actions[action]['name']);
-        }
-      }
     }
   }
 });

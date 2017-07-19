@@ -302,7 +302,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
               if(!angular.equals(element, {}))
                 data.push(element);
             }
-            console.log(data)
+
             $scope.createInputFileModule(file.name, data);
           };
         }
@@ -316,7 +316,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
               element['id'] = Number(row) + 1;
               data.push(element);
             }
-            console.log(data)
+
             $scope.createInputFileModule(file.name, data);
           }
         }
@@ -1711,7 +1711,6 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   //create the output modules for the executed methods
   //a new output module is always created
   function createOutputModule(mod) {
-    console.log(mod)
     var mod_name = 'Output - ' + mod.type + mod.name_id;
     var mod_pos = {top: mod.position.top, left: mod.position.left + 160};
 
