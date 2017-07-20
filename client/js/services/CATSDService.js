@@ -167,7 +167,7 @@ app.service('CATSDService', function($http, $q) {
       }
     }
 
-    if(result < 0)
+    if(result < 0 || result == undefined)
       result = 0;
 
     return result;
@@ -184,7 +184,7 @@ app.service('CATSDService', function($http, $q) {
       }
     }
 
-    if(result > 0)
+    if(result > 0 || result == undefined)
       result = 0;
 
     return result;
@@ -330,7 +330,11 @@ app.service('CATSDService', function($http, $q) {
 
   //a multiplicative comprehensive similarity function
   function delta(action, reference_action, category) {
-    var result = s(action, reference_action, category) * (1 + dPlus(action, reference_action)) * (1 + dMinus(action, reference_action));
+    var s_result = s(action, reference_action, category);
+    var dPlus_result = 1 + dPlus(action, reference_action);
+    var dMinus_result = 1 + dMinus(action, reference_action);
+
+    var result = s_result * dPlus_result * dMinus_result;
 
     //create and store an object with the action, reference action and value of the delta function
     deltaValues[action.name][reference_action.name] = result;
