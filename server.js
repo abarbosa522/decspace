@@ -204,7 +204,7 @@ var parser = new Parser();
 
 //evaluate expression
 app.post('/expr-eval', function(req, res) {
-  
+
   var criteria = req.body.criteria;
   var actions = req.body.actions;
   var categories = req.body.categories;
@@ -224,14 +224,16 @@ app.post('/expr-eval', function(req, res) {
 
             var condition = criteria[criterion]['branches'][branch]['condition'];
 
-            if((condition.indexOf('=') != -1) && (condition.indexOf('<=') == -1) && (condition.indexOf('>=') == -1) && (condition.indexOf('!=') == -1)) {
-              var a = criteria[criterion]['branches'][branch]['condition'];
-              var b = '=';
-              var position = criteria[criterion]['branches'][branch]['condition'].indexOf('=');
-              condition = [a.slice(0, position), b, a.slice(position)].join('');
-            }
+            //check the occurences of '=' and replace it by '=='
+            condition = condition.replace(/=/g, '==');
+
+            //check the occurrences of '<==', '>==' and '!==' and replace them by '<=', '>=' and '!=' respectively
+            condition = condition.replace(/<==/g, '<=');
+            condition = condition.replace(/>==/g, '>=');
+            condition = condition.replace(/!==/g, '!=');
 
             var cond = parser.parse(condition);
+
             var result = cond.evaluate({x: Number(arg1), y: Number(arg2)});
 
             if(result == true) {
