@@ -1330,13 +1330,14 @@
 
                   <br>
 
-                  <!-- Open Answer Questions -->
-                  <p class = 'header-1'>Open Answer Questions</p>
+                  <!-- Characterization Questions -->
+                  <p class = 'header-1'>Characterization Questions</p>
 
                   <table class = 'table table-bordered table-hover'>
                     <thead>
                       <tr>
                         <th class = 'text-center'>Question</th>
+                        <th class = 'text-center'>Type</th>
                         <th class = 'col-md-2'></th>
                       </tr>
                     </thead>
@@ -1347,6 +1348,13 @@
                           <div id = 'inquiry-open-answer-question-{{open_answer_question.id}}'>
                             <input type = 'text' class = 'form-control' ng-model = 'open_answer_question.question' ng-blur = 'blurInquiryOpenAnswerQuestion(open_answer_question)'>
                           </div>
+                        </td>
+                        <td>
+                          <select class = 'form-control' ng-model = 'open_answer_question.type' ng-blur = ''>
+                            <option value = '' selected disabled>--- Please Select ---</option>
+                            <option>Open Answer</option>
+                            <option>Multiple Choice</option>
+                          </select>
                         </td>
                         <td ng-if = 'open_answer_question.id != deleteIdOpenAnswerQuestion'>
                           <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(open_answer_question, "Open Answer Questions")' title = 'Delete Open Answer Question'>
@@ -1370,6 +1378,15 @@
                           </div>
                         </td>
                         <td>
+                          <div id = 'new-inquiry-open-answer-type'>
+                            <select class = 'form-control' ng-model = 'new_inquiry_open_answer_question.type'>
+                              <option value = '' selected disabled>--- Please Select ---</option>
+                              <option>Open Answer</option>
+                              <option>Multiple Choice</option>
+                            </select>
+                          </div>
+                        </td>
+                        <td>
                           <button type = 'button' class = 'btn btn-success' ng-click = 'addInquiryOpenAnswerQuestion()' title = 'Add Open Answer Question'>
                             <span class = 'glyphicon glyphicon-plus'></span>
                           </button>
@@ -1377,6 +1394,55 @@
                       </tr>
                     </tbody>
                   </table>
+
+                  <div ng-repeat = 'open_answer_question in currentModule.input.open_answer_questions' ng-if = 'open_answer_question.type == "Multiple Choice"'>
+                    <p class = 'header-2'>Choices of the question: {{open_answer_question.question}}</p>
+
+                    <table class = 'table table-bordered table-hover'>
+                      <thead>
+                        <tr>
+                          <th class = 'text-center'>Choices</th>
+                          <th class = 'col-md-2'></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <!-- Added Choices -->
+                        <tr ng-repeat = 'choice in open_answer_question.choices' ng-class = '{danger: open_answer_question.id == deleteIdChoice[0] && choice.id == deleteIdChoice[1]}'>
+                          <td>
+                            <div id = 'inquiry-choice-{{open_answer_question.id}}-{{choice.id}}'>
+                              <input type = 'text' class = 'form-control' ng-model = 'choice.text' ng-blur = ''>
+                            </div>
+                          </td>
+                          <td ng-if = 'open_answer_question.id != deleteIdChoice[0] || choice.id != deleteIdChoice[1]'>
+                            <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput([open_answer_question, choice], "Choice")' title = 'Delete Choice'>
+                              <span class = 'glyphicon glyphicon-minus'></span>
+                            </button>
+                          </td>
+                          <td ng-if = 'open_answer_question.id == deleteIdChoice[0] && choice.id == deleteIdChoice[1]'>
+                            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput([open_answer_question, choice], "Choice")' title = 'Confirm Delete Choice'>
+                              <span class = 'glyphicon glyphicon-ok'></span>
+                            </button>
+                            <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Choice")' title = 'Cancel Delete Choice'>
+                              <span class = 'glyphicon glyphicon-remove'></span>
+                            </button>
+                          </td>
+                        </tr>
+                        <!-- Form to add new open answer question -->
+                        <tr class = 'active'>
+                          <td>
+                            <div id = 'new-inquiry-choice'>
+                              <input class = 'form-control' type = 'text' ng-model = 'new_inquiry_choice[open_answer_question.id].text'>
+                            </div>
+                          </td>
+                          <td>
+                            <button type = 'button' class = 'btn btn-success' ng-click = 'addInquiryChoice(open_answer_question)' title = 'Add Choice'>
+                              <span class = 'glyphicon glyphicon-plus'></span>
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
 
                   <br>
 

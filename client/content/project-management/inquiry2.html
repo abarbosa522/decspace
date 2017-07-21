@@ -126,6 +126,8 @@
               <p class = 'header-1'>Inquiry Subject</p>
               {{subject}}
 
+              <br><br>
+
               <p class = 'header-1'>Questions</p>
               <table class = 'table table-bordered table-hover'>
                 <thead>
@@ -166,12 +168,12 @@
 
       <!-- List of Questions -->
       <ul id = 'list-questions' class = 'draggable-objects'>
-        <li ng-repeat = 'question in questions' style = 'display: inline-block; margin-left: 1%'>
-          <div ng-if = 'question.score == "null"' ng-drag = 'true' ng-drag-data = 'question' data-allow-transform = 'true' title = '{{question.description}}' ng-class = 'setFontSize(question.title)'>
+        <li ng-repeat = 'question in questions' style = 'list-style: none; float: left; margin-left: 2.5%'>
+          <div ng-if = 'question.score == "null"' ng-drag = 'true' ng-drag-data = 'question' data-allow-transform = 'true' title = '{{question.description}}' ng-class = 'setFontSize(question.title)' style = 'display: inline-block;' >
             {{question.title}}
           </div>
 
-          <div ng-if = 'question.score != "null"' ng-drop = 'true' ng-drop-success = 'resetDrop(question, $data)' ng-class = '[setFontSize(question.title), {"most_important_drop" : question.score > 0, "least_important_drop" : question.score < 0, "neutral_drop" : question.score == 0}]'>{{question.title}}</div>
+          <div ng-if = 'question.score != "null"' ng-drop = 'true' ng-drop-success = 'resetDrop(question, $data)' ng-class = '[setFontSize(question.title), {"most_important_drop" : question.score > 0, "least_important_drop" : question.score < 0, "neutral_drop" : question.score == 0}]' style = 'display: inline-block;'>{{question.title}}</div>
         </li>
       </ul>
 

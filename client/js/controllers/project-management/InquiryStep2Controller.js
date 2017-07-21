@@ -410,9 +410,9 @@ app.controller('InquiryStep2Controller', function($scope, $window, $http) {
       return 'extremely_large_font';
     else if(string.length > 25 && string.length <= 40)
       return 'very_large_font';
-    else if(string.length > 40 && string.length <= 55)
+    else if(string.length > 40 && string.length <= 50)
       return 'large_font';
-    else if(string.length > 55 && string.length <= 75)
+    else if(string.length > 50 && string.length <= 75)
       return 'medium_font';
     else if(string.length > 75)
       return 'small_font';

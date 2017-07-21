@@ -85,7 +85,19 @@
           <div class = 'col-md-4'></div>
 
           <div class = 'col-md-4' id = 'open-answer-question-{{quest.id}}'>
-            <input class = 'form-control' type = 'text' ng-model = 'quest.answer' ng-blur = 'blurOpenAnswerQuestion(quest)'>
+            <!-- Open Answer Question -->
+            <input class = 'form-control' type = 'text' ng-model = 'quest.answer' ng-blur = 'blurOpenAnswerQuestion(quest)' ng-if = 'quest.type == "Open Answer"'>
+            <!-- Multiple Choice Question -->
+            <select class = 'form-control' ng-model = 'quest.answer' ng-if = 'quest.type == "Multiple Choice"'>
+              <option value = '' selected disabled>--- Please Select---</option>
+              <option ng-repeat = 'choice in quest.choices'>{{choice.text}}</option>
+            </select>
+            <!--<ul ng-if = 'quest.type == "Multiple Choice"' style = 'list-style: none'>
+              <li ng-repeat = 'choice in quest.choices'>
+                <input type = 'radio' ng-model = 'quest.answer' value = '{{choice.text}}'>
+                {{choice.text}}
+              </li>
+            </ul>-->
           </div>
 
           <div class = 'col-md-4'></div>

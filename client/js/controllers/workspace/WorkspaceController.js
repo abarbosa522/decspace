@@ -666,10 +666,17 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         $scope.new_inquiry_question = {};
         $scope.new_inquiry_open_answer_question = {};
         $scope.new_inquiry_glossary = {};
+
+        $scope.new_inquiry_choice = {};
+        for(question in $scope.currentModule.input.open_answer_questions)
+          if(question.type == 'Multiple Choice')
+            $scope.new_inquiry_choice[$scope.currentModule.input.open_answer_questions[question].id] = {};
+
         $scope.deleteIdEmail = '';
         $scope.deleteIdQuestion = '';
         $scope.deleteIdOpenAnswerQuestion = '';
         $scope.deleteIdGlossaryConcept = '';
+        $scope.deleteIdChoice = '';
         break;
 
       case 'SRF':
@@ -1021,6 +1028,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   $scope.deleteIdQuestion = '';
   $scope.deleteIdOpenAnswerQuestion = '';
   $scope.deleteIdGlossaryConcept = '';
+  $scope.deleteIdChoice = ['', ''];
 
   //select a certain input to be deleted
   $scope.deleteInput = function(input, type) {
@@ -1067,6 +1075,10 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
       case 'Glossary':
         $scope.deleteIdGlossaryConcept = input.id;
+        break;
+
+      case 'Choice':
+        $scope.deleteIdChoice = [input[0].id, input[1].id];
         break;
     }
   }
@@ -1128,6 +1140,11 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         $scope.currentModule.input.glossary.splice($scope.currentModule.input.glossary.indexOf(input), 1);
         $scope.deleteIdGlossaryConcept = '';
         break;
+
+      case 'Choice':
+        $scope.currentModule.input.open_answer_questions[$scope.currentModule.input.open_answer_questions.indexOf(input[0])].choices.splice($scope.currentModule.input.open_answer_questions[$scope.currentModule.input.open_answer_questions.indexOf(input[0])].choices.indexOf(input[1]), 1);
+        $scope.deleteIdChoice = ['', ''];
+        break;
     }
   }
 
@@ -1176,6 +1193,10 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
       case 'Glossary':
         $scope.deleteIdGlossaryConcept = '';
+        break;
+
+      case 'Choice':
+        $scope.deleteIdChoice = ['', ''];
         break;
     }
   }
