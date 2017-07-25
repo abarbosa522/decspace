@@ -27,30 +27,29 @@ app.controller('ProjectsController', function($scope, $window, $http, SortDataSe
     });
   }
 
-  //user log out
+  //log out current user
   $scope.logOut = function() {
     $http.get('/logout').then(function(res) {
       if(!$scope.username.includes('unregistered@decspace.com')) {
         //mark the user as logged off
         $http.get('/accounts').then(function(response) {
-          var id_doc, proj_res;
+          var previous_proj, new_proj;
 
           for(account in response.data)
             if(response.data[account].email == $scope.username) {
+              //delete the id of the account
+              delete response.data[account]['_id'];
+              //store the current account
+              previous_proj = angular.copy(response.data[account]);
+
               response.data[account].logged_in = false;
 
-              id_doc = response.data[account]['_id'];
-              proj_res = response.data[account];
-              delete proj_res['_id'];
+              new_proj = response.data[account];
               break;
             }
 
-          //delete the previous document with the list of projects
-          $http.delete('/accounts/' + id_doc).then(function() {
-            //add the new list of projects
-            $http.post('/accounts', proj_res).then(function() {
-              $window.location.href = '../../index.html';
-            });
+          $http.put('/accounts', [previous_proj, new_proj]).then(function() {
+            $window.location.href = '../../index.html';
           });
         });
       }

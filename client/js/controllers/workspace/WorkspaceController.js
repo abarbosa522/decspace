@@ -37,24 +37,23 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       if(!$scope.username.includes('unregistered@decspace.com')) {
         //mark the user as logged off
         $http.get('/accounts').then(function(response) {
-          var id_doc, proj_res;
+          var previous_proj, new_proj;
 
           for(account in response.data)
             if(response.data[account].email == $scope.username) {
+              //delete the id of the account
+              delete response.data[account]['_id'];
+              //store the current account
+              previous_proj = angular.copy(response.data[account]);
+
               response.data[account].logged_in = false;
 
-              id_doc = response.data[account]['_id'];
-              proj_res = response.data[account];
-              delete proj_res['_id'];
+              new_proj = response.data[account];
               break;
             }
 
-          //delete the previous document with the list of projects
-          $http.delete('/accounts/' + id_doc).then(function() {
-            //add the new list of projects
-            $http.post('/accounts', proj_res).then(function() {
-              $window.location.href = '../../index.html';
-            });
+          $http.put('/accounts', [previous_proj, new_proj]).then(function() {
+            $window.location.href = '../../index.html';
           });
         });
       }
@@ -67,7 +66,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   function rewriteLastUpdate() {
     //get all projects from database
     $http.get('/projects').then(function(response) {
-      var id_doc, proj_res;
+      var previous_proj, new_proj;
 
       //get current date
       var current_date = new Date();
@@ -76,28 +75,26 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       //get the selected project
       for(proj in response.data) {
         if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
+          delete response.data[proj]['_id'];
+          previous_proj = angular.copy(response.data[proj]);
+
           //get the name of the project
           $scope.project_name = response.data[proj]['name'];
           //change the date of the last update of the project
           response.data[proj]['last_update'] = last_update;
-          //get the id of the document, so that it can be removed from the db
-          id_doc = response.data[proj]['_id'];
+
           //project to store in the db and remove the id of the document
-          proj_res = response.data[proj];
-          delete proj_res['_id'];
+          new_proj = response.data[proj];
           break;
         }
       }
 
-      //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).then(function() {
-        //add the new list of projects
-        $http.post('/projects', proj_res).then(function() {
-          //retrieve the data stored in the database
-          $scope.reloadData(false, '');
-          //update the list of executions
-          getArchive();
-        });
+      //update the previous project to the new project
+      $http.put('/accounts', [previous_proj, new_proj]).then(function() {
+        //retrieve the data stored in the database
+        $scope.reloadData(false, '');
+        //update the list of executions
+        getArchive();
       });
     });
   }
@@ -154,11 +151,16 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   $scope.saveData = function(callback) {
 
     $http.get('/projects').then(function(response) {
-        var id_doc, proj_res;
+        var previous_proj, new_proj;
 
         //get the current project
         for(proj in response.data) {
           if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
+            delete response.data[proj]['_id'];
+
+            //save the previous project
+            previous_proj = angular.copy(response.data[proj]);
+
             var new_workflow = {};
             new_workflow.modules = modules;
             new_workflow.connections = connections;
@@ -166,7 +168,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
             //get current date
             var current_date = new Date();
             var save_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
-            var save_time = + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
+            var save_time = current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
 
             new_workflow.date = save_date;
             new_workflow.time = save_time;
@@ -184,29 +186,24 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
             new_workflow.id = largest_id;
 
             response.data[proj].archive.push(new_workflow);
-            //get the id of the document
-            id_doc = response.data[proj]['_id'];
+
             //project to store in the db
-            proj_res = response.data[proj];
-            delete proj_res['_id'];
+            new_proj = response.data[proj];
             break;
           }
         }
 
-      //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).then(function() {
-        //add the new list of projects
-        $http.post('/projects', proj_res).then(function() {
-          //show save success alert
-          showAlert('save-success');
-          //refresh archive
-          getArchive();
-          //reset comment variable
-          $scope.comment = '';
+      //update database project
+      $http.put('/projects', [previous_proj, new_proj]).then(function() {
+        //show save success alert
+        showAlert('save-success');
+        //refresh archive
+        getArchive();
+        //reset comment variable
+        $scope.comment = '';
 
-          if(callback != undefined)
-            callback();
-        });
+        if(callback != undefined)
+          callback();
       });
     });
   }
@@ -1771,32 +1768,28 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   //delete workflow
   $scope.confirmDeleteWorkflow = function(workflow) {
     $http.get('/projects').then(function(response) {
-      var proj_res, id_doc;
+      var previous_proj, new_proj;
 
       //get the current project
       for(proj in response.data)
         if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
-          for(workf in response.data[proj].archive) {
-            if(response.data[proj].archive[workf].id == workflow.id) {
+          delete response.data[proj]['_id'];
+          previous_proj = angular.copy(response.data[proj]);
+
+          for(workf in response.data[proj].archive)
+            if(response.data[proj].archive[workf].id == workflow.id)
               response.data[proj].archive.splice(workf, 1);
-              //get the id of the document, so that it can be removed from the db
-              id_doc = response.data[proj]['_id'];
-              //project to store in the db and remove the id of the document
-              proj_res = response.data[proj];
-              delete proj_res['_id'];
-            }
-          }
+
+          //project to store in the db
+          new_proj = response.data[proj];
           break;
         }
 
-      //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).then(function() {
-        //add the new list of projects
-        $http.post('/projects', proj_res).then(function() {
-          //update the list of executions
-          getArchive();
-          $scope.delete_workflow = '';
-        });
+      //update the project
+      $http.put('/projects', [previous_proj, new_proj]).then(function() {
+        //update the list of executions
+        getArchive();
+        $scope.delete_workflow = '';
       });
     });
   }
@@ -1813,31 +1806,29 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   $scope.confirmDeleteAllWorkflows = function() {
     $http.get('/projects').then(function(response) {
-      var proj_res, id_doc;
+      var previous_proj, new_proj;
 
       //get the current project
       for(proj in response.data)
         if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
+          delete response.data[proj]['_id'];
+          previous_proj = angular.copy(response.data[proj]);
+
           response.data[proj].archive = [];
-          //get the id of the document, so that it can be removed from the db
-          id_doc = response.data[proj]['_id'];
-          //project to store in the db and remove the id of the document
-          proj_res = response.data[proj];
-          delete proj_res['_id'];
+
+          //project to store in the db
+          new_proj = response.data[proj];
 
           break;
         }
 
-      //delete the previous document with the list of projects
-      $http.delete('/projects/' + id_doc).then(function() {
-        //add the new list of projects
-        $http.post('/projects', proj_res).then(function() {
+      //update the project
+      $http.put('/projects', [previous_proj, new_proj]).then(function() {
           //update the list of executions
           getArchive();
           $('#delete-all-modal').modal('hide');
           $('#archive-modal').modal();
           $scope.delete_workflow = '';
-        });
       });
     });
   }

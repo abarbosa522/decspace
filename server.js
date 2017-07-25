@@ -340,6 +340,13 @@ app.delete('/accounts/:id', function(req, res) {
   });
 });
 
+//update account
+app.put('/accounts', function(req, res) {
+  db1.accounts.update(req.body[0], req.body[1], function(err, doc) {
+    res.json(doc);
+  });
+});
+
 //projects
 var db2 = mongojs('mongodb://' + username + ':' + password + '@ds157247.mlab.com:57247/decspace_users', ['projects']);
 
@@ -362,6 +369,13 @@ app.post('/projects', function(req, res) {
 app.delete('/projects/:id', function(req, res) {
   var id = req.params.id;
   db2.projects.remove({_id: mongojs.ObjectId(id)}, function(err, doc) {
+    res.json(doc);
+  });
+});
+
+//update project
+app.put('/projects', function(req, res) {
+  db2.projects.update(req.body[0], req.body[1], function(err, doc) {
     res.json(doc);
   });
 });
@@ -414,6 +428,13 @@ app.post('/inquiry_responses', function(req, res) {
 app.delete('/inquiry_responses/:id', function(req, res) {
   var id = req.params.id;
   db4.inquiry_responses.remove({_id: mongojs.ObjectId(id)}, function(err, doc) {
+    res.json(doc);
+  });
+});
+
+//update inquiry response
+app.put('/inquiry_responses', function(req, res) {
+  db4.inquiry_responses.update(req.body[0], req.body[1], function(err, doc) {
     res.json(doc);
   });
 });

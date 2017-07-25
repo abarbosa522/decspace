@@ -77,46 +77,29 @@
 
       <br><br>
 
-      <!-- List of Open Answer Questions -->
-      <div ng-repeat = 'quest in open_answer_questions'>
-        <p class = 'header-2'>{{quest.question}}</p>
+      <span class = 'header-8'>Glossary</span>
 
-        <div class = 'row'>
-          <div class = 'col-md-4'></div>
+      <br><br>
 
-          <div class = 'col-md-4' id = 'open-answer-question-{{quest.id}}'>
-            <!-- Open Answer Question -->
-            <input class = 'form-control' type = 'text' ng-model = 'quest.answer' ng-blur = 'blurOpenAnswerQuestion(quest)' ng-if = 'quest.type == "Open Answer"'>
-            <!-- Multiple Choice Question -->
-            <select class = 'form-control' ng-model = 'quest.answer' ng-if = 'quest.type == "Multiple Choice"'>
-              <option value = '' selected disabled>--- Please Select---</option>
-              <option ng-repeat = 'choice in quest.choices'>{{choice.text}}</option>
-            </select>
-            <!--<ul ng-if = 'quest.type == "Multiple Choice"' style = 'list-style: none'>
-              <li ng-repeat = 'choice in quest.choices'>
-                <input type = 'radio' ng-model = 'quest.answer' value = '{{choice.text}}'>
-                {{choice.text}}
-              </li>
-            </ul>-->
-          </div>
-
-          <div class = 'col-md-4'></div>
-        </div>
-
-        <br>
-      </div>
+      <table class = 'table table-bordered table-hover'>
+        <thead>
+          <tr>
+            <th class = 'text-center'>Name</th>
+            <th class = 'text-center'>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat = 'concept in glossary'>
+            <td>{{concept.name}}</td>
+            <td>{{concept.description}}</td>
+          </tr>
+        </tbody>
+      </table>
 
       <!-- Next Step Button -->
       <button type = 'button' class = 'btn btn-primary' ng-click = 'nextStep()' title = 'Next Step'>
         Next Step
       </button>
-
-      <br><br>
-
-      <!-- Open Answer Alert -->
-      <div class = 'alert alert-danger' id = 'open-answer-error' ng-cloak>
-        Please answer <strong>all</strong> questions.
-      </div>
 
     </div>
   </body>

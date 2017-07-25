@@ -5,7 +5,7 @@ app.controller('InquiryLoginController', function($scope, $window, $http, Inquir
   var url = window.location.href;
 
   //get the inquiry round (execution) id
-  var round_id = Number(url.slice(url.indexOf('round=') + 'round='.length));
+  var round_id = Number(url.slice(url.indexOf('r=') + 'r='.length));
 
   //get subject of inquiry
   function getSubject() {
@@ -30,14 +30,14 @@ app.controller('InquiryLoginController', function($scope, $window, $http, Inquir
           for(round in response.data) {
             if(response.data[round].id == round_id) {
               InquiryService.createAnswerData(response.data[round], $scope.login.email, function() {
-                $window.location.href = 'inquiry.html?round=' + round_id + '&user=' + $scope.login.email;
+                $window.location.href = 'inquiry.html?r=' + round_id + '&u=' + $scope.login.email;
               });
             }
           }
         });
       }
       else
-        $window.location.href = 'inquiry.html?round=' + round_id + '&user=' + $scope.login.email;
+        $window.location.href = 'inquiry.html?r=' + round_id + '&u=' + $scope.login.email;
     });
   }
 

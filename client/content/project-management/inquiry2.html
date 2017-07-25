@@ -72,208 +72,50 @@
 
     <div id = 'main-content' class = 'container'>
 
-      <!-- Survey Subject -->
-      <div class = 'row'>
-        <div class = 'col-md-10'>
-          <!-- Inquiry Subject -->
-          <span class = 'header-7' style = 'margin-left: 18%'>{{subject}}</span>
-        </div>
+      <!-- Inquiry Subject -->
+      <span class = 'header-7'>{{subject}}</span>
 
-        <div class = 'col-md-2'>
-          <!-- Glossary -->
-          <a href data-toggle = 'modal' data-target = '#glossary-modal'>
-            <span class = 'glyphicon glyphicon-info-sign' style = 'font-size: 25px; margin-top: 6%'></span>
-          </a>
-          <!-- Help Anchor - All in one line of code, so that a little space does not appear -->
-          <a href data-toggle = 'modal' data-target = '#help-modal' ng-click = 'registerHelpModalOpen()'>
-            <span class = 'glyphicon glyphicon-question-sign' style = 'font-size: 25px; margin-top: 6%'></span>
-          </a>
-        </div>
-      </div>
+      <br><br>
 
-      <!-- Help Modal -->
-      <div class = 'modal fade' id = 'help-modal' role = 'dialog'>
-        <div class = 'modal-dialog'>
-          <div class = 'modal-content'>
+      <!-- List of Open Answer Questions -->
+      <div ng-repeat = 'quest in open_answer_questions'>
+        <p class = 'header-2'>{{quest.question}}</p>
 
-            <div class = 'modal-header'>
-              <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-              <h4 class = 'modal-title'>Inquiry Help</h4>
-            </div>
+        <div class = 'row'>
+          <div class = 'col-md-4'></div>
 
-            <div class = 'modal-body'>
-              <p>To answer this survey, just drag the concepts/questions on the top of the screen to the boxes on the middle of screen, so that they are assigned the score displayed over the column of the box.</p>
-              <p>The concepts/questions you find most relevant should be assigned a higher score than the ones that you do not consider relevant.</p>
-              <p>To read the description of a certain question, just hover it with the cursor.</p>
-              <p>You can also add any suggestions of questions/concepts that you think that makes sense in this survey's context.</p>
-              <p>In the end, just click the "Submit" button to save your answer.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Glossary Modal -->
-      <div class = 'modal fade' id = 'glossary-modal' role = 'dialog'>
-        <div class = 'modal-dialog'>
-          <div class = 'modal-content'>
-
-            <div class = 'modal-header'>
-              <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-              <h4 class = 'modal-title'>Glossary</h4>
-            </div>
-
-            <div class = 'modal-body'>
-              <p class = 'header-1'>Inquiry Subject</p>
-              {{subject}}
-
-              <br><br>
-
-              <p class = 'header-1'>Questions</p>
-              <table class = 'table table-bordered table-hover'>
-                <thead>
-                  <tr>
-                    <th class = 'text-center'>{{suggestions_toggle.title}}</th>
-                    <th class = 'text-center'>Description</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr ng-repeat = 'question in questions'>
-                    <td>{{question.title}}</td>
-                    <td>{{question.description}}</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <p class = 'header-1'>Glossary</p>
-              <table class = 'table table-bordered table-hover'>
-                <thead>
-                  <tr>
-                    <th class = 'text-center'>Name</th>
-                    <th class = 'text-center'>Description</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr ng-repeat = 'concept in glossary'>
-                    <td>{{concept.name}}</td>
-                    <td>{{concept.description}}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <br>
-
-      <!-- List of Questions -->
-      <ul id = 'list-questions' class = 'draggable-objects'>
-        <li ng-repeat = 'question in questions' style = 'list-style: none; float: left; margin-left: 2.5%'>
-          <div ng-if = 'question.score == "null"' ng-drag = 'true' ng-drag-data = 'question' data-allow-transform = 'true' title = '{{question.description}}' ng-class = 'setFontSize(question.title)' style = 'display: inline-block;' >
-            {{question.title}}
+          <div class = 'col-md-4' id = 'open-answer-question-{{quest.id}}'>
+            <!-- Open Answer Question -->
+            <input class = 'form-control' type = 'text' ng-model = 'quest.answer' ng-blur = 'blurOpenAnswerQuestion(quest)' ng-if = 'quest.type == "Open Answer"'>
+            <!-- Multiple Choice Question -->
+            <select class = 'form-control' ng-model = 'quest.answer' ng-if = 'quest.type == "Multiple Choice"'>
+              <option value = '' selected disabled>--- Please Select---</option>
+              <option ng-repeat = 'choice in quest.choices'>{{choice.text}}</option>
+            </select>
           </div>
 
-          <div ng-if = 'question.score != "null"' ng-drop = 'true' ng-drop-success = 'resetDrop(question, $data)' ng-class = '[setFontSize(question.title), {"most_important_drop" : question.score > 0, "least_important_drop" : question.score < 0, "neutral_drop" : question.score == 0}]' style = 'display: inline-block;'>{{question.title}}</div>
-        </li>
-      </ul>
-
-      <!-- Drop Areas -->
-      <div id = 'drop-areas'>
-        <div ng-repeat = 'row in matrix'>
-          <div class = 'div_pos' ng-if = '$parent.$index == 0' ng-repeat = 'pos in row track by $index'>
-            <div ng-if = '$index == 0'>Least Important</div>
-            <div ng-if = 'pos == 0'>Neutral</div>
-            <div ng-if = '$index == row.length - 1'>Most Important</div>
-
-            <div ng-if = 'scaleCheck(pos)'>{{pos}}</div>
-
-          </div>
+          <div class = 'col-md-4'></div>
         </div>
 
-        <div ng-repeat = 'row in matrix'>
-          <div ng-drop = 'true' ng-drop-success = 'onDropComplete($data, row , $index)' ng-repeat = 'position in row track by $index' ng-center-anchor = '{{centerAnchor}}' ng-if = 'position != "null"' ng-class = '{"most_important_drop" : position > 0, "least_important_drop" : position < 0, "neutral_drop" : position == 0}' style = 'margin: 5px'>
-            <div ng-repeat = 'question in questions' ng-drag = 'true' ng-drag-data = 'question' ng-center-anchor = '{{centerAnchor}}' ng-if = 'checkQuestionPosition(question, row, $parent.$index)' title = '{{question.description}}' style = 'display: inline-block' ng-class = 'setFontSize(question.title)'>
-              {{question.title}}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <br>
-
-      <!-- Suggestions -->
-      <div ng-if = 'suggestions_toggle.toggle == true' ng-cloak>
-        <h2 class = 'header-8'>{{suggestions_toggle.question}}</h2>
-
-        <table class = 'table table-bordered table-hover'>
-          <thead>
-            <th class = 'text-center'>{{suggestions_toggle.title}}</th>
-            <th class = 'text-center'>Description</th>
-            <th class = 'col-md-2'></th>
-          </thead>
-          <tbody>
-            <tr ng-repeat = 'suggestion in suggestions' ng-class = '{danger: suggestion.id == delete_suggestion}'>
-              <td>
-                <div id = 'suggestion-title-{{suggestion.id}}'>
-                  <input class = 'form-control' type = 'text' ng-model = 'suggestion.title' ng-blur = 'blurSuggestionTitle(suggestion)'>
-                </div>
-              </td>
-              <td>
-                <div id = 'suggestion-description-{{suggestion.id}}'>
-                  <input class = 'form-control' type = 'text' ng-model = 'suggestion.description' ng-blur = 'blurSuggestionDescription(suggestion)'>
-                </div>
-              </td>
-              <td ng-if = 'suggestion.id != delete_suggestion'>
-                <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteSuggestion(suggestion)' title = 'Delete Suggestion'>
-                  <span class = 'glyphicon glyphicon-minus'></span>
-                </button>
-              </td>
-              <td ng-if = 'suggestion.id == delete_suggestion'>
-                <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteSuggestion(suggestion)' title = 'Confirm Delete Suggestion'>
-                  <span class = 'glyphicon glyphicon-ok'></span>
-                </button>
-                <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteSuggestion()' title = 'Cancel Delete Suggestion'>
-                  <span class = 'glyphicon glyphicon-remove'></span>
-                </button>
-              </td>
-            </tr>
-            <tr class = 'active'>
-              <td>
-                <div id = 'new-suggestion-title'>
-                  <input class = 'form-control' type = 'text' ng-model = 'new_suggestion.title'>
-                </div>
-              </td>
-              <td>
-                <div id = 'new-suggestion-description'>
-                  <input class = 'form-control' type = 'text' ng-model = 'new_suggestion.description'>
-                </div>
-              </td>
-              <td>
-                <button type = 'button' class = 'btn btn-success' ng-click = 'addSuggestion()' title = 'Add Suggestion'>
-                  <span class = 'glyphicon glyphicon-plus'></span>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Data Saved Alert -->
-      <div class = 'alert alert-success' id = 'save-success' ng-cloak>
-        Answer <strong>successfully</strong> saved.
+        <br>
       </div>
 
       <!-- Previous Step Button -->
       <button type = 'button' class = 'btn btn-primary' ng-click = 'previousStep()' title = 'Previous Step'>
         Previous Step
       </button>
-
-      <!-- Submit Button -->
-      <button type = 'button' class = 'btn btn-success' ng-click = 'saveData()' title = 'Submit Answer'>
-        Submit
+      
+      <!-- Next Step Button -->
+      <button type = 'button' class = 'btn btn-primary' ng-click = 'nextStep()' title = 'Next Step'>
+        Next Step
       </button>
 
       <br><br>
+
+      <!-- Open Answer Alert -->
+      <div class = 'alert alert-danger' id = 'open-answer-error' ng-cloak>
+        Please answer <strong>all</strong> questions.
+      </div>
 
     </div>
   </body>

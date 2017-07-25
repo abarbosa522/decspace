@@ -35,7 +35,7 @@ app.service('InquiryService', function($http, $q) {
       //suggestions toggle
       new_round.suggestions_toggle = suggestions_toggle;
       //generate survey link
-      new_round.link = 'http://decspace.sysresearch.org/content/project-management/inquiry-login.html?round=' + new_round.id;
+      new_round.link = 'http://decspace.sysresearch.org/content/project-management/inquiry-login.html?r=' + new_round.id;
       //color scheme
       new_round.color_scheme = color_scheme;
       //glossary
@@ -132,7 +132,7 @@ app.service('InquiryService', function($http, $q) {
     for(email in new_round['emails']) {
       var send_email = {};
       send_email.email = new_round['emails'][email]['address'];
-      send_email.link = 'http://decspace.sysresearch.org/content/project-management/inquiry.html?round=' + new_round['id'] + '&user=' + new_round['emails'][email]['address'];
+      send_email.link = 'http://decspace.sysresearch.org/content/project-management/inquiry.html?r=' + new_round['id'] + '&u=' + new_round['emails'][email]['address'];
 
       if(!personalized_email)
         $http.post('/default_inquiry_survey', send_email).then(function(response) {});
