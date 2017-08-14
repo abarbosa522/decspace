@@ -1,3 +1,4 @@
+/**FILE NOT USED**/
 app.controller('DashboardController', function($scope, $window, $http) {
   /*** SETUP FUNCTIONS ***/
 
@@ -11,7 +12,7 @@ app.controller('DashboardController', function($scope, $window, $http) {
       else {
         if(res.data.user == 'johndoe@decspace.com')
           $scope.unregisteredUser = true;
-          
+
         $scope.username = res.data.user;
         //get all accounts and find the name of the logged user
         $http.get('/accounts').then(function(response) {

@@ -1,3 +1,4 @@
+/**FILE NOT USED**/
 app.service('IntegratedSRFService', function() {
 
   this.integrated_criteria = [];
@@ -16,6 +17,6 @@ app.service('IntegratedSRFService', function() {
   }
 
   this.integrated_category = '';
-  
+
   this.integrated_results = [];
 });

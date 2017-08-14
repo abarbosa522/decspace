@@ -1,3 +1,4 @@
+/**FILE NOT USED**/
 app.controller('SRFMethodController', function($scope, $window, $http, SRFService, IntegratedSRFService) {
   /*** SETUP FUNCTIONS ***/
 

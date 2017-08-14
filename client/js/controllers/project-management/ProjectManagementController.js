@@ -1,3 +1,4 @@
+/**FILE NOT USED**/
 app.controller('ProjectManagementController', function($scope, $window, $http, SortDataService) {
   //order that projects should be retrieved from db
   var currentOrder = ['', ''];

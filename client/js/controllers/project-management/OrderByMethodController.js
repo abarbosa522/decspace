@@ -1,3 +1,4 @@
+/**FILE NOT USED**/
 app.controller('OrderByMethodController', function($scope, $window, $http, OrderByService) {
   //get the id of the open project
   var url = window.location.href;

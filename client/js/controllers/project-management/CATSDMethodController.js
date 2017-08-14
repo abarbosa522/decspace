@@ -1,3 +1,4 @@
+/**FILE NOT USED**/
 app.controller('CATSDMethodController', function($scope, $window, $http, CATSDService, IntegratedSRFService) {
   //get the id of the open project
   var url = window.location.href;
