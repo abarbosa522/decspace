@@ -1,3 +1,12 @@
-{"type":"Mutual-Strengthening Effect","criterion1":"Mental Sharpness","criterion2":"Mental Resilience","value":10}
-{"type":"Mutual-Weakening Effect","criterion1":"Physical Fitness","criterion2":"Teamwork Skills","value":-4}
-{"type":"Antagonistic Effect","criterion1":"Physical Fitness","criterion2":"Intelligence","value":-3}
+{"type":"Mutual-Strengthening Effect","criterion1":"Mental Sharpness","criterion2":"Mental Resilience","category":"Snipers","value":10}
+{"type":"Mutual-Strengthening Effect","criterion1":"Mental Sharpness","criterion2":"Mental Resilience","category":"Breachers","value":10}
+{"type":"Mutual-Strengthening Effect","criterion1":"Mental Sharpness","criterion2":"Mental Resilience","category":"Communications Operators","value":10}
+{"type":"Mutual-Strengthening Effect","criterion1":"Mental Sharpness","criterion2":"Mental Resilience","category":"Heavy Weapons Operators","value":10}
+{"type":"Mutual-Weakening Effect","criterion1":"Physical Fitness","criterion2":"Teamwork Skills","category":"Snipers","value":-4}
+{"type":"Mutual-Weakening Effect","criterion1":"Physical Fitness","criterion2":"Teamwork Skills","category":"Breachers","value":-4}
+{"type":"Mutual-Weakening Effect","criterion1":"Physical Fitness","criterion2":"Teamwork Skills","category":"Communications Operators","value":-4}
+{"type":"Mutual-Weakening Effect","criterion1":"Physical Fitness","criterion2":"Teamwork Skills","category":"Heavy Weapons Operators","value":-4}
+{"type":"Antagonistic Effect","criterion1":"Physical Fitness","criterion2":"Intelligence","category":"Snipers","value":-3}
+{"type":"Antagonistic Effect","criterion1":"Physical Fitness","criterion2":"Intelligence","category":"Breachers","value":-3}
+{"type":"Antagonistic Effect","criterion1":"Physical Fitness","criterion2":"Intelligence","category":"Communications Operators","value":-3}
+{"type":"Antagonistic Effect","criterion1":"Physical Fitness","criterion2":"Intelligence","category":"Heavy Weapons Operators","value":-3}

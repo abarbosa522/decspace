@@ -84,7 +84,7 @@
             <li ng-if = 'loggedIn'><a href = '../settings/settings.html'>Settings</a></li>
 
             <li><a href = '../administrator/administrator.html' ng-if = 'username == "admin@admin"' ng-cloak>Administrator</a></li>
-            
+
             <li ng-if = '!loggedIn' ng-cloak>
               <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'toSignUp()'>
                 <span class = 'glyphicon glyphicon-user'></span>
@@ -130,9 +130,15 @@
 
           <br>
 
-          <p>A new multiple criteria decision-aiding method for nominal classification problems where the categories are pre-defined and no order exists among them.</p>
-          <p>It consists of assigning each action, assessed according to multiple criteria, to at least one category.</p>
+          <p>CAT-SD (from CATegorization by Similarity-Dissimilarity) is a multiple criteria decision aiding method for nominal classification
+            problems, where the categories are pre-defined and no order exists among them.</p>
 
+          <p>The CAT-SD method is based on the concepts of similarity and dissimilarity between two actions, considering possible interactions
+            (or dependencies) between criteria. Each action (or alternative), assessed according to multiple criteria, is assigned to at least
+            one category. Actions are compared against reference actions, which characterize the nominal categories. Therefore, the assignment
+            of an action depends on such a comparison. Membership degrees allow an action to be assigned to the most adequate category or
+            categories. Application of this method must follow a decision aiding co-constructive approach: the analyst and the decision-maker
+            interact during the process of constructing a model.</p>
         </div>
 
         <!-- Example -->

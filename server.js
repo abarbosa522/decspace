@@ -208,21 +208,23 @@ app.post('/expr-eval', function(req, res) {
   var criteria = req.body.criteria;
   var actions = req.body.actions;
   var categories = req.body.categories;
+  var reference_actions = req.body.reference_actions;
+  var functions = req.body.functions;
   var antagonisticSet = req.body.antagonisticSet;
 
   var similarityValues = [];
 
   for(criterion in criteria) {
     for(action in actions) {
-      for(category in categories) {
-        for(reference_action in categories[category]['reference_actions']) {
-          //arguments used in the functions
-          var arg1 = actions[action][criteria[criterion]['name']];
-          var arg2 = categories[category]['reference_actions'][reference_action][criteria[criterion]['name']];
+      for(reference_action in reference_actions) {
+        //arguments used in the functions
+        var arg1 = actions[action][criteria[criterion].name];
+        var arg2 = reference_actions[reference_action][criteria[criterion].name];
 
-          for(branch in criteria[criterion]['branches']) {
-
-            var condition = criteria[criterion]['branches'][branch]['condition'];
+        for(branch in functions) {
+          if(functions[branch].criterion == criteria[criterion].name) {
+            
+            var condition = functions[branch].condition;
 
             //check the occurences of '=' and replace it by '=='
             condition = condition.replace(/=/g, '==');
@@ -236,15 +238,15 @@ app.post('/expr-eval', function(req, res) {
 
             var result = cond.evaluate({x: Number(arg1), y: Number(arg2)});
 
-            if(result == true) {
-              var func_branch = parser.parse(criteria[criterion]['branches'][branch]['function']);
+            if(result) {
+              var func_branch = parser.parse(functions[branch].function);
               result = func_branch.evaluate({x: Number(arg1), y: Number(arg2)});
 
               var result_obj = {};
-              result_obj['criterion'] = criteria[criterion]['name'];
-              result_obj['action'] = actions[action]['name'];
-              result_obj['reference_action'] = categories[category]['reference_actions'][reference_action]['name'];
-              result_obj['result'] = result;
+              result_obj.criterion = criteria[criterion].name;
+              result_obj.action = actions[action].name;
+              result_obj.reference_action = reference_actions[reference_action].name;
+              result_obj.result = result;
 
               similarityValues.push(result_obj);
               break;
@@ -257,40 +259,37 @@ app.post('/expr-eval', function(req, res) {
 
   for(item in antagonisticSet) {
     for(criterion in criteria) {
-      if(criteria[criterion]['name'] == antagonisticSet[item]['criterion2']) {
+      if(criteria[criterion].name == antagonisticSet[item].criterion2) {
         for(action in actions) {
-          for(category in categories) {
-            for(reference_action in categories[category]['reference_actions']) {
-              //arguments used in the functions
-              var arg1 = actions[action][criteria[criterion]['name']];
-              var arg2 = categories[category]['reference_actions'][reference_action][criteria[criterion]['name']];
+          for(reference_action in reference_actions) {
+            //arguments used in the functions
+            var arg1 = actions[action][criteria[criterion].name];
+            var arg2 = reference_actions[reference_action][criteria[criterion].name];
 
-              for(branch in criteria[criterion]['branches']) {
+            for(branch in functions) {
+              var condition = functions[branch].condition;
 
-                var condition = criteria[criterion]['branches'][branch]['condition'];
+              if((condition.indexOf('=') != -1) && (condition.indexOf('<=') == -1) && (condition.indexOf('>=') == -1) && (condition.indexOf('!=') == -1)) {
+                var a = functions[branch].condition;
+                var b = '=';
+                var position = functions[branch].condition.indexOf('=');
+                condition = [a.slice(0, position), b, a.slice(position)].join('');
+              }
 
-                if((condition.indexOf('=') != -1) && (condition.indexOf('<=') == -1) && (condition.indexOf('>=') == -1) && (condition.indexOf('!=') == -1)) {
-                  var a = criteria[criterion]['branches'][branch]['condition'];
-                  var b = '=';
-                  var position = criteria[criterion]['branches'][branch]['condition'].indexOf('=');
-                  condition = [a.slice(0, position), b, a.slice(position)].join('');
-                }
+              var cond = parser.parse(condition);
+              var result = cond.evaluate({x: Number(arg2), y: Number(arg1)});
 
-                var cond = parser.parse(condition);
-                var result = cond.evaluate({x: Number(arg2), y: Number(arg1)});
+              if(result) {
+                var func_branch = parser.parse(functions[branch].function);
+                result = func_branch.evaluate({x: Number(arg2), y: Number(arg1)});
 
-                if(result == true) {
-                  var func_branch = parser.parse(criteria[criterion]['branches'][branch]['function']);
-                  result = func_branch.evaluate({x: Number(arg2), y: Number(arg1)});
-
-                  var result_obj = {};
-                  result_obj['criterion'] = criteria[criterion]['name'];
-                  result_obj['reference_action'] = actions[action]['name'];
-                  result_obj['action'] = categories[category]['reference_actions'][reference_action]['name'];
-                  result_obj['result'] = result;
-                  similarityValues.push(result_obj);
-                  break;
-                }
+                var result_obj = {};
+                result_obj.criterion = criteria[criterion].name;
+                result_obj.reference_action = actions[action].name;
+                result_obj.action = reference_actions[reference_action].name;
+                result_obj.result = result;
+                similarityValues.push(result_obj);
+                break;
               }
             }
           }
@@ -298,7 +297,7 @@ app.post('/expr-eval', function(req, res) {
       }
     }
   }
-
+  
   res.json(similarityValues);
 });
 

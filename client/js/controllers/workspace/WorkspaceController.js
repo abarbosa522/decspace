@@ -300,6 +300,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
                 data.push(element);
             }
 
+            removeEmptyData(data, columns);
+
             $scope.createInputFileModule(file.name, data);
           };
         }
@@ -308,11 +310,12 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
           return function(e) {
             var rows = e.target.result.split("\n");
 
-            for(row in rows) {
-              var element = JSON.parse(rows[row]);
-              element['id'] = Number(row) + 1;
-              data.push(element);
-            }
+            for(row in rows)
+              if(rows[row] != '') {
+                var element = JSON.parse(rows[row]);
+                element['id'] = Number(row) + 1;
+                data.push(element);
+              }
 
             $scope.createInputFileModule(file.name, data);
           }
@@ -322,6 +325,26 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       //get the data from the file
       reader.readAsText(input_files.files[i]);
     }
+  }
+
+  //delete data rows that are empty or not completely filled
+  function removeEmptyData(data, fields) {
+    var to_remove = [];
+
+    for(data_row in data)
+      for(field in fields)
+        if(data[data_row][fields[field]] == undefined) {
+          to_remove.push(data[data_row].id);
+          break;
+        }
+
+    for(remove_id in to_remove)
+      for(data_row in data)
+        //fields does not include the 'id' attribute
+        if(Object.keys(data[data_row]).length != (fields.length + 1))
+          data.splice(data_row, 1);
+
+    return data;
   }
 
   //hide all alerts
@@ -412,9 +435,12 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         //initialize the input data array
         new_mod['input'] = {
           'criteria' : [],
-          'interaction effects' : [],
+          'scales' : [],
+          'functions' : [],
           'actions' : [],
-          'categories' : []
+          'categories' : [],
+          'interaction effects' : [],
+          'reference actions' : []
         };
         //initialize the output data array
         new_mod['output'] = [];
@@ -655,7 +681,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         $scope.deleteIdBranch = '';
         $scope.deleteIdAction = '';
         $scope.deleteIdCategory = '';
-        $scope.deleteIdReferenceAction = ['', ''];
+        $scope.deleteIdReferenceAction = '';
         break;
 
       case 'Inquiry':
@@ -1018,9 +1044,9 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   $scope.deleteIdAction = '';
   $scope.deleteIdObject = '';
   $scope.deleteIdInteractionEffect = '';
-  $scope.deleteIdBranch = ['', ''];
+  $scope.deleteIdBranch = '';
   $scope.deleteIdCategory = '';
-  $scope.deleteIdReferenceAction = ['', ''];
+  $scope.deleteIdReferenceAction = '';
   $scope.deleteIdEmail = '';
   $scope.deleteIdQuestion = '';
   $scope.deleteIdOpenAnswerQuestion = '';
@@ -1047,7 +1073,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         break;
 
       case 'Branches':
-        $scope.deleteIdBranch = [input[0]['id'], input[1]['id']];
+        $scope.deleteIdBranch = input.id;
         break;
 
       case 'Categories':
@@ -1055,7 +1081,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         break;
 
       case 'Reference Actions':
-        $scope.deleteIdReferenceAction = [input[0]['id'], input[1]['id']];
+        $scope.deleteIdReferenceAction = input.id;
         break;
 
       case 'Emails':
@@ -1086,6 +1112,15 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       case 'Criteria':
         $scope.currentModule.input.criteria.splice($scope.currentModule.input.criteria.indexOf(input), 1);
         $scope.deleteIdCriterion = '';
+        
+        //if the current module is of type CAT-SD - remove the correspondant scale
+        if($scope.currentModule.type == 'CAT-SD')
+          for(scale in $scope.currentModule.input.scales)
+            if($scope.currentModule.input.scales[scale].criterion == input.name) {
+              $scope.currentModule.input.scales.splice(scale, 1);
+              break;
+            }
+        
         break;
 
       case 'Actions':
@@ -1104,8 +1139,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         break;
 
       case 'Branches':
-        $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.indexOf(input[0])].branches.splice($scope.currentModule.input.criteria[$scope.currentModule.input.criteria.indexOf(input[0])].branches.indexOf(input[1]), 1);
-        $scope.deleteIdBranch = ['', ''];
+        $scope.currentModule.input.functions.splice($scope.currentModule.input.functions.indexOf(input), 1);
+        $scope.deleteIdBranch = '';
         break;
 
       case 'Categories':
@@ -1114,8 +1149,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         break;
 
       case 'Reference Actions':
-        $scope.currentModule.input.categories[$scope.currentModule.input.categories.indexOf(input[0])].reference_actions.splice($scope.currentModule.input.categories[$scope.currentModule.input.categories.indexOf(input[0])].reference_actions.indexOf(input[1]), 1);
-        $scope.deleteIdReferenceAction = ['', ''];
+        $scope.currentModule.input['reference actions'].splice($scope.currentModule.input['reference actions'].indexOf(input), 1);
+        $scope.deleteIdReferenceAction = '';
         break;
 
       case 'Emails':
@@ -1165,7 +1200,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         break;
 
       case 'Branches':
-        $scope.deleteIdBranch = ['', ''];
+        $scope.deleteIdBranch = '';
         break;
 
       case 'Categories':
@@ -1173,7 +1208,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         break;
 
       case 'Reference Actions':
-        $scope.deleteIdReferenceAction = ['', ''];
+        $scope.deleteIdReferenceAction = '';
         break;
 
       case 'Emails':
@@ -1309,41 +1344,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
             for(modl in modules) {
               if(modules[modl]['id'] == input) {
                 //SPECIAL CASES
-                //CAT-SD - SCALES
-                if(modules[modl]['type'] == 'CAT-SD' && input_type == 'scales') {
-                  for(scale in modules[mod]['output'])
-                    for(criterion in modules[modl]['input']['criteria'])
-                      if(modules[modl]['input']['criteria'][criterion]['name'] == modules[mod]['output'][scale]['criterion'])
-                        modules[modl]['input']['criteria'][criterion]['scale'] = modules[mod]['output'][scale];
-                }
-                //CAT-SD - FUNCTIONS/BRANCHES
-                else if(modules[modl]['type'] == 'CAT-SD' && input_type == 'functions') {
-                  for(branch in modules[mod]['output'])
-                    for(criterion in modules[modl]['input']['criteria'])
-                      if(modules[modl]['input']['criteria'][criterion]['name'] == modules[mod]['output'][branch]['criterion']) {
-                        if(modules[modl]['input']['criteria'][criterion]['branches'] == undefined)
-                          modules[modl]['input']['criteria'][criterion]['branches'] = [];
-
-                        modules[modl]['input']['criteria'][criterion]['branches'].push(modules[mod]['output'][branch]);
-                      }
-                }
-                //CAT-SD - REFERENCE ACTIONS
-                else if(modules[modl]['type'] == 'CAT-SD' && input_type == 'reference actions') {
-                  for(action in modules[mod]['output'])
-                    for(category in modules[modl]['input']['categories'])
-                      if(modules[modl]['input']['categories'][category]['name'] == modules[mod]['output'][action]['category']) {
-                        if(modules[modl]['input']['categories'][category].reference_actions == undefined)
-                          modules[modl]['input']['categories'][category].reference_actions = [];
-
-                        modules[modl]['input']['categories'][category].reference_actions.push(modules[mod]['output'][action]);
-                      }
-
-                  for(category in modules[modl]['input']['categories'])
-                    for(reference_action in modules[modl]['input']['categories'][category]['reference_actions'])
-                      modules[modl]['input']['categories'][category]['reference_actions'][reference_action]['name'] = 'b' + (Number(category) + 1) + (Number(reference_action) + 1);
-                }
                 //INQUIRY - SUBJECT
-                else if(modules[modl]['type'] == 'Inquiry' && input_type == 'subject')
+                if(modules[modl]['type'] == 'Inquiry' && input_type == 'subject')
                   modules[modl]['input']['subject'] = modules[mod]['output'][0]['subject'];
                 //INQUIRY - SUGGESTIONS TOGGLE
                 else if(modules[modl]['type'] == 'Inquiry' && input_type == 'suggestions toggle')
@@ -1363,6 +1365,19 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
                 //NORMAL CASE
                 else
                   modules[modl]['input'][input_type.toLowerCase()] = angular.copy(modules[mod]['output']);
+
+                //SPECIAL CASE - CAT-SD CRITERIA
+                //when criteria is added, its scales have to be added as well
+                if(modules[modl]['type'] == 'CAT-SD' && input_type == 'criteria')
+                  for(criterion in modules[modl].input.criteria)
+                    modules[modl].input.scales.push({
+                      'id' : modules[modl].input.criteria[criterion].id,
+                      'criterion' : modules[modl].input.criteria[criterion].name,
+                      'type' : '',
+                      'min' : '',
+                      'max' : '',
+                      'num_categories' : ''
+                    });
 
                 break;
               }
@@ -1512,23 +1527,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     for(mod in modules)
       if(modules[mod].id == connection.input) {
         //SPECIAL CASES
-        //CAT-SD SCALES
-        if(modules[mod].type == 'CAT-SD' && connection.input_type == 'scales') {
-          for(criterion in modules[mod].input.criteria)
-            modules[mod].input.criteria[criterion].scale = [];
-        }
-        //CAT-SD - FUNCTIONS/BRANCHES
-        else if(modules[mod].type == 'CAT-SD' && connection.input_type == 'functions') {
-          for(criterion in modules[mod].input.criteria)
-            modules[mod].input.criteria[criterion].branches = [];
-        }
-        //CAT-SD - REFERENCE ACTIONS
-        else if(modules[mod].type == 'CAT-SD' && connection.input_type == 'reference actions') {
-          for(category in modules[mod].input.categories)
-            modules[mod].input.categories[category].reference_actions = [];
-        }
         //INQUIRY - SUBJECT
-        else if(modules[mod].type == 'Inquiry' && connection.input_type == 'subject')
+        if(modules[mod].type == 'Inquiry' && connection.input_type == 'subject')
           modules[mod].input.subject = '';
         //INQUIRY - SUGGESTIONS TOGGLE
         else if(modules[mod].type == 'Inquiry' && connection.input_type == 'suggestions toggle')
@@ -1694,7 +1694,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         break;
 
       case 'CAT-SD':
-        CATSDService.getResults(mod.input.criteria, mod.input['interaction effects'], mod.input.actions, mod.input.categories).then(function(data) {
+        CATSDService.getResults(mod.input).then(function(data) {
           mod.output = data;
           createOutputModule(mod);
         });
@@ -1730,7 +1730,18 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   //a new output module is always created
   function createOutputModule(mod) {
     var mod_name = 'Output - ' + mod.type + mod.name_id;
-    var mod_pos = {top: mod.position.top, left: mod.position.left + 160};
+    
+    //define left coordinates based on the type of the module
+    var left_pos;
+    
+    if(mod.type == 'CAT-SD')
+      left_pos = mod.position.left + 200;
+    else if(mod.type == 'SRF')
+      left_pos = mod.position.left + 180;
+    else
+      left_pos = mod.position.left + 160;
+    
+    var mod_pos = {top: mod.position.top, left: left_pos};
 
     createOutputFileModule(mod_name, mod_pos);
     createOutputFileData(mod_name, mod.output, mod_pos, mod.type, mod.input);

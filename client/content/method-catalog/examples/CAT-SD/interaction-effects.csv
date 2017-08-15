@@ -1,4 +1,13 @@
-type;criterion1;criterion2;value
-Mutual-Strengthening Effect;Mental Sharpness;Mental Resilience;10
-Mutual-Weakening Effect;Physical Fitness;Teamwork Skills;-4
-Antagonistic Effect;Physical Fitness;Intelligence;-3
+type;criterion1;criterion2;category;value
+Mutual-Strengthening Effect;Mental Sharpness;Mental Resilience;Snipers;10
+Mutual-Strengthening Effect;Mental Sharpness;Mental Resilience;Breachers;10
+Mutual-Strengthening Effect;Mental Sharpness;Mental Resilience;Communications Operators;10
+Mutual-Strengthening Effect;Mental Sharpness;Mental Resilience;Heavy Weapons Operators;10
+Mutual-Weakening Effect;Physical Fitness;Teamwork Skills;Snipers;-4
+Mutual-Weakening Effect;Physical Fitness;Teamwork Skills;Breachers;-4
+Mutual-Weakening Effect;Physical Fitness;Teamwork Skills;Communications Operators;-4
+Mutual-Weakening Effect;Physical Fitness;Teamwork Skills;Heavy Weapons Operators;-4
+Antagonistic Effect;Physical Fitness;Intelligence;Snipers;-3
+Antagonistic Effect;Physical Fitness;Intelligence;Breachers;-3
+Antagonistic Effect;Physical Fitness;Intelligence;Communications Operators;-3
+Antagonistic Effect;Physical Fitness;Intelligence;Heavy Weapons Operators;-3

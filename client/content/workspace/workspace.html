@@ -394,13 +394,13 @@
                     <div class = 'col-md-2'></div>
 
                     <div class = 'col-md-4'>
-                      <button type = 'button' class = 'btn btn-primary' ng-click = 'confirmSaveReloadWorkflow()' data-dismiss = 'modal' title = 'Confirm Workflow Save'>
+                      <button type = 'button' class = 'btn btn-success' ng-click = 'confirmSaveReloadWorkflow()' data-dismiss = 'modal' title = 'Confirm Workflow Save'>
                         Yes
                       </button>
                     </div>
 
                     <div class = 'col-md-4'>
-                      <button type = 'button' class = 'btn btn-primary' ng-click = 'reloadData(true, reload_workflow)' data-dismiss = 'modal' title = 'Cancel Workflow Save'>
+                      <button type = 'button' class = 'btn btn-danger' ng-click = 'reloadData(true, reload_workflow)' data-dismiss = 'modal' title = 'Cancel Workflow Save'>
                         No
                       </button>
                     </div>
@@ -425,13 +425,13 @@
                     <div class = 'col-md-2'></div>
 
                     <div class = 'col-md-4'>
-                      <button type = 'button' class = 'btn btn-primary' ng-click = 'confirmSaveImportWorkflow()' data-dismiss = 'modal' title = 'Confirm Module Deletion'>
+                      <button type = 'button' class = 'btn btn-success' ng-click = 'confirmSaveImportWorkflow()' data-dismiss = 'modal' title = 'Confirm Module Deletion'>
                         Yes
                       </button>
                     </div>
 
                     <div class = 'col-md-4'>
-                      <button type = 'button' class = 'btn btn-primary' ng-click = 'importWorkflow()' data-dismiss = 'modal' title = 'Cancel Module Deletion'>
+                      <button type = 'button' class = 'btn btn-danger' ng-click = 'importWorkflow()' data-dismiss = 'modal' title = 'Cancel Module Deletion'>
                         No
                       </button>
                     </div>
@@ -456,13 +456,13 @@
                     <div class = 'col-md-2'></div>
 
                     <div class = 'col-md-4'>
-                      <button type = 'button' class = 'btn btn-primary' ng-click = 'confirmDeleteAllWorkflows()' title = 'Confirm Workflows Deletion'>
+                      <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteAllWorkflows()' title = 'Confirm Workflows Deletion'>
                         Yes
                       </button>
                     </div>
 
                     <div class = 'col-md-4'>
-                      <button type = 'button' class = 'btn btn-primary' ng-click = 'cancelDeleteAllWorkflows()' title = 'Cancel Workflows Deletion'>
+                      <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteAllWorkflows()' title = 'Cancel Workflows Deletion'>
                         No
                       </button>
                     </div>
@@ -662,8 +662,11 @@
                       </tr>
                     </tbody>
                   </table>
-                </div>
 
+                  <!-- OK button -->
+                  <button type = 'button' class = 'btn btn-primary' data-dismiss = 'modal'>OK</button>
+
+                </div>
               </div>
             </div>
           </div>
@@ -746,6 +749,9 @@
 
                   <br><br>
 
+                  <!-- OK button -->
+                  <button type = 'button' class = 'btn btn-primary' data-dismiss = 'modal'>OK</button>
+
                 </div>
               </div>
             </div>
@@ -787,6 +793,7 @@
                             <option disabled>--- Please Select ---</option>
                             <option>Minimize</option>
                             <option>Maximize</option>
+                            <option>None</option>
                           </select>
                         </td>
                         <td ng-if = 'criterion.id != deleteIdCriterion'>
@@ -816,6 +823,7 @@
                               <option value = '' disabled>--- Please Select ---</option>
                               <option>Minimize</option>
                               <option>Maximize</option>
+                              <option>None</option>
                             </select>
                           </div>
                         </td>
@@ -830,53 +838,59 @@
 
                   <br>
 
-                  <!-- Scales And Functions -->
-                  <p class = 'header-1'>Scales and Functions</p>
+                  <!-- Scales -->
+                  <p class = 'header-1'>Scales</p>
+
+                  <table class = 'table table-bordered table-hover'>
+                    <thead>
+                      <tr>
+                        <th class = 'text-center'>Criterion</th>
+                        <th class = 'text-center'>Type</th>
+                        <th class = 'text-center'>Minimum Value</th>
+                        <th class = 'text-center'>Maximum Value</th>
+                        <th class = 'text-center'>Number of Categories</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat = 'scale in currentModule.input.scales'>
+                        <td>{{scale.criterion}}</td>
+                        <td>
+                          <div id = 'cat-scale-{{scale.id}}-type'>
+                            <select class = 'form-control' ng-model = 'scale.type' ng-blur = 'blurCATScaleType(scale)'>
+                              <option value = '' disabled>--- Please Select ---</option>
+                              <option>Ordinal</option>
+                              <option>Cardinal</option>
+                            </select>
+                          </div>
+                        </td>
+                        <td>
+                          <div id = 'cat-scale-{{scale.id}}-min'>
+                            <input class = 'form-control' type = 'number' ng-model = 'scale.min' ng-blur = 'blurCATScaleMin(scale)' ng-disabled = 'disableCATScaleOrdinal(scale)'>
+                          </div>
+                        </td>
+                        <td>
+                          <div id = 'cat-scale-{{scale.id}}-max'>
+                            <input class = 'form-control' type = 'number' ng-model = 'scale.max' ng-blur = 'blurCATScaleMax(scale)' ng-disabled = 'disableCATScaleOrdinal(scale)'>
+                          </div>
+                        </td>
+                        <td>
+                          <div id = 'cat-scale-{{scale.id}}-categories'>
+                            <input class = 'form-control' type = 'number' ng-model = 'scale.num_categories' ng-blur = 'blurCATScaleCategories(scale)' ng-disabled = 'disableCATScaleCardinal(scale)'>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <br>
+
+                  <!-- Functions -->
+                  <p class = 'header-1'>Functions</p>
 
                   <div ng-repeat = 'criterion in currentModule.input.criteria'>
-                    <p class = 'header-2'>Criterion:  {{criterion.name}}</p>
 
-                    <!-- Scales -->
-                    <table class = 'table table-bordered table-hover table-striped'>
-                      <thead>
-                        <tr>
-                          <th class = 'text-center'>Type</th>
-                          <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Minimum Value</th>
-                          <th class = 'text-center' ng-if = 'criterion.scale.type == "Numerical"'>Maximum Value</th>
-                          <th class = 'text-center' ng-if = 'criterion.scale.type == "Categorical"'>Number of Categories</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr class = 'active'>
-                          <td>
-                            <div id = 'cat-scale-{{criterion.id}}-type'>
-                              <select class = 'form-control' ng-model = 'criterion.scale.type' ng-blur = 'blurCATScaleType(criterion)'>
-                                <option value = '' disabled>--- Please Select ---</option>
-                                <option>Numerical</option>
-                                <option>Categorical</option>
-                              </select>
-                            </div>
-                          </td>
-                          <td ng-if = 'criterion.scale.type == "Numerical"'>
-                            <div id = 'cat-scale-{{criterion.id}}-min'>
-                              <input class = 'form-control' type = 'number' ng-model = 'criterion.scale.min' ng-blur = 'blurCATScaleMin(criterion)'>
-                            </div>
-                          </td>
-                          <td ng-if = 'criterion.scale.type == "Numerical"'>
-                            <div id = 'cat-scale-{{criterion.id}}-max'>
-                              <input class = 'form-control' type = 'number' ng-model = 'criterion.scale.max' ng-blur = 'blurCATScaleMax(criterion)'>
-                            </div>
-                          </td>
-                          <td ng-if = 'criterion.scale.type == "Categorical"'>
-                            <div id = 'cat-scale-{{criterion.id}}-categories'>
-                              <input class = 'form-control' type = 'number' ng-model = 'criterion.scale.num_categories' ng-blur = 'blurCATScaleCategories(criterion)'>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    <p class = 'header-2'>{{criterion.name}}</p>
 
-                    <!-- Functions -->
                     <table class = 'table table-bordered table-hover'>
                       <thead>
                         <tr>
@@ -887,7 +901,7 @@
                       </thead>
                       <tbody>
                         <!-- Added Branches List -->
-                        <tr ng-repeat = 'branch in criterion.branches' ng-class = '{danger: criterion.id == deleteIdBranch[0] && branch.id == deleteIdBranch[1]}'>
+                        <tr ng-repeat = 'branch in currentModule.input.functions' ng-if = 'branch.criterion == criterion.name' ng-class = '{danger: branch.id == deleteIdBranch}'>
                           <td class = 'col-md-2'>
                             <div id = 'cat-branch-{{branch.id}}-function-{{criterion.id}}'>
                               <input class = 'form-control' type = 'text' ng-model = 'branch.function' ng-blur = 'blurCATBranchFunction(branch, criterion)'>
@@ -904,13 +918,13 @@
                           <td class = 'col-md-3'>
                             <p math-jax-bind = 'branch.condition'></p>
                           </td>
-                          <td class = 'col-md-2' ng-if = 'criterion.id != deleteIdBranch[0] || (criterion.id == deleteIdBranch[0] && branch.id != deleteIdBranch[1])'>
-                            <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput([criterion, branch], "Branches")' title = 'Delete Branch'>
+                          <td class = 'col-md-2' ng-if = 'branch.id != deleteIdBranch'>
+                            <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(branch, "Branches")' title = 'Delete Branch'>
                               <span class = 'glyphicon glyphicon-minus'></span>
                             </button>
                           </td>
-                          <td class = 'col-md-2' ng-if = 'criterion.id == deleteIdBranch[0] && branch.id == deleteIdBranch[1]'>
-                            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput([criterion, branch], "Branches")' title = 'Confirm Delete Branch'>
+                          <td class = 'col-md-2' ng-if = 'branch.id == deleteIdBranch'>
+                            <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(branch, "Branches")' title = 'Confirm Delete Branch'>
                               <span class = 'glyphicon glyphicon-ok'></span>
                             </button>
                             <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Branches")' title = 'Cancel Delete Branch'>
@@ -1208,20 +1222,20 @@
                     </thead>
                     <tbody ng-repeat = 'category in currentModule.input.categories'>
                       <!-- Added Reference Actions -->
-                      <tr ng-repeat = 'ref in category.reference_actions' ng-class = '{danger: category.id == deleteIdReferenceAction[0] && ref.id == deleteIdReferenceAction[1]}'>
-                        <td ng-if = '$index == 0' rowspan = '{{category.reference_actions.length + 1}}'>{{category.name}}</td>
+                      <tr ng-repeat = 'ref in getCategoryReferenceActions(category.name)' ng-class = '{danger: ref.id == deleteIdReferenceAction}' ng-if = 'ref.category == category.name'>
+                        <td>{{category.name}} ({{ref.name}})</td>
                         <td ng-repeat = 'criterion in currentModule.input.criteria'>
                           <div id = 'cat-ref-{{ref.id}}-{{category.id}}-criterion-{{criterion.id}}'>
                             <input class = 'form-control' type = 'number' ng-model = 'ref[criterion.name]' ng-blur = 'blurCATReferenceAction(ref, category, criterion)'>
                           </div>
                         </td>
-                        <td ng-if = 'category.id != deleteIdReferenceAction[0] || category.id == deleteIdReferenceAction[0] && ref.id != deleteIdReferenceAction[1]'>
-                          <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput([category, ref], "Reference Actions")' title = 'Delete Reference Action'>
+                        <td ng-if = 'ref.id != deleteIdReferenceAction'>
+                          <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(ref, "Reference Actions")' title = 'Delete Reference Action'>
                             <span class = 'glyphicon glyphicon-minus'></span>
                           </button>
                         </td>
-                        <td ng-if = 'category.id == deleteIdReferenceAction[0] && ref.id == deleteIdReferenceAction[1]'>
-                          <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput([category, ref], "Reference Actions")' title = 'Confirm Delete Reference Action'>
+                        <td ng-if = 'ref.id == deleteIdReferenceAction'>
+                          <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(ref, "Reference Actions")' title = 'Confirm Delete Reference Action'>
                             <span class = 'glyphicon glyphicon-ok'></span>
                           </button>
                           <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Reference Actions")' title = 'Cancel Delete Reference Action'>
@@ -1231,20 +1245,23 @@
                       </tr>
                       <!-- Form to add new reference action -->
                       <tr class = 'active'>
-                        <td ng-if = '[category.reference_actions.length] == 0'>{{category.name}}</td>
+                        <td>{{category.name}}</td>
                         <td ng-repeat = 'criterion in currentModule.input.criteria'>
                           <div id = 'new-cat-ref-{{category.id}}-criterion-{{criterion.id}}'>
                             <input class = 'form-control' type = 'number' ng-model = 'new_reference_action[category.id][criterion.name]'>
                           </div>
                         </td>
                         <td>
-                          <button type = 'button' class = 'btn btn-success' ng-click = 'addCATReferenceAction(category, $index)' title = 'Add Reference Action'>
+                          <button type = 'button' class = 'btn btn-success' ng-click = 'addCATReferenceAction(category)' title = 'Add Reference Action'>
                             <span class = 'glyphicon glyphicon-plus'></span>
                           </button>
                         </td>
                       </tr>
                     </tbody>
                   </table>
+
+                  <!-- OK button -->
+                  <button type = 'button' class = 'btn btn-primary' data-dismiss = 'modal'>OK</button>
 
                 </div>
               </div>
@@ -1649,7 +1666,12 @@
                         <textarea id = 'email-text' rows = '3' class = 'form-control' ng-model = 'currentModule.input.email.text'></textarea>
                       </div>
                     </div>
-                  </div>
+                  </form>
+
+                  <br>
+
+                  <!-- OK button -->
+                  <button type = 'button' class = 'btn btn-primary' data-dismiss = 'modal'>OK</button>
 
                 </div>
               </div>
@@ -1843,6 +1865,9 @@
                     </tbody>
                   </table>
 
+                  <!-- OK button -->
+                  <button type = 'button' class = 'btn btn-primary' data-dismiss = 'modal'>OK</button>
+
                 </div>
               </div>
             </div>
@@ -1900,7 +1925,7 @@
                       <div ng-if = 'currentModule.output == false'>
                         The Non-Negativity Condition was not satisfied.
                       </div>
-
+                      
                       <div ng-if = 'currentModule.output != false'>
                         <!-- Categories assigned to each action -->
                         <p class = 'header-2'>Assigned Categories</p>
@@ -1921,22 +1946,22 @@
                             </tr>
                           </tbody>
                         </table>
-
+                        
                         <!-- Delta Values -->
                         <p class = 'header-2'>Similarity Values Per Reference Action</p>
-
+                        
                         <table class = 'table table-bordered table-hover'>
                           <thead>
                             <tr>
                               <th class = 'text-center'>Action</th>
-                              <th class = 'text-center' ng-repeat = 'ref_action in currentModule.output[3]'>{{ref_action}}</th>
+                              <th class = 'text-center' ng-repeat = 'ref_action in currentModule.input["reference actions"]'>{{ref_action.name}}</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr ng-repeat = 'action in currentModule.input.actions'>
                               <td>{{action.name}}</td>
-                              <td ng-repeat = 'ref_action in currentModule.output[3]'>
-                                {{currentModule.output[2][action.name][ref_action]}}
+                              <td ng-repeat = 'ref_action in currentModule.input["reference actions"]'>
+                                {{currentModule.output[2][action.name][ref_action.name]}}
                               </td>
                             </tr>
                           </tbody>
@@ -2203,21 +2228,21 @@
               <button id = 'cat-sd-criteria' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "criteria")' style = 'margin-top: 3%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: -39.5%'>Criteria</span>
 
-              <button id = 'cat-sd-interaction-effects' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "interaction effects")' style = 'margin-top: 12%; margin-left: -48%'></button>
-              <span class = 'module-circle-span' style = 'margin-top: 10.5%; margin-left: -39.5%'>Interaction Effects</span>
+              <button id = 'cat-sd-scales' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "scales")' style = 'margin-top: 12%; margin-left: -48%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 10.5%; margin-left: -39.5%'>Scales</span>
 
-              <button id = 'cat-sd-scales' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "scales")' style = 'margin-top: 21%; margin-left: -48%'></button>
-              <span class = 'module-circle-span' style = 'margin-top: 19.5%; margin-left: -39.5%'>Scales</span>
+              <button id = 'cat-sd-functions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "functions")' style = 'margin-top: 21%; margin-left: -48%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 19.5%; margin-left: -39.5%'>Functions</span>
 
-              <button id = 'cat-sd-functions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "functions")' style = 'margin-top: 30%; margin-left: -48%'></button>
-              <span class = 'module-circle-span' style = 'margin-top: 28.5%; margin-left: -39.5%'>Functions</span>
+              <button id = 'cat-sd-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "actions")' style = 'margin-top: 30%; margin-left: -48%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 28.5%; margin-left: -39.5%'>Actions</span>
 
-              <button id = 'cat-sd-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "actions")' style = 'margin-top: 39%; margin-left: -48%'></button>
-              <span class = 'module-circle-span' style = 'margin-top: 37.5%; margin-left: -39.5%'>Actions</span>
-
-              <button id = 'cat-sd-categories' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "categories")' style = 'margin-top: 48%; margin-left: -48%'></button>
-              <span class = 'module-circle-span' style = 'margin-top: 46.5%; margin-left: -40%'>Categories</span>
-
+              <button id = 'cat-sd-categories' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "categories")' style = 'margin-top: 39%; margin-left: -48%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 37.5%; margin-left: -40%'>Categories</span>
+              
+              <button id = 'cat-sd-interaction-effects' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "interaction effects")' style = 'margin-top: 48%; margin-left: -48%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 46.5%; margin-left: -39.5%'>Interaction Effects</span>
+              
               <button id = 'cat-sd-reference-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "reference actions")' style = 'margin-top: 57%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 55.5%; margin-left: -40%'>Reference Actions</span>
 
@@ -2309,13 +2334,13 @@
                   <div class = 'col-md-2'></div>
 
                   <div class = 'col-md-4'>
-                    <button type = 'button' class = 'btn btn-primary' ng-click = 'deleteModule()' data-dismiss = 'modal' title = 'Confirm Module Deletion'>
+                    <button type = 'button' class = 'btn btn-success' ng-click = 'deleteModule()' data-dismiss = 'modal' title = 'Confirm Module Deletion'>
                       Yes
                     </button>
                   </div>
 
                   <div class = 'col-md-4'>
-                    <button type = 'button' class = 'btn btn-primary' data-dismiss = 'modal' title = 'Cancel Module Deletion'>
+                    <button type = 'button' class = 'btn btn-danger' data-dismiss = 'modal' title = 'Cancel Module Deletion'>
                       No
                     </button>
                   </div>
