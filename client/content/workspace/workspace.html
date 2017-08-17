@@ -515,7 +515,7 @@
 
                 <div class = 'modal-header'>
                   <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-                  <h4 class = 'modal-title'><a href = '../method-catalog/orderby.html' title = 'Method Catalog - OrderBy'>OrderBy{{currentModule.name_id}}</a></h4>
+                  <h4 class = 'modal-title'>OrderBy{{currentModule.name_id}}</h4>
                 </div>
 
                 <div class = 'modal-body'>
@@ -559,8 +559,13 @@
                           </select>
                         </td>
                         <td ng-if = 'criterion.id != deleteIdCriterion'>
+                          <!-- Delete Criterion Button -->
                           <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(criterion, "Criteria")' title = 'Delete Criterion'>
                             <span class = 'glyphicon glyphicon-minus'></span>
+                          </button>
+                          <!-- Duplicate Criterion Button -->
+                          <button type = 'button' class = 'btn btn-info' ng-click = '' title = 'Duplicate Criterion'>
+                            <span class = 'glyphicon glyphicon-duplicate'></span>
                           </button>
                         </td>
                         <td ng-if = 'criterion.id == deleteIdCriterion'>
@@ -678,7 +683,7 @@
 
                 <div class = 'modal-header'>
                   <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-                  <h4 class = 'modal-title'><a href = '../method-catalog/sort.html' title = 'Method Catalog - Sort'>Sort{{currentModule.name_id}}</a></h4>
+                  <h4 class = 'modal-title'>Sort{{currentModule.name_id}}</h4>
                 </div>
 
                 <div class = 'modal-body'>
@@ -764,7 +769,7 @@
 
                 <div class = 'modal-header'>
                   <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-                  <h4 class = 'modal-title'><a href = '../method-catalog/cat-sd.html' title = 'Method Catalog - CAT-SD'>CAT-SD{{currentModule.name_id}}</a></h4>
+                  <h4 class = 'modal-title'>CAT-SD{{currentModule.name_id}}</h4>
                 </div>
 
                 <div class = 'modal-body'>
@@ -1104,7 +1109,7 @@
 
                   <table class = 'table table-bordered table-hover'>
                     <thead>
-                      <th class = 'text-center'>Type Of Effect</th>
+                      <th class = 'text-center'>Type of Effect</th>
                       <th class = 'text-center'>Criterion 1</th>
                       <th class = 'text-center'>Criterion 2</th>
                       <th class = 'text-center'>Category</th>
@@ -1275,7 +1280,7 @@
 
                 <div class = 'modal-header'>
                   <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-                  <h4 class = 'modal-title'><a href = '../method-catalog/inquiry.html' title = 'Method Catalog - Inquiry'>Inquiry{{currentModule.name_id}}</a></h4>
+                  <h4 class = 'modal-title'>Inquiry{{currentModule.name_id}}</h4>
                 </div>
 
                 <div class = 'modal-body'>
@@ -1685,7 +1690,7 @@
 
                 <div class = 'modal-header'>
                   <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
-                  <h4 class = 'modal-title'><a href = '../method-catalog/srf.html' title = 'Method Catalog - SRF'>SRF{{currentModule.name_id}}</a></h4>
+                  <h4 class = 'modal-title'>SRF{{currentModule.name_id}}</h4>
                 </div>
 
                 <div class = 'modal-body'>
@@ -1929,19 +1934,23 @@
                       <div ng-if = 'currentModule.output != false'>
                         <!-- Categories assigned to each action -->
                         <p class = 'header-2'>Assigned Categories</p>
-
+                        
                         <table class = 'table table-bordered table-hover'>
                           <thead>
                             <tr>
                               <th class = 'text-center'>Action</th>
-                              <th class = 'text-center' ng-repeat = '(key, value) in currentModule.output[0]'>{{key}}</th>
+                              <th class = 'text-center' ng-repeat = 'category in currentModule.input.categories'>{{category.name}}</th>
+                              <th class = 'text-center'>Not Assigned</th>
                             </tr>
                           </thead>
                           <tbody>
-                            <tr ng-repeat = 'action in currentModule.input.actions'>
-                              <td>{{action.name}}</td>
-                              <td ng-repeat = 'result in currentModule.output[0]'>
-                                <span class = 'glyphicon glyphicon-ok' style = 'color: green' ng-if = 'result.includes(action.name)'></span>
+                            <tr ng-repeat = 'result in currentModule.output[0]'>
+                              <td>{{result.action}}</td>
+                              <td ng-repeat = 'category in currentModule.input.categories'>
+                                <span class = 'glyphicon glyphicon-ok' style = 'color: green' ng-if = 'result[category.name] == true'></span>
+                              </td>
+                              <td>
+                                <span class = 'glyphicon glyphicon-ok' style = 'color: green' ng-if = 'result["Not Assigned"] == true'></span>
                               </td>
                             </tr>
                           </tbody>
@@ -1958,10 +1967,10 @@
                             </tr>
                           </thead>
                           <tbody>
-                            <tr ng-repeat = 'action in currentModule.input.actions'>
-                              <td>{{action.name}}</td>
+                            <tr ng-repeat = 'result in currentModule.output[2]'>
+                              <td>{{result.action}}</td>
                               <td ng-repeat = 'ref_action in currentModule.input["reference actions"]'>
-                                {{currentModule.output[2][action.name][ref_action.name]}}
+                                {{result[ref_action.name]}}
                               </td>
                             </tr>
                           </tbody>
@@ -1969,7 +1978,7 @@
 
                         <!-- Delta Max Values -->
                         <p class = 'header-2'>Maximum Similarity Values Per Category</p>
-
+                        
                         <table class = 'table table-bordered table-hover'>
                           <thead>
                             <tr>
@@ -1978,10 +1987,10 @@
                             </tr>
                           </thead>
                           <tbody>
-                            <tr ng-repeat = 'action in currentModule.input.actions'>
-                              <td>{{action.name}}</td>
+                            <tr ng-repeat = 'result in currentModule.output[1]'>
+                              <td>{{result.action}}</td>
                               <td ng-repeat = 'category in currentModule.input.categories'>
-                                {{currentModule.output[1][action.name][category.name]}}
+                                {{result[category.name]}}
                               </td>
                             </tr>
                           </tbody>

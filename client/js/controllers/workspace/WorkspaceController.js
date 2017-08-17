@@ -329,20 +329,10 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   //delete data rows that are empty or not completely filled
   function removeEmptyData(data, fields) {
-    var to_remove = [];
-
+    //fields does not include the 'id' attribute
     for(data_row in data)
-      for(field in fields)
-        if(data[data_row][fields[field]] == undefined) {
-          to_remove.push(data[data_row].id);
-          break;
-        }
-
-    for(remove_id in to_remove)
-      for(data_row in data)
-        //fields does not include the 'id' attribute
-        if(Object.keys(data[data_row]).length != (fields.length + 1))
-          data.splice(data_row, 1);
+      if(Object.keys(data[data_row]).length != (fields.length + 1))
+        data.splice(data_row, 1);
 
     return data;
   }
@@ -1902,20 +1892,32 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       //transform modules data to CSV files
       var files = generateCSVFiles(workflow_data.modules[mod]);
 
-      //add files to the respective folders
+      //add the input files to the respective folders
       for(input_file in files[0]) {
         input_folder.file(files[2][input_file] + '.csv', files[0][input_file]);
 
-        //modify the workflow data to reference the data files
+        //modify the workflow data to reference the input files
         if(workflow_data.modules[mod].type == 'Input File' || workflow_data.modules[mod].type == 'Output File')
           workflow_data.modules[mod].input[files[2][input_file]] = 'modules data/' + workflow_data.modules[mod].name + '/input/' + files[2][input_file] + '.csv';
         else
           workflow_data.modules[mod].input[files[2][input_file]] = 'modules data/' + workflow_data.modules[mod].type + workflow_data.modules[mod].name_id + '/input/' + files[2][input_file] + '.csv';
       }
-
-      output_folder.file('output.csv', files[1]);
-
-      if(workflow_data.modules[mod].type == 'Input File' || workflow_data.modules[mod].type == 'Output File')
+      
+      //add the output files to the respective folders
+      //CAT-SD exception - three output files are generated
+      if(workflow_data.modules[mod].type == 'CAT-SD' || (workflow_data.modules[mod].type == 'Output File' && workflow_data.modules[mod].parent_type == 'CAT-SD')) {
+        for(output_file in files[1])
+          output_folder.file(files[3][output_file] + '.csv', files[1][output_file]);
+      }
+      else  
+        output_folder.file('output.csv', files[1]);
+      
+      //modify the workflow data to reference the output files - CAT-SD exception (three output files are generated)
+      if(workflow_data.modules[mod].type == 'CAT-SD')
+        workflow_data.modules[mod].output = ['modules data/' + workflow_data.modules[mod].type + workflow_data.modules[mod].name_id + '/output/' + files[3][0] + '.csv', 'modules data/' + workflow_data.modules[mod].type + workflow_data.modules[mod].name_id + '/output/' + files[3][1] + '.csv', 'modules data/' + workflow_data.modules[mod].type + workflow_data.modules[mod].name_id + '/output/' + files[3][2] + '.csv'];
+      else if(workflow_data.modules[mod].type == 'Output File' && workflow_data.modules[mod].parent_type == 'CAT-SD')
+        workflow_data.modules[mod].output = ['modules data/' + workflow_data.modules[mod].name + '/output/' + files[3][0] + '.csv', 'modules data/' + workflow_data.modules[mod].name + '/output/' + files[3][1] + '.csv', 'modules data/' + workflow_data.modules[mod].name + '/output/' + files[3][2] + '.csv'];
+      else if(workflow_data.modules[mod].type == 'Input File' || workflow_data.modules[mod].type == 'Output File')
         workflow_data.modules[mod].output = 'modules data/' + workflow_data.modules[mod].name + '/output/output.csv';
       else
         workflow_data.modules[mod].output = 'modules data/' + workflow_data.modules[mod].type + workflow_data.modules[mod].name_id + '/output/output.csv';
@@ -1929,22 +1931,34 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     });
   }
 
-  function generateCSVFiles(data) {
+  function generateCSVFiles(module) {
     //generate input files
     var input_files = [], input_titles = [];
 
     //iterate over input data (e.g, criteria and actions)
-    for(input in data.input) {
+    for(input in module.input) {
       //store title
       input_titles.push(input);
       //transform json data into csv
-      input_files.push(JSONtoCSV(data.input[input], input));
+      input_files.push(JSONtoCSV(module.input[input], input));
     }
+    
+    //output files of the CAT-SD method consist of three different tables
+    //generate output files
+    if(module.type == 'CAT-SD' || (module.type == 'Output File' && module.parent_type == 'CAT-SD')) {
+      var output_files = [], output_titles = ['Assigned Categories', 'Maximum Similarity Values Per Category', 'Similarity Values Per Reference Action'];
+      
+      for(output in module.output)
+        output_files.push(JSONtoCSV(module.output[output], output));
+      
+      return [input_files, output_files, input_titles, output_titles];
+    }
+    else {
+      //generate output file
+      var output_file = JSONtoCSV(module.output);
 
-    //generate output file
-    var output_file = JSONtoCSV(data.output);
-
-    return [input_files, output_file, input_titles];
+      return [input_files, output_file, input_titles];
+    }
   }
 
   $scope.selectImportWorkflow = function() {
@@ -1969,18 +1983,26 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
           for(mod in original_data.modules) {
             //unzip input data
-            for(input in original_data.modules[mod].input) {
+            for(input in original_data.modules[mod].input)
               unzipFile(zip, original_data.modules[mod].input[input], mod, input, original_data.modules[mod].input_formats[input], function(res_data, res_mod, res_input, res_format) {
                 original_data.modules[res_mod].input[res_input] = CSVtoJSON(res_data, res_format);
               });
-            }
-
+            
             //unzip output data
-            unzipFile(zip, original_data.modules[mod].output, mod, 0, original_data.modules[mod].output_format, function(res_data, res_mod, res_pos, res_format) {
-              original_data.modules[res_mod].output = CSVtoJSON(res_data, res_format);
-            });
+            //CAT-SD exception - three output files are generated
+            if(original_data.modules[mod].type == 'CAT-SD' || (original_data.modules[mod].type == 'Output File' && original_data.modules[mod].parent_type == 'CAT-SD'))
+              for(output_file in original_data.modules[mod].output)
+                unzipFile(zip, original_data.modules[mod].output[output_file], mod, output_file, original_data.modules[mod].output_format, function(res_data, res_mod, res_pos, res_format) {
+                  original_data.modules[res_mod].output[res_pos] = CSVtoJSON(res_data, res_format);
+                });
+            else  
+              unzipFile(zip, original_data.modules[mod].output, mod, 0, original_data.modules[mod].output_format, function(res_data, res_mod, res_pos, res_format) {
+                original_data.modules[res_mod].output = CSVtoJSON(res_data, res_format);
+              });
+            
+           
           }
-
+          
           //remove current modules and connections
           resetCurrentData();
 
@@ -2027,21 +2049,23 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
       //iterate over the fields
       for(field in data[0])
-        if((typeof data[0][field] != 'object' && data[0][field] != null) || (typeof data[0][field] == 'object' && data[0][field] != null && Object.keys(deleteNullAttributes(data[0][field])).length > 0))
-          csv_str += field + ';';
+        csv_str += field + ';';
 
       csv_str = csv_str.substring(0, csv_str.length - 1);
       csv_str += '\n';
 
       for(obj in data) {
-        for(item in data[obj])
-          if((typeof data[obj][item] != 'object' && data[obj][item] != null) || (typeof data[obj][item] == 'object' && data[obj][item] != null && Object.keys(deleteNullAttributes(data[obj][item])).length > 0))
+        for(item in data[obj]) {
+          if(data[obj][item] === '')
+            csv_str += "''" + ';';
+          else
             csv_str += data[obj][item] + ';';
-
+        }
+            
         csv_str = csv_str.substring(0, csv_str.length - 1);
         csv_str += '\n';
       }
-
+      
       return csv_str;
     }
     else
@@ -2071,14 +2095,28 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         element['id'] = i;
 
         for(var j = 0; j < cells.length; j++) {
-          if(cells[j].trim() != '' && columns[j].trim() != '')
-            element[columns[j]] = cells[j];
+          if(cells[j].trim() != '' && columns[j].trim() != '') {
+            if(cells[j].trim() == "''")
+              element[columns[j]] = '';
+            else {
+              if(cells[j] == 'true' || cells[j] == 'false')
+                element[columns[j]] = (cells[j] == 'true');
+              else if(isNaN(cells[j]))
+                element[columns[j]] = cells[j];
+              else
+                element[columns[j]] = Number(cells[j]);
+            }
+          }
         }
 
         if(!angular.equals(element, {}))
           res_data.push(element);
       }
-
+      
+      for(data_row in res_data)
+        if(Object.keys(res_data[data_row]).length == 1)
+          res_data.splice(data_row, 1);
+      
       return res_data;
     }
     else if(format == 'number') {
@@ -2091,14 +2129,6 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
       return rows[1];
     }
-  }
-
-  function deleteNullAttributes(obj) {
-    for(field in obj)
-      if(obj[field] == null)
-        delete obj[field];
-
-    return obj;
   }
 
   /*** OUTPUT FILE FUNCTIONS ***/

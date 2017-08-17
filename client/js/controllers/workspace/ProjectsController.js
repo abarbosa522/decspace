@@ -155,9 +155,11 @@ app.controller('ProjectsController', function($scope, $window, $http, SortDataSe
       var copy_number = 0;
 
       for(proj in response.data)
-        if(response.data[proj].name == project.name)
-          copy_number++;
-
+        if(response.data[proj].name == project.name && response.data[proj].username == $scope.username && response.data[proj].copy_number > copy_number)
+          copy_number = response.data[proj].copy_number;
+      
+      copy_number++;
+      
       //create the new project
       var new_proj = angular.copy(project);
       delete new_proj['_id'];

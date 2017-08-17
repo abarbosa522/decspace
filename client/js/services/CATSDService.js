@@ -60,7 +60,9 @@ app.service('CATSDService', function($http, $q) {
       similarityValues = resolve;
 
       assignActions();
-
+      
+      transformOutput();
+      
       deferred.resolve([assignedActions, deltaMaxValues, deltaValues]);
     });
 
@@ -363,5 +365,59 @@ app.service('CATSDService', function($http, $q) {
         for(cat in k_set)
           assignedActions[k_set[cat]].push(actions[action].name);
     }
+  }
+  
+  //transform output to more convenient format
+  function transformOutput() {
+    //assigned actions
+    var assigned_actions = [];
+    
+    for(action in actions) {
+      var action_obj = {'action' : actions[action].name};
+      
+      for(category in categories) {
+        if(assignedActions[categories[category].name].includes(actions[action].name))
+          action_obj[categories[category].name] = true;
+        else
+          action_obj[categories[category].name] = false;
+      }
+      
+      if(assignedActions['Not Assigned'].includes(actions[action].name))
+        action_obj['Not Assigned'] = true;
+      else
+        action_obj['Not Assigned'] = false;
+      
+      assigned_actions.push(action_obj);
+    }
+    
+    assignedActions = assigned_actions;
+    
+    //delta maximum values
+    var delta_max_values = [];
+    
+    for(action in actions) {
+      var delta_max_obj = {'action' : actions[action].name};
+      
+      for(category in categories)
+        delta_max_obj[categories[category].name] = deltaMaxValues[actions[action].name][categories[category].name];
+      
+      delta_max_values.push(delta_max_obj);
+    }
+    
+    deltaMaxValues = delta_max_values;
+    
+    //delta values
+    var delta_values = [];
+    
+    for(action in actions) {
+      var delta_obj = {'action' : actions[action].name};
+      
+      for(reference_action in reference_actions)
+        delta_obj[reference_actions[reference_action].name] = deltaValues[actions[action].name][reference_actions[reference_action].name];
+    
+      delta_values.push(delta_obj);
+    }
+    
+    deltaValues = delta_values;
   }
 });

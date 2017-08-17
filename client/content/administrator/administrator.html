@@ -188,11 +188,6 @@
               <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'newSortProjects("username", "ascendant")' title = "Sort 'User' Upwards"></span></a>
             </th>
             <th class = 'text-center col-md-2'>
-              Type
-              <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'newSortProjects("type", "descendant")' title = "Sort 'Type' Downwards"></span></a>
-              <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'newSortProjects("type", "ascendant")' title = "Sort 'Type' Upwards"></span></a>
-            </th>
-            <th class = 'text-center col-md-2'>
               Creation Date
               <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'newSortProjects("creation_date", "descendant")' title = "Sort 'Creation Date' Downwards"></span></a>
               <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'newSortProjects("creation_date", "ascendant")' title = "Sort 'Creation Date' Upwards"></span></a>
@@ -212,12 +207,6 @@
 
             <!-- User -->
             <td>{{project.username}}</td>
-
-            <!-- Type -->
-            <td>
-              <span ng-if = 'project.method != undefined'>Single-Method</span>
-              <span ng-if = 'project.method == undefined'>Multi-Method</span>
-            </td>
 
             <!-- Creation Date -->
             <td>{{project.creation_date}}</td>

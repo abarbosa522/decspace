@@ -80,9 +80,10 @@ app.controller('MethodController', function($scope, $window, $http) {
 
   /*** SORT METHOD ***/
   $scope.sort_objects = [
-    {'name' : 'Object 2'},
-    {'name' : 'Object 1'},
-    {'name' : 'Object 3'}
+    {'name' : 'Music'},
+    {'name' : 'Photography'},
+    {'name' : 'Movies'},
+    {'name' : 'Drawing'}
   ];
 
   /*** STARTUP FUNCTIONS ***/
