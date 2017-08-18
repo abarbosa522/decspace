@@ -944,7 +944,7 @@
                             <button type = 'button' class = 'btn btn-info' ng-click = 'copyCATBranch(branch)' title = 'Duplicate Branch'>
                               <span class = 'glyphicon glyphicon-duplicate'></span>
                             </button>
-                            <!-- Delete Branch Function -->
+                            <!-- Delete Branch Button -->
                             <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(branch, "Branches")' title = 'Delete Branch'>
                               <span class = 'glyphicon glyphicon-minus'></span>
                             </button>
@@ -1017,7 +1017,7 @@
                           <button type = 'button' class = 'btn btn-info' ng-click = 'copyCATAction(action)' title = 'Duplicate Action'>
                             <span class = 'glyphicon glyphicon-duplicate'></span>
                           </button>
-                          <!-- Delete Action Function -->
+                          <!-- Delete Action Button -->
                           <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(action, "Actions")' title = 'Delete Action'>
                             <span class = 'glyphicon glyphicon-minus'></span>
                           </button>
@@ -1092,7 +1092,7 @@
                           <button type = 'button' class = 'btn btn-info' ng-click = 'copyCATCategory(category)' title = 'Duplicate Category'>
                             <span class = 'glyphicon glyphicon-duplicate'></span>
                           </button>
-                          <!-- Delete Category Function -->
+                          <!-- Delete Category Button -->
                           <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(category, "Categories")' title = 'Delete Category'>
                             <span class = 'glyphicon glyphicon-minus'></span>
                           </button>
@@ -1186,7 +1186,7 @@
                           <button type = 'button' class = 'btn btn-info' ng-click = 'copyCATInteraction(interaction)' title = 'Duplicate Interaction Effect'>
                             <span class = 'glyphicon glyphicon-duplicate'></span>
                           </button>
-                          <!-- Delete Interaction Effect Function -->
+                          <!-- Delete Interaction Effect Button -->
                           <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(interaction, "Interaction Effects")' title = 'Delete Interaction Effect'>
                             <span class = 'glyphicon glyphicon-minus'></span>
                           </button>
@@ -1275,7 +1275,7 @@
                           <button type = 'button' class = 'btn btn-info' ng-click = 'copyCATReferenceAction(ref, category)' title = 'Duplicate Reference Action'>
                             <span class = 'glyphicon glyphicon-duplicate'></span>
                           </button>
-                          <!-- Delete Reference Action Function -->
+                          <!-- Delete Reference Action Button -->
                           <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(ref, "Reference Actions")' title = 'Delete Reference Action'>
                             <span class = 'glyphicon glyphicon-minus'></span>
                           </button>
@@ -1362,6 +1362,11 @@
                           </div>
                         </td>
                         <td ng-if = 'email.id != deleteIdEmail'>
+                          <!-- Duplicate Email Button -->
+                          <button type = 'button' class = 'btn btn-info' ng-click = 'copyInquiryEmail(email)' title = 'Duplicate Email'>
+                            <span class = 'glyphicon glyphicon-duplicate'></span>
+                          </button>
+                          <!-- Delete Email Button -->
                           <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(email, "Emails")' title = 'Delete Email'>
                             <span class = 'glyphicon glyphicon-minus'></span>
                           </button>
@@ -1405,7 +1410,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <!-- Added Open Answer Questions -->
+                      <!-- Added Characterization Questions -->
                       <tr ng-repeat = 'open_answer_question in currentModule.input.open_answer_questions' ng-class = '{danger: open_answer_question.id == deleteIdOpenAnswerQuestion}'>
                         <td>
                           <div id = 'inquiry-open-answer-question-{{open_answer_question.id}}'>
@@ -1420,7 +1425,12 @@
                           </select>
                         </td>
                         <td ng-if = 'open_answer_question.id != deleteIdOpenAnswerQuestion'>
-                          <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(open_answer_question, "Open Answer Questions")' title = 'Delete Open Answer Question'>
+                          <!-- Duplicate Characterization Question Button -->
+                          <button type = 'button' class = 'btn btn-info' ng-click = 'copyInquiryCharacterizationQuestion(open_answer_question)' title = 'Duplicate Question'>
+                            <span class = 'glyphicon glyphicon-duplicate'></span>
+                          </button>
+                          <!-- Delete Characterization Question Button -->
+                          <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(open_answer_question, "Open Answer Questions")' title = 'Delete Question'>
                             <span class = 'glyphicon glyphicon-minus'></span>
                           </button>
                         </td>
@@ -1477,6 +1487,11 @@
                             </div>
                           </td>
                           <td ng-if = 'open_answer_question.id != deleteIdChoice[0] || choice.id != deleteIdChoice[1]'>
+                            <!-- Duplicate Choice Button -->
+                            <button type = 'button' class = 'btn btn-info' ng-click = 'copyInquiryChoice(open_answer_question, choice)' title = 'Duplicate Choice'>
+                              <span class = 'glyphicon glyphicon-duplicate'></span>
+                            </button>
+                            <!-- Delete Choice Button -->
                             <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput([open_answer_question, choice], "Choice")' title = 'Delete Choice'>
                               <span class = 'glyphicon glyphicon-minus'></span>
                             </button>
@@ -1509,7 +1524,7 @@
 
                   <br>
 
-                  <!-- Questions -->
+                  <!-- Q-Sort Questions -->
                   <p class = 'header-1'>Q-Sort Questions</p>
 
                   <table class = 'table table-bordered table-hover'>
@@ -1534,7 +1549,12 @@
                           </div>
                         </td>
                         <td ng-if = 'question.id != deleteIdQuestion'>
-                          <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(question, "Questions")' title = 'Delete Question'>
+                          <!-- Duplicate Q-Sort Question Button -->
+                          <button type = 'button' class = 'btn btn-info' ng-click = 'copyInquiryQuestion(question)' title = 'Duplicate Q-Sort Question'>
+                            <span class = 'glyphicon glyphicon-duplicate'></span>
+                          </button>
+                          <!-- Delete Q-Sort Question Button -->
+                          <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(question, "Questions")' title = 'Delete Q-Sort Question'>
                             <span class = 'glyphicon glyphicon-minus'></span>
                           </button>
                         </td>
@@ -1632,6 +1652,11 @@
                           </div>
                         </td>
                         <td ng-if = 'gloss.id != deleteIdGlossaryConcept'>
+                          <!-- Duplicate Glossary Concept Button -->
+                          <button type = 'button' class = 'btn btn-info' ng-click = 'copyInquiryConcept(gloss)' title = 'Duplicate Glossary Concept'>
+                            <span class = 'glyphicon glyphicon-duplicate'></span>
+                          </button>
+                          <!-- Delete Glossary Concept Button -->
                           <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(gloss, "Glossary")' title = 'Delete Glossary Concept'>
                             <span class = 'glyphicon glyphicon-minus'></span>
                           </button>
@@ -1755,6 +1780,11 @@
                           </div>
                         </td>
                         <td ng-if = 'criterion.id != deleteIdCriterion'>
+                           <!-- Duplicate Criterion Button -->
+                          <button type = 'button' class = 'btn btn-info' ng-click = 'copySRFCriterion(criterion)' title = 'Duplicate Criterion'>
+                            <span class = 'glyphicon glyphicon-duplicate'></span>
+                          </button>
+                          <!-- Delete Criterion Button -->
                           <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(criterion, "Criteria")' title = 'Delete Criterion'>
                             <span class = 'glyphicon glyphicon-minus'></span>
                           </button>

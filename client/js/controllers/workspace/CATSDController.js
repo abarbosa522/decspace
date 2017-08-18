@@ -557,7 +557,6 @@ app.controller('CATSDController', function($scope) {
   
   //copy a reference action
   $scope.copyCATReferenceAction = function(reference_action, category) {
-    console.log(reference_action)
     //make a copy of the selected reference action
     var new_reference_action = angular.copy(reference_action);
     //give it a new id
@@ -575,8 +574,6 @@ app.controller('CATSDController', function($scope) {
       
     //insert the new interaction into the interactions array
     $scope.currentModule.input['reference actions'].push(new_reference_action);
-    
-    console.log($scope.currentModule.input['reference actions'])
   }
   
 });

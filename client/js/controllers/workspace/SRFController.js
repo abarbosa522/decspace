@@ -41,14 +41,24 @@ app.controller('SRFController', function($scope) {
     else
       $('#srf-criterion-' + criterion.id + '-name').removeClass('has-error');
   }
-
+  
+  //copy a criterion
+  $scope.copySRFCriterion = function(criterion) {
+    //make a copy of the selected criterion
+    var new_criterion = angular.copy(criterion);
+    //give it a new id
+    new_criterion.id = $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.length - 1].id + 1;
+    //insert the new criterion into the criteria array
+    $scope.currentModule.input.criteria.push(new_criterion);
+  }
+  
   $scope.blurSRFRatioZ = function() {
     if($scope.currentModule.input['ratio z'] == '' || $scope.currentModule.input['ratio z'] == undefined || $scope.currentModule.input['ratio z'] < 1)
       $('#srf-ratio-z').addClass('has-error');
     else
       $('#srf-ratio-z').removeClass('has-error');
   }
-
+  
   $scope.blurSRFDecimalPlaces = function() {
     if($scope.currentModule.input['decimal places'] == undefined || $scope.currentModule.input['decimal places'] == '')
       $('#srf-decimal-places').addClass('has-error');
