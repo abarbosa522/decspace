@@ -559,13 +559,13 @@
                           </select>
                         </td>
                         <td ng-if = 'criterion.id != deleteIdCriterion'>
+                          <!-- Duplicate Criterion Button -->
+                          <button type = 'button' class = 'btn btn-info' ng-click = 'copyOrderByCriterion(criterion)' title = 'Duplicate Criterion'>
+                            <span class = 'glyphicon glyphicon-duplicate'></span>
+                          </button>
                           <!-- Delete Criterion Button -->
                           <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(criterion, "Criteria")' title = 'Delete Criterion'>
                             <span class = 'glyphicon glyphicon-minus'></span>
-                          </button>
-                          <!-- Duplicate Criterion Button -->
-                          <button type = 'button' class = 'btn btn-info' ng-click = '' title = 'Duplicate Criterion'>
-                            <span class = 'glyphicon glyphicon-duplicate'></span>
                           </button>
                         </td>
                         <td ng-if = 'criterion.id == deleteIdCriterion'>
@@ -622,6 +622,7 @@
                       <th class = 'col-md-2'></th>
                     </thead>
                     <tbody>
+                      <!-- Added Actions -->
                       <tr ng-repeat = 'orderby_action in currentModule.input.actions' ng-class = '{danger: orderby_action.id == deleteIdAction}'>
                         <td>
                           <div id = 'orderby-action-{{orderby_action.id}}-name'>
@@ -634,6 +635,11 @@
                           </div>
                         </td>
                         <td ng-if = 'orderby_action.id != deleteIdAction'>
+                           <!-- Duplicate Action Button -->
+                          <button type = 'button' class = 'btn btn-info' ng-click = 'copyOrderByAction(orderby_action)' title = 'Duplicate Action'>
+                            <span class = 'glyphicon glyphicon-duplicate'></span>
+                          </button>
+                          <!-- Delete Action Button -->
                           <button type = 'button' class = 'btn btn-danger btn-action-remove' ng-click = 'deleteInput(orderby_action, "Actions")' title = 'Delete Action'>
                             <span class = 'glyphicon glyphicon-minus'></span>
                           </button>
@@ -707,6 +713,11 @@
                           </div>
                         </td>
                         <td ng-if = 'object.id != deleteIdObject'>
+                          <!-- Duplicate Object Button -->
+                          <button type = 'button' class = 'btn btn-info' ng-click = 'copySortObject(object)' title = 'Duplicate Object'>
+                            <span class = 'glyphicon glyphicon-duplicate'></span>
+                          </button>
+                          <!-- Delete Object Button -->
                           <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(object, "Objects")' title = 'Delete Object'>
                             <span class = 'glyphicon glyphicon-minus'></span>
                           </button>
@@ -802,6 +813,11 @@
                           </select>
                         </td>
                         <td ng-if = 'criterion.id != deleteIdCriterion'>
+                          <!-- Duplicate Criterion Button -->
+                          <button type = 'button' class = 'btn btn-info' ng-click = 'copyCATCriterion(criterion)' title = 'Duplicate Criterion'>
+                            <span class = 'glyphicon glyphicon-duplicate'></span>
+                          </button>
+                          <!-- Delete Criterion Button -->
                           <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(criterion, "Criteria")' title = 'Delete Criterion'>
                             <span class = 'glyphicon glyphicon-minus'></span>
                           </button>
@@ -924,6 +940,11 @@
                             <p math-jax-bind = 'branch.condition'></p>
                           </td>
                           <td class = 'col-md-2' ng-if = 'branch.id != deleteIdBranch'>
+                            <!-- Duplicate Branch Button -->
+                            <button type = 'button' class = 'btn btn-info' ng-click = 'copyCATBranch(branch)' title = 'Duplicate Branch'>
+                              <span class = 'glyphicon glyphicon-duplicate'></span>
+                            </button>
+                            <!-- Delete Branch Function -->
                             <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(branch, "Branches")' title = 'Delete Branch'>
                               <span class = 'glyphicon glyphicon-minus'></span>
                             </button>
@@ -992,6 +1013,11 @@
                           </div>
                         </td>
                         <td ng-if = 'action.id != deleteIdAction'>
+                         <!-- Duplicate Action Button -->
+                          <button type = 'button' class = 'btn btn-info' ng-click = 'copyCATAction(action)' title = 'Duplicate Action'>
+                            <span class = 'glyphicon glyphicon-duplicate'></span>
+                          </button>
+                          <!-- Delete Action Function -->
                           <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(action, "Actions")' title = 'Delete Action'>
                             <span class = 'glyphicon glyphicon-minus'></span>
                           </button>
@@ -1062,6 +1088,11 @@
                           </div>
                         </td>
                         <td ng-if = 'category.id != deleteIdCategory'>
+                          <!-- Duplicate Category Button -->
+                          <button type = 'button' class = 'btn btn-info' ng-click = 'copyCATCategory(category)' title = 'Duplicate Category'>
+                            <span class = 'glyphicon glyphicon-duplicate'></span>
+                          </button>
+                          <!-- Delete Category Function -->
                           <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(category, "Categories")' title = 'Delete Category'>
                             <span class = 'glyphicon glyphicon-minus'></span>
                           </button>
@@ -1151,6 +1182,11 @@
                           </div>
                         </td>
                         <td ng-if = 'interaction.id != deleteIdInteractionEffect'>
+                          <!-- Duplicate Interaction Effect Button -->
+                          <button type = 'button' class = 'btn btn-info' ng-click = 'copyCATInteraction(interaction)' title = 'Duplicate Interaction Effect'>
+                            <span class = 'glyphicon glyphicon-duplicate'></span>
+                          </button>
+                          <!-- Delete Interaction Effect Function -->
                           <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(interaction, "Interaction Effects")' title = 'Delete Interaction Effect'>
                             <span class = 'glyphicon glyphicon-minus'></span>
                           </button>
@@ -1235,6 +1271,11 @@
                           </div>
                         </td>
                         <td ng-if = 'ref.id != deleteIdReferenceAction'>
+                          <!-- Duplicate Reference Action Button -->
+                          <button type = 'button' class = 'btn btn-info' ng-click = 'copyCATReferenceAction(ref, category)' title = 'Duplicate Reference Action'>
+                            <span class = 'glyphicon glyphicon-duplicate'></span>
+                          </button>
+                          <!-- Delete Reference Action Function -->
                           <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(ref, "Reference Actions")' title = 'Delete Reference Action'>
                             <span class = 'glyphicon glyphicon-minus'></span>
                           </button>

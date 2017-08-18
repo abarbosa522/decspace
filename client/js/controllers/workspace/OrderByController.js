@@ -36,12 +36,12 @@ app.controller('OrderByController', function($scope) {
       if($scope.currentModule.input.criteria.length == 0)
         $scope.new_orderby_criterion.id = 1;
       else
-        $scope.new_orderby_criterion.id = $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.length - 1]['id'] + 1;
+        $scope.new_orderby_criterion.id = $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.length - 1].id + 1;
 
       //the criterion is not selected by default
-      $scope.new_orderby_criterion.selected = false;
+      $scope.new_orderby_criterion.selected = 'false';
 
-      //add the new criterion to the
+      //add the new criterion to the criteria
       $scope.currentModule.input.criteria.push(angular.copy($scope.new_orderby_criterion));
 
       //reset the criterion input fields
@@ -71,11 +71,24 @@ app.controller('OrderByController', function($scope) {
       //make sure no other criterion is selected
       for(crit in $scope.currentModule.input.criteria)
         $scope.currentModule.input.criteria[crit]['selected'] = 'false';
+      
       //select the clicked criterion
       $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.indexOf(criterion)]['selected'] = 'true';
     }
   }
-
+  
+  //copy a criterion
+  $scope.copyOrderByCriterion = function(criterion) {
+    //make a copy of the selected criterion
+    var new_criterion = angular.copy(criterion);
+    //give it a new id
+    new_criterion.id = $scope.currentModule.input.criteria[$scope.currentModule.input.criteria.length - 1].id + 1;
+    //copied criterion should not be selected, even if the selected criterion is selected
+    new_criterion.selected = 'false';
+    //insert the new criterion into the criteria array
+    $scope.currentModule.input.criteria.push(new_criterion);
+  }
+  
   //add a new action
   $scope.addOrderByAction = function() {
     var can_add_action = true;
@@ -129,5 +142,15 @@ app.controller('OrderByController', function($scope) {
       $('#orderby-action-' + action.id + '-criterion-' + criterion.id).addClass('has-error');
     else
       $('#orderby-action-' + action.id + '-criterion-' + criterion.id).removeClass('has-error');
+  }
+  
+  //copy an action
+  $scope.copyOrderByAction = function(action) {
+    //make a copy of the selected action
+    var new_action = angular.copy(action);
+    //give it a new id
+    new_action.id = $scope.currentModule.input.actions[$scope.currentModule.input.actions.length - 1].id + 1;
+    //insert the new action into the actions array
+    $scope.currentModule.input.actions.push(new_action);
   }
 });

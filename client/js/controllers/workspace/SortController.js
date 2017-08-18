@@ -28,7 +28,16 @@ app.controller('SortController', function($scope) {
     else
       $('#sort-object-' + object.id).removeClass('has-error');
   }
-
+  
+  $scope.copySortObject = function(object) {
+    //make a copy of the selected object
+    var new_object = angular.copy(object);
+    //give it a new id
+    new_object.id = $scope.currentModule.input.objects[$scope.currentModule.input.objects.length - 1].id + 1;
+    //insert the new object into the objects array
+    $scope.currentModule.input.objects.push(new_object);
+  }
+  
   $scope.onDropComplete = function(index, obj, evt) {
     var otherObj = $scope.currentModule.input.objects[index];
     var otherIndex = $scope.currentModule.input.objects.indexOf(obj);
