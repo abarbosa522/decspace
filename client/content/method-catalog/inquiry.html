@@ -46,13 +46,7 @@
             <span class = 'icon-bar'></span>
           </button>
           <!-- Title -->
-          <div ng-if = '!loggedIn' ng-cloak>
-            <a class = 'navbar-brand' href = '../../index.html'>DecSpace</a>
-          </div>
-
-          <div ng-if = 'loggedIn' ng-cloak>
-            <a class = 'navbar-brand' href = '../workspace/projects.html'>DecSpace</a>
-          </div>
+          <a class = 'navbar-brand' href = '../../index.html'>DecSpace</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -64,10 +58,15 @@
 
               <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic' ng-if = 'unregistered_user' ng-cloak>Welcome!</p>
             </li>
-
+            
+             <li ng-if = 'loggedIn' ng-cloak><a href = '../workspace/projects.html'>Projects</a></li>
+            
             <li><a href = '../homepage/about.html'>About</a></li>
+            
             <li class = 'active'><a href = 'method-catalog.html'>Method Catalog</a></li>
+            
             <li><a href = '../homepage/faq.html'>FAQ</a></li>
+            
             <li><a href = '../homepage/contactus.html'>Contact Us</a></li>
 
             <li ng-if = 'loggedIn'><a href = '../settings/settings.html'>Settings</a></li>
