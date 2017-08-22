@@ -62,7 +62,7 @@ app.service('InquiryService', function($http, $q) {
 
   function createAnswerDocs(new_round) {
     for(email in new_round.emails)
-      self.createAnswerData(new_round, new_round.emails[email].address, 'active');
+      self.createAnswerData(new_round, new_round.emails[email].address, 'approved');
   }
 
   this.createAnswerData = function(new_round, email, status) {
