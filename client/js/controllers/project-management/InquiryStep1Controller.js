@@ -20,6 +20,8 @@ app.controller('InquiryStep1Controller', function($scope, $window, $http) {
           $scope.subject = response.data[answer].subject;
           //get the glossary
           $scope.glossary = response.data[answer].glossary;
+          //get the description
+          $scope.description = response.data[answer].description;
           break;
         }
       }

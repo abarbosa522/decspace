@@ -453,6 +453,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         //initialize the input data array
         new_mod['input'] = {
           'subject' : '',
+          'description' : '',
           'emails' : [],
           'questions' : [],
           'open_answer_questions' : [],
@@ -1693,7 +1694,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         break;
 
       case 'Inquiry':
-        var results = InquiryService.startRound($scope.username, proj_id, mod.input.subject, mod.input.emails, mod.input.open_answer_questions, mod.input.questions, mod.input.current_round, mod.input.suggestions, mod.input.personalized_email, mod.input.email, mod.input.color_scheme, mod.input.glossary, mod.input.scale);
+        var results = InquiryService.startRound($scope.username, proj_id, mod.input.subject, mod.input.description, mod.input.emails, mod.input.open_answer_questions, mod.input.questions, mod.input.current_round, mod.input.suggestions, mod.input.personalized_email, mod.input.email, mod.input.color_scheme, mod.input.glossary, mod.input.scale);
 
         results.then(function(resolve) {
           mod.input.round_id = resolve.id;
@@ -2131,7 +2132,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     }
   }
 
-  /*** OUTPUT FILE FUNCTIONS ***/
+  /*** INQUIRY OUTPUT FUNCTIONS ***/
   //get the results in "real-time" for Inquiry Method
   function aggregateInquiryResults() {
     var results = InquiryService.aggregateResults($scope.currentModule.input.round_id);
@@ -2143,6 +2144,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       $scope.currentModule.log.suggestions = resolve[2];
       $scope.currentModule.log.link = resolve[3];
       $scope.currentModule.log.open_answer_questions = resolve[4];
+      $scope.currentModule.log.pending_users = resolve[5];
     });
   }
 
@@ -2151,7 +2153,64 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
     $scope.saveData();
   }
+  
+  $scope.approveRequest = function(user) {
+    $http.get('/inquiry_responses').then(function(response) {
+      var previous_res, new_res;
+      
+      for(res in response.data)
+        if(response.data[res].user == user.email && response.data[res].round_id == $scope.currentModule.input.round_id) {
+          delete response.data[res]['_id'];
+          previous_res = angular.copy(response.data[res]);
+          
+          response.data[res].status = 'approved';
+          
+          new_res = response.data[res];
+          break;
+        }
+      
+      $http.put('/inquiry_responses', [previous_res, new_res]).then(function() {
+        $scope.currentModule.log.pending_users.splice($scope.currentModule.log.pending_users.indexOf(user), 1);
+        
+        //send survey link
+        var send_email = {
+          'email' : user.email,
+          'link' : 'http://decspace.sysresearch.org/content/project-management/inquiry.html?r=' + new_res.round_id + '&u=' + user.email
+        };
+        
+        if(!$scope.currentModule.input.personalized_email)
+          $http.post('/default_inquiry_survey', send_email).then(function(response) {});
+        else {
+          send_email.subject = $scope.currentModule.input.email.subject;
+          send_email.text = $scope.currentModule.input.email.text;
 
+          $http.post('/personalized_inquiry_survey', send_email).then(function(response) {});
+        }
+      });
+    });
+  }
+  
+  $scope.rejectRequest = function(user) {
+    $http.get('/inquiry_responses').then(function(response) {
+      var previous_res, new_res;
+      
+      for(res in response.data)
+        if(response.data[res].user == user.email && response.data[res].round_id == $scope.currentModule.input.round_id) {
+          delete response.data[res]['_id'];
+          previous_res = angular.copy(response.data[res]);
+          
+          response.data[res].status = 'rejected';
+          
+          new_res = response.data[res];
+          break;
+        }
+      
+      $http.put('/inquiry_responses', [previous_res, new_res]).then(function() {
+        $scope.currentModule.log.pending_users.splice($scope.currentModule.log.pending_users.indexOf(user), 1);
+      });
+    });
+  }
+    
   //reorder by "attr" and "dir"
   $scope.sortData = function(attr, dir, data) {
     SortDataService.sortDataVar(data, attr, dir);

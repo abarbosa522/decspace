@@ -430,9 +430,8 @@ app.controller('InquiryStep3Controller', function($scope, $window, $http) {
   function hexToRgbA(hex) {
     var c = hex.substring(1).split('');
 
-    if(c.length == 3) {
+    if(c.length == 3)
       c = [c[0], c[0], c[1], c[1], c[2], c[2]];
-    }
 
     c = '0x' + c.join('');
 
@@ -468,7 +467,137 @@ app.controller('InquiryStep3Controller', function($scope, $window, $http) {
         return -1;
     }
   }
+  
+  /*** 3 SCALES FUNCTIONS ***/
+  $scope.getNumberOfNegativePositions = function() {
+    //count the number of negative positions 
+    var cont_negative = 0;
+    
+    for(row in $scope.matrix)
+      for(position in $scope.matrix[row])
+        if($scope.matrix[row][position] <= -1)
+          cont_negative++;
+    
+    //create the array of the negative positions
+    $scope.negative_positions = [];
+    
+    for(var i = 0; i < cont_negative; i++)
+      $scope.negative_positions.push('');
+    
+    return new Array(cont_negative);
+  }
+  
+  $scope.getNumberOfNeutralPositions = function() {
+    //count the number of neutral positions
+    var cont_neutral = 0;
+    
+    for(row in $scope.matrix)
+      for(position in $scope.matrix[row])
+        if($scope.matrix[row][position] == 0)
+          cont_neutral++;
+    
+    //create the array of the neutral positions
+    $scope.neutral_positions = [];
+    
+    for(var i = 0; i < cont_neutral; i++)
+      $scope.neutral_positions.push('');
+    
+    return new Array(cont_neutral);
+  }
+  
+  $scope.getNumberOfPositivePositions = function() {
+    //count the number of positive positions
+    var cont_positive = 0;
+    
+    for(row in $scope.matrix)
+      for(position in $scope.matrix[row])
+        if($scope.matrix[row][position] >= 1)
+          cont_positive++;
+    
+    //create the array of the positive positions
+    $scope.positive_positions = [];
+    
+    for(var i = 0; i < cont_positive; i++)
+      $scope.positive_positions.push('');
+    
+    return new Array(cont_positive);
+  }
+  
+  //assign the drop box position to the question
+  $scope.onDrop3Values = function(data, index, value_position) {
+    //get the respective array of positions and score
+    var positions_array = [], score;
+    
+    if(value_position == 'negative')
+      score = -1;
+    else if(value_position == 'neutral')
+      score = 0;
+    else if(value_position == 'positive')
+      score = 1;
+    
+    //check if the position is already filled and, if it is, get the correspondant question
+    var filled_pos = false, question_pos;
 
+    for(question in $scope.questions)
+      if($scope.questions[question].position == (value_position + '-' + index)) {
+        question_pos = question;
+        filled_pos = true;
+        break;
+      }
+
+    //if dragged question is unanswered and position is not filled
+    if(!filled_pos) {
+      //add position and score to the question
+      $scope.questions[$scope.questions.indexOf(data)].position = value_position + '-' + index;
+      $scope.questions[$scope.questions.indexOf(data)].score = score;
+    }
+    //if dragged question is unanswered and position is filled
+    else if(data.position == -1 && filled_pos) {
+      //reset the position and score of the answered question
+      $scope.questions[question_pos].position = -1;
+      $scope.questions[question_pos].score = 'null';
+      //sort the questions by id
+      $scope.questions.sort(sortById);
+
+      //add position and score to the question
+      $scope.questions[$scope.questions.indexOf(data)].position = value_position + '-' + index;
+      $scope.questions[$scope.questions.indexOf(data)].score = score;
+    }
+    else if(data.position != -1 && filled_pos) {
+      //save and switch the answered questions' positions and scores with each other
+      var pos1 = angular.copy($scope.questions[$scope.questions.indexOf(data)].position);
+      var score1 = angular.copy($scope.questions[$scope.questions.indexOf(data)].score);
+      var pos2 = angular.copy($scope.questions[question_pos].position);
+      var score2 = angular.copy($scope.questions[question_pos].score);
+
+      $scope.questions[$scope.questions.indexOf(data)].position = pos2;
+      $scope.questions[$scope.questions.indexOf(data)].score = score2;
+
+      $scope.questions[question_pos].position = pos1;
+      $scope.questions[question_pos].score = score1;
+    }
+    
+    //increment the drag and drop counter - usability metric
+    drag_and_drops++;
+  }
+  
+  $scope.checkQuestionPos3Values = function(question, index, value_position) {
+    if(question.position == value_position + '-' + index) {
+      return true;
+    }
+    else
+      return false;
+  }
+  
+  $scope.equalizeHeights = function() {
+    if($scope.scale == '3 values') {
+      
+      console.log($('#negative-drops').height());
+       console.log($('#neutral-drops').css('height'));
+       console.log($('#positive-drops').css('height'));
+    }
+  }
+  
   /*** STARTUP FUNCTIONS ***/
   getData();
   hideAlert();

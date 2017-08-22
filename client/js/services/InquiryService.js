@@ -1,7 +1,7 @@
 app.service('InquiryService', function($http, $q) {
   var self = this;
 
-  this.startRound = function(username, proj_id, subject, emails, open_answer_questions, questions, current_round, suggestions_toggle, personalized_email, email_content, color_scheme, glossary, scale) {
+  this.startRound = function(username, proj_id, subject, description, emails, open_answer_questions, questions, current_round, suggestions_toggle, personalized_email, email_content, color_scheme, glossary, scale) {
     var deferred = $q.defer();
 
     $http.get('/inquiry_rounds').then(function(response) {
@@ -32,6 +32,8 @@ app.service('InquiryService', function($http, $q) {
       new_round.questions = questions;
       //survey subject
       new_round.subject = subject;
+      //survey description
+      new_round.description = description;
       //suggestions toggle
       new_round.suggestions_toggle = suggestions_toggle;
       //generate survey link
@@ -60,10 +62,10 @@ app.service('InquiryService', function($http, $q) {
 
   function createAnswerDocs(new_round) {
     for(email in new_round.emails)
-      self.createAnswerData(new_round, new_round.emails[email].address);
+      self.createAnswerData(new_round, new_round.emails[email].address, 'active');
   }
 
-  this.createAnswerData = function(new_round, email, callback) {
+  this.createAnswerData = function(new_round, email, status) {
     //create a new answer document
     var new_answer = {};
     //define the corresponding round id
@@ -74,6 +76,8 @@ app.service('InquiryService', function($http, $q) {
     new_answer.user = email;
     //define the subject survey
     new_answer.subject = new_round.subject;
+    //define the survey description
+    new_answer.description = new_round.description;
     //define the suggestions
     new_answer.suggestions = [];
     //define the suggestions toggle
@@ -84,7 +88,13 @@ app.service('InquiryService', function($http, $q) {
     new_answer.glossary = new_round.glossary;
     //scale
     new_answer.scale = new_round.scale;
-
+    //status
+    new_answer.status = status;
+    //answer document creation date
+    var current_date = new Date();
+    new_answer.request_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
+    new_answer.request_date += ' ' + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
+    
     //define the set of questions
     new_answer.questions = [];
 
@@ -122,10 +132,7 @@ app.service('InquiryService', function($http, $q) {
     new_answer['usability_metrics']['incomplete_saves'] = 0;
 
     //add the new answer document
-    $http.post('/inquiry_responses', new_answer).then(function() {
-      if(callback != null)
-        callback();
-    });
+    $http.post('/inquiry_responses', new_answer);
   }
 
   function sendSurveyLinks(new_round, personalized_email, email_content) {
@@ -144,12 +151,14 @@ app.service('InquiryService', function($http, $q) {
       }
     }
   }
-
+  
   this.aggregateResults = function(round_id) {
     var deferred = $q.defer();
 
     //aggregation of all questions' scores
     var questions = [];
+    //emails of the users waiting for approval
+    var pending_emails = [];
     //emails of the users that answered
     var answer_emails = [];
     //aggregation of all suggestions
@@ -186,8 +195,10 @@ app.service('InquiryService', function($http, $q) {
 
       $http.get('/inquiry_responses').then(function(response2) {
         //calculate the total score of each question, as well as the total number of answers
-        for(answer in response2.data)
-          if(response2.data[answer].round_id == round_id && response2.data[answer].usability_metrics.task_complete) {
+        for(answer in response2.data) {
+          if(response2.data[answer].round_id == round_id && response2.data[answer].status == 'pending')
+            pending_emails.push({'email' : response2.data[answer].user, 'request_date' : response2.data[answer].request_date});
+          else if(response2.data[answer].round_id == round_id && response2.data[answer].usability_metrics.task_complete) {
             answer_emails.push({'email' : response2.data[answer].user, 'answer_submission_date' : response2.data[answer].usability_metrics.answer_submission_date});
 
             for(suggestion in response2.data[answer].suggestions)
@@ -206,6 +217,7 @@ app.service('InquiryService', function($http, $q) {
                 if(response2.data[answer].open_answer_questions[quest].question == open_answer_questions[quest2].question)
                   open_answer_questions[quest2][response2.data[answer].user] = response2.data[answer].open_answer_questions[quest].answer;
           }
+        }
 
         //calculate the average score and standard deviation of each question
         for(question in questions) {
@@ -219,7 +231,7 @@ app.service('InquiryService', function($http, $q) {
           }
         }
 
-        deferred.resolve([questions, answer_emails, suggestions, link, open_answer_questions]);
+        deferred.resolve([questions, answer_emails, suggestions, link, open_answer_questions, pending_emails]);
       });
     });
 

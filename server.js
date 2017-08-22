@@ -197,6 +197,23 @@ app.post('/personalized_inquiry_survey', function(req, res) {
   });
 });
 
+//send notification to inquiry owner for confirmation
+app.post('/inquiry_new_expert', function(req, res) {
+  var mailOptions = {
+    from: 'decspace2017@gmail.com', //sender address
+    to: req.body.receiver,             //receiver
+    subject: 'New Expert - Inquiry',          //Subject Title
+    text: 'A new expert with the email address "' + req.body.email + '" has requested to start the inquiry.'
+  };
+
+  transporter.sendMail(mailOptions, function(error, info) {
+    if(error)
+      res.json(error);
+    else
+      res.json('Message sent!');
+  });
+});
+
 //EXPRESSION PARSER
 var Parser = require('expr-eval').Parser;
 

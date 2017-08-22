@@ -1344,6 +1344,21 @@
                   </div>
 
                   <br>
+                  
+                  <!-- Survey Description -->
+                  <p class = 'header-1'>Survey Description</p>
+                  
+                  <div class = 'row'>
+                    <div class = 'col-md-1'></div>
+                    
+                    <div class = 'col-md-10'>
+                      <textarea class = 'form-control' rows = '4' ng-model = 'currentModule.input.description'></textarea>
+                    </div>
+                    
+                    <div class = 'col-md-1'></div>
+                  </div>
+                  
+                  <br>
 
                   <!-- Specialists' Emails -->
                   <p class = 'header-1'>Specialists' Emails</p>
@@ -2108,7 +2123,32 @@
                       <div class = 'row' ng-if = 'currentModule.log.status == "ended"' ng-cloak>Ended</div>
 
                       <br>
+                      
+                      <!-- Specialists waiting for approval -->
+                      <p class = 'header-1'>Specialists waiting for approval</p>
 
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>Email Address</th>
+                            <th class = 'text-center'>Request Date</th>
+                            <th class = 'col-md-2'></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat = 'user in currentModule.log.pending_users'>
+                            <td>{{user.email}}</td>
+                            <td>{{user.request_date}}</td>
+                            <td>
+                              <button type = 'button' class = 'btn btn-success' title = 'Approve Request' ng-click = 'approveRequest(user)'>Approve</button>
+                              <button type = 'button' class = 'btn btn-danger' title = 'Reject Request' ng-click = 'rejectRequest(user)'>Reject</button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      
+                      <br>
+                      
                       <!-- Specialists that answered -->
                       <p class = 'header-1'>Specialists that answered</p>
 

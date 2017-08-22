@@ -176,9 +176,10 @@
           <div ng-if = 'question.score != "null"' ng-drop = 'true' ng-drop-success = 'resetDrop(question, $data)' ng-class = '[setFontSize(question.title), {"most_important_drop" : question.score > 0, "least_important_drop" : question.score < 0, "neutral_drop" : question.score == 0}]' style = 'display: inline-block;'>{{question.title}}</div>
         </li>
       </ul>
-
+      
       <!-- Drop Areas -->
-      <div id = 'drop-areas'>
+      <!-- Q-Sort Pyramid For Default Scale -->
+      <div id = 'drop-areas' ng-if = 'scale == "Default"'>
         <div ng-repeat = 'row in matrix'>
           <div class = 'div_pos' ng-if = '$parent.$index == 0' ng-repeat = 'pos in row track by $index'>
             <div ng-if = '$index == 0'>Least Important</div>
@@ -198,7 +199,43 @@
           </div>
         </div>
       </div>
-
+      
+      <div ng-if = 'scale == "3 values"' style = 'display: table'>
+        <!-- Labels -->
+        <div style = 'display: table-row'>
+          <div style = 'display: table-cell'>Least Important</div>
+          <div style = 'display: table-cell'>Neutral</div>
+          <div style = 'display: table-cell'>Most Important</div>
+        </div>
+        <!-- Drop Divs -->
+        <div style = 'display: table-row'>
+          <!-- Drop for Negative Score -->
+          <div id = 'negative-drops' class = 'drop3values'>
+            <div class = 'least_important_drop' ng-drop-success = 'onDrop3Values($data, $index, "negative")' ng-repeat = 'position in getNumberOfNegativePositions() track by $index' ng-drop = 'true' style = 'margin: 3px'>
+              <div ng-repeat = 'question in questions' ng-drag = 'true' ng-drag-data = 'question' ng-if = 'checkQuestionPos3Values(question, $parent.$index, "negative")' title = '{{question.description}}' style = 'display: inline-block' ng-class = 'setFontSize(question.title)'>
+                {{question.title}}
+              </div>
+            </div>
+          </div>
+          <!-- Drop for Neutral Score --> 
+          <div id = 'neutral-drops' class = 'drop3values'>
+            <div class = 'neutral_drop' ng-drop-success = 'onDrop3Values($data, $index, "neutral")' ng-repeat = 'position in getNumberOfNeutralPositions() track by $index' ng-drop = 'true' style = 'margin: 3px'>
+              <div ng-repeat = 'question in questions' ng-drag = 'true' ng-drag-data = 'question' ng-if = 'checkQuestionPos3Values(question, $parent.$index, "neutral")' title = '{{question.description}}' style = 'display: inline-block' ng-class = 'setFontSize(question.title)'>
+                {{question.title}}
+              </div>
+            </div>
+          </div>
+          <!-- Drop for Positive Score -->
+          <div id = 'positive-drops' class = 'drop3values'>
+             <div class = 'most_important_drop' ng-drop-success = 'onDrop3Values($data, $index, "positive")' ng-repeat = 'position in getNumberOfPositivePositions() track by $index' ng-drop = 'true' style = 'margin: 3px'>
+              <div ng-repeat = 'question in questions' ng-drag = 'true' ng-drag-data = 'question' ng-if = 'checkQuestionPos3Values(question, $parent.$index, "positive")' title = '{{question.description}}' style = 'display: inline-block' ng-class = 'setFontSize(question.title)'>
+                {{question.title}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> 
+      
       <br>
 
       <!-- Suggestions -->

@@ -90,7 +90,17 @@
 
         <button class = 'btn btn-primary' ng-click = 'startSurvey()'>Start Survey</button>
       </form>
-
+      
+      <br>
+      
+      <!-- Alerts -->
+      <div class = 'alert alert-info' id = 'registered-alert' style = 'height: 50px' ng-cloak>
+        Please wait for the confirmation email with the link for your inquiry.
+      </div>
+      <div class = 'alert alert-danger' id = 'rejected-alert' style = 'height: 50px' ng-cloak>
+        Your request to answer to the inquiry was rejected.
+      </div>
+      
     </div>
   </body>
 </html>
