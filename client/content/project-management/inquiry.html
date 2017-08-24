@@ -78,26 +78,26 @@
       <br><br>
       
       <!-- Description -->
-      <p style = 'white-space: pre'>{{description}}</p>
+      {{description}}
       
-      <br>
+      <br><br>
       
       <!-- Glossary -->
       <span class = 'header-8'>Glossary</span>
-
-      <br><br>
-
+      
+      <br>
+      
       <table class = 'table table-bordered table-hover'>
         <thead>
           <tr>
-            <th class = 'text-center'>Name</th>
-            <th class = 'text-center'>Description</th>
+            <th class = 'text-center col-md-3'>Name</th>
+            <th class = 'text-center col-md-9'>Description</th>
           </tr>
         </thead>
         <tbody>
           <tr ng-repeat = 'concept in glossary'>
-            <td>{{concept.name}}</td>
-            <td>{{concept.description}}</td>
+            <td align = 'left'>{{concept.name}}</td>
+            <td align = 'left'>{{concept.description}}</td>
           </tr>
         </tbody>
       </table>

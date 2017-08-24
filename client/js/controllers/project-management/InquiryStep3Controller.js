@@ -29,6 +29,8 @@ app.controller('InquiryStep3Controller', function($scope, $window, $http) {
           $scope.questions = response.data[answer].questions;
           //get the survey subject
           $scope.subject = response.data[answer].subject;
+          //description
+          $scope.description = response.data[answer].description;
           //get the stored suggestions
           $scope.suggestions = response.data[answer].suggestions;
           //get the suggestions toggle

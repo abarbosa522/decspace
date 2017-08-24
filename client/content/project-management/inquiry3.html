@@ -114,7 +114,7 @@
 
       <!-- Glossary Modal -->
       <div class = 'modal fade' id = 'glossary-modal' role = 'dialog'>
-        <div class = 'modal-dialog'>
+        <div class = 'modal-dialog' style = 'width: 90%'>
           <div class = 'modal-content'>
 
             <div class = 'modal-header'>
@@ -123,23 +123,28 @@
             </div>
 
             <div class = 'modal-body'>
-              <p class = 'header-1'>Inquiry Subject</p>
+              <p class = 'header-1'>Subject</p>
               {{subject}}
 
               <br><br>
-
+              
+              <p class = 'header-1'>Description</p>
+              {{description}}
+              
+              <br><br>
+              
               <p class = 'header-1'>Questions</p>
               <table class = 'table table-bordered table-hover'>
                 <thead>
                   <tr>
-                    <th class = 'text-center'>{{suggestions_toggle.title}}</th>
-                    <th class = 'text-center'>Description</th>
+                    <th class = 'text-center col-md-3'>{{suggestions_toggle.title}}</th>
+                    <th class = 'text-center col-md-9'>Description</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr ng-repeat = 'question in questions'>
-                    <td>{{question.title}}</td>
-                    <td>{{question.description}}</td>
+                    <td align = 'left'>{{question.title}}</td>
+                    <td align = 'left'>{{question.description}}</td>
                   </tr>
                 </tbody>
               </table>
@@ -148,14 +153,14 @@
               <table class = 'table table-bordered table-hover'>
                 <thead>
                   <tr>
-                    <th class = 'text-center'>Name</th>
-                    <th class = 'text-center'>Description</th>
+                    <th class = 'text-center col-md-3'>Name</th>
+                    <th class = 'text-center col-md-9'>Description</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr ng-repeat = 'concept in glossary'>
-                    <td>{{concept.name}}</td>
-                    <td>{{concept.description}}</td>
+                    <td align = 'left'>{{concept.name}}</td>
+                    <td align = 'left'>{{concept.description}}</td>
                   </tr>
                 </tbody>
               </table>
@@ -210,7 +215,7 @@
         <!-- Drop Divs -->
         <div style = 'display: table-row'>
           <!-- Drop for Negative Score -->
-          <div id = 'negative-drops' class = 'drop3values'>
+          <div id = 'negative-drops' class = 'drop3values' style = 'width: 37.5%'>
             <div class = 'least_important_drop' ng-drop-success = 'onDrop3Values($data, $index, "negative")' ng-repeat = 'position in getNumberOfNegativePositions() track by $index' ng-drop = 'true' style = 'margin: 3px'>
               <div ng-repeat = 'question in questions' ng-drag = 'true' ng-drag-data = 'question' ng-if = 'checkQuestionPos3Values(question, $parent.$index, "negative")' title = '{{question.description}}' style = 'display: inline-block' ng-class = 'setFontSize(question.title)'>
                 {{question.title}}
@@ -218,7 +223,7 @@
             </div>
           </div>
           <!-- Drop for Neutral Score --> 
-          <div id = 'neutral-drops' class = 'drop3values'>
+          <div id = 'neutral-drops' class = 'drop3values' style = 'width: 25%'>
             <div class = 'neutral_drop' ng-drop-success = 'onDrop3Values($data, $index, "neutral")' ng-repeat = 'position in getNumberOfNeutralPositions() track by $index' ng-drop = 'true' style = 'margin: 3px'>
               <div ng-repeat = 'question in questions' ng-drag = 'true' ng-drag-data = 'question' ng-if = 'checkQuestionPos3Values(question, $parent.$index, "neutral")' title = '{{question.description}}' style = 'display: inline-block' ng-class = 'setFontSize(question.title)'>
                 {{question.title}}
@@ -226,7 +231,7 @@
             </div>
           </div>
           <!-- Drop for Positive Score -->
-          <div id = 'positive-drops' class = 'drop3values'>
+          <div id = 'positive-drops' class = 'drop3values' style = 'width: 37.5%'>
              <div class = 'most_important_drop' ng-drop-success = 'onDrop3Values($data, $index, "positive")' ng-repeat = 'position in getNumberOfPositivePositions() track by $index' ng-drop = 'true' style = 'margin: 3px'>
               <div ng-repeat = 'question in questions' ng-drag = 'true' ng-drag-data = 'question' ng-if = 'checkQuestionPos3Values(question, $parent.$index, "positive")' title = '{{question.description}}' style = 'display: inline-block' ng-class = 'setFontSize(question.title)'>
                 {{question.title}}
