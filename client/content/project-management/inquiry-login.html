@@ -82,24 +82,24 @@
         <!-- Input Name -->
         <div class = 'form-group'>
           <label for = 'input-name' class = 'col-sm-4 control-label'>Name</label>
-          <div class = 'col-sm-4'>
-            <input id = 'input-name' type = 'text' class = 'form-control' ng-model = 'login.name'>
+          <div class = 'col-sm-4' id = 'input-name'>
+            <input type = 'text' class = 'form-control' ng-model = 'login.name'>
           </div>
         </div>
         
         <!-- Input Email -->
         <div class = 'form-group'>
           <label for = 'input-email' class = 'col-sm-4 control-label'>Email Address</label>
-          <div class = 'col-sm-4'>
-            <input id = 'input-email' type = 'email' class = 'form-control' ng-model = 'login.email'>
+          <div class = 'col-sm-4' id = 'input-email'>
+            <input type = 'email' class = 'form-control' ng-model = 'login.email'>
           </div>
         </div>
         
         <!-- Input Affiliation -->
         <div class = 'form-group'>
           <label for = 'input-affiliation' class = 'col-sm-4 control-label'>Affiliation</label>
-          <div class = 'col-sm-4'>
-            <input id = 'input-affiliation' type = 'text' class = 'form-control' ng-model = 'login.affiliation'>
+          <div class = 'col-sm-4' id = 'input-affiliation'>
+            <input type = 'text' class = 'form-control' ng-model = 'login.affiliation'>
           </div>
         </div>
         
@@ -121,6 +121,13 @@
           <span aria-hidden = 'true'>&times;</span>
         </button>
         Your request to answer to the inquiry was rejected.
+      </div>
+      <!-- Fields Not Filled Alert -->
+      <div class = 'alert alert-danger inquiry-custom-alert' id = 'fields-alert'ng-cloak>
+        <button type = 'button' class = 'close' ng-click = 'hideAlert("fields-alert")' aria-label = 'Close'>
+          <span aria-hidden = 'true'>&times;</span>
+        </button>
+        Please fill all the required fields.
       </div>
       
     </div>

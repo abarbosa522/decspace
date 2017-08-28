@@ -8,7 +8,9 @@ app.controller('InquiryLoginController', function($scope, $window, $http, Inquir
   var round_id = Number(url.slice(url.indexOf('r=') + 'r='.length));
   
   //alerts array
-  var alerts = ['registered-alert', 'rejected-alert'];
+  var alerts = ['registered-alert', 'rejected-alert', 'fields-alert'];
+  
+  $scope.login = {};
   
   //get subject of inquiry
   function getSubject() {
@@ -23,51 +25,78 @@ app.controller('InquiryLoginController', function($scope, $window, $http, Inquir
 
   //redirect to the inquiry page
   $scope.startSurvey = function() {
-    $http.get('/inquiry_responses').then(function(response) {
-      var answer_exists = false, response_status;
+    var can_start_survey = true;
+    
+    if($scope.login.name == undefined || $scope.login.name == '') {
+      can_start_survey = false;
+      $('#input-name').addClass('has-error');
+    }
+    else
+      $('#input-name').removeClass('has-error');
+    
+    if($scope.login.email == undefined || $scope.login.email == '') {
+      can_start_survey = false;
+      $('#input-email').addClass('has-error');
+    }
+    else
+      $('#input-email').removeClass('has-error');
+    
+    if($scope.login.affiliation == undefined || $scope.login.affiliation == '') {
+      can_start_survey = false;
+      $('#input-affiliation').addClass('has-error');
+    }
+    else
+      $('#input-affiliation').removeClass('has-error');
+    
+    if(!can_start_survey)
+      showAlert('fields-alert');
+    else {
+      $http.get('/inquiry_responses').then(function(response) {
+        var answer_exists = false, response_status;
 
-      for(answer in response.data)
-        if(response.data[answer].user == $scope.login.email && response.data[answer].round_id == round_id) {
-          answer_exists = true;
-          response_status = response.data[answer].status;
-          break;
-        }
-      
-      //if answer does not exist, send email to the survey owner for a confirmation
-      if(!answer_exists) {
-        showAlert('registered-alert');
-        
-        //object to post
-        var new_expert = {
-          'receiver' : $scope.inquiry_owner,
-          'email' : $scope.login.email,
-          'name' : $scope.login.name,
-          'affiliation' : $scope.login.affiliation
-        };
-        
-        $http.post('/inquiry_new_expert', new_expert).then(function() {
-          $http.get('/inquiry_rounds').then(function(response) {
-            for(round in response.data)
-              if(response.data[round].id == round_id) {
-                InquiryService.createAnswerData(response.data[round], new_expert.email, new_expert.name, new_expert.affiliation, 'pending');
-                break;
-              }
+        for(answer in response.data)
+          if(response.data[answer].user == $scope.login.email && response.data[answer].round_id == round_id) {
+            answer_exists = true;
+            response_status = response.data[answer].status;
+            break;
+          }
+
+        //if answer does not exist, send email to the survey owner for a confirmation
+        if(!answer_exists) {
+          showAlert('registered-alert');
+
+          //object to post
+          var new_expert = {
+            'receiver' : $scope.inquiry_owner,
+            'email' : $scope.login.email,
+            'name' : $scope.login.name,
+            'affiliation' : $scope.login.affiliation
+          };
+
+          $http.post('/inquiry_new_expert', new_expert).then(function() {
+            $http.get('/inquiry_rounds').then(function(response) {
+              for(round in response.data)
+                if(response.data[round].id == round_id) {
+                  InquiryService.createAnswerData(response.data[round], new_expert.email, new_expert.name, new_expert.affiliation, 'pending');
+                  break;
+                }
+            });
           });
-        });
-      }
-      else if(response_status == 'pending')
-        showAlert('registered-alert');
-      else if(response_status == 'rejected')
-        showAlert('rejected-alert');
-      else
-        $window.location.href = 'inquiry.html?r=' + round_id + '&u=' + $scope.login.email;
-    });
+        }
+        else if(response_status == 'pending')
+          showAlert('registered-alert');
+        else if(response_status == 'rejected')
+          showAlert('rejected-alert');
+        else
+          $window.location.href = 'inquiry.html?r=' + round_id + '&u=' + $scope.login.email;
+      }); 
+    }
   }
   
   //hide the alerts
   function hideAlerts() {
-    $('#registered-alert').hide();
-    $('#rejected-alert').hide();
+    for(alert in alerts)
+      $('#' + alerts[alert]).hide();
   }
   
   //show a certain alert and hide the others
