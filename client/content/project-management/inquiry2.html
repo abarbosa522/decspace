@@ -87,16 +87,23 @@
           <div class = 'col-md-4' id = 'open-answer-question-{{quest.id}}'>
             <!-- Open Answer Question -->
             <input class = 'form-control' type = 'text' ng-model = 'quest.answer' ng-blur = 'blurOpenAnswerQuestion(quest)' ng-if = 'quest.type == "Open Answer"'>
+            
             <!-- Multiple Choice Question -->
-            <select class = 'form-control' ng-model = 'quest.answer' ng-if = 'quest.type == "Multiple Choice"'>
-              <option value = '' selected disabled>--- Please Select---</option>
-              <option ng-repeat = 'choice in quest.choices'>{{choice.text}}</option>
-            </select>
+            <div ng-if = 'quest.type == "Multiple Choice"'>
+              <select class = 'form-control' ng-model = 'quest.answer' multiple>
+                <option ng-repeat = 'choice in quest.choices'>{{choice.text}}</option>
+              </select>
+            </div>
+            
           </div>
 
           <div class = 'col-md-4'></div>
         </div>
-
+        
+        <div class = 'row' ng-if = 'quest.type == "Multiple Choice"'>
+          <sub>Hold down the Ctrl (Windows)/ Command (Mac) button to select multiple options.</sub>
+        </div>
+        
         <br>
       </div>
 

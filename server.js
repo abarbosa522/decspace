@@ -182,11 +182,15 @@ app.post('/default_inquiry_survey', function(req, res) {
 
 //send personalized inquiry email
 app.post('/personalized_inquiry_survey', function(req, res) {
+  //replace "<LINK>" with the actual link
+  
+  req.body.text = req.body.text.replace(/<LINK>/g, req.body.link);
+  
   var mailOptions = {
     from: 'decspace2017@gmail.com', //sender address
     to: req.body.email,             //receiver
     subject: req.body.subject,          //Subject Title
-    text: req.body.text + '\nThe link to your survey is ' + req.body.link
+    text: req.body.text //email content
   };
 
   transporter.sendMail(mailOptions, function(error, info) {
@@ -203,7 +207,7 @@ app.post('/inquiry_new_expert', function(req, res) {
     from: 'decspace2017@gmail.com', //sender address
     to: req.body.receiver,             //receiver
     subject: 'New Expert - Inquiry',          //Subject Title
-    text: 'A new expert with the email address "' + req.body.email + '" has requested to start the inquiry.'
+    text: 'A new expert has requested to start the inquiry.\n\nName: ' + req.body.name + '\nEmail Address: ' + req.body.email + '\nAffiliation: ' + req.body.affiliation
   };
 
   transporter.sendMail(mailOptions, function(error, info) {

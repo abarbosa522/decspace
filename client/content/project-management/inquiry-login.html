@@ -78,16 +78,30 @@
       <p class = 'header-1' style = 'margin-top: 3%'>Inquiry - {{subject}}</p>
 
       <form class = 'form-horizontal' style = 'margin-top: 3%'>
-        <!-- Input Email -->
+        <!-- Input Name -->
         <div class = 'form-group'>
-          <label for = 'input-name' class = 'col-sm-4 control-label'>
-            <span class = 'glyphicon glyphicon-envelope'></span>
-          </label>
-          <div id = 'input-email-div' class = 'col-sm-4'>
-            <input id = 'input-email' type = 'email' class = 'form-control' placeholder = 'Email Address' ng-model = 'login.email'>
+          <label for = 'input-name' class = 'col-sm-4 control-label'>Name</label>
+          <div class = 'col-sm-4'>
+            <input id = 'input-name' type = 'text' class = 'form-control' ng-model = 'login.name'>
           </div>
         </div>
-
+        
+        <!-- Input Email -->
+        <div class = 'form-group'>
+          <label for = 'input-email' class = 'col-sm-4 control-label'>Email Address</label>
+          <div class = 'col-sm-4'>
+            <input id = 'input-email' type = 'email' class = 'form-control' ng-model = 'login.email'>
+          </div>
+        </div>
+        
+        <!-- Input Affiliation -->
+        <div class = 'form-group'>
+          <label for = 'input-affiliation' class = 'col-sm-4 control-label'>Affiliation</label>
+          <div class = 'col-sm-4'>
+            <input id = 'input-affiliation' type = 'text' class = 'form-control' ng-model = 'login.affiliation'>
+          </div>
+        </div>
+        
         <button class = 'btn btn-primary' ng-click = 'startSurvey()'>Start Survey</button>
       </form>
       

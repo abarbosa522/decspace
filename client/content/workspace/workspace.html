@@ -1487,7 +1487,7 @@
 
                   <div ng-repeat = 'open_answer_question in currentModule.input.open_answer_questions' ng-if = 'open_answer_question.type == "Multiple Choice"'>
                     <p class = 'header-2'>Choices of the question: {{open_answer_question.question}}</p>
-
+                    
                     <table class = 'table table-bordered table-hover'>
                       <thead>
                         <tr>
@@ -2130,14 +2130,18 @@
                       <table class = 'table table-bordered table-hover'>
                         <thead>
                           <tr>
+                            <th class = 'text-center'>Name</th>
                             <th class = 'text-center'>Email Address</th>
+                            <th class = 'text-center'>Affiliation</th>
                             <th class = 'text-center'>Request Date</th>
                             <th class = 'col-md-2'></th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr ng-repeat = 'user in currentModule.log.pending_users'>
+                            <td>{{user.name}}</td>
                             <td>{{user.email}}</td>
+                            <td>{{user.affiliation}}</td>
                             <td>{{user.request_date}}</td>
                             <td>
                               <button type = 'button' class = 'btn btn-success' title = 'Approve Request' ng-click = 'approveRequest(user)'>Approve</button>
@@ -2172,7 +2176,7 @@
                       <br><br>
 
                       <!-- Open Answer Questions -->
-                      <p class = 'header-1'>Open Answer Questions</p>
+                      <p class = 'header-1'>Characterization Questions</p>
 
                       <div ng-repeat = 'quest in currentModule.log.open_answer_questions'>
                         <table class = 'table table-bordered table-hover'>
@@ -2184,7 +2188,13 @@
                           <tbody>
                             <tr ng-repeat = 'user in currentModule.log.emails'>
                               <td class = 'col-md-6'>{{user.email}}</td>
-                              <td class = 'col-md-6'>{{quest[user.email]}}</td>
+                              <td class = 'col-md-6'>
+                                <span ng-if = 'checkTypeAnswer(quest[user.email])' ng-repeat = 'answer in quest[user.email] track by $index'>
+                                  <span ng-if = '!$last'>{{answer}}, </span>
+                                  <span ng-if = '$last'>{{answer}}</span>
+                                </span>
+                                <span ng-if = '!checkTypeAnswer(quest[user.email])'>{{quest[user.email]}}</span>
+                              </td>
                             </tr>
                           </tbody>
                         </table>

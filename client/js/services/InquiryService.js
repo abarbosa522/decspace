@@ -62,10 +62,10 @@ app.service('InquiryService', function($http, $q) {
 
   function createAnswerDocs(new_round) {
     for(email in new_round.emails)
-      self.createAnswerData(new_round, new_round.emails[email].address, 'approved');
+      self.createAnswerData(new_round, new_round.emails[email].address, '', '', 'approved');
   }
 
-  this.createAnswerData = function(new_round, email, status) {
+  this.createAnswerData = function(new_round, email, name, affiliation, status) {
     //create a new answer document
     var new_answer = {};
     //define the corresponding round id
@@ -74,6 +74,8 @@ app.service('InquiryService', function($http, $q) {
     new_answer.user_creator = new_round.username;
     //define the user that will answer the survey
     new_answer.user = email;
+    new_answer.name = name;
+    new_answer.affiliation = affiliation;
     //define the subject survey
     new_answer.subject = new_round.subject;
     //define the survey description
@@ -197,7 +199,7 @@ app.service('InquiryService', function($http, $q) {
         //calculate the total score of each question, as well as the total number of answers
         for(answer in response2.data) {
           if(response2.data[answer].round_id == round_id && response2.data[answer].status == 'pending')
-            pending_emails.push({'email' : response2.data[answer].user, 'request_date' : response2.data[answer].request_date});
+            pending_emails.push({'name' : response2.data[answer].name, 'email' : response2.data[answer].user, 'affiliation' : response2.data[answer].affiliation, 'request_date' : response2.data[answer].request_date});
           else if(response2.data[answer].round_id == round_id && response2.data[answer].usability_metrics.task_complete) {
             answer_emails.push({'email' : response2.data[answer].user, 'answer_submission_date' : response2.data[answer].usability_metrics.answer_submission_date});
 

@@ -37,14 +37,16 @@ app.controller('InquiryLoginController', function($scope, $window, $http, Inquir
         //object to post
         var new_expert = {
           'receiver' : $scope.inquiry_owner,
-          'email' : $scope.login.email
+          'email' : $scope.login.email,
+          'name' : $scope.login.name,
+          'affiliation' : $scope.login.affiliation
         };
         
         $http.post('/inquiry_new_expert', new_expert).then(function() {
           $http.get('/inquiry_rounds').then(function(response) {
             for(round in response.data)
               if(response.data[round].id == round_id) {
-                InquiryService.createAnswerData(response.data[round], $scope.login.email, 'pending');
+                InquiryService.createAnswerData(response.data[round], new_expert.email, new_expert.name, new_expert.affiliation, 'pending');
                 break;
               }
           });

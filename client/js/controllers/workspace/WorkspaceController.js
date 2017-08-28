@@ -2210,7 +2210,14 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       });
     });
   }
-    
+  
+  $scope.checkTypeAnswer = function(answer) {
+    if(typeof answer == 'object')
+      return true;
+    else
+      return false;
+  }
+  
   //reorder by "attr" and "dir"
   $scope.sortData = function(attr, dir, data) {
     SortDataService.sortDataVar(data, attr, dir);
