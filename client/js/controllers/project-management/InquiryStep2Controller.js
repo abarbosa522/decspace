@@ -28,19 +28,13 @@ app.controller('InquiryStep2Controller', function($scope, $window, $http) {
 
   //hide the successful save alert
   function hideAlerts() {
-    angular.element(document.querySelector('#open-answer-error')).hide();
+    angular.element(document.querySelector('#characterization-alert')).hide();
   }
-
-  //show certain alert and hide it smoothly
-  function showAlert(alert_id) {
-    //show alert
-    angular.element(document.querySelector('#' + alert_id)).alert();
-    //hide alert
-    angular.element(document.querySelector('#' + alert_id)).fadeTo(3000, 500).slideUp(500, function(){
-      angular.element(document.querySelector('#' + alert_id)).slideUp(500);
-    });
+  
+  $scope.hideAlert = function(alert) {
+    $('#' + alert).hide();
   }
-
+  
   //save the current data on the database
   $scope.nextStep = function() {
     var answered_all = true;
@@ -76,7 +70,7 @@ app.controller('InquiryStep2Controller', function($scope, $window, $http) {
       });
     }
     else
-      showAlert('open-answer-error');
+      $('#characterization-alert').show();
   }
 
   //redirect to the previous step

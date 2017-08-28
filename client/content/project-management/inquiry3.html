@@ -299,9 +299,12 @@
           </tbody>
         </table>
       </div>
-
-      <!-- Data Saved Alert -->
-      <div class = 'alert alert-success' id = 'save-success' ng-cloak>
+      
+      <!-- Alerts -->
+      <div class = 'alert alert-success inquiry-custom-alert' id = 'save-alert' ng-cloak>
+        <button type = 'button' class = 'close' ng-click = 'hideAlert("save-alert")' aria-label = 'Close'>
+          <span aria-hidden = 'true'>&times;</span>
+        </button>
         Answer <strong>successfully</strong> saved.
       </div>
 

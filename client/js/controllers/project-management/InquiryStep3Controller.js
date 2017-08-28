@@ -111,10 +111,14 @@ app.controller('InquiryStep3Controller', function($scope, $window, $http) {
   }
 
   //hide the successful save alert
-  function hideAlert() {
-    angular.element(document.querySelector('#save-success')).hide();
+  function hideAlerts() {
+    $('#save-alert').hide();
   }
-
+  
+  $scope.hideAlert = function(alert) {
+    $('#' + alert).hide();
+  }
+  
   /*** BUTTON BAR FUNCTIONS ***/
 
   //save the current data on the database
@@ -162,11 +166,7 @@ app.controller('InquiryStep3Controller', function($scope, $window, $http) {
       //update answer
       $http.put('/inquiry_responses', [previous_answer, new_answer]).then(function() {
         //show save success alert
-        angular.element(document.querySelector('#save-success')).alert();
-        //smoothly hide success alert
-        angular.element(document.querySelector('#save-success')).fadeTo(2000, 500).slideUp(500, function(){
-             angular.element(document.querySelector('#save-success')).slideUp(500);
-        });
+        $('#save-alert').show();
       });
     });
   }
@@ -584,23 +584,13 @@ app.controller('InquiryStep3Controller', function($scope, $window, $http) {
   }
   
   $scope.checkQuestionPos3Values = function(question, index, value_position) {
-    if(question.position == value_position + '-' + index) {
+    if(question.position == value_position + '-' + index)
       return true;
-    }
     else
       return false;
   }
   
-  $scope.equalizeHeights = function() {
-    if($scope.scale == '3 values') {
-      
-      console.log($('#negative-drops').height());
-       console.log($('#neutral-drops').css('height'));
-       console.log($('#positive-drops').css('height'));
-    }
-  }
-  
   /*** STARTUP FUNCTIONS ***/
   getData();
-  hideAlert();
+  hideAlerts();
 });

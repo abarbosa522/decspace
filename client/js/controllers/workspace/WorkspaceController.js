@@ -90,7 +90,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       }
 
       //update the previous project to the new project
-      $http.put('/accounts', [previous_proj, new_proj]).then(function() {
+      $http.put('/projects', [previous_proj, new_proj]).then(function() {
         //retrieve the data stored in the database
         $scope.reloadData(false, '');
         //update the list of executions

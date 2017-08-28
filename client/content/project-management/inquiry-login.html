@@ -7,6 +7,7 @@
 
     <!-- CSS Stylesheet -->
     <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css'/>
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/inquiry.css'/>
 
     <!-- jQuery -->
     <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
@@ -107,11 +108,18 @@
       
       <br>
       
-      <!-- Alerts -->
-      <div class = 'alert alert-info' id = 'registered-alert' style = 'height: 50px' ng-cloak>
+      <!-- Registered Alert -->
+      <div class = 'alert alert-info inquiry-custom-alert' id = 'registered-alert' ng-cloak>
+        <button type = 'button' class = 'close' ng-click = 'hideAlert("registered-alert")' aria-label = 'Close'>
+          <span aria-hidden = 'true'>&times;</span>
+        </button>
         Please wait for the confirmation email with the link for your inquiry.
       </div>
-      <div class = 'alert alert-danger' id = 'rejected-alert' style = 'height: 50px' ng-cloak>
+      <!-- Rejected Alert -->
+      <div class = 'alert alert-danger inquiry-custom-alert' id = 'rejected-alert'ng-cloak>
+        <button type = 'button' class = 'close' ng-click = 'hideAlert("rejected-alert")' aria-label = 'Close'>
+          <span aria-hidden = 'true'>&times;</span>
+        </button>
         Your request to answer to the inquiry was rejected.
       </div>
       

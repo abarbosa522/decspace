@@ -6,7 +6,10 @@ app.controller('InquiryLoginController', function($scope, $window, $http, Inquir
 
   //get the inquiry round (execution) id
   var round_id = Number(url.slice(url.indexOf('r=') + 'r='.length));
-
+  
+  //alerts array
+  var alerts = ['registered-alert', 'rejected-alert'];
+  
   //get subject of inquiry
   function getSubject() {
     $http.get('/inquiry_rounds').then(function(response) {
@@ -63,18 +66,21 @@ app.controller('InquiryLoginController', function($scope, $window, $http, Inquir
   
   //hide the alerts
   function hideAlerts() {
-    angular.element(document.querySelector('#registered-alert')).hide();
-    angular.element(document.querySelector('#rejected-alert')).hide();
+    $('#registered-alert').hide();
+    $('#rejected-alert').hide();
   }
   
-  //show certain alert and hide it smoothly
-  function showAlert(alert_id) {
-    //show alert
-    angular.element(document.querySelector('#' + alert_id)).alert();
-    //hide alert
-    angular.element(document.querySelector('#' + alert_id)).fadeTo(3000, 500).slideUp(500, function(){
-      angular.element(document.querySelector('#' + alert_id)).slideUp(500);
-    });
+  //show a certain alert and hide the others
+  function showAlert(alertId) {
+    for(alert in alerts)
+      if(alerts[alert] != alertId)
+        $('#' + alerts[alert]).hide();
+    
+    $('#' + alertId).show();
+  }
+  
+  $scope.hideAlert = function(alert) {
+    $('#' + alert).hide();
   }
   
   /*** STARTUP FUNCTIONS ***/

@@ -84,3 +84,10 @@ ul.draggable-objects:after {
 .small_font {
   font-size: 8px;
 }
+
+.inquiry-custom-alert {
+  position: fixed;
+  top: 11%;
+  left: 1%;
+  width: 30%;
+}

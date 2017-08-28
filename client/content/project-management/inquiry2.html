@@ -118,12 +118,15 @@
       </button>
 
       <br><br>
-
-      <!-- Open Answer Alert -->
-      <div class = 'alert alert-danger' id = 'open-answer-error' ng-cloak>
+      
+      <!-- Alerts -->
+      <div class = 'alert alert-danger inquiry-custom-alert' id = 'characterization-alert' ng-cloak>
+        <button type = 'button' class = 'close' ng-click = 'hideAlert("characterization-alert")' aria-label = 'Close'>
+          <span aria-hidden = 'true'>&times;</span>
+        </button>
         Please answer <strong>all</strong> questions.
       </div>
-
+      
     </div>
   </body>
 </html>
