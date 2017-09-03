@@ -2131,8 +2131,15 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       return rows[1];
     }
   }
-
+  
+  //reorder by "attr" and "dir"
+  $scope.sortData = function(attr, dir, data) {
+    SortDataService.sortDataVar(data, attr, dir);
+  }
+  
   /*** INQUIRY OUTPUT FUNCTIONS ***/
+  $scope.new_inquiry_output_email = {};
+  
   //get the results in "real-time" for Inquiry Method
   function aggregateInquiryResults() {
     var results = InquiryService.aggregateResults($scope.currentModule.input.round_id);
@@ -2147,7 +2154,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       $scope.currentModule.log.pending_users = resolve[5];
     });
   }
-
+  
   $scope.stopInquiry = function() {
     $scope.currentModule.log.status = 'ended';
 
@@ -2218,11 +2225,83 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       return false;
   }
   
-  //reorder by "attr" and "dir"
-  $scope.sortData = function(attr, dir, data) {
-    SortDataService.sortDataVar(data, attr, dir);
-  }
+  $scope.addInquiryOutputEmail = function() {
+    var already_sent_email = false;
+    
+    for(email in $scope.currentModule.input.emails)
+      if($scope.currentModule.input.emails[email].address == $scope.new_inquiry_output_email.address)
+        already_sent_email = true;
+      
+    //if there is an input field not assigned
+    if($scope.new_inquiry_output_email.address == undefined || $scope.new_inquiry_output_email.address == '' || already_sent_email)
+      $('#new-inquiry-output-email').addClass('has-error');
+    else {      
+      //assign an unique id to the new email
+      if($scope.currentModule.input.emails.length == 0)
+        $scope.new_inquiry_output_email.id = 1;
+      else
+        $scope.new_inquiry_output_email.id = $scope.currentModule.input.emails[$scope.currentModule.input.emails.length - 1]['id'] + 1;
 
+      $scope.currentModule.input.emails.push(angular.copy($scope.new_inquiry_output_email));
+      
+      $http.get('/inquiry_rounds').then(function(response) {
+        var current_round, prev_round, nw_round;
+        
+        for(round in response.data)
+          if(response.data[round].id == $scope.currentModule.input.round_id) {
+            delete response.data[round]['_id'];
+            current_round = response.data[round];
+            prev_round = angular.copy(response.data[round]);
+            break;
+          }
+        
+        //create answer doc
+        InquiryService.createAnswerData(current_round, $scope.new_inquiry_output_email.address, 'approved', true);
+
+        //send link
+        InquiryService.sendSurveyLink($scope.currentModule.input, $scope.new_inquiry_output_email.address);
+        
+        current_round.emails.push(angular.copy($scope.new_inquiry_output_email));
+        
+        nw_round = angular.copy(current_round);
+
+        $http.put('/inquiry_rounds', [prev_round, nw_round]).then(function() {
+          $scope.new_inquiry_output_email.address = '';
+
+          //remove all error classes - just be sure
+          $('#new-inquiry-output-email').removeClass('has-error');
+        });
+      });
+    }
+  }
+  
+  $scope.deleteAnswerEmail = '';
+  
+  $scope.deleteAnswer = function(email) {
+    $scope.deleteAnswerEmail = email;
+  }
+  
+  $scope.confirmAnswerDeletion = function(email) {
+    $http.get('/inquiry_responses').then(function(response) {
+      var current_answer;
+      
+      for(answer in response.data)
+        if(response.data[answer].round_id == $scope.currentModule.input.round_id && response.data[answer].user == email) {
+          current_answer = response.data[answer]['_id'];
+          break;
+        }
+      
+      $http.delete('/inquiry_responses/' + current_answer).then(function() {
+        $scope.deleteAnswerEmail = '';
+        aggregateInquiryResults();
+      });
+    });
+  }
+  
+  $scope.cancelAnswerDeletion = function() {
+    $scope.deleteAnswerEmail = '';
+  }
+  
   /*** STARTUP FUNCTIONS ***/
   requestLogIn();
   rewriteLastUpdate();

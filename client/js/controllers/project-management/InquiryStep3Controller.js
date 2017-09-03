@@ -109,15 +109,6 @@ app.controller('InquiryStep3Controller', function($scope, $window, $http) {
       }
     }
   }
-
-  //hide the successful save alert
-  function hideAlerts() {
-    $('#save-alert').hide();
-  }
-  
-  $scope.hideAlert = function(alert) {
-    $('#' + alert).hide();
-  }
   
   /*** BUTTON BAR FUNCTIONS ***/
 
@@ -166,7 +157,7 @@ app.controller('InquiryStep3Controller', function($scope, $window, $http) {
       //update answer
       $http.put('/inquiry_responses', [previous_answer, new_answer]).then(function() {
         //show save success alert
-        $('#save-alert').show();
+        $('#data-submit-modal').modal('show');
       });
     });
   }
@@ -590,7 +581,10 @@ app.controller('InquiryStep3Controller', function($scope, $window, $http) {
       return false;
   }
   
+  $scope.redirectToFinalPage = function() {
+    $window.location.href = 'inquiry4.html?r=' + round_id + '&u=' + $scope.user_id;
+  }
+  
   /*** STARTUP FUNCTIONS ***/
   getData();
-  hideAlerts();
 });

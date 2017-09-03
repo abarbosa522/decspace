@@ -299,14 +299,6 @@
           </tbody>
         </table>
       </div>
-      
-      <!-- Alerts -->
-      <div class = 'alert alert-success inquiry-custom-alert' id = 'save-alert' ng-cloak>
-        <button type = 'button' class = 'close' ng-click = 'hideAlert("save-alert")' aria-label = 'Close'>
-          <span aria-hidden = 'true'>&times;</span>
-        </button>
-        Answer <strong>successfully</strong> saved.
-      </div>
 
       <!-- Previous Step Button -->
       <button type = 'button' class = 'btn btn-primary' ng-click = 'previousStep()' title = 'Previous Step'>
@@ -319,7 +311,37 @@
       </button>
 
       <br><br>
+      
+      <div class = 'modal fade' id = 'data-submit-modal' role = 'dialog'>
+        <div class = 'modal-dialog'>
+          <div class = 'modal-content'>
+            <div class = 'modal-header'>
+              <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+              <h4 class = 'modal-title'><strong>Answer successfully submited!</strong> Do you wish to edit your answer?</h4>
+            </div>
+            <div class = 'modal-body'>
+              <div class = 'row'>
+                <div class = 'col-md-2'></div>
 
+                <div class = 'col-md-4'>
+                  <button type = 'button' class = 'btn btn-success' data-dismiss = 'modal' title = 'Confirm Answer Edition'>
+                    Yes
+                  </button>
+                </div>
+
+                <div class = 'col-md-4'>
+                  <button type = 'button' class = 'btn btn-danger' ng-click = 'redirectToFinalPage()' title = 'Confirm Answer Submission'>
+                    No
+                  </button>
+                </div>
+
+                <div class = 'col-md-2'></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
     </div>
   </body>
 </html>

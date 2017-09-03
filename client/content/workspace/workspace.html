@@ -2121,7 +2121,39 @@
                       </div>
 
                       <div class = 'row' ng-if = 'currentModule.log.status == "ended"' ng-cloak>Ended</div>
-
+                      
+                      <br>
+                      
+                      <!-- Send Link to new users -->
+                      <p class = 'header-1'>Send link to new specialists</p>
+                      
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                          <tr>
+                            <th class = 'text-center'>Email Address</th>
+                            <th class = 'col-md-2'></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat = 'email in currentModule.input.emails'>
+                            <td>{{email.address}}</td>
+                            <td></td>
+                          </tr>
+                          <tr class = 'active'>
+                            <td>
+                              <div id = 'new-inquiry-output-email'>
+                                <input class = 'form-control' type = 'text' ng-model = 'new_inquiry_output_email.address'>
+                              </div>
+                            </td>
+                            <td>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'addInquiryOutputEmail()' title = 'Send Link to Email'>
+                                <span class = 'glyphicon glyphicon-plus'></span>
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      
                       <br>
                       
                       <!-- Specialists waiting for approval -->
@@ -2161,12 +2193,27 @@
                           <tr>
                             <th class = 'text-center'>Email Address</th>
                             <th class = 'text-center'>Answer Submission Date</th>
+                            <th class = 'col-md-2'></th>
                           </tr>
                         </thead>
                         <tbody>
-                          <tr ng-repeat = 'user in currentModule.log.emails'>
+                          <tr ng-repeat = 'user in currentModule.log.emails' ng-class = '{danger: user.email == deleteAnswerEmail}'>
                             <td>{{user.email}}</td>
                             <td>{{user.answer_submission_date}}</td>
+                            <td ng-if = 'user.email != deleteAnswerEmail'>
+                              <!-- Delete Email Button -->
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteAnswer(user.email)' title = 'Delete Email'>
+                                <span class = 'glyphicon glyphicon-minus'></span>
+                              </button>
+                            </td>
+                            <td ng-if = 'user.email == deleteAnswerEmail'>
+                              <button type = 'button' class = 'btn btn-success' ng-click = 'confirmAnswerDeletion(user.email)' title = 'Confirm Answer Deletion'>
+                                <span class = 'glyphicon glyphicon-ok'></span>
+                              </button>
+                              <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelAnswerDeletion()' title = 'Cancel Answer Deletion'>
+                                <span class = 'glyphicon glyphicon-remove'></span>
+                            </button>
+                            </td>
                           </tr>
                         </tbody>
                       </table>

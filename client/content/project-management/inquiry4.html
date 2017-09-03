@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DecSpace - Inquiry</title>
+
+    <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
+
+    <!-- CSS Stylesheet -->
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css'/>
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/inquiry.css'/>
+
+    <!-- jQuery -->
+    <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
+    <script type = 'text/javascript' src = '../../js/shared/jquery-ui-1.12.0/jquery-ui.js'></script>
+
+    <!-- AngularJS -->
+    <script src = '../../js/shared/angular.min.js'></script>
+
+    <!-- AngularJS Modules -->
+    <script src = '../../js/app.js'></script>
+
+    <!-- AngularJS Controllers -->
+    <script src = '../../js/controllers/project-management/InquiryStep4Controller.js'></script>
+
+    <!-- Bootstrap -->
+    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
+    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.js'></script>
+
+    <!-- Google Web Fonts -->
+    <link href = 'https://fonts.googleapis.com/css?family=Open+Sans:400,600i' rel = 'stylesheet'>
+
+    <!-- ng-draggable module -->
+    <script src = '../../js/shared/ng-draggable/ngDraggable.js'></script>
+  </head>
+
+  <body ng-app = 'decspace' ng-controller = 'InquiryStep3Controller'>
+    <!-- Navigation Bar -->
+    <nav class = 'navbar navbar-custom navbar-fixed-top'>
+      <div class = 'container'>
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class = 'navbar-header'>
+          <button type = 'button' class = 'navbar-toggle collapsed' data-toggle = 'collapse' data-target = '#top-navbar' aria-expanded = 'false'>
+            <span class = 'sr-only'>Toggle navigation</span>
+            <span class = 'icon-bar'></span>
+            <span class = 'icon-bar'></span>
+            <span class = 'icon-bar'></span>
+          </button>
+          <!-- Title -->
+          <a class = 'navbar-brand' href = '../../index.html'>DecSpace</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class = 'collapse navbar-collapse' id = 'top-navbar'>
+          <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
+          <ul class = 'nav navbar-nav navbar-right'>
+            <li>
+              <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic'>Welcome, {{user_id}}!</p>
+            </li>
+
+            <li><a href = '../homepage/about.html'>About</a></li>
+
+            <li><a href = '../method-catalog/method-catalog.html'>Method Catalog</a></li>
+
+            <li><a href = '../homepage/faq.html'>FAQ</a></li>
+
+            <li><a href = '../homepage/contactus.html'>Contact Us</a></li>
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div id = 'main-content' class = 'container'>
+      
+      <br><br>
+      
+      <span class = 'header-1'>Thank you for your contribution!</span>
+      
+      <br><br>
+      
+      <span class = 'glyphicon glyphicon-ok' style = 'color: forestgreen; font-size: 50px'></span>
+      
+    </div>
+  </body>
+</html>

@@ -62,10 +62,10 @@ app.service('InquiryService', function($http, $q) {
 
   function createAnswerDocs(new_round) {
     for(email in new_round.emails)
-      self.createAnswerData(new_round, new_round.emails[email].address, '', '', 'approved');
+      self.createAnswerData(new_round, new_round.emails[email].address, '', '', 'approved', true);
   }
 
-  this.createAnswerData = function(new_round, email, name, affiliation, status) {
+  this.createAnswerData = function(new_round, email, name, affiliation, status, direct_email) {
     //create a new answer document
     var new_answer = {};
     //define the corresponding round id
@@ -116,7 +116,7 @@ app.service('InquiryService', function($http, $q) {
     //open answer questions
     for(quest in new_answer.open_answer_questions)
       new_answer.open_answer_questions[quest].answer = '';
-
+    
     //usability metrics
     new_answer['usability_metrics'] = {};
     new_answer['usability_metrics']['log_ins'] = 0;
@@ -132,11 +132,15 @@ app.service('InquiryService', function($http, $q) {
     new_answer['usability_metrics']['help_modal_open'] = 0;
     new_answer['usability_metrics']['task_complete'] = '';
     new_answer['usability_metrics']['incomplete_saves'] = 0;
-
+    
+    //the system sent a direct email
+    if(direct_email)
+      new_answer.direct_email = true;
+    
     //add the new answer document
     $http.post('/inquiry_responses', new_answer);
   }
-
+  
   function sendSurveyLinks(new_round, personalized_email, email_content) {
     for(email in new_round['emails']) {
       var send_email = {};
@@ -151,6 +155,22 @@ app.service('InquiryService', function($http, $q) {
 
         $http.post('/personalized_inquiry_survey', send_email).then(function(response) {});
       }
+    }
+  }
+  
+  this.sendSurveyLink = function(new_round, email) {
+    var send_email = {
+      'email' : email,
+      'link' : 'http://decspace.sysresearch.org/content/project-management/inquiry.html?r=' + new_round.round_id + '&u=' + email
+    };
+    
+    if(!new_round.personalized_email)
+      $http.post('/default_inquiry_survey', send_email);
+    else {
+      send_email.subject = new_round.email.subject;
+      send_email.text = new_round.email.text;
+      
+      $http.post('/personalized_inquiry_survey', send_email);
     }
   }
   

@@ -428,6 +428,12 @@ app.delete('/inquiry_rounds/:id', function(req, res) {
   });
 });
 
+app.put('/inquiry_rounds', function(req, res) {
+  db3.inquiry_rounds.update(req.body[0], req.body[1], function(err, doc) {
+    res.json(doc);
+  });
+});
+
 //inquiry responses
 var db4 = mongojs('mongodb://' + username + ':' + password + '@ds157247.mlab.com:57247/decspace_users', ['inquiry_responses']);
 
