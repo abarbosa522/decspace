@@ -871,7 +871,7 @@
                         <th class = 'text-center'>Type</th>
                         <th class = 'text-center'>Minimum Value</th>
                         <th class = 'text-center'>Maximum Value</th>
-                        <th class = 'text-center'>Number of Categories</th>
+                        <th class = 'text-center'>Number of Levels</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -881,24 +881,24 @@
                           <div id = 'cat-scale-{{scale.id}}-type'>
                             <select class = 'form-control' ng-model = 'scale.type' ng-blur = 'blurCATScaleType(scale)'>
                               <option value = '' disabled>--- Please Select ---</option>
-                              <option>Ordinal</option>
                               <option>Cardinal</option>
+                              <option>Ordinal</option>
                             </select>
                           </div>
                         </td>
                         <td>
                           <div id = 'cat-scale-{{scale.id}}-min'>
-                            <input class = 'form-control' type = 'number' ng-model = 'scale.min' ng-blur = 'blurCATScaleMin(scale)' ng-disabled = 'disableCATScaleOrdinal(scale)'>
+                            <input class = 'form-control' type = 'number' ng-model = 'scale.min' ng-blur = 'blurCATScaleMin(scale)' ng-disabled = 'disableCATScaleCardinal(scale)'>
                           </div>
                         </td>
                         <td>
                           <div id = 'cat-scale-{{scale.id}}-max'>
-                            <input class = 'form-control' type = 'number' ng-model = 'scale.max' ng-blur = 'blurCATScaleMax(scale)' ng-disabled = 'disableCATScaleOrdinal(scale)'>
+                            <input class = 'form-control' type = 'number' ng-model = 'scale.max' ng-blur = 'blurCATScaleMax(scale)' ng-disabled = 'disableCATScaleCardinal(scale)'>
                           </div>
                         </td>
                         <td>
                           <div id = 'cat-scale-{{scale.id}}-categories'>
-                            <input class = 'form-control' type = 'number' ng-model = 'scale.num_categories' ng-blur = 'blurCATScaleCategories(scale)' ng-disabled = 'disableCATScaleCardinal(scale)'>
+                            <input class = 'form-control' type = 'number' ng-model = 'scale.num_categories' ng-blur = 'blurCATScaleCategories(scale)' ng-disabled = 'disableCATScaleOrdinal(scale)'>
                           </div>
                         </td>
                       </tr>
@@ -1137,6 +1137,62 @@
 
                   <br>
 
+                  <!-- Reference Actions -->
+                  <p class = 'header-1'>Reference Actions</p>
+
+                  <table class = 'table table-bordered table-hover'>
+                    <thead>
+                      <th class = 'text-center'>Category</th>
+                      <th class = 'text-center' ng-repeat = 'criterion in currentModule.input.criteria'>{{criterion.name}}</th>
+                      <th class = 'col-md-2'></th>
+                    </thead>
+                    <tbody ng-repeat = 'category in currentModule.input.categories'>
+                      <!-- Added Reference Actions -->
+                      <tr ng-repeat = 'ref in getCategoryReferenceActions(category.name)' ng-class = '{danger: ref.id == deleteIdReferenceAction}' ng-if = 'ref.category == category.name'>
+                        <td>{{category.name}} ({{ref.name}})</td>
+                        <td ng-repeat = 'criterion in currentModule.input.criteria'>
+                          <div id = 'cat-ref-{{ref.id}}-{{category.id}}-criterion-{{criterion.id}}'>
+                            <input class = 'form-control' type = 'number' ng-model = 'ref[criterion.name]' ng-blur = 'blurCATReferenceAction(ref, category, criterion)'>
+                          </div>
+                        </td>
+                        <td ng-if = 'ref.id != deleteIdReferenceAction'>
+                          <!-- Duplicate Reference Action Button -->
+                          <button type = 'button' class = 'btn btn-info' ng-click = 'copyCATReferenceAction(ref, category)' title = 'Duplicate Reference Action'>
+                            <span class = 'glyphicon glyphicon-duplicate'></span>
+                          </button>
+                          <!-- Delete Reference Action Button -->
+                          <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(ref, "Reference Actions")' title = 'Delete Reference Action'>
+                            <span class = 'glyphicon glyphicon-minus'></span>
+                          </button>
+                        </td>
+                        <td ng-if = 'ref.id == deleteIdReferenceAction'>
+                          <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(ref, "Reference Actions")' title = 'Confirm Delete Reference Action'>
+                            <span class = 'glyphicon glyphicon-ok'></span>
+                          </button>
+                          <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Reference Actions")' title = 'Cancel Delete Reference Action'>
+                            <span class = 'glyphicon glyphicon-remove'></span>
+                          </button>
+                        </td>
+                      </tr>
+                      <!-- Form to add new reference action -->
+                      <tr class = 'active'>
+                        <td>{{category.name}}</td>
+                        <td ng-repeat = 'criterion in currentModule.input.criteria'>
+                          <div id = 'new-cat-ref-{{category.id}}-criterion-{{criterion.id}}'>
+                            <input class = 'form-control' type = 'number' ng-model = 'new_reference_action[category.id][criterion.name]'>
+                          </div>
+                        </td>
+                        <td>
+                          <button type = 'button' class = 'btn btn-success' ng-click = 'addCATReferenceAction(category)' title = 'Add Reference Action'>
+                            <span class = 'glyphicon glyphicon-plus'></span>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  
+                  <br>
+
                   <!-- Interaction Effects -->
                   <p class = 'header-1'>Interaction Effects</p>
 
@@ -1251,63 +1307,9 @@
                       </tr>
                     </tbody>
                   </table>
-
+                  
                   <br>
-
-                  <!-- Reference Actions -->
-                  <p class = 'header-1'>Reference Actions</p>
-
-                  <table class = 'table table-bordered table-hover'>
-                    <thead>
-                      <th class = 'text-center'>Category</th>
-                      <th class = 'text-center' ng-repeat = 'criterion in currentModule.input.criteria'>{{criterion.name}}</th>
-                      <th class = 'col-md-2'></th>
-                    </thead>
-                    <tbody ng-repeat = 'category in currentModule.input.categories'>
-                      <!-- Added Reference Actions -->
-                      <tr ng-repeat = 'ref in getCategoryReferenceActions(category.name)' ng-class = '{danger: ref.id == deleteIdReferenceAction}' ng-if = 'ref.category == category.name'>
-                        <td>{{category.name}} ({{ref.name}})</td>
-                        <td ng-repeat = 'criterion in currentModule.input.criteria'>
-                          <div id = 'cat-ref-{{ref.id}}-{{category.id}}-criterion-{{criterion.id}}'>
-                            <input class = 'form-control' type = 'number' ng-model = 'ref[criterion.name]' ng-blur = 'blurCATReferenceAction(ref, category, criterion)'>
-                          </div>
-                        </td>
-                        <td ng-if = 'ref.id != deleteIdReferenceAction'>
-                          <!-- Duplicate Reference Action Button -->
-                          <button type = 'button' class = 'btn btn-info' ng-click = 'copyCATReferenceAction(ref, category)' title = 'Duplicate Reference Action'>
-                            <span class = 'glyphicon glyphicon-duplicate'></span>
-                          </button>
-                          <!-- Delete Reference Action Button -->
-                          <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(ref, "Reference Actions")' title = 'Delete Reference Action'>
-                            <span class = 'glyphicon glyphicon-minus'></span>
-                          </button>
-                        </td>
-                        <td ng-if = 'ref.id == deleteIdReferenceAction'>
-                          <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(ref, "Reference Actions")' title = 'Confirm Delete Reference Action'>
-                            <span class = 'glyphicon glyphicon-ok'></span>
-                          </button>
-                          <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Reference Actions")' title = 'Cancel Delete Reference Action'>
-                            <span class = 'glyphicon glyphicon-remove'></span>
-                          </button>
-                        </td>
-                      </tr>
-                      <!-- Form to add new reference action -->
-                      <tr class = 'active'>
-                        <td>{{category.name}}</td>
-                        <td ng-repeat = 'criterion in currentModule.input.criteria'>
-                          <div id = 'new-cat-ref-{{category.id}}-criterion-{{criterion.id}}'>
-                            <input class = 'form-control' type = 'number' ng-model = 'new_reference_action[category.id][criterion.name]'>
-                          </div>
-                        </td>
-                        <td>
-                          <button type = 'button' class = 'btn btn-success' ng-click = 'addCATReferenceAction(category)' title = 'Add Reference Action'>
-                            <span class = 'glyphicon glyphicon-plus'></span>
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-
+                  
                   <!-- OK button -->
                   <button type = 'button' class = 'btn btn-primary' data-dismiss = 'modal'>OK</button>
 
@@ -2419,11 +2421,11 @@
               <button id = 'cat-sd-categories' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "categories")' style = 'margin-top: 39%; margin-left: -48%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 37.5%; margin-left: -40%'>Categories</span>
               
-              <button id = 'cat-sd-interaction-effects' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "interaction effects")' style = 'margin-top: 48%; margin-left: -48%'></button>
-              <span class = 'module-circle-span' style = 'margin-top: 46.5%; margin-left: -39.5%'>Interaction Effects</span>
+              <button id = 'cat-sd-reference-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "reference actions")' style = 'margin-top: 48%; margin-left: -48%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 46.5%; margin-left: -39.5%'>Reference Actions</span>
               
-              <button id = 'cat-sd-reference-actions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "reference actions")' style = 'margin-top: 57%; margin-left: -48%'></button>
-              <span class = 'module-circle-span' style = 'margin-top: 55.5%; margin-left: -40%'>Reference Actions</span>
+              <button id = 'cat-sd-interaction-effects' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "interaction effects")' style = 'margin-top: 57%; margin-left: -48%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 55.5%; margin-left: -40%'>Interaction Effects</span>
 
               <button id = 'cat-sd-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event, "output")' style = 'margin-top: 3%; margin-left: 42%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: 18.5%'>Output</span>

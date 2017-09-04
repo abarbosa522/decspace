@@ -99,8 +99,8 @@ app.controller('CATSDController', function($scope) {
       $('#cat-scale-' + scale.id + '-type').removeClass('has-error');
   }
 
-  $scope.disableCATScaleOrdinal = function(scale) {
-    if(scale.type == 'Ordinal')
+  $scope.disableCATScaleCardinal = function(scale) {
+    if(scale.type == 'Cardinal')
       return false;
     else {
       scale.min = '';
@@ -109,8 +109,8 @@ app.controller('CATSDController', function($scope) {
     }
   }
 
-  $scope.disableCATScaleCardinal = function(scale) {
-    if(scale.type == 'Cardinal')
+  $scope.disableCATScaleOrdinal = function(scale) {
+    if(scale.type == 'Ordinal')
       return false;
     else {
       scale.num_categories = '';
@@ -238,8 +238,8 @@ app.controller('CATSDController', function($scope) {
           crt_scale = $scope.currentModule.input.scales[scale];
 
       if(($scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] == "")
-      || (crt_scale.type == 'Ordinal' && ($scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] < crt_scale.min || $scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] > crt_scale.max))
-      || (crt_scale.type == 'Cardinal' && ($scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] > crt_scale.num_categories || $scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] < 1))) {
+      || (crt_scale.type == 'Cardinal' && ($scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] < crt_scale.min || $scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] > crt_scale.max))
+      || (crt_scale.type == 'Ordinal' && ($scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] > crt_scale.num_categories || $scope.new_cat_action[$scope.currentModule.input.criteria[criterion]['name']] < 1))) {
         $('#new-cat-action-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).addClass('has-error');
         can_add_action = false;
       }
@@ -283,8 +283,8 @@ app.controller('CATSDController', function($scope) {
           if($scope.currentModule.input.scales[scale].criterion == $scope.currentModule.input.criteria[criterion].name)
             crt_scale = $scope.currentModule.input.scales[scale];
         
-        if((crt_scale.type == 'Ordinal' && (action[criterion_name] < crt_scale.min || action[criterion_name] > crt_scale.max))
-        || (crt_scale.type == 'Cardinal' && (action[criterion_name] > crt_scale.num_categories || action[criterion_name] < 1)))
+        if((crt_scale.type == 'Cardinal' && (action[criterion_name] < crt_scale.min || action[criterion_name] > crt_scale.max))
+        || (crt_scale.type == 'Ordinal' && (action[criterion_name] > crt_scale.num_categories || action[criterion_name] < 1)))
           $('#cat-action-' + action.id + '-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).addClass('has-error');
         else
           $('#cat-action-' + action.id + '-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).removeClass('has-error');
@@ -490,8 +490,8 @@ app.controller('CATSDController', function($scope) {
           crt_scale = $scope.currentModule.input.scales[scale];
         
       if(($scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] == undefined || $scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] == "")
-      || (crt_scale.type == 'Ordinal' && ($scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] < crt_scale.min || $scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] > crt_scale.max))
-      || (crt_scale.type == 'Cardinal' && ($scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] > crt_scale.num_categories || $scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] < 1))) {
+      || (crt_scale.type == 'Cardinal' && ($scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] < crt_scale.min || $scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] > crt_scale.max))
+      || (crt_scale.type == 'Ordinal' && ($scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] > crt_scale.num_categories || $scope.new_reference_action[category.id][$scope.currentModule.input.criteria[criterion]['name']] < 1))) {
         $('#new-cat-ref-' + category.id + '-criterion-' + $scope.currentModule.input.criteria[criterion]['id']).addClass('has-error');
         can_add_reference = false;
       }
@@ -548,8 +548,8 @@ app.controller('CATSDController', function($scope) {
         crt_scale = $scope.currentModule.input.scales[scale];
 
     if((ref[criterion.name] == undefined || ref[criterion.name] == "")
-    || (crt_scale.type == 'Ordinal' && (ref[criterion.name] < crt_scale.min || ref[criterion.name] > crt_scale.max))
-    || (crt_scale.type == 'Cardinal' && (ref[criterion.name] > crt_scale.num_categories || ref[criterion.name] < 1)))
+    || (crt_scale.type == 'Cardinal' && (ref[criterion.name] < crt_scale.min || ref[criterion.name] > crt_scale.max))
+    || (crt_scale.type == 'Ordinal' && (ref[criterion.name] > crt_scale.num_categories || ref[criterion.name] < 1)))
       $('#cat-ref-' + ref.id + '-' + category.id + '-criterion-' + criterion.id).addClass('has-error');
     else
       $('#cat-ref-' + ref.id + '-' + category.id + '-criterion-' + criterion.id).removeClass('has-error');

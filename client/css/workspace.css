@@ -18,27 +18,27 @@
 }
 
 .module-orderby {
-  height: 60px;
+  height: 61.5px;
   width: 140px;
 }
 
 .module-sort {
-  height: 44px;
+  height: 45.5px;
   width: 140px;
 }
 
 .module-cat-sd {
-  height: 145px;
+  height: 146.5px;
   width: 190px;
 }
 
 .module-inquiry {
-  height: 78px;
+  height: 79.5px;
   width: 140px;
 }
 
 .module-srf {
-  height: 130px;
+  height: 131.5px;
   width: 170px;
 }
 
@@ -49,9 +49,10 @@
 
 .module-circle {
   position: absolute;
-	width: 12px;
-	height: 12px;
+  width: 12px;
+  height: 12px;
   border: black 1px solid;
+  padding: 0;
 }
 
 .module-circle-input {

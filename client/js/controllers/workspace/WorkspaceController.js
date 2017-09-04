@@ -1359,17 +1359,26 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
                 //SPECIAL CASE - CAT-SD CRITERIA
                 //when criteria is added, its scales have to be added as well
-                if(modules[modl]['type'] == 'CAT-SD' && input_type == 'criteria')
-                  for(criterion in modules[modl].input.criteria)
-                    modules[modl].input.scales.push({
-                      'id' : modules[modl].input.criteria[criterion].id,
-                      'criterion' : modules[modl].input.criteria[criterion].name,
-                      'type' : '',
-                      'min' : '',
-                      'max' : '',
-                      'num_categories' : ''
-                    });
-
+                if(modules[modl]['type'] == 'CAT-SD' && input_type == 'criteria') {
+                  for(criterion in modules[modl].input.criteria) {
+                    var scale_exists = false;
+                    
+                    for(scale in modules[modl].input.scales)
+                      if(modules[modl].input.scales[scale].criterion == modules[modl].input.criteria[criterion].name)
+                        scale_exists = true;
+                    
+                    if(!scale_exists)
+                      modules[modl].input.scales.push({
+                        'id' : modules[modl].input.criteria[criterion].id,
+                        'criterion' : modules[modl].input.criteria[criterion].name,
+                        'type' : '',
+                        'min' : '',
+                        'max' : '',
+                        'num_categories' : ''
+                      });
+                    }
+                  }
+                
                 break;
               }
             }
@@ -1592,6 +1601,9 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
           //SPECIAL CASE - SRF
           else if(modules[mod].type == 'SRF' && (input == 'ranking' || input == 'ratio z' || input == 'decimal places' || input == 'weight type'))
             input_data++;
+          //SPECIAL CASE - CAT-SD 
+          else if(modules[mod].type == 'CAT-SD' && input == 'interaction effects')
+            input_data++;
           else {
             for(connection in connections)
               if(connections[connection]['input'] == modules[mod]['id'] && connections[connection]['input_type'] == input) {
@@ -1600,7 +1612,6 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
               }
           }
         }
-
         //check if all input points of the current module have a connection or already have input data
         if(input_data == Object.keys(modules[mod]['input']).length)
           modules_data++;
@@ -1608,6 +1619,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       else
         modules_data++;
     }
+    
     return modules_data == modules.length;
   }
 
@@ -1621,6 +1633,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
         //check if current module received all necessary data
         //or another module needs to executed first
+        console.log(checkModData(modules[mod]))
         if(checkModData(modules[mod])) {
           //try to execute method
           if(executeMethod(modules[mod]))
@@ -1645,6 +1658,9 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     for(input in mod.input) {
       //SPECIAL CASE - INQUIRY EMAILS
       if(mod.type == 'Inquiry' && input == 'emails')
+        continue;
+      //SPECIAL CASE - CAT-SD INTERACTION EFFECTS
+      else if(mod.type == 'CAT-SD' && input == 'interaction effects')
         continue;
       else if(mod.input[input].length == 0)
         return false;

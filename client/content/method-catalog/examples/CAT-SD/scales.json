@@ -1,6 +1,6 @@
-{"criterion":"Physical Fitness","type":"Ordinal","min":370,"max":1281,"num_categories":""}
-{"criterion":"Mental Sharpness","type":"Ordinal","min":35,"max":99,"num_categories":""}
-{"criterion":"Mental Resilience","type":"Cardinal","min":"","max":"","num_categories":4}
-{"criterion":"Intelligence","type":"Cardinal","min":"","max":"","num_categories":7}
-{"criterion":"Teamwork Skills","type":"Cardinal","min":"","max":"","num_categories":7}
-{"criterion":"Motivation","type":"Cardinal","min":"","max":"","num_categories":7}
+{"criterion":"Physical Fitness","type":"Cardinal","min":370,"max":1281,"num_categories":""}
+{"criterion":"Mental Sharpness","type":"Cardinal","min":35,"max":99,"num_categories":""}
+{"criterion":"Mental Resilience","type":"Ordinal","min":"","max":"","num_categories":4}
+{"criterion":"Intelligence","type":"Ordinal","min":"","max":"","num_categories":7}
+{"criterion":"Teamwork Skills","type":"Ordinal","min":"","max":"","num_categories":7}
+{"criterion":"Motivation","type":"Ordinal","min":"","max":"","num_categories":7}
