@@ -183,34 +183,58 @@
         <div class = 'col-md-5'>
           <!-- Alerts -->
           <div class = 'alert alert-success custom-alert' id = 'save-success' style = 'height: 50px' ng-cloak>
+            <button type = 'button' class = 'close' ng-click = 'hideAlert("save-success")' aria-label = 'Close'>
+              <span aria-hidden = 'true'>&times;</span>
+            </button>
             Workflow <strong>successfully</strong> saved.
           </div>
 
           <div class = 'alert alert-success custom-alert' id = 'reload-success' style = 'height: 50px' ng-cloak>
+            <button type = 'button' class = 'close' ng-click = 'hideAlert("reload-success")' aria-label = 'Close'>
+              <span aria-hidden = 'true'>&times;</span>
+            </button>
             Workflow <strong>successfully</strong> reloaded.
           </div>
 
           <div class = 'alert alert-danger custom-alert' id = 'invalid-connection1' style = 'height: 60px' ng-cloak>
+            <button type = 'button' class = 'close' ng-click = 'hideAlert("invalid-connection1")' aria-label = 'Close'>
+              <span aria-hidden = 'true'>&times;</span>
+            </button>
             <strong>Invalid connection</strong> - Input points should be connected to Output points.
           </div>
 
           <div class = 'alert alert-danger custom-alert' id = 'invalid-connection2' style = 'height: 60px' ng-cloak>
+            <button type = 'button' class = 'close' ng-click = 'hideAlert("invalid-connection2")' aria-label = 'Close'>
+              <span aria-hidden = 'true'>&times;</span>
+            </button>
             <strong>Invalid connection</strong> - Only points of different modules should be connected.
           </div>
 
           <div class = 'alert alert-danger custom-alert' id = 'invalid-connection3' style = 'height: 50px' ng-cloak>
+            <button type = 'button' class = 'close' ng-click = 'hideAlert("invalid-connection3")' aria-label = 'Close'>
+              <span aria-hidden = 'true'>&times;</span>
+            </button>
             <strong>Invalid connection</strong> - That connection already exists.
           </div>
 
           <div class = 'alert alert-danger custom-alert' id = 'invalid-connection4' style = 'height: 50px' ng-cloak>
+            <button type = 'button' class = 'close' ng-click = 'hideAlert("invalid-connection4")' aria-label = 'Close'>
+              <span aria-hidden = 'true'>&times;</span>
+            </button>
             <strong>Invalid connection</strong> - Input points can only be connected once.
           </div>
 
           <div class = 'alert alert-success custom-alert' id = 'execution-success' style = 'height: 50px' ng-cloak>
+            <button type = 'button' class = 'close' ng-click = 'hideAlert("execution-success")' aria-label = 'Close'>
+              <span aria-hidden = 'true'>&times;</span>
+            </button>
             Workflow <strong>successfully</strong> executed.
           </div>
 
           <div class = 'alert alert-danger custom-alert' id = 'execution-error' style = 'height: 60px' ng-cloak>
+            <button type = 'button' class = 'close' ng-click = 'hideAlert("execution-error")' aria-label = 'Close'>
+              <span aria-hidden = 'true'>&times;</span>
+            </button>
             <strong>Execution error</strong> - One or more modules do not have input data or any connection.
           </div>
         </div>
@@ -1143,13 +1167,17 @@
                   <table class = 'table table-bordered table-hover'>
                     <thead>
                       <th class = 'text-center'>Category</th>
+                      <th class = 'text-center'>Reference Action</th>
                       <th class = 'text-center' ng-repeat = 'criterion in currentModule.input.criteria'>{{criterion.name}}</th>
                       <th class = 'col-md-2'></th>
                     </thead>
                     <tbody ng-repeat = 'category in currentModule.input.categories'>
                       <!-- Added Reference Actions -->
-                      <tr ng-repeat = 'ref in getCategoryReferenceActions(category.name)' ng-class = '{danger: ref.id == deleteIdReferenceAction}' ng-if = 'ref.category == category.name'>
-                        <td>{{category.name}} ({{ref.name}})</td>
+                      <tr ng-repeat = 'ref in getCategoryReferenceActions(category.name) track by $index' ng-class = '{danger: ref.id == deleteIdReferenceAction}' ng-if = 'ref.category == category.name'>
+                        <td ng-if = '$index == 0' rowspan = '{{getNumberRefCategory(category.name)}}'>{{category.name}}</td>
+                        <td>
+                          <input class = 'form-control' type = 'text' ng-model = 'ref.name' ng-blur = 'blurCATCategoryCriterion(category, criterion)'>
+                        </td>
                         <td ng-repeat = 'criterion in currentModule.input.criteria'>
                           <div id = 'cat-ref-{{ref.id}}-{{category.id}}-criterion-{{criterion.id}}'>
                             <input class = 'form-control' type = 'number' ng-model = 'ref[criterion.name]' ng-blur = 'blurCATReferenceAction(ref, category, criterion)'>
@@ -1176,7 +1204,10 @@
                       </tr>
                       <!-- Form to add new reference action -->
                       <tr class = 'active'>
-                        <td>{{category.name}}</td>
+                        <td ng-if = 'getNumberRefCategory(category.name) == 1'>{{category.name}}</td>
+                        <td>
+                          <input class = 'form-control' type = 'text' ng-model = 'new_reference_action[category.id].name'>
+                        </td>
                         <td ng-repeat = 'criterion in currentModule.input.criteria'>
                           <div id = 'new-cat-ref-{{category.id}}-criterion-{{criterion.id}}'>
                             <input class = 'form-control' type = 'number' ng-model = 'new_reference_action[category.id][criterion.name]'>
@@ -1611,7 +1642,7 @@
 
                   <!-- Q-Sort Colors -->
                   <p class = 'header-1'>Q-Sort Color Scheme</p>
-
+                  
                   <form class = 'form-horizontal'>
                     <div class = 'form-group'>
                       <label for = 'most-important' class = 'control-label col-md-6'>Most Important Questions</label>
@@ -1712,9 +1743,9 @@
 
                   <hr>
 
-                  <!-- Suggestions Toggle -->
+                  <!-- Suggestions -->
                   <p class = 'header-1'>Suggestions</p>
-
+                  
                   <label for = 'suggestions-check'>Ask for suggestions?</label>
                   <input id = 'suggestions-check' type = 'checkbox' ng-model = 'currentModule.input.suggestions.toggle'>
 
@@ -1756,6 +1787,9 @@
                         <textarea id = 'email-text' rows = '3' class = 'form-control' ng-model = 'currentModule.input.email.text'></textarea>
                       </div>
                     </div>
+                    
+                    <sub>To add the personalized link to the email, just write '&lt;LINK&gt;'</sub>
+                      
                   </form>
 
                   <br>
@@ -2047,7 +2081,7 @@
                         </table>
                         
                         <!-- Delta Values -->
-                        <p class = 'header-2'>Similarity Values Per Reference Action</p>
+                        <!--<p class = 'header-2'>Similarity Values Per Reference Action</p>
                         
                         <table class = 'table table-bordered table-hover'>
                           <thead>
@@ -2064,10 +2098,10 @@
                               </td>
                             </tr>
                           </tbody>
-                        </table>
+                        </table>-->
 
                         <!-- Delta Max Values -->
-                        <p class = 'header-2'>Maximum Similarity Values Per Category</p>
+                        <!--<p class = 'header-2'>Maximum Similarity Values Per Category</p>
                         
                         <table class = 'table table-bordered table-hover'>
                           <thead>
@@ -2084,7 +2118,7 @@
                               </td>
                             </tr>
                           </tbody>
-                        </table>
+                        </table>-->
 
                       </div>
                     </div>
@@ -2160,7 +2194,7 @@
                       
                       <!-- Specialists waiting for approval -->
                       <p class = 'header-1'>Specialists waiting for approval</p>
-
+                      
                       <table class = 'table table-bordered table-hover'>
                         <thead>
                           <tr>
@@ -2437,21 +2471,42 @@
             <div id = 'inquiry' class = 'module-template module-inquiry draggable'>
               <a id = 'mod-name' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#inquiry-modal' ng-click = 'selectCurrentModule($event)'></a>
 
-              <a href ng-click = 'selectDeleteModule($event)' style = 'display: block; margin-top: -14%; margin-left: 87%'>
+              <a href ng-click = 'selectDeleteModule($event)' style = 'display: block; margin-top: -10%; margin-left: 88%'>
                 <span class = 'glyphicon glyphicon-remove'></span>
               </a>
 
               <button id = 'inquiry-subject' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "subject")' style = 'margin-top: 3%; margin-left: -48%'></button>
-              <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: -36%'>Subject</span>
-
-              <button id = 'inquiry-emails' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "emails")' style = 'margin-top: 15%; margin-left: -48%'></button>
-              <span class = 'module-circle-span' style = 'margin-top: 13.5%; margin-left: -36%'>Emails</span>
-
-              <button id = 'inquiry-questions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "questions")' style = 'margin-top: 27%; margin-left: -48%'></button>
-              <span class = 'module-circle-span' style = 'margin-top: 25.5%; margin-left: -36%'>Q-Sort Questions</span>
-
-              <button id = 'inquiry-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event, "output")' style = 'margin-top: 3%; margin-left: 38.5%'></button>
-              <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: 7%'>Output</span>
+              <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: -40%'>Subject</span>
+              
+              <button id = 'inquiry-description' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "description")' style = 'margin-top: 13%; margin-left: -48%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 11.5%; margin-left: -40%'>Description</span>
+              
+              <button id = 'inquiry-emails' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "emails")' style = 'margin-top: 23%; margin-left: -48%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 21.5%; margin-left: -40%'>Specialists' Emails</span>
+              
+              <button id = 'inquiry-characterization-questions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "open_answer_questions")' style = 'margin-top: 33%; margin-left: -48%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 31.5%; margin-left: -40%'>Characterization Questions</span>
+              
+              <button id = 'inquiry-questions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "questions")' style = 'margin-top: 43%; margin-left: -48%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 41.5%; margin-left: -40%'>Q-Sort Questions</span>
+              
+              <button id = 'inquiry-color-scheme' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "color_scheme")' style = 'margin-top: 53%; margin-left: -48%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 51.5%; margin-left: -40%'>Q-Sort Color Scheme</span>
+              
+              <button id = 'inquiry-scale' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "scale")' style = 'margin-top: 63%; margin-left: -48%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 61.5%; margin-left: -40%'>Q-Sort Scale</span>
+              
+              <button id = 'inquiry-glossary' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "glossary")' style = 'margin-top: 73%; margin-left: -48%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 71.5%; margin-left: -40%'>Glossary</span>
+              
+              <button id = 'inquiry-suggestions' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "suggestions")' style = 'margin-top: 83%; margin-left: -48%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 81.5%; margin-left: -40%'>Suggestions</span>
+              
+              <button id = 'inquiry-personalized-email' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "personalized_email")' style = 'margin-top: 93%; margin-left: -48%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 91.5%; margin-left: -40%'>Personalized Email</span>
+              
+              <button id = 'inquiry-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event, "output")' style = 'margin-top: 3%; margin-left: 40.5%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: 18%'>Output</span>
             </div>
           </template>
 

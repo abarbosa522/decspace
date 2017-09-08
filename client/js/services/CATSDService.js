@@ -14,7 +14,13 @@ app.service('CATSDService', function($http, $q) {
   //all the values of delta max
   var deltaMaxValues = {};
   var deltaValues = {};
-
+  
+  //values of per-criterion similarity-dissimilarity functions
+  var functionsValues = {};
+  
+  //similiarity and dissimilarity values
+  var sValues = [], dPlusValues = [], dMinusValues = [];
+  
   this.getResults = function(mod_data) {
     var deferred = $q.defer();
 
@@ -58,12 +64,12 @@ app.service('CATSDService', function($http, $q) {
 
     var result = applyCriterionFunction().then(function(resolve) {
       similarityValues = resolve;
-
+      
       assignActions();
       
       transformOutput();
-      
-      deferred.resolve([assignedActions, deltaMaxValues, deltaValues]);
+   
+      deferred.resolve([assignedActions, deltaMaxValues, deltaValues, sValues, dMinusValues, dPlusValues, functionsValues]);
     });
 
     return deferred.promise;
@@ -287,7 +293,7 @@ app.service('CATSDService', function($http, $q) {
     }
 
     var res2 = result/k(action, reference_action, category);
-
+    
     return res2;
   }
 
@@ -322,7 +328,25 @@ app.service('CATSDService', function($http, $q) {
 
     //create and store an object with the action, reference action and value of the delta function
     deltaValues[action.name][reference_action.name] = result;
-
+    
+    sValues.push({
+      action : action.name,
+      reference_action : reference_action.name,
+      value: s_result
+    });
+    
+    dMinusValues.push({
+      action : action.name,
+      reference_action : reference_action.name,
+      value: dMinus_result - 1
+    });
+    
+    dPlusValues.push({
+      action : action.name,
+      reference_action : reference_action.name,
+      value: dPlus_result - 1
+    });
+    
     return result;
   }
 
@@ -419,5 +443,82 @@ app.service('CATSDService', function($http, $q) {
     }
     
     deltaValues = delta_values;
+    
+    //functions values
+    var functions_values = [];
+    
+    for(criterion in criteria) {
+      var new_crit_obj = {
+        criterion : criteria[criterion].name,
+        results : []
+      };
+      
+      for(action in actions) {
+        var new_action_obj = {
+          action : actions[action].name
+        };
+        
+        for(value in similarityValues)
+          if(similarityValues[value].criterion == new_crit_obj.criterion && similarityValues[value].action == actions[action].name)
+            new_action_obj[similarityValues[value].reference_action] = similarityValues[value].result;
+        
+        new_crit_obj.results.push(new_action_obj);
+      }
+      
+      functions_values.push(new_crit_obj);
+    }
+    
+    functionsValues = functions_values;
+    
+    //similarity values
+    var s_values = [];
+    
+    for(action in actions) {
+      var new_action_obj = {
+        action : actions[action].name,
+      };
+      
+      for(value in sValues)
+        if(sValues[value].action == new_action_obj.action)
+          new_action_obj[sValues[value].reference_action] = sValues[value].value;
+    
+      s_values.push(new_action_obj);
+    }
+    
+    sValues = s_values;
+    
+    //dMinusValues
+    var d_minus_values = [];
+    
+    for(action in actions) {
+      var new_action_obj = {
+        action : actions[action].name,
+      };
+      
+      for(value in dMinusValues)
+        if(dMinusValues[value].action == new_action_obj.action)
+          new_action_obj[dMinusValues[value].reference_action] = dMinusValues[value].value;
+    
+      d_minus_values.push(new_action_obj);
+    }
+    
+    dMinusValues = d_minus_values;
+    
+    //dPlusValues
+    var d_plus_values = [];
+    
+    for(action in actions) {
+      var new_action_obj = {
+        action : actions[action].name,
+      };
+      
+      for(value in dPlusValues)
+        if(dPlusValues[value].action == new_action_obj.action)
+          new_action_obj[dPlusValues[value].reference_action] = dPlusValues[value].value;
+    
+      d_plus_values.push(new_action_obj);
+    }
+    
+    dPlusValues = d_plus_values;
   }
 });

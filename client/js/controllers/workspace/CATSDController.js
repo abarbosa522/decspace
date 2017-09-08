@@ -511,9 +511,6 @@ app.controller('CATSDController', function($scope) {
       for(ref in $scope.currentModule.input['reference actions'])
         if($scope.currentModule.input['reference actions'][ref].category == category.name)
           num_ref_category++;
-        
-      //add the name of the reference action
-      $scope.new_reference_action[category.id].name = 'b' + ($scope.currentModule.input.categories.indexOf(category) + 1) + num_ref_category;
       
       //add the category name to the reference action
       $scope.new_reference_action[category.id].category = category.name;
@@ -538,6 +535,16 @@ app.controller('CATSDController', function($scope) {
         ref_actions.push($scope.currentModule.input['reference actions'][ref]);
     
     return ref_actions;
+  }
+  
+  $scope.getNumberRefCategory = function(category) {
+    var ref_actions = [];
+    
+    for(ref in $scope.currentModule.input['reference actions'])
+      if($scope.currentModule.input['reference actions'][ref].category == category)
+        ref_actions.push($scope.currentModule.input['reference actions'][ref]);
+    
+    return ref_actions.length + 1;
   }
   
   $scope.blurCATReferenceAction = function(ref, category, criterion) {
@@ -568,12 +575,8 @@ app.controller('CATSDController', function($scope) {
     for(ref in $scope.currentModule.input['reference actions'])
       if($scope.currentModule.input['reference actions'][ref].category == category.name)
         num_ref_category++;
-        
-    //add the name of the reference action
-    new_reference_action.name = 'b' + ($scope.currentModule.input.categories.indexOf(category) + 1) + num_ref_category;
       
     //insert the new interaction into the interactions array
     $scope.currentModule.input['reference actions'].push(new_reference_action);
   }
-  
 });

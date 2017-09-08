@@ -336,7 +336,9 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
     return data;
   }
-
+  
+  /*** ALERTS FUNCTIONS ***/
+  
   //hide all alerts
   function hideAlerts() {
     $('#save-success').hide();
@@ -351,14 +353,17 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   //show certain alert and hide it smoothly
   function showAlert(alert_id) {
+    //make sure all alerts hidden before showing the new one
+    hideAlerts();
     //show alert
-    angular.element(document.querySelector('#' + alert_id)).alert();
-    //hide alert
-    angular.element(document.querySelector('#' + alert_id)).fadeTo(3000, 500).slideUp(500, function(){
-      angular.element(document.querySelector('#' + alert_id)).slideUp(500);
-    });
+    $('#' + alert_id).show();
   }
-
+  
+  //hide certain alert
+  $scope.hideAlert = function(alert) {
+    $('#' + alert).hide();
+  }
+  
   /*** MODULES FUNCTIONS ***/
 
   //created modules
@@ -1338,9 +1343,38 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
                 //INQUIRY - SUBJECT
                 if(modules[modl]['type'] == 'Inquiry' && input_type == 'subject')
                   modules[modl]['input']['subject'] = modules[mod]['output'][0]['subject'];
-                //INQUIRY - SUGGESTIONS TOGGLE
-                else if(modules[modl]['type'] == 'Inquiry' && input_type == 'suggestions toggle')
-                  modules[modl]['input']['suggestions toggle'] = modules[mod]['output'][0]['suggestions toggle'];
+                //INQUIRY - DESCRIPTION
+                else if(modules[modl].type == 'Inquiry' && input_type == 'description')
+                  modules[modl].input.description = modules[mod].output[0].description;
+                //INQUIRY - COLOR SCHEME
+                else if(modules[modl].type == 'Inquiry' && input_type == 'color_scheme')
+                  modules[modl].input.color_scheme = modules[mod].output[0];
+                //INQUIRY - SCALE
+                else if(modules[modl].type == 'Inquiry' && input_type == 'scale')
+                  modules[modl].input.scale = modules[mod].output[0].scale;
+                //INQUIRY - SUGGESTIONS
+                else if(modules[modl].type == 'Inquiry' && input_type == 'suggestions') {
+                  modules[modl].input.suggestions = modules[mod].output[0];
+                  
+                  //convert toggle field into boolean
+                  if(modules[modl].input.suggestions.toggle == 'true')
+                    modules[modl].input.suggestions.toggle = true;
+                  else
+                    modules[modl].input.suggestions.toggle = false;
+                }
+                //INQUIRY - PERSONALIZED EMAIL
+                else if(modules[modl].type == 'Inquiry' && input_type == 'personalized_email') {
+                  modules[modl].input.personalized_email = modules[mod].output[0].toggle;
+                  
+                  //convert toggle field into boolean
+                  if(modules[modl].input.personalized_email == 'true')
+                    modules[modl].input.personalized_email = true;
+                  else
+                    modules[modl].input.personalized_email = false;
+                  
+                  modules[modl].input.email.subject = modules[mod].output[0].subject;
+                  modules[modl].input.email.text = modules[mod].output[0].text;
+                }
                 //SRF - RANKING
                 else if(modules[modl]['type'] == 'SRF' && input_type == 'ranking')
                   modules[modl]['input']['ranking'] = modules[mod]['output'][0]['ranking'];
@@ -1633,7 +1667,6 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
         //check if current module received all necessary data
         //or another module needs to executed first
-        console.log(checkModData(modules[mod]))
         if(checkModData(modules[mod])) {
           //try to execute method
           if(executeMethod(modules[mod]))
@@ -1963,11 +1996,20 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     //output files of the CAT-SD method consist of three different tables
     //generate output files
     if(module.type == 'CAT-SD' || (module.type == 'Output File' && module.parent_type == 'CAT-SD')) {
-      var output_files = [], output_titles = ['Assigned Categories', 'Maximum Similarity Values Per Category', 'Similarity Values Per Reference Action'];
+      var output_files = [], output_titles = ['Assigned Categories', 'Maximum Similarity-Dissimilarity Degrees Per Category', 'Similarity-Dissimilarity Degrees Per Reference Action', 'Similarity Values', 'Negative Dissimilarity Values', 'Positive Dissimilarity Values'];
       
-      for(output in module.output)
-        output_files.push(JSONtoCSV(module.output[output], output));
+      for(criterion in module.input.criteria)
+        output_titles.push('Values of ' + module.input.criteria[criterion].name + ' Similarity-Dissimilarity Functions');
       
+      for(output in module.output) {
+        //the functions values must be processed differently
+        if(output != 6)
+          output_files.push(JSONtoCSV(module.output[output], output));
+        else
+          for(crit_out in module.output[output])
+            output_files.push(JSONtoCSV(module.output[output][crit_out].results));
+      }
+        
       return [input_files, output_files, input_titles, output_titles];
     }
     else {
