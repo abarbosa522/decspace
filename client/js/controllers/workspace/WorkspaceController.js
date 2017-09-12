@@ -1975,9 +1975,9 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
     zip.file('data.json', JSON.stringify(workflow_data));
 
-    zip.generateAsync({type:"blob"}).then(function(content) {
+    zip.generateAsync({type:'blob'}).then(function(content) {
       // see FileSaver.js
-      saveAs(content, "workflow.zip");
+      saveAs(content, 'workflow-' + $scope.project_name + '.zip');
     });
   }
 
@@ -1999,7 +1999,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       var output_files = [], output_titles = ['Assigned Categories', 'Maximum Similarity-Dissimilarity Degrees Per Category', 'Similarity-Dissimilarity Degrees Per Reference Action', 'Similarity Values', 'Negative Dissimilarity Values', 'Positive Dissimilarity Values'];
       
       for(criterion in module.input.criteria)
-        output_titles.push('Values of ' + module.input.criteria[criterion].name + ' Similarity-Dissimilarity Functions');
+        output_titles.push('Values of Similarity-Dissimilarity Functions - ' + module.input.criteria[criterion].name);
       
       for(output in module.output) {
         //the functions values must be processed differently
