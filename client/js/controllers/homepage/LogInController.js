@@ -37,7 +37,7 @@ app.controller('LogInController', function($scope, $window, $http) {
           $http.delete('/accounts/' + id_doc).then(function() {
             //add the new list of projects
             $http.post('/accounts', proj_res).then(function() {
-              $window.location.href = '../workspace/projects.html';
+              $window.location.href = '../projects/projects.html';
             });
           });
         });

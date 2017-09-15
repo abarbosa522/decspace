@@ -70,7 +70,9 @@
               <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic' ng-if = 'unregistered_user' ng-cloak>Welcome!</p>
             </li>
             
-             <li ng-if = 'loggedIn' ng-cloak><a href = '../workspace/projects.html'>Projects</a></li>
+            <li ng-if = 'loggedIn' ng-cloak><a href = '../projects/projects.html'>My Projects</a></li>
+            
+            <li ng-if = 'loggedIn' ng-cloak><a href = '../projects/public-projects.html'>Public Projects</a></li>
             
             <li><a href = '../homepage/about.html'>About</a></li>
             

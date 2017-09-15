@@ -45,7 +45,7 @@
     <link href = 'https://fonts.googleapis.com/css?family=Open+Sans:400,600i' rel = 'stylesheet'>
 
     <!-- Font Awesome -->
-    <link rel = 'stylesheet' href = '../../js/shared/font-awesome-4.7.0/css/font-awesome.css'></link>
+    <link rel = 'stylesheet' href = '../../js/shared/font-awesome-4.7.0/css/font-awesome.css'>
 
     <!-- ng-draggable module -->
     <script src = '../../js/shared/ng-draggable/ngDraggable.js'></script>
@@ -85,7 +85,7 @@
             <span class = 'icon-bar'></span>
           </button>
           <!-- Title -->
-          <a class = 'navbar-brand' href = '../workspace/projects.html'>DecSpace</a>
+          <a class = 'navbar-brand' href = '../../index.html'>DecSpace</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -98,7 +98,9 @@
               <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic' ng-if = 'unregistered_user' ng-cloak>Welcome!</p>
             </li>
             
-            <li><a href = 'projects.html'>Projects</a></li>
+            <li><a href = '../projects/projects.html'>My Projects</a></li>
+            
+            <li><a href = '../projects/public-projects.html'>Public Projects</a></li>
             
             <li><a href = '../homepage/about.html'>About</a></li>
 
@@ -138,13 +140,14 @@
             <button type = 'button' class = 'btn btn-default' ng-if = '!isLoading' ng-click = 'executeWorkflow()' title = 'Execute Workflow'>
               <span class = 'glyphicon glyphicon-play'></span>
             </button>
+            
             <!-- Loading Button -->
             <button class = 'btn btn-default active' ng-if = 'isLoading' title = 'Working...' ng-cloak>
               <span class = 'glyphicon glyphicon-refresh glyphicon-refresh-animate'></span>
             </button>
 
             <!-- Save Button -->
-            <button type = 'button' class = 'btn btn-success' ng-click = 'openSaveDataModal()' title = 'Save Workflow'>
+            <button type = 'button' class = 'btn btn-success' ng-click = 'openSaveDataModal()' title = 'Save Workflow' ng-if = '!public_proj'>
               <span class = 'glyphicon glyphicon-floppy-save icon-large'></span>
             </button>
 
@@ -374,7 +377,7 @@
                               <span class = 'glyphicon glyphicon-export'></span>
                             </button>
                             <!-- Delete Workflow Button -->
-                            <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteWorkflow(workflow)' title = 'Delete Workflow'>
+                            <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteWorkflow(workflow)' title = 'Delete Workflow' ng-if = '!public_proj'>
                               <span class = 'glyphicon glyphicon-minus'></span>
                             </button>
                           </div>
@@ -398,7 +401,7 @@
                     <div class = 'col-md-4'></div>
                     <div class = 'col-md-4'></div>
                     <div class = 'col-md-4'>
-                      <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteAllWorkflows()'>Delete All Workflows</button>
+                      <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteAllWorkflows()' ng-if = '!public_proj'>Delete All Workflows</button>
                     </div>
                   </div>
 

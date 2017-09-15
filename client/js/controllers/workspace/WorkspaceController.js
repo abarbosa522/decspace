@@ -1,10 +1,18 @@
 app.controller('WorkspaceController', function($scope, $window, $http, $compile, $q, OrderByService, CATSDService, InquiryService, SRFService, MethodsService, SortDataService) {
   /*** SETUP FUNCTIONS ***/
 
-  //get the id of the open project
-  var url = window.location.href;
-  var proj_id = Number(url.substr(url.indexOf('?id=') + 4));
-
+  //get the parameters of the open project
+  var url = new URL(window.location.href);
+  var proj_id = url.searchParams.get('id');
+  
+  $scope.public_proj;
+  if(url.searchParams.get('public') == 'y')
+    $scope.public_proj = true;
+  else
+    $scope.public_proj = false;
+  
+  var public_user = url.searchParams.get('user');
+  
   //check if there is a user logged in
   function requestLogIn() {
     $http.get('/requestlogin').then(function(res) {
@@ -74,7 +82,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
       //get the selected project
       for(proj in response.data) {
-        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
+        if((($scope.public_proj && response.data[proj].username == public_user) || (!$scope.public_proj && response.data[proj].username == $scope.username)) && response.data[proj].project_id == proj_id) {
           delete response.data[proj]['_id'];
           previous_proj = angular.copy(response.data[proj]);
 
@@ -85,6 +93,13 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
           //project to store in the db and remove the id of the document
           new_proj = response.data[proj];
+
+          //if the project was accessed by a different and the project is public
+          if(response.data[proj].username == $scope.username)
+            $scope.accessed_by_owner = true;
+          else
+            $scope.accessed_by_owner = false;
+          
           break;
         }
       }
@@ -149,50 +164,50 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   //save the current data
   $scope.saveData = function(callback) {
-
     $http.get('/projects').then(function(response) {
-        var previous_proj, new_proj;
+      var previous_proj, new_proj;
 
-        //get the current project
-        for(proj in response.data) {
-          if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
-            delete response.data[proj]['_id'];
+      //get the current project
+      for(proj in response.data) {
+        if($scope.username == response.data[proj].username && response.data[proj].project_id == proj_id) {
+          delete response.data[proj]['_id'];
 
-            //save the previous project
-            previous_proj = angular.copy(response.data[proj]);
+          //save the previous project
+          previous_proj = angular.copy(response.data[proj]);
 
-            var new_workflow = {};
-            new_workflow.modules = modules;
-            new_workflow.connections = connections;
+          var new_workflow = {};
+          new_workflow.modules = modules;
+          new_workflow.connections = connections;
 
-            //get current date
-            var current_date = new Date();
-            var save_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
-            var save_time = current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
+          //get current date
+          var current_date = new Date();
+          var save_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
+          var save_time = current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
 
-            new_workflow.date = save_date;
-            new_workflow.time = save_time;
+          new_workflow.date = save_date;
+          new_workflow.time = save_time;
 
-            new_workflow.comment = $scope.save_comment;
+          new_workflow.comment = $scope.save_comment;
 
-            var largest_id = 0;
+          var largest_id = 0;
 
-            for(workflow in response.data[proj].archive)
-              if(response.data[proj].archive[workflow].id > largest_id)
-                largest_id = response.data[proj].archive[workflow].id;
+          for(workflow in response.data[proj].archive)
+            if(response.data[proj].archive[workflow].id > largest_id)
+              largest_id = response.data[proj].archive[workflow].id;
 
-            largest_id++;
+          largest_id++;
 
-            new_workflow.id = largest_id;
+          new_workflow.id = largest_id;
 
-            response.data[proj].archive.push(new_workflow);
+          response.data[proj].archive.push(new_workflow);
 
-            //project to store in the db
-            new_proj = response.data[proj];
-            break;
-          }
+          //project to store in the db
+          new_proj = response.data[proj];
+
+          break;
         }
-
+      }
+      
       //update database project
       $http.put('/projects', [previous_proj, new_proj]).then(function() {
         //show save success alert
@@ -217,8 +232,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
       //reload last saved workflow
       if(workflow == '') {
-        for(proj in response.data)
-          if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
+        for(proj in response.data) 
+          if((($scope.public_proj && response.data[proj].username == public_user) || (!$scope.public_proj && response.data[proj].username == $scope.username)) && response.data[proj].project_id == proj_id) {
             if(response.data[proj].archive.length > 0) {
               modules = response.data[proj].archive[response.data[proj].archive.length - 1].modules;
               connections = response.data[proj].archive[response.data[proj].archive.length - 1].connections;
@@ -228,7 +243,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       }
       else {
         for(proj in response.data)
-          if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
+          if((($scope.public_proj && response.data[proj].username == public_user) || (!$scope.public_proj && response.data[proj].username == $scope.username)) && response.data[proj].project_id == proj_id) {
             for(workf in response.data[proj].archive)
               if(response.data[proj].archive[workf].id == workflow) {
                 modules = response.data[proj].archive[workf].modules;
@@ -1795,7 +1810,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     $http.get('/projects').then(function(response) {
       //get the current project
       for(proj in response.data)
-        if(response.data[proj].username == $scope.username && response.data[proj]['project_id'] == proj_id) {
+        if((($scope.public_proj && response.data[proj].username == public_user) || (!$scope.public_proj && response.data[proj].username == $scope.username)) && response.data[proj].project_id == proj_id) {
           $scope.archive = response.data[proj].archive;
           break;
         }

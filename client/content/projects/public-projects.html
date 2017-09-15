@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DecSpace: Public Projects</title>
+
+    <meta name = 'viewport' content = 'width = device-width, initial-scale = 1'>
+
+    <!-- CSS Stylesheet -->
+    <link rel = 'stylesheet' type = 'text/css' href = '../../css/index.css'/>
+
+    <!-- jQuery -->
+    <script type = 'text/javascript' src = '../../js/shared/jquery-3.1.0.js'></script>
+    <script type = 'text/javascript' src = '../../js/shared/jquery-ui-1.12.0/jquery-ui.js'></script>
+
+    <!-- AngularJS -->
+    <script src = '../../js/shared/angular.min.js'></script>
+
+    <!-- AngularJS Modules -->
+    <script src = '../../js/app.js'></script>
+
+    <!-- AngularJS Controllers -->
+    <script src = '../../js/controllers/projects/PublicProjectsController.js'></script>
+
+    <!-- AngularJS Services -->
+    <script src = '../../js/services/SortDataService.js'></script>
+
+    <!-- Bootstrap -->
+    <link rel = 'stylesheet' href = '../../js/shared/bootstrap-3.3.7-dist/css/bootstrap.min.css'/>
+    <script type = 'text/javascript' src = '../../js/shared/bootstrap-3.3.7-dist/js/bootstrap.js'></script>
+
+    <!-- Google Web Fonts -->
+    <link href = 'https://fonts.googleapis.com/css?family=Open+Sans:400,600i' rel = 'stylesheet'>
+
+    <!-- ng-draggable module -->
+    <script src = '../../js/shared/ng-draggable/ngDraggable.js'></script>
+
+    <!-- Font Awesome -->
+    <link rel = 'stylesheet' href = '../../js/shared/font-awesome-4.7.0/css/font-awesome.css'>
+  </head>
+
+  <body ng-app = 'decspace' ng-controller = 'PublicProjectsController'>
+
+    <!-- Navigation Bar -->
+    <nav class = 'navbar navbar-custom navbar-fixed-top'>
+      <div class = 'container'>
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class = 'navbar-header'>
+          <button type = 'button' class = 'navbar-toggle collapsed' data-toggle = 'collapse' data-target = '#top-navbar' aria-expanded = 'false'>
+            <span class = 'sr-only'>Toggle navigation</span>
+            <span class = 'icon-bar'></span>
+            <span class = 'icon-bar'></span>
+            <span class = 'icon-bar'></span>
+          </button>
+          <!-- Title -->
+          <a class = 'navbar-brand' href = '../../index.html'>DecSpace</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class = 'collapse navbar-collapse' id = 'top-navbar'>
+          <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
+          <ul class = 'nav navbar-nav navbar-right'>
+            <li>
+              <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic' ng-if = '!unregistered_user' ng-cloak>Welcome, {{name}}!</p>
+
+              <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic' ng-if = 'unregistered_user' ng-cloak>Welcome!</p>
+            </li>
+            
+            <li><a href = 'projects.html'>My Projects</a></li>
+            
+            <li class = 'active'><a href = 'public-projects.html'>Public Projects</a></li>
+            
+            <li><a href = '../homepage/about.html'>About</a></li>
+
+            <li><a href = '../method-catalog/method-catalog.html'>Method Catalog</a></li>
+
+            <li><a href = '../homepage/faq.html'>FAQ</a></li>
+
+            <li><a href = '../homepage/contactus.html'>Contact Us</a></li>
+
+            <li><a href = '../settings/settings.html'>Settings</a></li>
+
+            <li><a href = '../administrator/administrator.html' ng-if = 'username == "admin@admin"' ng-cloak>Administrator</a></li>
+
+            <li>
+              <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'logOut()'>
+                <span class = 'glyphicon glyphicon-log-out'></span>
+                Log Out
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div id = 'main-content' class = 'container'>
+      <br>
+
+      <div class = 'row'>
+        <span class = 'header-1' style = 'margin-left: 10%'>Public Projects</span>
+
+        <button type = 'button' class = 'btn btn-default' ng-click = 'changeView("list")' title = 'List View' style = 'float: right; margin-top: 1%' ng-class = '{active : current_view == "list"}'>
+          <i class = 'fa fa-list fa-lg'></i>
+        </button>
+
+        <button type = 'button' class = 'btn btn-default' ng-click = 'changeView("table")' title = 'Table View' style = 'float: right; margin-top: 1%' ng-class = '{active : current_view == "table"}'>
+          <i class = 'fa fa-table fa-lg'></i>
+        </button>
+      </div>
+
+      <br>
+
+      <!-- TABLE VIEW -->
+      <div ng-if = 'current_view == "table"'>
+        <table class = 'table table-bordered table-hover' data-toggle = 'table'>
+          <thead>
+            <tr>
+              <th class = 'text-center'>
+                Project Name
+                <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeCurrentOrder("name", "descendant")' title = 'Sort "Name" Downwards'></span></a>
+                <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeCurrentOrder("name", "ascendant")' title = 'Sort "Name" Upwards'></span></a>
+              </th>
+              
+              <th class = 'text-center'>
+                Username
+                <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeCurrentOrder("username", "descendant")' title = 'Sort "Username" Downwards'></span></a>
+                <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeCurrentOrder("username", "ascendant")' title = 'Sort "Username" Upwards'></span></a>
+              </th>
+              
+              <th class = 'text-center col-md-2'>
+                Creation Date
+                <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeCurrentOrder("creation_date", "descendant")' title = 'Sort "Creation Date" Downwards'></span></a>
+                <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeCurrentOrder("creation_date", "ascendant")' title = 'Sort "Creation Date" Upwards'></span></a>
+              </th>
+
+              <th class = 'text-center col-md-2'>
+                Last Update
+                <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'changeCurrentOrder("last_update", "descendant")' title = 'Sort "Last Update" Downwards'></span></a>
+                <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'changeCurrentOrder("last_update", "ascendant")' title = 'Sort "Last Update" Upwards'></span></a>
+              </th>
+              
+              <th class = 'col-md-2'></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat = 'project in projects'>
+              <!-- Project Name -->
+              <td ng-if = 'project.copy_number == undefined'>{{project.name}}</td>
+
+              <td ng-if = 'project.copy_number != undefined'>{{project.name}}({{project.copy_number}})</td>
+              
+              <!-- Username -->
+              <td>{{project.username}}</td>
+              
+              <!-- Creation Date -->
+              <td>{{project.creation_date}}</td>
+
+              <!-- Last Update -->
+              <td>{{project.last_update}}</td>
+              
+              <!-- Open and Clone Project -->
+              <td ng-if = 'delete_id_project != project.project_id'>
+                <button type = 'button' class = 'btn btn-primary' ng-click = 'openProject(project)' title = 'Open Project'>
+                  <span class = 'glyphicon glyphicon-folder-open'></span>
+                </button>
+
+                <button type = 'button' class = 'btn btn-info' ng-click = 'cloneProject(project)' title = 'Clone Project'>
+                  <span class = 'glyphicon glyphicon-duplicate'></span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- LIST VIEW -->
+      <div ng-if = 'current_view == "list"' ng-cloak>
+        <table class = 'table table-hover' style = 'border: none'>
+          <thead>
+            <tr>
+              <th class = 'col-md-1' style = 'border: none'></th>
+              <th class = 'col-md-8' style = 'border: none'></th>
+              <th class = 'col-md-3' style = 'border: none'></th>
+            </tr>
+          </thead>
+          <tbody style = 'border: none'>
+            <!-- PROJECT NAME LIST -->
+            <tr ng-click = 'openList("name")' ng-class = '{active: current_list == "name"}'>
+              <td>
+                <a href ng-if = 'current_list != "name"'><span class = 'glyphicon glyphicon-chevron-right'></span></a>
+                <a href ng-if = 'current_list == "name"'><span class = 'glyphicon glyphicon-chevron-down'></span></a>
+              </td>
+              <td colspan = '2'><strong style = 'margin-left: -8%'>Project Name</strong></td>
+            </tr>
+            <tr ng-repeat = 'project in projects' ng-if = 'current_list == "name"'>
+              <td></td>
+              
+              <td><span style = 'margin-left: 27%'>{{project.name}}</span></td>
+              
+              <!-- Open and Clone Project -->
+              <td ng-if = 'delete_id_project != project.project_id'>
+                <button type = 'button' class = 'btn btn-primary' ng-click = 'openProject(project)' title = 'Open Project'>
+                  <span class = 'glyphicon glyphicon-folder-open'></span>
+                </button>
+
+                <button type = 'button' class = 'btn btn-info' ng-click = 'cloneProject(project)' title = 'Clone Project'>
+                  <span class = 'glyphicon glyphicon-duplicate'></span>
+                </button>
+              </td>
+            </tr>
+            
+            <!-- USERNAME LIST -->
+            <tr ng-click = 'openList("username")' ng-class = '{active: current_list == "username"}'>
+              <td>
+                <a href ng-if = 'current_list != "username"'><span class = 'glyphicon glyphicon-chevron-right'></span></a>
+                <a href ng-if = 'current_list == "username"'><span class = 'glyphicon glyphicon-chevron-down'></span></a>
+              </td>
+              <td colspan = '2'><strong style = 'margin-left: -8%'>Username</strong></td>
+            </tr>
+            <tr ng-repeat = 'project in projects' ng-if = 'current_list == "username"'>
+              <td></td>
+              
+              <td><span style = 'margin-left: 27%'>{{project.name}} ({{project.username}})</span></td>
+              
+              <!-- Open and Clone Project -->
+              <td ng-if = 'delete_id_project != project.project_id'>
+                <button type = 'button' class = 'btn btn-primary' ng-click = 'openProject(project)' title = 'Open Project'>
+                  <span class = 'glyphicon glyphicon-folder-open'></span>
+                </button>
+
+                <button type = 'button' class = 'btn btn-info' ng-click = 'cloneProject(project)' title = 'Clone Project'>
+                  <span class = 'glyphicon glyphicon-duplicate'></span>
+                </button>
+              </td>
+            </tr>
+            
+            <!-- CREATION DATE LIST -->
+            <tr ng-click = 'openList("creation_date")' ng-class = '{active: current_list == "creation_date"}'>
+              <td>
+                <a href ng-if = 'current_list != "creation_date"'><span class = 'glyphicon glyphicon-chevron-right'></span></a>
+                <a href ng-if = 'current_list == "creation_date"'><span class = 'glyphicon glyphicon-chevron-down'></span></a>
+              </td>
+              <td colspan = '2'><strong style = 'margin-left: -8%'>Creation Date</strong></td>
+            </tr>
+            <tr ng-repeat = 'project in projects' ng-if = 'current_list == "creation_date"' ng-cloak>
+              <td></td>
+              
+              <td><span style = 'margin-left: 27%'>{{project.name}} ({{project.creation_date}})</span></td>
+              
+              <!-- Open and Clone Project -->
+              <td ng-if = 'delete_id_project != project.project_id'>
+                <button type = 'button' class = 'btn btn-primary' ng-click = 'openProject(project)' title = 'Open Project'>
+                  <span class = 'glyphicon glyphicon-folder-open'></span>
+                </button>
+
+                <button type = 'button' class = 'btn btn-info' ng-click = 'cloneProject(project)' title = 'Clone Project'>
+                  <span class = 'glyphicon glyphicon-duplicate'></span>
+                </button>
+              </td>
+            </tr>
+
+            <!-- LAST UPDATE LIST -->
+            <tr ng-click = 'openList("last_update")' ng-class = '{active: current_list == "last_update"}'>
+              <td>
+                <a href ng-if = 'current_list != "last_update"'><span class = 'glyphicon glyphicon-chevron-right'></span></a>
+                <a href ng-if = 'current_list == "last_update"'><span class = 'glyphicon glyphicon-chevron-down'></span></a>
+              </td>
+              <td colspan = '2'><strong style = 'margin-left: -8%'>Last Update</strong></td>
+            </tr>
+            <tr ng-repeat = 'project in projects' ng-if = 'current_list == "last_update"' ng-cloak>
+              <td></td>
+              
+              <td><span style = 'margin-left: 27%'>{{project.name}} ({{project.last_update}})</span></td>
+              
+              <!-- Open and Clone Project -->
+              <td ng-if = 'delete_id_project != project.project_id'>
+                <button type = 'button' class = 'btn btn-primary' ng-click = 'openProject(project)' title = 'Open Project'>
+                  <span class = 'glyphicon glyphicon-folder-open'></span>
+                </button>
+
+                <button type = 'button' class = 'btn btn-info' ng-click = 'cloneProject(project)' title = 'Clone Project'>
+                  <span class = 'glyphicon glyphicon-duplicate'></span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <br><br>
+
+    </div>
+  </body>
+</html>
