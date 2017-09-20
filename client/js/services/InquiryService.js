@@ -62,10 +62,10 @@ app.service('InquiryService', function($http, $q) {
 
   function createAnswerDocs(new_round) {
     for(email in new_round.emails)
-      self.createAnswerData(new_round, new_round.emails[email].address, '', '', 'approved', true);
+      self.createAnswerData(new_round, new_round.emails[email].address, '', '', 'approved', true, new_round.emails[email].ask_characterization_questions);
   }
 
-  this.createAnswerData = function(new_round, email, name, affiliation, status, direct_email) {
+  this.createAnswerData = function(new_round, email, name, affiliation, status, direct_email, ask_characterization_questions) {
     //create a new answer document
     var new_answer = {};
     //define the corresponding round id
@@ -96,6 +96,8 @@ app.service('InquiryService', function($http, $q) {
     var current_date = new Date();
     new_answer.request_date = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
     new_answer.request_date += ' ' + current_date.getHours() + ':' + current_date.getMinutes() + ':' + current_date.getSeconds();
+    
+    new_answer.ask_characterization_questions = ask_characterization_questions;
     
     //define the set of questions
     new_answer.questions = [];

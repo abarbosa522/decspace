@@ -1403,6 +1403,7 @@
                     <thead>
                       <tr>
                         <th class = 'text-center'>Email Address</th>
+                        <th class = 'text-center'>Ask Characterization Questions?</th>
                         <th class = 'col-md-2'></th>
                       </tr>
                     </thead>
@@ -1413,6 +1414,13 @@
                           <div id = 'inquiry-email-{{email.id}}'>
                             <input type = 'text' class = 'form-control' ng-model = 'email.address' ng-blur = 'blurInquiryEmail(email)'>
                           </div>
+                        </td>
+                        <td>
+                          <select class = 'form-control' ng-model = 'email.ask_characterization_questions' ng-blur = ''>
+                            <option value = '' selected disabled>--- Please Select ---</option>
+                            <option>Yes</option>
+                            <option>No</option>
+                          </select>
                         </td>
                         <td ng-if = 'email.id != deleteIdEmail'>
                           <!-- Duplicate Email Button -->
@@ -1438,6 +1446,15 @@
                         <td>
                           <div id = 'new-inquiry-email'>
                             <input class = 'form-control' type = 'text' ng-model = 'new_inquiry_email.address'>
+                          </div>
+                        </td>
+                        <td>
+                          <div id = 'new-inquiry-ask'>
+                            <select class = 'form-control' ng-model = 'new_inquiry_email.ask_characterization_questions'>
+                              <option value = '' selected disabled>--- Please Select ---</option>
+                              <option>Yes</option>
+                              <option>No</option>
+                            </select>
                           </div>
                         </td>
                         <td>
@@ -1791,7 +1808,7 @@
                       </div>
                     </div>
                     
-                    <sub>To add the personalized link to the email, just write '&lt;LINK&gt;'</sub>
+                    <sub>To add the personalized link to the email, just add '&lt;LINK&gt;' to the email text.</sub>
                       
                   </form>
 

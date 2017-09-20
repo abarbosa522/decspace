@@ -182,9 +182,6 @@ app.post('/default_inquiry_survey', function(req, res) {
 
 //send personalized inquiry email
 app.post('/personalized_inquiry_survey', function(req, res) {
-  //SOLUÇAO TEMPORARIA
-  req.body.text += '\nThe link to your survey is <LINK>';
-  
   //replace "<LINK>" with the actual link
   req.body.text = req.body.text.replace(/<LINK>/g, req.body.link);
   

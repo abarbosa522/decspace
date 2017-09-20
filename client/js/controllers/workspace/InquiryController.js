@@ -13,10 +13,23 @@ app.controller('InquiryController', function($scope) {
   /*** EMAILS ***/
   
   $scope.addInquiryEmail = function() {
+    var can_add = true;
     //if there is an input field not assigned
-    if($scope.new_inquiry_email.address == undefined || $scope.new_inquiry_email.address == '')
+    if($scope.new_inquiry_email.address == undefined || $scope.new_inquiry_email.address == '') {
       $('#new-inquiry-email').addClass('has-error');
-    else {
+      can_add = false;
+    }
+    else
+      $('#new-inquiry-email').removeClass('has-error');
+    
+    if($scope.new_inquiry_email.ask_characterization_questions == undefined || $scope.new_inquiry_email.ask_characterization_questions == '') {
+      $('#new-inquiry-ask').addClass('has-error');
+      can_add = false;
+    }
+    else
+      $('#new-inquiry-ask').removeClass('has-error');
+    
+    if(can_add) {
       //assign an unique id to the new email
       if($scope.currentModule.input.emails.length == 0)
         $scope.new_inquiry_email.id = 1;
@@ -29,6 +42,7 @@ app.controller('InquiryController', function($scope) {
 
       //remove all error classes - just be sure
       $('#new-inquiry-email').removeClass('has-error');
+      $('#new-inquiry-ask').removeClass('has-error');
     }
   }
 

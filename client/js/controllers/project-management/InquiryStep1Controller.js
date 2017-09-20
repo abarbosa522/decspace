@@ -22,6 +22,9 @@ app.controller('InquiryStep1Controller', function($scope, $window, $http) {
           $scope.glossary = response.data[answer].glossary;
           //get the description
           $scope.description = response.data[answer].description;
+          //
+          $scope.ask_characterization_questions = response.data[answer].ask_characterization_questions;
+          console.log($scope.ask_characterization_questions)
           break;
         }
       }
@@ -45,8 +48,12 @@ app.controller('InquiryStep1Controller', function($scope, $window, $http) {
 
   //save the current data on the database
   $scope.nextStep = function() {
+    console.log($scope.ask_characterization_questions)
     //redirect to the next step
-    $window.location.href = 'inquiry2.html?r=' + round_id + '&u=' + $scope.user_id;
+    if($scope.ask_characterization_questions == 'Yes')
+      $window.location.href = 'inquiry2.html?r=' + round_id + '&u=' + $scope.user_id;
+    else
+      $window.location.href = 'inquiry3.html?r=' + round_id + '&u=' + $scope.user_id;
   }
 
   /*** STARTUP FUNCTIONS ***/

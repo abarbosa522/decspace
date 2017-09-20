@@ -77,7 +77,7 @@ app.controller('InquiryLoginController', function($scope, $window, $http, Inquir
             $http.get('/inquiry_rounds').then(function(response) {
               for(round in response.data)
                 if(response.data[round].id == round_id) {
-                  InquiryService.createAnswerData(response.data[round], new_expert.email, new_expert.name, new_expert.affiliation, 'pending', false);
+                  InquiryService.createAnswerData(response.data[round], new_expert.email, new_expert.name, new_expert.affiliation, 'pending', false, 'Yes');
                   break;
                 }
             });
