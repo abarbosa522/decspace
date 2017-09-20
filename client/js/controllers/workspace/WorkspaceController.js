@@ -2299,16 +2299,28 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   }
   
   $scope.addInquiryOutputEmail = function() {
-    var already_sent_email = false;
+    var already_sent_email = false, can_add_email = true;
     
     for(email in $scope.currentModule.input.emails)
       if($scope.currentModule.input.emails[email].address == $scope.new_inquiry_output_email.address)
         already_sent_email = true;
       
     //if there is an input field not assigned
-    if($scope.new_inquiry_output_email.address == undefined || $scope.new_inquiry_output_email.address == '' || already_sent_email)
+    if($scope.new_inquiry_output_email.address == undefined || $scope.new_inquiry_output_email.address == '' || already_sent_email) {
       $('#new-inquiry-output-email').addClass('has-error');
-    else {      
+      can_add_email = false;
+    }
+    else
+      $('#new-inquiry-output-email').removeClass('has-error');
+    
+    if($scope.new_inquiry_output_email.ask_characterization_questions == undefined || $scope.new_inquiry_output_email.ask_characterization_questions == '' || already_sent_email) {
+      $('#new-inquiry-output-ask').addClass('has-error');
+      can_add_email = false;
+    }
+    else
+      $('#new-inquiry-output-ask').removeClass('has-error');
+    
+    if(can_add_email) {      
       //assign an unique id to the new email
       if($scope.currentModule.input.emails.length == 0)
         $scope.new_inquiry_output_email.id = 1;
@@ -2329,7 +2341,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
           }
         
         //create answer doc
-        InquiryService.createAnswerData(current_round, $scope.new_inquiry_output_email.address, 'approved', true);
+        InquiryService.createAnswerData(current_round, $scope.new_inquiry_output_email.address, 'approved', true, $scope.new_inquiry_output_email.ask_characterization_questions);
 
         //send link
         InquiryService.sendSurveyLink($scope.currentModule.input, $scope.new_inquiry_output_email.address);
@@ -2340,9 +2352,11 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
         $http.put('/inquiry_rounds', [prev_round, nw_round]).then(function() {
           $scope.new_inquiry_output_email.address = '';
-
+          $scope.new_inquiry_output_email.ask_characterization_questions = '';
+          
           //remove all error classes - just be sure
           $('#new-inquiry-output-email').removeClass('has-error');
+          $('#new-inquiry-output-ask').removeClass('has-error');
         });
       });
     }

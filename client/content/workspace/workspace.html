@@ -1403,7 +1403,7 @@
                     <thead>
                       <tr>
                         <th class = 'text-center'>Email Address</th>
-                        <th class = 'text-center'>Ask Characterization Questions?</th>
+                        <th class = 'text-center col-md-3'>Ask Characterization Questions?</th>
                         <th class = 'col-md-2'></th>
                       </tr>
                     </thead>
@@ -2187,18 +2187,29 @@
                         <thead>
                           <tr>
                             <th class = 'text-center'>Email Address</th>
+                            <th class = 'text-center col-md-3'>Ask Characterization Questions?</th>
                             <th class = 'col-md-2'></th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr ng-repeat = 'email in currentModule.input.emails'>
                             <td>{{email.address}}</td>
+                            <td>{{email.ask_characterization_questions}}</td>
                             <td></td>
                           </tr>
                           <tr class = 'active'>
                             <td>
                               <div id = 'new-inquiry-output-email'>
                                 <input class = 'form-control' type = 'text' ng-model = 'new_inquiry_output_email.address'>
+                              </div>
+                            </td>
+                            <td>
+                              <div id = 'new-inquiry-output-ask'>
+                                <select class = 'form-control' ng-model = 'new_inquiry_output_email.ask_characterization_questions'>
+                                  <option value = '' selected disabled>--- Please Select ---</option>
+                                  <option>Yes</option>
+                                  <option>No</option>
+                                </select>
                               </div>
                             </td>
                             <td>
