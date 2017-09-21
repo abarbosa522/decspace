@@ -494,7 +494,8 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
             'least_important' : '#ff0000'
           },
           'glossary' : [],
-          'scale' : ''
+          'scale' : '',
+          'ask_characterization_questions_survey_link' : ''
         };
         //initialize the output data array
         new_mod['output'] = [];
@@ -1367,6 +1368,9 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
                 //INQUIRY - SCALE
                 else if(modules[modl].type == 'Inquiry' && input_type == 'scale')
                   modules[modl].input.scale = modules[mod].output[0].scale;
+                //INQUIRY - ASK THE CHARACTERIZATION QUESTIONS TO THE SURVEY LINK EXPERTS
+                else if(modules[modl].type == 'Inquiry' && input_type == 'ask_characterization_questions_survey_link')
+                  modules[modl].input.ask_characterization_questions_survey_link = modules[mod].output[0].ask_characterization_questions_survey_link;
                 //INQUIRY - SUGGESTIONS
                 else if(modules[modl].type == 'Inquiry' && input_type == 'suggestions') {
                   modules[modl].input.suggestions = modules[mod].output[0];
@@ -1579,6 +1583,9 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         //INQUIRY - SUBJECT
         if(modules[mod].type == 'Inquiry' && connection.input_type == 'subject')
           modules[mod].input.subject = '';
+        //INQUIRY - ASK CHARACTERIZATION QUESTIONS TO THE SURVEY LINK EXPERTS
+        if(modules[mod].type == 'Inquiry' && connection.input_type == 'ask_characterization_questions_survey_link')
+          modules[mod].input.ask_characterization_questions_survey_link = '';
         //INQUIRY - SUGGESTIONS TOGGLE
         else if(modules[mod].type == 'Inquiry' && connection.input_type == 'suggestions toggle')
           modules[mod].input['suggestions toggle'] = false;
@@ -1645,7 +1652,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
           if(modules[mod]['input'][input].length > 0)
             input_data++;
           //SPECIAL CASE - INQUIRY (EMAILS, CURRENT ROUND, ROUND ID, PERSONALIZED EMAIL, EMAIL, COLOR SCHEME, SUGGESTIONS)
-          else if(modules[mod].type == 'Inquiry' && (input == 'emails' || input == 'current_round' || input == 'round_id' || input == 'personalized_email' || input == 'email' || input == 'color_scheme' || input == 'suggestions'))
+          else if(modules[mod].type == 'Inquiry' && (input == 'emails' || input == 'current_round' || input == 'round_id' || input == 'personalized_email' || input == 'email' || input == 'color_scheme' || input == 'suggestions' || input == 'ask_characterization_questions_survey_link'))
             input_data++;
           //SPECIAL CASE - SRF
           else if(modules[mod].type == 'SRF' && (input == 'ranking' || input == 'ratio z' || input == 'decimal places' || input == 'weight type'))
@@ -1758,7 +1765,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         break;
 
       case 'Inquiry':
-        var results = InquiryService.startRound($scope.username, proj_id, mod.input.subject, mod.input.description, mod.input.emails, mod.input.open_answer_questions, mod.input.questions, mod.input.current_round, mod.input.suggestions, mod.input.personalized_email, mod.input.email, mod.input.color_scheme, mod.input.glossary, mod.input.scale);
+        var results = InquiryService.startRound($scope.username, proj_id, mod.input);
 
         results.then(function(resolve) {
           mod.input.round_id = resolve.id;

@@ -19,6 +19,7 @@ app.controller('InquiryLoginController', function($scope, $window, $http, Inquir
         if(response.data[round].id == round_id) {
           $scope.subject = response.data[round].subject;
           $scope.inquiry_owner = response.data[round].username;
+          $scope.ask_characterization_questions = response.data[round].ask_characterization_questions_survey_link;
         }
     });
   }
@@ -77,7 +78,7 @@ app.controller('InquiryLoginController', function($scope, $window, $http, Inquir
             $http.get('/inquiry_rounds').then(function(response) {
               for(round in response.data)
                 if(response.data[round].id == round_id) {
-                  InquiryService.createAnswerData(response.data[round], new_expert.email, new_expert.name, new_expert.affiliation, 'pending', false, 'Yes');
+                  InquiryService.createAnswerData(response.data[round], new_expert.email, new_expert.name, new_expert.affiliation, 'pending', false, $scope.ask_characterization_questions);
                   break;
                 }
             });

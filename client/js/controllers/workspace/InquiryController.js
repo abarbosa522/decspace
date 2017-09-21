@@ -39,7 +39,8 @@ app.controller('InquiryController', function($scope) {
       $scope.currentModule.input.emails.push(angular.copy($scope.new_inquiry_email));
 
       $scope.new_inquiry_email.address = '';
-
+      $scope.new_inquiry_email.ask_characterization_questions = '';
+      
       //remove all error classes - just be sure
       $('#new-inquiry-email').removeClass('has-error');
       $('#new-inquiry-ask').removeClass('has-error');

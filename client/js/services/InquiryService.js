@@ -1,7 +1,7 @@
 app.service('InquiryService', function($http, $q) {
   var self = this;
 
-  this.startRound = function(username, proj_id, subject, description, emails, open_answer_questions, questions, current_round, suggestions_toggle, personalized_email, email_content, color_scheme, glossary, scale) {
+  this.startRound = function(username, proj_id, mod_input) {
     var deferred = $q.defer();
 
     $http.get('/inquiry_rounds').then(function(response) {
@@ -21,37 +21,39 @@ app.service('InquiryService', function($http, $q) {
       //project this round belongs to
       new_round.project_id = proj_id;
       //id in the project context
-      new_round.execution_project_id = current_round;
+      new_round.execution_project_id = mod_input.current_round;
       //who created the round
       new_round.username = username;
       //list of emails
-      new_round.emails = emails;
+      new_round.emails = mod_input.emails;
       //list of open answer questions
-      new_round.open_answer_questions = open_answer_questions;
+      new_round.open_answer_questions = mod_input.open_answer_questions;
       //list of questions
-      new_round.questions = questions;
+      new_round.questions = mod_input.questions;
       //survey subject
-      new_round.subject = subject;
+      new_round.subject = mod_input.subject;
       //survey description
-      new_round.description = description;
+      new_round.description = mod_input.description;
       //suggestions toggle
-      new_round.suggestions_toggle = suggestions_toggle;
+      new_round.suggestions_toggle = mod_input.suggestions_toggle;
       //generate survey link
       new_round.link = 'http://decspace.sysresearch.org/content/project-management/inquiry-login.html?r=' + new_round.id;
       //color scheme
-      new_round.color_scheme = color_scheme;
+      new_round.color_scheme = mod_input.color_scheme;
       //glossary
-      new_round.glossary = glossary;
+      new_round.glossary = mod_input.glossary;
       //scale
-      new_round.scale = scale;
-
+      new_round.scale = mod_input.scale;
+      //ask characterization questions survey link
+      new_round.ask_characterization_questions_survey_link = mod_input.ask_characterization_questions_survey_link;
+      
       //add the new list of projects
       $http.post('/inquiry_rounds', new_round).then(function() {
         //create the answer documents
         createAnswerDocs(new_round);
 
         //send the emails with links to the surveys
-        sendSurveyLinks(new_round, personalized_email, email_content);
+        sendSurveyLinks(new_round, mod_input.personalized_email, mod_input.email_content);
 
         deferred.resolve(new_round);
       });
