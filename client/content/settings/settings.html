@@ -59,7 +59,9 @@
               <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic' ng-if = 'unregistered_user' ng-cloak>Welcome!</p>
             </li>
             
-            <li><a href = '../workspace/projects.html'>Projects</a></li>
+            <li><a href = '../projects/projects.html'>My Projects</a></li>
+            
+            <li><a href = '../projects/public-projects.html'>Public Projects</a></li>
             
             <li><a href = '../homepage/about.html'>About</a></li>
 
@@ -133,17 +135,31 @@
       </form>
 
       <br>
+      
+      <!-- ALERTS -->
+      <div class = 'row'>
+        <div class = 'col-md-3'></div>
+        
+        <div id = 'password-error' class = 'alert alert-danger col-md-6' role = 'alert' ng-cloak>
+          <button type = 'button' class = 'close' ng-click = 'hideAlert("password-error")' aria-label = 'Close'>
+            <span aria-hidden = 'true'>&times;</span>
+          </button>
+          The current password was <strong>not</strong> correctly introduced.
+        </div>
 
-      <div class = 'alert alert-danger' role = 'alert' ng-if = 'showPasswordError' ng-cloak>
-        The current password was <strong>not</strong> correctly introduced.
-      </div>
+        <div id = 'password-success' class = 'alert alert-success col-md-6' role = 'alert' ng-cloak>
+          <button type = 'button' class = 'close' ng-click = 'hideAlert("password-success")' aria-label = 'Close'>
+            <span aria-hidden = 'true'>&times;</span>
+          </button>
+          Your password was <strong>successfully</strong> changed!
+        </div>
 
-      <div class = 'alert alert-success' role = 'alert' ng-if = 'showPasswordSuccess' ng-cloak>
-        Your password was <strong>successfully</strong> changed!
-      </div>
-
-      <div class = 'alert alert-danger' role = 'alert' ng-if = 'showFieldsError' ng-cloak>
-        <strong>Please</strong> fill both fields shown above.
+        <div id = 'fields-error' class = 'alert alert-danger col-md-6' role = 'alert' ng-cloak>
+          <button type = 'button' class = 'close' ng-click = 'hideAlert("fields-error")' aria-label = 'Close'>
+            <span aria-hidden = 'true'>&times;</span>
+          </button>
+          <strong>Please</strong> fill both fields shown above.
+        </div>
       </div>
 
     </div>

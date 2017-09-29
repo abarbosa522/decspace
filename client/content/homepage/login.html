@@ -130,6 +130,9 @@
         <div class = 'col-md-2'></div>
 
         <div id = 'login-error' class = 'alert alert-danger col-md-8' role = 'alert' ng-cloak>
+          <button type = 'button' class = 'close' ng-click = 'hideAlert("login-error")' aria-label = 'Close'>
+            <span aria-hidden = 'true'>&times;</span>
+          </button>
           <strong>Incorrect</strong> email or password.
         </div>
 

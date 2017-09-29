@@ -57,7 +57,9 @@
               <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic'>Welcome, {{name}}!</p>
             </li>
             
-            <li><a href = '../workspace/projects.html'>Projects</a></li>
+            <li><a href = '../projects/projects.html'>My Projects</a></li>
+            
+            <li><a href = '../projects/public-projects.html'>Public Projects</a></li>
             
             <li><a href = '../homepage/about.html'>About</a></li>
 
@@ -199,6 +201,11 @@
               <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'newSortProjects("last_update", "descendant")' title = "Sort 'Last Update' Downwards"></span></a>
               <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'newSortProjects("last_update", "ascendant")' title = "Sort 'Last Update' Upwards"></span></a>
             </th>
+            <th class = 'text-center col-md-2'>
+              Privacy Setting
+              <a href><span class = 'glyphicon glyphicon-triangle-bottom' style = 'float: right' ng-click = 'newSortProjects("privacy_setting", "descendant")' title = "Sort 'Last Update' Downwards"></span></a>
+              <a href><span class = 'glyphicon glyphicon-triangle-top' style = 'float: right' ng-click = 'newSortProjects("privacy_setting", "ascendant")' title = "Sort 'Last Update' Upwards"></span></a>
+            </th>
             <th class = 'col-md-2'></th>
           </tr>
         </thead>
@@ -215,7 +222,9 @@
 
             <!-- Last Update -->
             <td>{{project.last_update}}</td>
-
+            
+            <td>{{project.privacy_setting}}</td>
+            
             <!-- Delete Project Button -->
             <td ng-if = '(delete_id_project[0] != project.project_id && delete_id_project[1] != project.username) ||
             (delete_id_project[0] == project.project_id && delete_id_project[1] != project.username) ||

@@ -16,10 +16,15 @@ app.controller('LogInController', function($scope, $window, $http) {
       if(res.data != unsuccessfulString) {
 
         $http.get('/accounts').then(function(response) {
-          var id_doc, proj_res;
+          var previous_proj, new_proj;
 
           for(account in response.data)
             if(response.data[account].email == res.data) {
+              //delete the id of the account
+              delete response.data[account]['_id'];
+              //store the current account
+              previous_proj = angular.copy(response.data[account]);
+              
               //get current date
               var current_date = new Date();
               var last_login = current_date.getDate() + '-' + (current_date.getMonth() + 1) + '-' + current_date.getFullYear();
@@ -27,18 +32,12 @@ app.controller('LogInController', function($scope, $window, $http) {
 
               response.data[account].logged_in = true;
               
-              id_doc = response.data[account]['_id'];
-              proj_res = response.data[account];
-              delete proj_res['_id'];
+              new_proj = response.data[account];
               break;
             }
 
-          //delete the previous document with the list of projects
-          $http.delete('/accounts/' + id_doc).then(function() {
-            //add the new list of projects
-            $http.post('/accounts', proj_res).then(function() {
-              $window.location.href = '../projects/projects.html';
-            });
+          $http.put('/accounts/', [previous_proj, new_proj]).then(function() {
+            $window.location.href = '../projects/projects.html';
           });
         });
       }
@@ -64,19 +63,21 @@ app.controller('LogInController', function($scope, $window, $http) {
     }
   }
 
+  /*** ALERTS FUNCTIONS ***/
   //hide all alerts
   function hideAlerts() {
     $('#login-error').hide();
   }
-
+  
+  //hide a specific alert
+  $scope.hideAlert = function(alert) {
+    $('#' + alert).hide();
+  }
+  
   //show certain alert and hide it smoothly
   function showAlert(alert_id) {
-    //show alert
-    angular.element(document.querySelector('#' + alert_id)).alert();
-    //hide alert
-    angular.element(document.querySelector('#' + alert_id)).fadeTo(3000, 500).slideUp(500, function() {
-      angular.element(document.querySelector('#' + alert_id)).slideUp(500);
-    });
+    hideAlerts();
+    $('#' + alert_id).show();
   }
 
   hideAlerts();

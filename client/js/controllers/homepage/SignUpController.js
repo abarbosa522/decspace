@@ -105,19 +105,21 @@ app.controller('SignUpController', function($scope, $window, $http) {
     }
   }
 
+  /*** ALERTS FUNCTIONS ***/
   //hide all alerts
   function hideAlerts() {
     $('#successful-register').hide();
   }
-
+  
+  //hide a specific alert
+  $scope.hideAlert = function(alert) {
+    $('#' + alert).hide();
+  }
+  
   //show certain alert and hide it smoothly
   function showAlert(alert_id) {
-    //show alert
-    angular.element(document.querySelector('#' + alert_id)).alert();
-    //hide alert
-    angular.element(document.querySelector('#' + alert_id)).fadeTo(3000, 500).slideUp(500, function(){
-      angular.element(document.querySelector('#' + alert_id)).slideUp(500);
-    });
+    hideAlerts();
+    $('#' + alert_id).show();
   }
 
   hideAlerts();

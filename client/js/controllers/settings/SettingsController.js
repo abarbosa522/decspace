@@ -105,49 +105,63 @@ app.controller('SettingsController', function($scope, $window, $http) {
 
   $scope.passwordReset = function() {
     if(getNumberOfFields($scope.password) < 2 || $scope.password.current == '' || $scope.password.new == '') {
-      $scope.showPasswordError = false;
-      $scope.showPasswordSuccess = false;
-      $scope.showFieldsError = true;
+      showAlert('fields-error');
     }
     else {
       $http.get('/accounts').then(function(response) {
-        var id_doc, account_res;
+        var prev_proj, new_proj;
         var password_reset = false;
 
         for(account in response.data) {
           if(response.data[account].email == $scope.username && response.data[account].password == $scope.password.current) {
-            //store and delete the document id
-            id_doc = response.data[account]['_id'];
+            //delete the id of the account
             delete response.data[account]['_id'];
+            //store the current account
+            prev_proj = angular.copy(response.data[account]);
+            
             //change the password to the new one
             response.data[account].password = $scope.password.new;
-            account_res = response.data[account];
             password_reset = true;
+            
+            new_proj = response.data[account];
             break;
           }
         }
 
         if(password_reset) {
           //delete the previous document with the list of projects
-          $http.delete('/accounts/' + id_doc).then(function() {
-            //add the new list of projects
-            $http.post('/accounts', account_res).then(function() {
-              //show success alert
-              $scope.showPasswordError = false;
-              $scope.showPasswordSuccess = true;
-              $scope.showFieldsError = false;
-            });
+          $http.put('/accounts/', [prev_proj, new_proj]).then(function() {
+            //show success alert
+            showAlert('password-success');
           });
         }
         else {
           //show error alert
-          $scope.showPasswordError = true;
-          $scope.showPasswordSuccess = false;
-          $scope.showFieldsError = false;
+          showAlert('password-error');
         }
       });
     }
   }
-
+  
+  /*** ALERTS FUNCTIONS ***/
+  //hide all alerts
+  function hideAlerts() {
+    $('#password-error').hide();
+    $('#password-success').hide();
+    $('#fields-error').hide();
+  }
+  
+  //hide a specific alert
+  $scope.hideAlert = function(alert) {
+    $('#' + alert).hide();
+  }
+  
+  //show certain alert and hide it smoothly
+  function showAlert(alert_id) {
+    hideAlerts();
+    $('#' + alert_id).show();
+  }
+  
   requestLogIn();
+  hideAlerts();
 });
