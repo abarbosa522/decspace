@@ -149,7 +149,8 @@ app.service('InquiryService', function($http, $q) {
     for(email in new_round['emails']) {
       var send_email = {};
       send_email.email = new_round['emails'][email]['address'];
-      send_email.link = 'http://decspace.sysresearch.org/content/project-management/inquiry.html?r=' + new_round['id'] + '&u=' + new_round['emails'][email]['address'];
+      send_email.link = 'http://decspace.sysresearch.org/content/project-management/inquiry.html?r=' + 
+        new_round['id'] + '&u=' + new_round['emails'][email]['address'];
 
       if(!personalized_email)
         $http.post('/default_inquiry_survey', send_email).then(function(response) {});

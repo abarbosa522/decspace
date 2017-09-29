@@ -41,7 +41,9 @@ app.controller('InquiryStep3Controller', function($scope, $window, $http) {
           $scope.glossary = response.data[answer].glossary;
           //scale
           $scope.scale = response.data[answer].scale;
-
+          //answer characterization questions
+          $scope.ask_characterization_questions = response.data[answer].ask_characterization_questions;
+          
           //get survey usability metrics
           log_ins = response.data[answer].usability_metrics.log_ins;
           log_in_date_string = response.data[answer].usability_metrics.log_in_date;
@@ -433,7 +435,10 @@ app.controller('InquiryStep3Controller', function($scope, $window, $http) {
 
   //redirect to the previous step
   $scope.previousStep = function() {
-    $window.location.href = 'inquiry2.html?r=' + round_id + '&u=' + $scope.user_id;
+    if($scope.ask_characterization_questions == 'Yes')
+      $window.location.href = 'inquiry2.html?r=' + round_id + '&u=' + $scope.user_id;
+    else if($scope.ask_characterization_questions == 'No')
+      $window.location.href = 'inquiry.html?r=' + round_id + '&u=' + $scope.user_id;
   }
 
   $scope.scaleCheck = function(pos) {

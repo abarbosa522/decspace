@@ -103,7 +103,8 @@ app.service('CATSDService', function($http, $q) {
     }
   }
 
-  //guarantee that the weights of the criteria never become negative after considering the interaction effects
+  //guarantee that the weights of the criteria never become negative 
+  //after considering the interaction effects
   function nonNegativityCondition() {
     for(criterion in criteria) {
       for(category in categories) {

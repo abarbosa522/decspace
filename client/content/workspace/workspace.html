@@ -392,6 +392,7 @@
                             <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteWorkflow()' title = 'Cancel Workflow Deletion'>
                               <span class = 'glyphicon glyphicon-remove'></span>
                             </button>
+                          </div>
                         </td>
                       </tr>
                     </tbody>
@@ -950,11 +951,14 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <!-- Added Branches List -->
-                        <tr ng-repeat = 'branch in currentModule.input.functions' ng-if = 'branch.criterion == criterion.name' ng-class = '{danger: branch.id == deleteIdBranch}'>
+                        <!-- Added Functions List -->
+                        <tr ng-repeat = 'branch in currentModule.input.functions' 
+                            ng-if = 'branch.criterion == criterion.name' 
+                            ng-class = '{danger: branch.id == deleteIdBranch}'>
                           <td class = 'col-md-2'>
                             <div id = 'cat-branch-{{branch.id}}-function-{{criterion.id}}'>
-                              <input class = 'form-control' type = 'text' ng-model = 'branch.function' ng-blur = 'blurCATBranchFunction(branch, criterion)'>
+                              <input class = 'form-control' type = 'text' ng-model = 'branch.function' 
+                                     ng-blur = 'blurCATBranchFunction(branch, criterion)'>
                             </div>
                           </td>
                           <td class = 'col-md-3'>
@@ -962,7 +966,8 @@
                           </td>
                           <td class = 'col-md-2'>
                             <div id = 'cat-branch-{{branch.id}}-condition-{{criterion.id}}'>
-                              <input class = 'form-control' type = 'text' ng-model = 'branch.condition' ng-blur = 'blurCATBranchCondition(branch, criterion)'>
+                              <input class = 'form-control' type = 'text' ng-model = 'branch.condition' 
+                                     ng-blur = 'blurCATBranchCondition(branch, criterion)'>
                             </div>
                           </td>
                           <td class = 'col-md-3'>

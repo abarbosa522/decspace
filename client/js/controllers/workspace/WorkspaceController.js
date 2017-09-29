@@ -5,6 +5,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   var url = new URL(window.location.href);
   var proj_id = url.searchParams.get('id');
   
+  //detect if project is public
   $scope.public_proj;
   if(url.searchParams.get('public') == 'y')
     $scope.public_proj = true;
@@ -749,6 +750,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
 
   //remove error classes from the forms to add new data
   //add error classes to the added fields, if necessary
+  //INCOMPLETE
   function resetErrorClasses(type) {
     switch(type) {
       case 'OrderBy':
@@ -806,7 +808,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         var compiled_temp = $compile(temp_clone)($scope);
         //add the new instance of the template to the document
         compiled_temp.appendTo($('#workspace'));
-        //define the initial posiiton of the new module
+        //define the initial position of the new module
         $('#orderby-' + unique_id).offset({top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10});
         break;
 
@@ -2348,7 +2350,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
           }
         
         //create answer doc
-        InquiryService.createAnswerData(current_round, $scope.new_inquiry_output_email.address, 'approved', true, $scope.new_inquiry_output_email.ask_characterization_questions);
+        InquiryService.createAnswerData(current_round, $scope.new_inquiry_output_email.address, '', '', 'approved', true, $scope.new_inquiry_output_email.ask_characterization_questions);
 
         //send link
         InquiryService.sendSurveyLink($scope.currentModule.input, $scope.new_inquiry_output_email.address);

@@ -54,9 +54,11 @@
           <!-- About, FAQ and Contact Us links. Sign Up and Log In buttons. -->
           <ul class = 'nav navbar-nav navbar-right'>
             <li ng-if = 'loggedIn' ng-cloak>
-              <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic' ng-if = '!unregistered_user' ng-cloak>Welcome, {{name}}!</p>
+              <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic' 
+                 ng-if = '!unregistered_user' ng-cloak>Welcome, {{name}}!</p>
 
-              <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic' ng-if = 'unregistered_user' ng-cloak>Welcome!</p>
+              <p class = 'navbar-text' style = 'font-weight: 600; font-style: italic' 
+                 ng-if = 'unregistered_user' ng-cloak>Welcome!</p>
             </li>
             
             <li ng-if = 'loggedIn' ng-cloak><a href = 'content/projects/projects.html'>My Projects</a></li>
@@ -73,7 +75,8 @@
             
             <li ng-if = 'loggedIn'><a href = 'content/settings/settings.html'>Settings</a></li>
 
-            <li><a href = 'content/administrator/administrator.html' ng-if = 'username == "admin@admin"' ng-cloak>Administrator</a></li>
+            <li><a href = 'content/administrator/administrator.html' 
+                   ng-if = 'username == "admin@admin"' ng-cloak>Administrator</a></li>
             
             <li ng-if = '!loggedIn' ng-cloak>
               <button type = 'button' class = 'btn btn-default navbar-btn' ng-click = 'toSignUp()'>

@@ -50,7 +50,7 @@ app.controller('InquiryStep1Controller', function($scope, $window, $http) {
     //redirect to the next step
     if($scope.ask_characterization_questions == 'Yes')
       $window.location.href = 'inquiry2.html?r=' + round_id + '&u=' + $scope.user_id;
-    else
+    else if($scope.ask_characterization_questions == 'No')
       $window.location.href = 'inquiry3.html?r=' + round_id + '&u=' + $scope.user_id;
   }
 
