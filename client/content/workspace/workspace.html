@@ -160,6 +160,7 @@
               <ul class = 'dropdown-menu'>
                 <li data-toggle = 'modal' data-target = '#import-input-file-modal'><a href>Import Input File</a></li>
                 <li data-toggle = 'modal' data-target = '#import-workflow-modal'><a href>Import Workflow</a></li>
+                <li data-toggle = 'modal' data-target = '#import-XMCDA-workflow-modal'><a href>Import XMCDA Workflow</a></li>
               </ul>
             </div>
 
@@ -344,6 +345,37 @@
             </div>
           </div>
 
+           <!-- Import XMCDA Workflow Modal -->
+          <div class = 'modal fade' id = 'import-XMCDA-workflow-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>Import XMCDA Workflow</h4>
+                </div>
+                <div class = 'modal-body'>
+
+                  <div class = 'row'>
+                    <div class = 'col-md-4'></div>
+                    <input id = 'input-xmcda-workflow' type = 'file'>
+                  </div>
+
+                  <br>
+
+                  <div class = 'row'>
+                    <div class = 'col-md-5'></div>
+                    <button type = 'button' class = 'btn btn-primary col-md-2' ng-click = 'selectXmcdaImportWorkflow()' data-dismiss = 'modal'>
+                      Import
+                    </button>
+                  </div>
+
+                  <p><sub>Only ZIP format is accepted.</sub></p>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Archive Modal -->
           <div class = 'modal fade' id = 'archive-modal' role = 'dialog'>
             <div class = 'modal-dialog'>
@@ -375,6 +407,10 @@
                             <!-- Export Workflow Button -->
                             <button type = 'button' class = 'btn btn-warning' ng-click = 'exportWorkflow(workflow)' title = 'Export Workflow'>
                               <span class = 'glyphicon glyphicon-export'></span>
+                            </button>
+                             <!-- Export XMCDA Button -->
+                            <button type = 'button' class = 'btn btn-warning' ng-click = 'exportWorkflowinXMCDA(workflow)' title = 'Export XMCDA'>
+                              <span class = 'glyphicon glyphicon-tag'></span>
                             </button>
                             <!-- Delete Workflow Button -->
                             <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteWorkflow(workflow)' title = 'Delete Workflow' ng-if = '!public_proj'>
@@ -462,6 +498,37 @@
 
                     <div class = 'col-md-4'>
                       <button type = 'button' class = 'btn btn-danger' ng-click = 'importWorkflow()' data-dismiss = 'modal' title = 'Cancel Module Deletion'>
+                        No
+                      </button>
+                    </div>
+
+                    <div class = 'col-md-2'></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+           <!-- Save Confirmation Modal - Import -->
+          <div class = 'modal fade' id = 'save-confirmation-xmcda-import-modal' role = 'dialog'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>Do you want to save the current workflow before importing the new one?</h4>
+                </div>
+                <div class = 'modal-body'>
+                  <div class = 'row'>
+                    <div class = 'col-md-2'></div>
+
+                    <div class = 'col-md-4'>
+                      <button type = 'button' class = 'btn btn-primary' ng-click = 'confirmXmcdaSaveImportWorkflow()' data-dismiss = 'modal' title = 'Confirm Module Deletion'>
+                        Yes
+                      </button>
+                    </div>
+
+                    <div class = 'col-md-4'>
+                      <button type = 'button' class = 'btn btn-primary' ng-click = 'xmcdaimportWorkflow()' data-dismiss = 'modal' title = 'Cancel Module Deletion'>
                         No
                       </button>
                     </div>

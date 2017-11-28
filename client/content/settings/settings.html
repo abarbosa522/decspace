@@ -135,6 +135,25 @@
       </form>
 
       <br>
+      <!-- Create User -->
+      <p class = 'header-2'>Create Users</p>
+
+      <form class = 'form-horizontal'>
+
+        <!-- Input Email -->
+        <div class = 'form-group'>
+          <label for = 'input-email' class = 'col-sm-4 control-label'>
+            <span class = 'glyphicon glyphicon-envelope'></span>
+          </label>
+          <div id = 'input-email-div' class = 'col-sm-4'>
+            <input id = 'input-email' type = 'email' class = 'form-control' placeholder = 'Email Address' ng-model = 'signup.email'>
+          </div>
+        </div>
+
+        <button class = 'btn btn-primary' ng-click = 'createusers()'>Send</button>
+
+      </form>
+      <br>
       
       <!-- ALERTS -->
       <div class = 'row'>

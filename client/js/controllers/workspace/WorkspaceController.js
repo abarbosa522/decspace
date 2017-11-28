@@ -2005,6 +2005,77 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     });
   }
 
+  $scope.exportWorkflowinXMCDA = function(workflow) {
+        //make a copy of the workflow data
+        var workflow_data = angular.copy(workflow);
+
+        //create zip file
+        var zip = new JSZip();
+        //create modules folder
+        zip.folder('modules data');
+
+        for(mod in workflow_data.modules) {
+            //get the formats of the input data
+            workflow_data.modules[mod].input_formats = {};
+
+            for(input_data in workflow_data.modules[mod].input)
+                workflow_data.modules[mod].input_formats[input_data] = typeof workflow_data.modules[mod].input[input_data];
+
+            //get the format of the output data
+            workflow_data.modules[mod].output_format = typeof workflow_data.modules[mod].output;
+
+            //create folder for module data
+            var input_folder, output_folder;
+
+            if(workflow_data.modules[mod].type == 'Input File' || workflow_data.modules[mod].type == 'Output File') {
+                zip.folder('modules data/' + workflow_data.modules[mod].name);
+                input_folder = zip.folder('modules data/' + workflow_data.modules[mod].name + '/input');
+                output_folder = zip.folder('modules data/' + workflow_data.modules[mod].name + '/output');
+            }
+            else {
+                zip.folder('modules data/' + workflow_data.modules[mod].type + workflow_data.modules[mod].name_id);
+                input_folder = zip.folder('modules data/' + workflow_data.modules[mod].type + workflow_data.modules[mod].name_id + '/input');
+                output_folder = zip.folder('modules data/' + workflow_data.modules[mod].type + workflow_data.modules[mod].name_id + '/output');
+            }
+
+            //transform modules data to CSV files
+            var files = generateCSVFiles(workflow_data.modules[mod]);
+
+            //add the input files to the respective folders
+            for(input_file in files[0]) {
+                input_folder.file(files[2][input_file] + '.csv', files[0][input_file]);
+
+                //modify the workflow data to reference the input files
+                if(workflow_data.modules[mod].type == 'Input File' || workflow_data.modules[mod].type == 'Output File')
+                    workflow_data.modules[mod].input[files[2][input_file]] = 'modules data/' + workflow_data.modules[mod].name + '/input/' + files[2][input_file] + '.csv';
+                else
+                    workflow_data.modules[mod].input[files[2][input_file]] = 'modules data/' + workflow_data.modules[mod].type + workflow_data.modules[mod].name_id + '/input/' + files[2][input_file] + '.csv';
+            }
+
+            //add the output files to the respective folders
+            //CAT-SD exception - three output files are generated
+            if(workflow_data.modules[mod].type == 'CAT-SD' || (workflow_data.modules[mod].type == 'Output File' && workflow_data.modules[mod].parent_type == 'CAT-SD')) {
+                for(output_file in files[1])
+                    output_folder.file(files[3][output_file] + '.csv', files[1][output_file]);
+            }
+            else
+                output_folder.file('output.csv', files[1]);
+
+            //modify the workflow data to reference the output files - CAT-SD exception (three output files are generated)
+            if(workflow_data.modules[mod].type == 'CAT-SD')
+                workflow_data.modules[mod].output = ['modules data/' + workflow_data.modules[mod].type + workflow_data.modules[mod].name_id + '/output/' + files[3][0] + '.csv', 'modules data/' + workflow_data.modules[mod].type + workflow_data.modules[mod].name_id + '/output/' + files[3][1] + '.csv', 'modules data/' + workflow_data.modules[mod].type + workflow_data.modules[mod].name_id + '/output/' + files[3][2] + '.csv'];
+            else if(workflow_data.modules[mod].type == 'Output File' && workflow_data.modules[mod].parent_type == 'CAT-SD')
+                workflow_data.modules[mod].output = ['modules data/' + workflow_data.modules[mod].name + '/output/' + files[3][0] + '.csv', 'modules data/' + workflow_data.modules[mod].name + '/output/' + files[3][1] + '.csv', 'modules data/' + workflow_data.modules[mod].name + '/output/' + files[3][2] + '.csv'];
+            else if(workflow_data.modules[mod].type == 'Input File' || workflow_data.modules[mod].type == 'Output File')
+                workflow_data.modules[mod].output = 'modules data/' + workflow_data.modules[mod].name + '/output/output.csv';
+            else
+                workflow_data.modules[mod].output = 'modules data/' + workflow_data.modules[mod].type + workflow_data.modules[mod].name_id + '/output/output.csv';
+        }
+
+        objecttoxml(workflow_data, zip);
+
+    }
+
   function generateCSVFiles(module) {
     //generate input files
     var input_files = [], input_titles = [];
@@ -2101,6 +2172,93 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       });
     }
   }
+
+   $scope.selectXmcdaImportWorkflow = function() {
+        $('#save-confirmation-xmcda-import-modal').modal();
+    }
+
+    $scope.confirmXmcdaSaveImportWorkflow = function() {
+        $scope.saveData(function() {
+            $scope.xmcdaimportWorkflow();
+        });
+    }
+
+    $scope.xmcdaimportWorkflow = function() {
+        var input_workflow = document.getElementById('input-xmcda-workflow');
+
+        for(i = 0; i < input_workflow.files.length; i++) {
+            var zip = new JSZip();
+
+            JSZip.loadAsync(input_workflow.files[i]).then(function(zip) {
+                zip.file("data.xml").async("string").then(function(data) {
+                    var  xmcda_obj = {
+                        'content' : data
+                    };
+                    $http.post('/xxx', xmcda_obj).then(function(response){
+                        resetCurrentData();
+
+                        var obj = JSON.stringify(response.data);
+                        var original_data = JSON.parse(obj);
+
+                        if(original_data.connections == null){
+                          var ar0 = [];
+                          original_data.connections = ar0;
+                        }
+                        connections = original_data.connections;
+                        if(!(Array.isArray(connections))){
+                            var con = [];
+                            con.push(connections);
+                            original_data.connections = con;
+                        }
+
+                        modules = original_data.modules;
+                        if(!(Array.isArray(modules))){
+                            var armod = [];
+                            armod.push(modules);
+                            original_data.modules = armod;
+                        }
+
+                    for(mod in original_data.modules) {
+                        //unzip input data
+                        for(input in original_data.modules[mod].input)
+                            unzipFile(zip, original_data.modules[mod].input[input], mod, input, original_data.modules[mod].input_formats[input], function(res_data, res_mod, res_input, res_format) {
+                                original_data.modules[res_mod].input[res_input] = CSVtoJSON(res_data, res_format);
+                            });
+
+                        //unzip output data
+                        //CAT-SD exception - three output files are generated
+                        if(original_data.modules[mod].type == 'CAT-SD' || (original_data.modules[mod].type == 'Output File' && original_data.modules[mod].parent_type == 'CAT-SD'))
+                            for(output_file in original_data.modules[mod].output)
+                                unzipFile(zip, original_data.modules[mod].output[output_file], mod, output_file, original_data.modules[mod].output_format, function(res_data, res_mod, res_pos, res_format) {
+                                    original_data.modules[res_mod].output[res_pos] = CSVtoJSON(res_data, res_format);
+                                });
+                        else
+                            unzipFile(zip, original_data.modules[mod].output, mod, 0, original_data.modules[mod].output_format, function(res_data, res_mod, res_pos, res_format) {
+                                original_data.modules[res_mod].output = CSVtoJSON(res_data, res_format);
+                            });
+
+
+                    }
+
+                    //remove current modules and connections
+                    resetCurrentData();
+
+                    //reload imported data
+                    modules = original_data.modules;
+                            for(mod in modules)
+                              reloadModule(modules[mod]);
+
+
+
+                    connections = original_data.connections;
+                      for(connection in connections)
+                        reloadConnection(connections[connection]);
+
+                    });
+                });
+            });
+        }
+    }
 
   //get the data from a zipped file
   function unzipFile(zip, data, mod, input, format, callback) {
@@ -2398,6 +2556,23 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
     $scope.deleteAnswerEmail = '';
   }
   
+  function objecttoxml(json, zip){
+        var  json_obj = {
+            'content' : json
+        };
+
+        $http.post('/o2x', json_obj).then(function(response){
+            zip.file('data.xml', response.data);
+
+            zip.generateAsync({type:"blob"}).then(function(content) {
+                // see FileSaver.js
+                saveAs(content, "workflow.zip");
+            });
+
+
+        });
+    }
+    
   /*** STARTUP FUNCTIONS ***/
   requestLogIn();
   rewriteLastUpdate();
