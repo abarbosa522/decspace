@@ -162,6 +162,23 @@ app.controller('SettingsController', function($scope, $window, $http) {
     $('#' + alert_id).show();
   }
   
+  $scope.createusers = function() {
+
+            $scope.signup.name = $scope.signup.email.substr(0, $scope.signup.email.indexOf('@'));
+        $scope.signup.password= Math.random().toString(36).slice(-8);
+
+            $http.post('/accounts', $scope.signup).then(function(response) {
+                showAlert('successful-register');
+            });
+
+            $http.post('/accountx', $scope.signup).then(function(response) {
+                if(response.data == message_template)
+                    showAlert('success-alert');
+                else
+                    showAlert('error-alert');
+            });
+    }
+    
   requestLogIn();
   hideAlerts();
 });
