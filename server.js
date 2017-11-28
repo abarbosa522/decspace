@@ -163,6 +163,25 @@ app.post('/password', function(req, res) {
   });
 });
 
+//send accounts
+app.post('/accountx', function(req, res) {
+    var mailOptions = {
+        from: 'decspace2017@gmail.com', // sender address
+        to: req.body.email, // list of receivers
+        subject: 'Decspace Account', // Subject line
+        text: 'Your account is confirmed, your username is ' + req.body.name + ' and your password is ' + req.body.password
+    };
+
+    transporter.sendMail(mailOptions, function(error, info) {
+        if(error) {
+            res.json(error);
+        }
+        else {
+            res.json('Message sent!');
+        }
+    });
+});
+
 //send inquiry links to user
 app.post('/default_inquiry_survey', function(req, res) {
   var mailOptions = {
@@ -182,6 +201,9 @@ app.post('/default_inquiry_survey', function(req, res) {
 
 //send personalized inquiry email
 app.post('/personalized_inquiry_survey', function(req, res) {
+  //SOLUÇAO TEMPORARIA
+  req.body.text += '\nThe link to your survey is <LINK>';
+  
   //replace "<LINK>" with the actual link
   req.body.text = req.body.text.replace(/<LINK>/g, req.body.link);
   
@@ -464,5 +486,48 @@ app.put('/inquiry_responses', function(req, res) {
   });
 });
 
+
+///json to xmcda
+var o2x = require('object-to-xml');
+app.post('/o2x', function(req, res){
+    var result = o2x(req.body.content);
+    res.json(result);
+});
+
+
+///xmcda to json
+var fastXmlParser = require('fast-xml-parser');
+app.post('/xxx', function(req, res){
+    var result = x2o(req.body.content);
+    res.json(result);
+});
+
+function x2o(xmcda) {
+    var jsonObj = fastXmlParser.parse(xmcda);
+
+
+// when a tag has attributes
+    var options = {
+        attrPrefix: "@_",
+        textNodeName: "#text",
+        ignoreNonTextNodeAttr: true,
+        ignoreTextNodeAttr: true,
+        ignoreNameSpace: true,
+        ignoreRootElement: false,
+        textNodeConversion: true,
+        textAttrConversion: false,
+        arrayMode: true
+    };
+    if (fastXmlParser.validate(xmcda) === true) {//optional
+        var jsonObj = fastXmlParser.parse(xmcda, options);
+
+    }
+
+    //Intermediate obj
+    var tObj = fastXmlParser.getTraversalObj(xmcda, options);
+    var jsonObj = fastXmlParser.convertToJson(tObj);
+    return jsonObj;
+
+}
 app.listen(8082);
 console.log("Server running on port 8082");
