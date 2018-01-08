@@ -1,4 +1,4 @@
-app.controller('WorkspaceController', function($scope, $window, $http, $compile, $q, OrderByService, CATSDService, InquiryService, SRFService, MethodsService, SortDataService) {
+app.controller('WorkspaceController', function($scope, $window, $http, $compile, $q, OrderByService, CATSDService, InquiryService, AdditiveAggregationService, SRFService, MethodsService, SortDataService) {
   /*** SETUP FUNCTIONS ***/
 
   //get the parameters of the open project
@@ -411,6 +411,29 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         modules.push(new_mod);
         break;
 
+        case 'AdditiveAggregation':
+            var new_mod = {};
+            //generate the unique id
+            var unique_id = generateUniqueId(modules);
+            //store the module id
+            new_mod['id'] = 'additiveaggregation-' + unique_id;
+            //generate and store module name
+            new_mod['name_id'] = generateUniqueNameId('AdditiveAggregation');
+            //store the module type
+            new_mod['type'] = 'AdditiveAggregation';
+            //initialize the input data array
+            new_mod['input'] = {
+                'criteria' : [],
+                'options' : []
+            };
+            //initialize the output data array
+            new_mod['output'] = [];
+            //store the initial position
+            new_mod['position'] = {top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10};
+            //store the new module into the modules array
+            modules.push(new_mod);
+            break;
+
       case 'Sort':
         var new_mod = {};
         //generate the unique id
@@ -669,6 +692,13 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         $scope.deleteIdAction = '';
         break;
 
+        case 'AdditiveAggregation':
+            $scope.new_additiveaggregation_criterion = {};
+            $scope.new_additiveaggregation_option = {};
+            $scope.deleteIdCriterion = '';
+            $scope.deleteIdOption = '';
+            break;
+
       case 'Sort':
         $scope.new_object = {};
         $scope.deleteIdObject = '';
@@ -812,6 +842,24 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         $('#orderby-' + unique_id).offset({top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10});
         break;
 
+        case 'AdditiveAggregation':
+            //get the method's template
+            var temp = document.getElementById('additiveaggregation-temp');
+            //clone the template
+            var temp_clone = $(temp.content).clone();
+            //make its id unique
+            var unique_id = generateUniqueId(modules);
+            temp_clone.find('#additiveaggregation').attr('id', 'additiveaggregation-' + unique_id);
+            //add the file name to the module
+            temp_clone.find('#mod-name').html('AdditiveAggregation' + generateUniqueNameId('AdditiveAggregation'));
+            //cloned elements need to be manually compiled - angularJS
+            var compiled_temp = $compile(temp_clone)($scope);
+            //add the new instance of the template to the document
+            compiled_temp.appendTo($('#workspace'));
+            //define the initial position of the new module
+            $('#additiveaggregation-' + unique_id).offset({top: $('#svg').offset().top + 10, left: $('#svg').offset().left + 10});
+            break;
+
       case 'Sort':
         //get the method's template
         var temp = document.getElementById('sort-temp');
@@ -928,6 +976,23 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         //set position of module
         $('#' + mod['id']).offset(mod['position']);
         break;
+
+        case 'AdditiveAggregation':
+            //get the method's template
+            var temp = document.getElementById('additiveaggregation-temp');
+            //clone the template
+            var temp_clone = $(temp.content).clone();
+            //make its id unique
+            temp_clone.find('#additiveaggregation').attr('id', mod['id']);
+            //add the module name to the module
+            temp_clone.find('#mod-name').html('AdditiveAggregation' + mod['name_id']);
+            //cloned elements need to be manually compiled - angularJS
+            var compiled_temp = $compile(temp_clone)($scope);
+            //add the new instance of the template to the document
+            compiled_temp.appendTo($('#workspace'));
+            //set position of module
+            $('#' + mod['id']).offset(mod['position']);
+            break;
 
       case 'Input File':
         //get the input file template
@@ -1056,6 +1121,7 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
   //selected input to be deleted
   $scope.deleteIdCriterion = '';
   $scope.deleteIdAction = '';
+  $scope.deleteIdOption = '';
   $scope.deleteIdObject = '';
   $scope.deleteIdInteractionEffect = '';
   $scope.deleteIdBranch = '';
@@ -1073,6 +1139,10 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
       case 'Criteria':
         $scope.deleteIdCriterion = input.id;
         break;
+
+        case 'Options':
+            $scope.deleteIdOption = input.id;
+            break;
 
       case 'Actions':
         $scope.deleteIdAction = input.id;
@@ -1750,6 +1820,12 @@ app.controller('WorkspaceController', function($scope, $window, $http, $compile,
         method_executed = true;
         createOutputModule(mod);
         break;
+
+        case 'AdditiveAggregation':
+            mod.output = AdditiveAggregationService.getResults(mod.input.criteria, mod.input.options);
+            method_executed = true;
+            createOutputModule(mod);
+            break;
 
       case 'Sort':
         mod.output = angular.copy(mod.input.objects);

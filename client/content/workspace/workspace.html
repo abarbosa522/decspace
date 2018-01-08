@@ -26,11 +26,13 @@
     <script src = '../../js/controllers/workspace/CATSDController.js'></script>
     <script src = '../../js/controllers/workspace/InquiryController.js'></script>
     <script src = '../../js/controllers/workspace/OrderByController.js'></script>
+    <script src = '../../js/controllers/workspace/AdditiveAggregationController.js'></script>
     <script src = '../../js/controllers/workspace/SortController.js'></script>
     <script src = '../../js/controllers/workspace/SRFController.js'></script>
 
     <!-- AngularJS Services -->
     <script src = '../../js/services/OrderByService.js'></script>
+    <script src = '../../js/services/AdditiveAggregationService.js'></script>
     <script src = '../../js/services/CATSDService.js'></script>
     <script src = '../../js/services/InquiryService.js'></script>
     <script src = '../../js/services/SRFService.js'></script>
@@ -166,15 +168,9 @@
 
             <!-- Modules List -->
             <div class = 'btn-group' role = 'group'>
-              <button class = 'btn btn-info dropdown-toggle' type = 'button' data-toggle = 'dropdown'>
+              <button class = 'btn btn-info' type = 'button' data-toggle="modal" data-target="#methodsListModal">
                 Methods
-                <span class = 'caret'></span>
               </button>
-              <ul class = 'dropdown-menu'>
-                <li ng-repeat = 'method in methods' ng-click = 'createModule(method)'>
-                  <a href>{{method}}</a>
-                </li>
-              </ul>
             </div>
 
             <!-- Archive Button -->
@@ -281,6 +277,341 @@
                 </div>
               </div>
             </div>
+          </div>
+
+          <!-- Methods List Modal -->
+          <div class="modal fade" id="methodsListModal" role="dialog">
+            <div class="modal-dialog modal-lg">
+
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h2 class="modal-title">Available Methods</h4>
+                </div>
+                <div class="modal-body">
+
+                  <h3>Local Methods</h3>
+
+                  <div class="panel-group" id="accordion">
+                    <div class="panel panel-default">
+                      <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapse1">
+                        <h4 class="panel-title clearfix">
+                          Order By
+                          <button class = 'btn btn-info' type = 'button' ng-click = 'createModule("OrderBy")' style="float:right;">ADD</button>
+                        </h4>
+                      </div>
+                      <div id="collapse1" class="panel-collapse collapse">
+                        <div class="panel-body">
+                          <table class = 'table text-left'>
+                            <thead>
+                            <tr>
+                              <th class = 'col-md-2'>Method Name</th>
+                              <th class = 'col-md-8'>Description</th>
+                              <th class = 'col-md-2'>Input</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                              <td>Order By</td>
+                              <td>Orders a given group of actions by a certain criterion in a specific direction (ascendant and descendant).</td>
+                              <td>
+                                <ul style="padding:8px;">
+                                  <li>Criteria</li>
+                                  <li>Actions</li>
+                                </ul>
+                              </td>
+                            </tr>
+                            </tbody>
+                          </table>
+                          <a href="http://localhost:8082/content/method-catalog/orderby.html" target="_blank">Order By reference and examples</a>
+                        </div>
+                      </div>
+                    </div>
+
+
+                    <div class="panel panel-default">
+                      <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapse2">
+                        <h4 class="panel-title clearfix">
+                          CAT-SD
+                          <button class = 'btn btn-info' type = 'button' ng-click = 'createModule("CAT-SD")' style="float:right;">ADD</button>
+                        </h4>
+                      </div>
+                      <div id="collapse2" class="panel-collapse collapse">
+                        <div class="panel-body">
+                          <table class = 'table text-left'>
+                            <thead>
+                            <tr>
+                              <th class = 'col-md-2'>Method Name</th>
+                              <th class = 'col-md-8'>Description</th>
+                              <th class = 'col-md-2'>Input</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                              <td>CAT-SD</td>
+                              <td>CAT-SD (from CATegorization by Similarity-Dissimilarity) is a multiple criteria decision aiding method for nominal classification problems, where the categories are pre-defined and no order exists among them.</td>
+                              <td>
+                                <ul style="padding:8px;">
+                                  <li>Criteria</li>
+                                  <li>Scales</li>
+                                  <li>Functions</li>
+                                  <li>Actions</li>
+                                  <li>Categories</li>
+                                  <li>Reference Actions</li>
+                                  <li>Interaction Effects</li>
+                                </ul>
+                              </td>
+                            </tr>
+                            </tbody>
+                          </table>
+                          <a>CAT-SD reference and examples</a>
+                        </div>
+                      </div>
+                    </div>
+
+
+                    <div class="panel panel-default">
+                      <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapse3">
+                        <h4 class="panel-title clearfix">
+                          Inquiry
+                          <button class = 'btn btn-info' type = 'button' ng-click = 'createModule("Inquiry")' style="float:right;">ADD</button>
+                        </h4>
+                      </div>
+                      <div id="collapse3" class="panel-collapse collapse">
+                        <div class="panel-body">
+                          <table class = 'table text-left'>
+                            <thead>
+                            <tr>
+                              <th class = 'col-md-2'>Method Name</th>
+                              <th class = 'col-md-8'>Description</th>
+                              <th class = 'col-md-2'>Input</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                              <td>Inquiry</td>
+                              <td>Mostly used for obtaining an opinion, judgment or choice consensus. It is divided in various rounds. In each round, a survey is sent to the specialists. The Q-Sort technique is used to answer the surveys.</td>
+                              <td>
+                                <ul style="padding:8px;">
+                                  <li>Subject</li>
+                                  <li>Description</li>
+                                  <li>Specialists' Emails</li>
+                                  <li>Characterization Question</li>
+                                  <li>Q-Sort Questions</li>
+                                  <li>Q-Sort Color Scheme</li>
+                                  <li>Q-Sort Scale</li>
+                                  <li>Glossary</li>
+                                  <li>Suggestions</li>
+                                  <li>Personalized Email</li>
+                                </ul>
+                              </td>
+                            </tr>
+                            </tbody>
+                          </table>
+                          <a>Inquiry reference and examples</a>
+                        </div>
+                      </div>
+                    </div>
+
+
+                    <div class="panel panel-default">
+                      <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapse4">
+                        <h4 class="panel-title clearfix">
+                          Sort
+                          <button class = 'btn btn-info' type = 'button' ng-click = 'createModule("OrderBy")' style="float:right;">ADD</button>
+                        </h4>
+                      </div>
+                      <div id="collapse4" class="panel-collapse collapse">
+                        <div class="panel-body">
+                          <table class = 'table text-left'>
+                            <thead>
+                            <tr>
+                              <th class = 'col-md-2'>Method Name</th>
+                              <th class = 'col-md-8'>Description</th>
+                              <th class = 'col-md-2'>Input</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                              <td>Sort</td>
+                              <td>List various objects (only the name is needed) and then reorder them by their importance. The object on the left should be the most important and the object on the right should be the least important.</td>
+                              <td>
+                                <ul style="padding:8px;">
+                                  <li>Subject</li>
+                                </ul>
+                              </td>
+                            </tr>
+                            </tbody>
+                          </table>
+                          <a>Sort reference and examples</a>
+                        </div>
+                      </div>
+                    </div>
+
+
+                    <div class="panel panel-default">
+                      <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapse5">
+                        <h4 class="panel-title clearfix">
+                          SRF
+                          <button class = 'btn btn-info' type = 'button' ng-click = 'createModule("OrderBy")' style="float:right;">ADD</button>
+                        </h4>
+                      </div>
+                      <div id="collapse5" class="panel-collapse collapse">
+                        <div class="panel-body">
+                          <table class = 'table text-left'>
+                            <thead>
+                            <tr>
+                              <th class = 'col-md-2'>Method Name</th>
+                              <th class = 'col-md-8'>Description</th>
+                              <th class = 'col-md-2'>Input</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                              <td>SRF</td>
+                              <td>Mainly used for determining the weights of a certain criteria set with a revised Simos' procedure. It is available as a standalone method, but it is also integrated with other methods that can make use of it.</td>
+                              <td>
+                                <ul style="padding:8px;">
+                                  <li>Criteria</li>
+                                  <li>White Cards</li>
+                                  <li>Ranking</li>
+                                  <li>Ratio Z</li>
+                                  <li>Decimal Places</li>
+                                  <li>Weight Type</li>
+                                </ul>
+                              </td>
+
+                            </tr>
+                            </tbody>
+                          </table>
+                          <a>SRF reference and examples</a>
+                        </div>
+                      </div>
+                    </div>
+
+
+                    <div class="panel panel-default">
+                      <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapse8">
+                        <h4 class="panel-title clearfix">
+                          Additive Aggregation
+                          <button class = 'btn btn-info' type = 'button' ng-click = 'createModule("AdditiveAggregation")' style="float:right;">ADD</button>
+                        </h4>
+                      </div>
+                      <div id="collapse8" class="panel-collapse collapse">
+                        <div class="panel-body">
+                          <table class = 'table text-left'>
+                            <thead>
+                            <tr>
+                              <th class = 'col-md-2'>Method Name</th>
+                              <th class = 'col-md-8'>Description</th>
+                              <th class = 'col-md-2'>Input</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                              <td>Additive Aggregation</td>
+                              <td>Orders a group of options by their calculaated aggregated value based on criteria.</td>
+                              <td>
+                                <ul style="padding:8px;">
+                                  <li>Criteria</li>
+                                  <li>Options</li>
+                                </ul>
+                              </td>
+                            </tr>
+                            </tbody>
+                          </table>
+                          <a href="http://localhost:8082/content/method-catalog/orderby.html" target="_blank">Order By reference and examples</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
+                  <h3>Remote Methods</h3>
+
+                  <div class="panel-group" id="accordion2">
+                    <div class="panel panel-default">
+                      <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapse6">
+                        <h4 class="panel-title clearfix">
+                          Rank Alternative Values
+                          <button class = 'btn btn-info' type = 'button' ng-click = 'createModule("DivizRankAlternativeValues")' style="float:right;">ADD</button>
+                        </h4>
+                      </div>
+                      <div id="collapse6" class="panel-collapse collapse">
+                        <div class="panel-body">
+                          <table class = 'table text-left'>
+                            <thead>
+                            <tr>
+                              <th class = 'col-md-2'>Method Name</th>
+                              <th class = 'col-md-6'>Description</th>
+                              <th class = 'col-md-2'>Input</th>
+                              <th class = 'col-md-2'>Server</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                              <td>Rank Alternative Values</td>
+                              <td>Calculates the rank of alternatives via their overall values.</td>
+                              <td>
+                                <ul>
+                                  <li>Alternatives</li>
+                                  <li>Overall Values</li>
+                                </ul>
+                              </td>
+                              <td>Remote Diviz Server</td>
+                            </tr>
+                            </tbody>
+                          </table>
+                          <a>Rank Alternative Values reference and examples</a>
+                        </div>
+                      </div>
+                    </div>
+
+
+                    <div class="panel panel-default">
+                      <div class="panel-heading" data-toggle="collapse" data-parent="#accordion2" href="#collapse7">
+                        <h4 class="panel-title clearfix">
+                          Remote Diviz Server
+                          <button class = 'btn btn-info' type = 'button' ng-click = 'createModule("DivizGenericCall")' style="float:right;">ADD</button>
+                        </h4>
+                      </div>
+                      <div id="collapse7" class="panel-collapse collapse">
+                        <div class="panel-body">
+                          <table class = 'table text-left'>
+                            <thead>
+                            <tr>
+                              <th class = 'col-md-2'>Method Name</th>
+                              <th class = 'col-md-6'>Description</th>
+                              <th class = 'col-md-2'>Input</th>
+                              <th class = 'col-md-2'>Server</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                              <td>Generic Diviz Call</td>
+                              <td>Calls the specified Diviz method defined by the user.</td>
+                              <td>Varies per method.</td>
+                              <td>Remote Diviz Server</td>
+                            </tr>
+                            </tbody>
+                          </table>
+                          <a>Generic Diviz Call reference and examples</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+
+
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+
           </div>
 
           <!-- Import Input File Modal -->
@@ -768,6 +1099,157 @@
                           </button>
                         </td>
                       </tr>
+                    </tbody>
+                  </table>
+
+                  <!-- OK button -->
+                  <button type = 'button' class = 'btn btn-primary' data-dismiss = 'modal'>OK</button>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AdditiveAggregation Modal -->
+          <div id = 'additiveaggregation-modal' class = 'modal fade custom-modal'  role = 'dialog' ng-controller = 'AdditiveAggregationController'>
+            <div class = 'modal-dialog'>
+              <div class = 'modal-content'>
+
+                <div class = 'modal-header'>
+                  <button type = 'button' class = 'close' data-dismiss = 'modal'>&times;</button>
+                  <h4 class = 'modal-title'>AdditiveAggregation{{currentModule.name_id}}</h4>
+                </div>
+
+                <div class = 'modal-body'>
+
+                  <!-- Criteria -->
+                  <p class = 'header-1'>Criteria</p>
+
+                  <table class = 'table table-bordered table-hover'>
+                    <thead>
+                    <tr>
+                      <th class = 'text-center'>Criterion Name</th>
+                      <th class = 'text-center'>Weight</th>
+                      <th class = 'col-md-2'></th>
+                    </tr>
+                    </thead>
+                    <!-- Added Criteria -->
+                    <tbody>
+                    <tr ng-repeat = 'criterion in currentModule.input.criteria' ng-class = '{danger: criterion.id == deleteIdCriterion}'>
+
+                      <td>
+                        <div id = 'additiveaggregation-criterion-{{criterion.id}}-name'>
+                          <input class = 'form-control' type = 'text' ng-model = 'criterion.name' ng-blur = 'blurAdditiveAggregationCriterionName(criterion)'>
+                        </div>
+                      </td>
+
+                      <td>
+                        <div id = 'additiveaggregation-criterion-{{criterion.id}}-weight'>
+                          <input class = 'form-control' ng-model = 'criterion.weight' ng-blur = 'blurAdditiveAggregationCriterionWeight(criterion)'>
+                        </div>
+                      </td>
+
+                      <td ng-if = 'criterion.id != deleteIdCriterion'>
+                        <!-- Duplicate Criterion Button -->
+                        <button type = 'button' class = 'btn btn-info' ng-click = 'copyAdditiveAggregationCriterion(criterion)' title = 'Duplicate Criterion'>
+                          <span class = 'glyphicon glyphicon-duplicate'></span>
+                        </button>
+                        <!-- Delete Criterion Button -->
+                        <button type = 'button' class = 'btn btn-danger' ng-click = 'deleteInput(criterion, "Criteria")' title = 'Delete Criterion'>
+                          <span class = 'glyphicon glyphicon-minus'></span>
+                        </button>
+                      </td>
+                      <td ng-if = 'criterion.id == deleteIdCriterion'>
+                        <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(criterion, "Criteria")' title = 'Confirm Delete Criterion'>
+                          <span class = 'glyphicon glyphicon-ok'></span>
+                        </button>
+                        <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Criteria")' title = 'Cancel Delete Criterion'>
+                          <span class = 'glyphicon glyphicon-remove'></span>
+                        </button>
+                      </td>
+                    </tr>
+                    <!-- Form to add criteria -->
+                    <tr class = 'active'>
+
+                      <td>
+                        <div id = 'new-additiveaggregation-criterion-name' class = 'form-group'>
+                          <input class = 'form-control' type = 'text' ng-model = 'new_additiveaggregation_criterion.name'>
+                        </div>
+                      </td>
+                      <td>
+                        <div id = 'new-additiveaggregation-criterion-weight' class = 'form-group'>
+                          <input class = 'form-control' type = 'number' ng-model = 'new_additiveaggregation_criterion.weight'>
+                        </div>
+                      </td>
+
+                      <td>
+                        <button type = 'button' class = 'btn btn-success' ng-click = 'addAdditiveAggregationCriterion()' title = 'Add Criterion'>
+                          <span class = 'glyphicon glyphicon-plus'></span>
+                        </button>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+
+                  <!-- Options -->
+                  <p class = 'header-1'>Options</p>
+
+                  <table class = 'table table-bordered table-hover'>
+                    <thead>
+                    <th class = 'text-center'>Name</th>
+                    <th class = 'text-center' ng-repeat = 'additiveaggregation_criterion in currentModule.input.criteria'>{{additiveaggregation_criterion.name}}-Score</th>
+                    <th class = 'col-md-2'></th>
+                    </thead>
+                    <tbody>
+                    <!-- Added Options -->
+                    <tr ng-repeat = 'additiveaggregation_option in currentModule.input.options' ng-class = '{danger: additiveaggregation_option.id == deleteIdOption}'>
+                      <td>
+                        <div id = 'additiveaggregation-option-{{additiveaggregation_option.id}}-name'>
+                          <input class = 'form-control' ng-model = 'additiveaggregation_option.name' ng-blur = 'blurAdditiveAggregationOptionName(additiveaggregation_option)'>
+                        </div>
+                      </td>
+                      <td ng-repeat = 'additiveaggregation_criterion in currentModule.input.criteria'>
+                        <div id = 'additiveaggregation-option-{{additiveaggregation_option.id}}-criterion-{{additiveaggregation_criterion.id}}'>
+                          <input class = 'form-control' ng-model = 'additiveaggregation_option[additiveaggregation_criterion.name]' ng-blur = 'blurAdditiveAggregationOptionCriterion(additiveaggregation_option, additiveaggregation_criterion)'>
+                        </div>
+                      </td>
+                      <td ng-if = 'additiveaggregation_option.id != deleteIdOption'>
+                        <!-- Duplicate Option Button -->
+                        <button type = 'button' class = 'btn btn-info' ng-click = 'copyAdditiveAggregationOption(additiveaggregation_option)' title = 'Duplicate Option'>
+                          <span class = 'glyphicon glyphicon-duplicate'></span>
+                        </button>
+                        <!-- Delete Option Button -->
+                        <button type = 'button' class = 'btn btn-danger btn-option-remove' ng-click = 'deleteInput(additiveaggregation_option, "Options")' title = 'Delete Option'>
+                          <span class = 'glyphicon glyphicon-minus'></span>
+                        </button>
+                      </td>
+                      <td ng-if = 'additiveaggregation_option.id == deleteIdOption'>
+                        <button type = 'button' class = 'btn btn-success' ng-click = 'confirmDeleteInput(additiveaggregation_option, "Options")' title = 'Confirm Delete Option'>
+                          <span class = 'glyphicon glyphicon-ok'></span>
+                        </button>
+                        <button type = 'button' class = 'btn btn-danger' ng-click = 'cancelDeleteInput("Options")' title = 'Cancel Delete Option'>
+                          <span class = 'glyphicon glyphicon-remove'></span>
+                        </button>
+                      </td>
+                    </tr>
+                    <!-- Form to add option -->
+                    <tr class = 'active'>
+                      <td>
+                        <div id = 'new-additiveaggregation-option-name' class = 'form-group'>
+                          <input class = 'form-control' ng-model = 'new_additiveaggregation_option.name'>
+                        </div>
+                      </td>
+                      <td ng-repeat = 'criterion in currentModule.input.criteria'>
+                        <div id = 'new-additiveaggregation-option-criterion-{{criterion.id}}' class = 'form-group'>
+                          <input class = 'form-control' type = 'number' ng-model = 'new_additiveaggregation_option[criterion.name]'>
+                        </div>
+                      </td>
+                      <td>
+                        <button type = 'button' class = 'btn btn-success btn-option-add' ng-click = 'addAdditiveAggregationOption()' title = 'Add Option'>
+                          <span class = 'glyphicon glyphicon-plus'></span>
+                        </button>
+                      </td>
+                    </tr>
                     </tbody>
                   </table>
 
@@ -2139,6 +2621,22 @@
                       </table>
                     </div>
 
+                    <!-- AdditiveAggregation Module -->
+                    <div ng-if = 'currentModule.parent_type == "AdditiveAggregation"' ng-cloak>
+                      <table class = 'table table-bordered table-hover'>
+                        <thead>
+                        <th class = 'text-center'>Option Name</th>
+                        <th class = 'text-center'>Aggregated Score</th>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat = 'option in currentModule.output'>
+                          <td>{{option.name}}</td>
+                          <td>{{option.score}}</td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
                     <!-- Sort Module -->
                     <div ng-if = 'currentModule.parent_type == "Sort"' ng-cloak>
                       <div class = 'row text-center'>
@@ -2528,6 +3026,26 @@
               <span class = 'module-circle-span' style = 'margin-top: 13.5%; margin-left: -37%'>Actions</span>
 
               <button id = 'orderby-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event, "output")' style = 'margin-top: 3%; margin-left: 38%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: 6.5%'>Output</span>
+            </div>
+          </template>
+
+          <!-- AdditiveAggregation Template -->
+          <template id = 'additiveaggregation-temp'>
+            <div id = 'additiveaggregation' class = 'module-template module-additiveaggregation draggable'>
+              <a id = 'mod-name' href class = 'module-circle-anchor' data-toggle = 'modal' data-target = '#additiveaggregation-modal' ng-click = 'selectCurrentModule($event)'></a>
+
+              <a href ng-click = 'selectDeleteModule($event)' style = 'display: block; margin-top: -14.5%; margin-left: 87%'>
+                <span class = 'glyphicon glyphicon-remove'></span>
+              </a>
+
+              <button id = 'additiveaggregation-criteria' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "criteria")' style = 'margin-top: 3%; margin-left: -49%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: -37%'>Criteria</span>
+
+              <button id = 'additiveaggregation-options' type = 'button' class = 'module-circle module-circle-input' ng-click = 'drawConnection($event, "options")' style = 'margin-top: 15%; margin-left: -49%'></button>
+              <span class = 'module-circle-span' style = 'margin-top: 13.5%; margin-left: -37%'>Options</span>
+
+              <button id = 'additiveaggregation-output' type = 'button' class = 'module-circle module-circle-output' ng-click = 'drawConnection($event, "output")' style = 'margin-top: 3%; margin-left: 38%'></button>
               <span class = 'module-circle-span' style = 'margin-top: 1.5%; margin-left: 6.5%'>Output</span>
             </div>
           </template>
