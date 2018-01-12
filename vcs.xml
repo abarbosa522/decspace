@@ -18,8 +18,12 @@
           <option name="url" value="https://github.com/abarbosa522/decspace.git" />
           <option name="userName" value="" />
         </UrlAndUserName>
+        <UrlAndUserName>
+          <option name="url" value="https://isg.repositoryhosting.com/git/isg/decspace.git" />
+          <option name="userName" value="" />
+        </UrlAndUserName>
       </list>
     </option>
-    <option name="cloneParentDir" value="C:\Users\Francisco\Desktop\MERGE" />
+    <option name="cloneParentDir" value="C:\Users\Francisco\Desktop\DECSPACE" />
   </component>
 </application>
